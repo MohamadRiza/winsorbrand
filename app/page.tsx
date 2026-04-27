@@ -1,4 +1,5 @@
 import CollectionsSection from "@/components/CollectionsSection/CollectionsSection";
+import WatchbyGender from "@/components/WatchbyGender/WatchbyGender";
 
 // app/page.tsx
 export default function Home() {
@@ -128,40 +129,8 @@ export default function Home() {
       {/* Collections Section */}
       <CollectionsSection />
 
-      {/* Heritage Section */}
-      <section className="py-32 bg-[#1a1209] relative overflow-hidden">
-        <div className="absolute inset-0 opacity-5">
-          <div
-            className="absolute inset-0 bg-cover bg-center"
-            style={{
-              backgroundImage: "url('https://www.transparenttextures.com/patterns/stardust.png')",
-            }}
-          />
-        </div>
-        
-        <div className="max-w-4xl mx-auto px-4 text-center relative z-10">
-          <p
-            className="text-[#8B6914] tracking-[0.35em] text-[10px] mb-6 uppercase"
-            style={{ fontFamily: "'Jost', sans-serif", fontWeight: 500 }}
-          >
-            EST. 1987
-          </p>
-          <h2
-            className="text-white text-3xl md:text-5xl mb-8 leading-tight"
-            style={{
-              fontFamily:    "'Cormorant Garamond', serif",
-              fontWeight:    300,
-              letterSpacing: '0.05em',
-              lineHeight:    1.3,
-            }}
-          >
-            "Crafting exceptional timepieces for those who appreciate the finer moments in life"
-          </h2>
-          <div
-            className="w-24 h-px bg-[#8B6914] mx-auto"
-          />
-        </div>
-      </section>
+      {/* Gender Section */}
+      <WatchbyGender />
 
       {/* Shop CTA Section */}
       <section id="shop" className="min-h-screen bg-[#faf7f0] flex items-center">
