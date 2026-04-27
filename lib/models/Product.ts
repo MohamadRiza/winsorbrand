@@ -58,6 +58,13 @@ const ProductSchema = new Schema<IProduct & Document>(
       },
     },
 
+    collectionSections: {
+  type:    [String],
+  enum:    ['sports', 'new', 'luxury', 'limited', 'bestsellers'],
+  default: [],
+},
+
+
     thumbnail: { type: CloudinaryAssetSchema, required: true },
     images: {
       type:     [CloudinaryAssetSchema],
@@ -79,6 +86,7 @@ const ProductSchema = new Schema<IProduct & Document>(
 
 ProductSchema.index({ showOnHome: 1, isActive: 1 });
 ProductSchema.index({ brand: 1 });
+ProductSchema.index({ collectionSections: 1, isActive: 1, showOnHome: 1 });
 
 // Clear cached model to avoid stale schema errors in development
 delete (mongoose.models as any).Product;

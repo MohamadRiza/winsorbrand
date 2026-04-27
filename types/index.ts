@@ -15,6 +15,14 @@ export const WARRANTY_LABELS: Record<WarrantyOption, string> = {
   '2_years':   '2 Years',
 };
 
+// ✅ ADD THIS (matches your schema exactly)
+export type CollectionSection =
+  | 'sports'
+  | 'new'
+  | 'luxury'
+  | 'limited'
+  | 'bestsellers';
+
 export interface CloudinaryAsset {
   url:      string;
   publicId: string;
@@ -32,24 +40,27 @@ export interface IProduct {
   _id?:        string;
   title:       string;
   brand:       'Winsor';           // always fixed
-  modelNo:     string;             // e.g. "WS:2019"
-  watchShape:  string;             // e.g. "Round", "Square", "Oval"
-  price:       number;             // LKR
-  description: string;             // max 500 words
+  modelNo:     string;
+  watchShape:  string;
+  price:       number;
+  description: string;
   warranty:    WarrantyOption;
-  specifications: Record<string, string>; // dynamic key-value
+  specifications: Record<string, string>;
   colorVariants:  ColorVariant[];
+
+  // ✅ ADD THIS (THIS FIXES YOUR ERROR)
+  collectionSections: CollectionSection[];
 
   // Media
   thumbnail: CloudinaryAsset;
-  images:    CloudinaryAsset[];    // max 10
+  images:    CloudinaryAsset[];
   video?:    CloudinaryAsset;
 
   // Admin controls
-  isActive:       boolean;         // overall publish toggle
-  showOnHome:     boolean;         // show in homepage section
-  stickerEnabled: boolean;         // show badge sticker
-  stickerText:    string;          // e.g. "New Year Offer"
+  isActive:       boolean;
+  showOnHome:     boolean;
+  stickerEnabled: boolean;
+  stickerText:    string;
 
   createdAt?: Date;
   updatedAt?: Date;

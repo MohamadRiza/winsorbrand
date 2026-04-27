@@ -1,3 +1,5 @@
+import CollectionsSection from "@/components/CollectionsSection/CollectionsSection";
+
 // app/page.tsx
 export default function Home() {
   return (
@@ -124,62 +126,7 @@ export default function Home() {
       </section>
 
       {/* Collections Section */}
-      <section id="collections" className="min-h-screen bg-[#faf7f0] py-24 px-4">
-        <div className="max-w-7xl mx-auto">
-          {/* Section Header */}
-          <div className="text-center mb-20">
-            <p
-              className="text-[#8B6914] tracking-[0.35em] text-[10px] mb-4 uppercase"
-              style={{ fontFamily: "'Jost', sans-serif", fontWeight: 500 }}
-            >
-              OUR COLLECTIONS
-            </p>
-            <h2
-              className="text-[#1a1209] text-4xl md:text-5xl"
-              style={{
-                fontFamily:    "'Cormorant Garamond', serif",
-                fontWeight:    400,
-                letterSpacing: '0.08em',
-              }}
-            >
-              TIMELESS ELEGANCE
-            </h2>
-            <div
-              className="w-16 h-px bg-[#8B6914] mx-auto mt-6"
-            />
-          </div>
-
-          {/* Collection Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {['Classic', 'Sport', 'Heritage'].map((collection, index) => (
-              <div
-                key={collection}
-                className="group cursor-pointer"
-              >
-                <div className="relative aspect-[3/4] overflow-hidden bg-[#f0ebe0] mb-6">
-                  <div
-                    className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
-                    style={{
-                      backgroundImage: `url(https://images.unsplash.com/photo-${
-                        index === 0 ? '1524592081133-5e2b21c15676' :
-                        index === 1 ? '1619161113016-85f94f90a3dc' :
-                        '1612686549202-fe9504cbb644'
-                      }?q=80&w=1000&auto=format&fit=crop)`,
-                    }}
-                  />
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-500" />
-                </div>
-                <h3
-                  className="text-[#1a1209] text-xl tracking-[0.2em] text-center uppercase"
-                  style={{ fontFamily: "'Jost', sans-serif", fontWeight: 500 }}
-                >
-                  {collection}
-                </h3>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <CollectionsSection />
 
       {/* Heritage Section */}
       <section className="py-32 bg-[#1a1209] relative overflow-hidden">
