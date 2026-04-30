@@ -1,4 +1,5 @@
 import CollectionsSection from "@/components/CollectionsSection/CollectionsSection";
+import GiftSection from "@/components/GiftSection/GiftSection";
 import WatchbyGender from "@/components/WatchbyGender/WatchbyGender";
 
 // app/page.tsx
@@ -133,62 +134,7 @@ export default function Home() {
       <WatchbyGender />
 
       {/* Shop CTA Section */}
-      <section id="shop" className="min-h-screen bg-[#faf7f0] flex items-center">
-        <div className="max-w-7xl mx-auto px-4 py-24 w-full">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
-            <div>
-              <p
-                className="text-[#8B6914] tracking-[0.35em] text-[10px] mb-4 uppercase"
-                style={{ fontFamily: "'Jost', sans-serif", fontWeight: 500 }}
-              >
-                NEW ARRIVALS
-              </p>
-              <h2
-                className="text-[#1a1209] text-4xl md:text-5xl mb-6"
-                style={{
-                  fontFamily:    "'Cormorant Garamond', serif",
-                  fontWeight:    400,
-                  letterSpacing: '0.05em',
-                }}
-              >
-                DISCOVER EXCELLENCE
-              </h2>
-              <p
-                className="text-[#1a1209]/60 tracking-wide text-sm leading-relaxed mb-10 max-w-md"
-                style={{ fontFamily: "'Jost', sans-serif" }}
-              >
-                Explore our latest collection of luxury timepieces, where Swiss precision meets 
-                contemporary design. Each watch is a testament to centuries of horological expertise.
-              </p>
-              
-              <a
-                href="/collections"
-                className="group inline-block relative"
-              >
-                <span
-                  className="text-[#1a1209] tracking-[0.25em] text-xs uppercase transition-all duration-300 group-hover:text-[#8B6914]"
-                  style={{ fontFamily: "'Jost', sans-serif", fontWeight: 500 }}
-                >
-                  EXPLORE COLLECTIONS
-                </span>
-                <span
-                  className="absolute -bottom-1 left-0 w-0 h-px bg-[#8B6914] transition-all duration-500 group-hover:w-full"
-                />
-              </a>
-            </div>
-            
-            <div className="relative">
-              <div className="aspect-square bg-[#f0ebe0] relative overflow-hidden">
-                <img
-                  src="https://images.unsplash.com/photo-1523170335258-f5ed11844a49?q=80&w=1000&auto=format&fit=crop"
-                  alt="Winsor Flagship Watch"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      <GiftSection/>
     </main>
   );
 }
