@@ -423,7 +423,34 @@ export default function GiftSection() {
       `}</style>
 
       {/* Top tabs (categories from admin) */}
-      ////
+      <div style={{
+            padding: '32px 20px 24px',
+            textAlign: 'center',
+            background: '#ffffff',
+          }}>
+            <h2 style={{
+              fontFamily:"'Jost',sans-serif",
+              fontSize: 'clamp(20px, 4vw, 28px)',
+              fontWeight:600,
+              color:'#1a1a1a',
+              letterSpacing:'0.1em',
+              margin:'0 0 8px 0',
+              textTransform:'uppercase',
+              lineHeight: 1.3,
+            }}>
+              Celebrate moments with elegance
+            </h2>
+            <p style={{
+              fontFamily:"'Jost',sans-serif",
+              fontSize:'13px',
+              color:'#666666',
+              letterSpacing:'0.05em',
+              margin:0,
+              lineHeight: 1.5,
+            }}>
+              A gift that lasts forever
+            </p>
+          </div>
       <div
         style={{
           borderBottom: '1px solid #eee',
