@@ -104,7 +104,7 @@ function HeroStage({
       style={{
         position: 'relative',
         width: '100%',
-        minHeight: 'min(78vh, 720px)',
+        minHeight: 'min(98vh, 920px)',
         overflow: 'hidden',
         backgroundImage: `url(${background})`,
         backgroundSize: 'cover',
@@ -423,6 +423,7 @@ export default function GiftSection() {
       `}</style>
 
       {/* Top tabs (categories from admin) */}
+      ////
       <div
         style={{
           borderBottom: '1px solid #eee',
@@ -554,7 +555,7 @@ export default function GiftSection() {
             transition: 'all 0.3s ease',
           }}
         >
-          View All Gift Collections →
+          View All Gift Collections → {activeCat?.emoji}
         </Link>
       </div>
     </section>
