@@ -1,6 +1,8 @@
 import CollectionsSection from "@/components/CollectionsSection/CollectionsSection";
 import GiftSection from "@/components/GiftSection/GiftSection";
+import Ourdetails from "@/components/OurDetails/Ourdetails";
 import WatchbyGender from "@/components/WatchbyGender/WatchbyGender";
+import WatchShowcase from "@/components/WatchShowcase/WatchShowcase";
 
 // app/page.tsx
 export default function Home() {
@@ -137,6 +139,9 @@ export default function Home() {
       <GiftSection/>
 
       {/* Additional sections can be added here */}
+      <WatchShowcase />
+
+      <Ourdetails />
       
     </main>
   );
