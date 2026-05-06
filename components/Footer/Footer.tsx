@@ -95,31 +95,11 @@ const FOOTER_LINKS = {
 // SOCIAL MEDIA LINKS
 // ─────────────────────────────────────────────────────────────
 const SOCIAL_LINKS = [
-  { 
-    name: 'Instagram', 
-    href: 'https://instagram.com/winsor', 
-    icon: <InstagramIcon /> 
-  },
-  { 
-    name: 'Facebook', 
-    href: 'https://facebook.com/winsor', 
-    icon: <FacebookIcon /> 
-  },
-  { 
-    name: 'TikTok', 
-    href: 'https://tiktok.com/@winsor', 
-    icon: <TikTokIcon /> 
-  },
-  { 
-    name: 'YouTube', 
-    href: 'https://youtube.com/@winsor', 
-    icon: <YouTubeIcon /> 
-  },
-  { 
-    name: 'LinkedIn', 
-    href: 'https://linkedin.com/company/winsor', 
-    icon: <LinkedInIcon /> 
-  },
+  { name: 'Instagram', href: 'https://instagram.com/winsor', icon: <InstagramIcon /> },
+  { name: 'Facebook', href: 'https://facebook.com/winsor', icon: <FacebookIcon /> },
+  { name: 'TikTok', href: 'https://tiktok.com/@winsor', icon: <TikTokIcon /> },
+  { name: 'YouTube', href: 'https://youtube.com/@winsor', icon: <YouTubeIcon /> },
+  { name: 'LinkedIn', href: 'https://linkedin.com/company/winsor', icon: <LinkedInIcon /> },
 ];
 
 // ─────────────────────────────────────────────────────────────
@@ -156,7 +136,7 @@ function CurrencySelectorCompact() {
         <span>{selected.flag} {selected.code}</span>
         <ChevronDn />
       </button>
-      
+
       {isOpen && (
         <div style={{
           position: 'absolute',
@@ -216,7 +196,6 @@ export default function Footer() {
   const handleSubscribe = (e: React.FormEvent) => {
     e.preventDefault();
     if (email) {
-      // TODO: Connect to your backend newsletter API
       setSubscribed(true);
       setEmail('');
       setTimeout(() => setSubscribed(false), 3000);
@@ -227,104 +206,185 @@ export default function Footer() {
     <>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600;700&family=Jost:wght@300;400;500&display=swap');
-        .ft-a{text-decoration:none;transition:color 0.2s ease;color:rgba(26,18,9,0.65);}
-        .ft-a:hover{color:#8B6914!important;}
-        .ft-social{transition:all 0.3s ease;transform:translateY(0);}
-        .ft-social:hover{transform:translateY(-3px);opacity:0.85;}
-        .ft-input:focus{border-color:#8B6914!important;outline:none;}
-        @media(max-width:1024px){
-          .ft-desktop-only{display:none!important;}
-          .ft-mobile-only{display:flex!important;}
-          .ft-grid{grid-template-columns:1fr 1fr!important;gap:32px!important;}
-          .ft-brand-col{grid-column:span 2!important;}
-          .ft-social-row{justify-content:center!important;}
+
+        .ft-a {
+          text-decoration: none;
+          transition: color 0.2s ease;
+          color: rgba(26,18,9,0.65);
         }
-        @media(min-width:1025px){
-          .ft-mobile-only{display:none!important;}
-          .ft-desktop-only{display:flex!important;}
-          .ft-grid{grid-template-columns:1.2fr 1fr 1fr 1.2fr!important;}
+        .ft-a:hover { color: #8B6914 !important; }
+
+        .ft-social {
+          transition: all 0.3s ease;
+          transform: translateY(0);
         }
-        @media(max-width:640px){
-          .ft-grid{grid-template-columns:1fr!important;}
-          .ft-brand-col{grid-column:span 1!important;}
-          .ft-bottom-bar{flex-direction:column!important;align-items:center!important;text-align:center!important;gap:12px!important;}
-          .ft-legal-links{justify-content:center!important;}
-          .ft-social-row{gap:12px!important;}
+        .ft-social:hover {
+          transform: translateY(-3px);
+          opacity: 0.85;
+        }
+
+        .ft-input:focus {
+          border-color: #8B6914 !important;
+          outline: none;
+        }
+
+        /* ── DESKTOP (≥ 1025px): 5-column grid ── */
+        @media (min-width: 1025px) {
+          .ft-main-grid {
+            display: grid !important;
+            grid-template-columns: 1.6fr 1fr 1fr 1fr 1.3fr !important;
+            gap: 40px !important;
+            align-items: start !important;
+          }
+          .ft-mobile-only  { display: none !important; }
+          .ft-desktop-only { display: flex !important; }
+          .ft-bottom-bar {
+            flex-direction: row !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+          }
+          .ft-bottom-right {
+            flex-direction: row !important;
+            align-items: center !important;
+            justify-content: flex-end !important;
+            text-align: right !important;
+          }
+        }
+
+        /* ── TABLET (641px – 1024px): 3-column grid ── */
+        @media (min-width: 641px) and (max-width: 1024px) {
+          .ft-main-grid {
+            display: grid !important;
+            grid-template-columns: 1fr 1fr 1fr !important;
+            gap: 36px !important;
+            align-items: start !important;
+          }
+          .ft-brand-col    { grid-column: span 3 !important; }
+          .ft-newsletter-col { grid-column: span 3 !important; }
+          .ft-desktop-only { display: none !important; }
+          .ft-mobile-only  { display: flex !important; }
+          .ft-bottom-bar {
+            flex-direction: row !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+            flex-wrap: wrap !important;
+          }
+          .ft-bottom-right {
+            flex-direction: row !important;
+            align-items: center !important;
+            gap: 8px !important;
+          }
+        }
+
+        /* ── MOBILE (≤ 640px): single column ── */
+        @media (max-width: 640px) {
+          .ft-main-grid {
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 32px !important;
+          }
+          .ft-desktop-only { display: none !important; }
+          .ft-mobile-only  { display: flex !important; }
+
+          .ft-bottom-bar {
+            flex-direction: column !important;
+            align-items: center !important;
+            gap: 14px !important;
+            text-align: center !important;
+          }
+          .ft-legal-links  { justify-content: center !important; }
+
+          /* Bottom-right stack: currency → copyright → nexasoft */
+          .ft-bottom-right {
+            flex-direction: column !important;
+            align-items: center !important;
+            gap: 10px !important;
+            width: 100% !important;
+          }
+          .ft-copyright-nexasoft {
+            flex-direction: column !important;
+            align-items: center !important;
+            gap: 6px !important;
+          }
+          .ft-dot-separator { display: none !important; }
+
+          .ft-social-row { gap: 10px !important; flex-wrap: wrap !important; }
         }
       `}</style>
 
-      <footer style={{ 
-        background: '#faf7f0', 
+      <footer style={{
+        background: '#faf7f0',
         borderTop: '1px solid rgba(26,18,9,0.07)',
         fontFamily: "'Jost',sans-serif",
         color: '#1a1209'
       }}>
+
         {/* ───────── MAIN FOOTER CONTENT ───────── */}
-        <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '56px 40px 32px' }}>
-          <div className="ft-grid" style={{ display: 'grid', gap: '48px' }}>
-            
-            {/* BRAND, CONTACT & SOCIAL */}
-            <div className="ft-brand-col" style={{ gridColumn: 'span 1' }}>
-              <Link href="/" style={{ display: 'inline-block', marginBottom: '20px' }}>
-                <Image 
-                  src="/yellow.webp" 
-                  alt="Winsor Brand" 
-                  width={140} 
-                  height={48} 
+        <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '64px 48px 40px' }}>
+          <div className="ft-main-grid">
+
+            {/* ── COL 1: BRAND / CONTACT / SOCIAL ── */}
+            <div className="ft-brand-col">
+              <Link href="/" style={{ display: 'inline-block', marginBottom: '24px' }}>
+                <Image
+                  src="/yellow.webp"
+                  alt="Winsor Brand"
+                  width={140}
+                  height={48}
                   style={{ objectFit: 'contain', height: 'auto' }}
                   priority
                 />
               </Link>
-              
-              <p style={{ 
-                fontFamily: "'Cormorant Garamond',serif", 
-                fontSize: '14px', 
-                color: '#1a1209', 
-                lineHeight: 1.7, 
-                marginBottom: '24px',
+
+              <p style={{
+                fontFamily: "'Cormorant Garamond',serif",
+                fontSize: '14px',
+                color: '#1a1209',
+                lineHeight: 1.7,
+                marginBottom: '28px',
                 maxWidth: '280px'
               }}>
                 A trusted luxury timepiece curator since 2022.
               </p>
-              
+
               {/* Contact Details */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '24px' }}>
-                <a href="tel:+94771234567" className="ft-a" style={{ fontSize: '12px', color: 'rgba(26,18,9,0.65)' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '28px' }}>
+                <a href="tel:+94771234567" className="ft-a" style={{ fontSize: '13px' }}>
                   +94 77 123 4567
                 </a>
-                <a href="tel:+94712345678" className="ft-a" style={{ fontSize: '12px', color: 'rgba(26,18,9,0.65)' }}>
+                <a href="tel:+94712345678" className="ft-a" style={{ fontSize: '13px' }}>
                   +94 71 234 5678
                 </a>
-                <a href="mailto:info@happytime.lk" className="ft-a" style={{ fontSize: '12px', color: 'rgba(26,18,9,0.65)' }}>
+                <a href="mailto:info@happytime.lk" className="ft-a" style={{ fontSize: '13px' }}>
                   info@happytime.lk
                 </a>
-                <address className="ft-a" style={{ 
-                  fontSize: '12px', 
-                  color: 'rgba(26,18,9,0.65)', 
-                  fontStyle: 'normal', 
-                  lineHeight: 1.6 
+                <address className="ft-a" style={{
+                  fontSize: '13px',
+                  fontStyle: 'normal',
+                  lineHeight: 1.6
                 }}>
                   49A Keyzer Street, Pettah,<br />
                   Colombo, Sri Lanka
                 </address>
               </div>
 
-              {/* Social Icons - Perfect Grid */}
-              <div className="ft-social-row" style={{ display: 'flex', gap: '16px' }}>
+              {/* Social Icons */}
+              <div className="ft-social-row" style={{ display: 'flex', gap: '12px', flexWrap: 'nowrap' }}>
                 {SOCIAL_LINKS.map((social) => (
-                  <a 
-                    key={social.name} 
-                    href={social.href} 
-                    target="_blank" 
+                  <a
+                    key={social.name}
+                    href={social.href}
+                    target="_blank"
                     rel="noopener noreferrer"
                     className="ft-social"
-                    style={{ 
-                      display: 'flex', 
-                      alignItems: 'center', 
-                      justifyContent: 'center', 
-                      width: '40px', 
-                      height: '40px', 
-                      borderRadius: '50%', 
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      width: '40px',
+                      height: '40px',
+                      flexShrink: 0,
+                      borderRadius: '50%',
                       border: '1px solid rgba(139,105,20,0.3)',
                       color: '#8B6914',
                       background: 'transparent',
@@ -348,26 +408,26 @@ export default function Footer() {
               </div>
             </div>
 
-            {/* COLLECTIONS */}
+            {/* ── COL 2: COLLECTIONS ── */}
             <div>
-              <p style={{ 
-                fontFamily: "'Jost',sans-serif", 
-                fontSize: '10px', 
-                letterSpacing: '0.25em', 
-                color: '#8B6914', 
-                fontWeight: 600, 
-                marginBottom: '20px', 
-                textTransform: 'uppercase' 
+              <h3 style={{
+                fontFamily: "'Jost',sans-serif",
+                fontSize: '11px',
+                letterSpacing: '0.2em',
+                color: '#8B6914',
+                fontWeight: 600,
+                margin: '0 0 24px 0',
+                textTransform: 'uppercase'
               }}>
                 Collections
-              </p>
-              <nav style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              </h3>
+              <nav style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 {FOOTER_LINKS.collections.map(link => (
-                  <Link 
-                    key={link.href} 
-                    href={link.href} 
-                    className="ft-a" 
-                    style={{ fontSize: '12px', color: 'rgba(26,18,9,0.65)' }}
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className="ft-a"
+                    style={{ fontSize: '13px', lineHeight: 1.5 }}
                   >
                     {link.label}
                   </Link>
@@ -375,78 +435,79 @@ export default function Footer() {
               </nav>
             </div>
 
-            {/* COMPANY & SUPPORT */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
-              <div>
-                <p style={{ 
-                  fontFamily: "'Jost',sans-serif", 
-                  fontSize: '10px', 
-                  letterSpacing: '0.25em', 
-                  color: '#8B6914', 
-                  fontWeight: 600, 
-                  marginBottom: '20px', 
-                  textTransform: 'uppercase' 
-                }}>
-                  Company
-                </p>
-                <nav style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                  {FOOTER_LINKS.company.map(link => (
-                    <Link 
-                      key={link.href} 
-                      href={link.href} 
-                      className="ft-a" 
-                      style={{ fontSize: '12px', color: 'rgba(26,18,9,0.65)' }}
-                    >
-                      {link.label}
-                    </Link>
-                  ))}
-                </nav>
-              </div>
-              <div>
-                <p style={{ 
-                  fontFamily: "'Jost',sans-serif", 
-                  fontSize: '10px', 
-                  letterSpacing: '0.25em', 
-                  color: '#8B6914', 
-                  fontWeight: 600, 
-                  marginBottom: '20px', 
-                  textTransform: 'uppercase' 
-                }}>
-                  Support
-                </p>
-                <nav style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                  {FOOTER_LINKS.support.map(link => (
-                    <Link 
-                      key={link.href} 
-                      href={link.href} 
-                      className="ft-a" 
-                      style={{ fontSize: '12px', color: 'rgba(26,18,9,0.65)' }}
-                    >
-                      {link.label}
-                    </Link>
-                  ))}
-                </nav>
-              </div>
+            {/* ── COL 3: COMPANY ── */}
+            <div>
+              <h3 style={{
+                fontFamily: "'Jost',sans-serif",
+                fontSize: '11px',
+                letterSpacing: '0.2em',
+                color: '#8B6914',
+                fontWeight: 600,
+                margin: '0 0 24px 0',
+                textTransform: 'uppercase'
+              }}>
+                Company
+              </h3>
+              <nav style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                {FOOTER_LINKS.company.map(link => (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className="ft-a"
+                    style={{ fontSize: '13px', lineHeight: 1.5 }}
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+              </nav>
             </div>
 
-            {/* NEWSLETTER */}
+            {/* ── COL 4: SUPPORT ── */}
             <div>
-              <p style={{ 
-                fontFamily: "'Jost',sans-serif", 
-                fontSize: '10px', 
-                letterSpacing: '0.25em', 
-                color: '#8B6914', 
-                fontWeight: 600, 
-                marginBottom: '20px', 
-                textTransform: 'uppercase' 
+              <h3 style={{
+                fontFamily: "'Jost',sans-serif",
+                fontSize: '11px',
+                letterSpacing: '0.2em',
+                color: '#8B6914',
+                fontWeight: 600,
+                margin: '0 0 24px 0',
+                textTransform: 'uppercase'
+              }}>
+                Support
+              </h3>
+              <nav style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                {FOOTER_LINKS.support.map(link => (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className="ft-a"
+                    style={{ fontSize: '13px', lineHeight: 1.5 }}
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+              </nav>
+            </div>
+
+            {/* ── COL 5: NEWSLETTER ── */}
+            <div className="ft-newsletter-col">
+              <h3 style={{
+                fontFamily: "'Jost',sans-serif",
+                fontSize: '11px',
+                letterSpacing: '0.2em',
+                color: '#8B6914',
+                fontWeight: 600,
+                margin: '0 0 20px 0',
+                textTransform: 'uppercase'
               }}>
                 Stay Connected
-              </p>
-              <p style={{ 
-                fontSize: '12px', 
-                color: 'rgba(26,18,9,0.65)', 
-                marginBottom: '16px', 
-                lineHeight: 1.6 
+              </h3>
+              <p style={{
+                fontSize: '13px',
+                color: 'rgba(26,18,9,0.65)',
+                marginBottom: '20px',
+                lineHeight: 1.6,
+                margin: '0 0 20px 0'
               }}>
                 Subscribe for exclusive releases, private events, and early access to limited editions.
               </p>
@@ -460,21 +521,22 @@ export default function Footer() {
                   className="ft-input"
                   style={{
                     width: '100%',
-                    padding: '11px 14px',
+                    padding: '12px 14px',
                     border: '1px solid rgba(26,18,9,0.15)',
                     borderRadius: '4px',
                     background: '#fff',
                     fontFamily: "'Jost',sans-serif",
-                    fontSize: '12px',
+                    fontSize: '13px',
                     color: '#1a1209',
-                    transition: 'border-color 0.2s ease'
+                    transition: 'border-color 0.2s ease',
+                    boxSizing: 'border-box'
                   }}
                 />
                 <button
                   type="submit"
                   style={{
                     width: '100%',
-                    padding: '11px',
+                    padding: '12px',
                     background: '#8B6914',
                     color: '#fff',
                     border: 'none',
@@ -493,79 +555,104 @@ export default function Footer() {
                   {subscribed ? '✓ Subscribed' : 'Subscribe'}
                 </button>
               </form>
-              
-              {/* Currency Selector - Desktop Only */}
-              <div className="ft-desktop-only" style={{ marginTop: '28px', paddingTop: '20px', borderTop: '1px solid rgba(26,18,9,0.07)' }}>
+
+              {/* Currency Selector – Desktop Only (inside newsletter col) */}
+              <div
+                className="ft-desktop-only"
+                style={{ marginTop: '28px', paddingTop: '20px', borderTop: '1px solid rgba(26,18,9,0.07)' }}
+              >
                 <CurrencySelectorCompact />
               </div>
             </div>
+
           </div>
         </div>
 
         {/* ───────── BOTTOM BAR ───────── */}
-        <div style={{ 
-          borderTop: '1px solid rgba(26,18,9,0.07)', 
+        <div style={{
+          borderTop: '1px solid rgba(26,18,9,0.07)',
           background: 'rgba(26,18,9,0.02)',
-          padding: '18px 40px'
+          padding: '20px 48px'
         }}>
-          <div className="ft-bottom-bar" style={{ 
-            maxWidth: '1400px', 
-            margin: '0 auto', 
-            display: 'flex', 
-            alignItems: 'center', 
-            justifyContent: 'space-between', 
-            flexWrap: 'wrap', 
-            gap: '16px' 
-          }}>
-            
+          <div
+            className="ft-bottom-bar"
+            style={{
+              maxWidth: '1400px',
+              margin: '0 auto',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '16px'
+            }}
+          >
             {/* Legal Links */}
-            <div className="ft-legal-links" style={{ display: 'flex', gap: '24px', flexWrap: 'wrap' }}>
+            <div
+              className="ft-legal-links"
+              style={{ display: 'flex', gap: '24px', flexWrap: 'wrap', alignItems: 'center' }}
+            >
               {FOOTER_LINKS.legal.map(link => (
-                <Link 
-                  key={link.href} 
-                  href={link.href} 
-                  className="ft-a" 
-                  style={{ fontSize: '10px', color: 'rgba(26,18,9,0.45)', letterSpacing: '0.05em' }}
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className="ft-a"
+                  style={{ fontSize: '11px', color: 'rgba(26,18,9,0.5)', letterSpacing: '0.02em' }}
                 >
                   {link.label}
                 </Link>
               ))}
             </div>
 
-            {/* Currency - Mobile Only */}
-            <div className="ft-mobile-only">
-              <CurrencySelectorCompact />
-            </div>
+            {/* Right side: currency (mobile) + copyright + nexasoft */}
+            <div
+              className="ft-bottom-right"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                marginLeft: 'auto',
+                flexShrink: 0
+              }}
+            >
+              {/* Currency – Mobile / Tablet Only */}
+              <div className="ft-mobile-only" style={{ alignItems: 'center' }}>
+                <CurrencySelectorCompact />
+              </div>
 
-            {/* Copyright + Nexasoft Credit */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
-              <p style={{ 
-                fontSize: '11px', 
-                color: 'rgba(26,18,9,0.55)', 
-                letterSpacing: '0.03em',
-                margin: 0
-              }}>
-                © 2026 Winsor Brand. All Rights Reserved.
-              </p>
-              <span style={{ fontSize: '10px', color: 'rgba(26,18,9,0.25)' }}>•</span>
-              <a 
-                href="https://nexasoft.site" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="ft-a"
-                style={{ 
-                  fontSize: '11px', 
-                  color: '#8B6914', 
-                  letterSpacing: '0.03em', 
-                  fontWeight: 500,
-                  textDecoration: 'none'
-                }}
+              {/* Copyright + Nexasoft – always together */}
+              <div
+                className="ft-copyright-nexasoft"
+                style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'nowrap' }}
               >
-                Developed with precision by Nexasoft
-              </a>
+                <p style={{
+                  fontSize: '11px',
+                  color: 'rgba(26,18,9,0.55)',
+                  letterSpacing: '0.02em',
+                  margin: 0,
+                  whiteSpace: 'nowrap'
+                }}>
+                  © 2026 Winsor Brand. All Rights Reserved.
+                </p>
+                <span className="ft-dot-separator" style={{ fontSize: '9px', color: 'rgba(26,18,9,0.3)' }}>•</span>
+                <a
+                  href="https://nexasoft.site"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="ft-a"
+                  style={{
+                    fontSize: '11px',
+                    color: '#8B6914',
+                    letterSpacing: '0.02em',
+                    fontWeight: 500,
+                    textDecoration: 'none',
+                    whiteSpace: 'nowrap'
+                  }}
+                >
+                  Developed with precision by Nexasoft
+                </a>
+              </div>
             </div>
           </div>
         </div>
+
       </footer>
     </>
   );

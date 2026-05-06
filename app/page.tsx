@@ -135,6 +135,9 @@ export default function Home() {
 
       {/* Shop CTA Section */}
       <GiftSection/>
+
+      {/* Additional sections can be added here */}
+      
     </main>
   );
 }
