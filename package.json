@@ -9,16 +9,26 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@tanstack/react-router": "^1.169.2",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/jsonwebtoken": "^9.0.10",
+    "bcryptjs": "^3.0.3",
     "cloudinary": "^2.9.0",
+    "dotenv": "^17.4.2",
+    "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.5.0",
     "multer": "^2.1.1",
     "multer-storage-cloudinary": "^2.2.1",
     "next": "16.2.4",
+    "rate-limiter-flexible": "^11.1.0",
     "react": "19.2.4",
-    "react-dom": "19.2.4"
+    "react-dom": "19.2.4",
+    "react-hot-toast": "^2.6.0"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@tanstack/router-devtools": "^1.166.13",
+    "@tanstack/router-plugin": "^1.167.35",
     "@types/multer": "^2.1.0",
     "@types/node": "^20.19.39",
     "@types/react": "^19",
