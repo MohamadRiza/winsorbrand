@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@marsidev/react-turnstile": "^1.5.2",
     "@tanstack/react-router": "^1.169.2",
     "@types/bcryptjs": "^2.4.6",
     "@types/jsonwebtoken": "^9.0.10",

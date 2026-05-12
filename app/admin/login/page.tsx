@@ -1,105 +1,170 @@
 'use client';
 
-import { useState, FormEvent } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, FormEvent, useEffect, useRef } from 'react';
+import Image from 'next/image';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Toaster, toast } from 'react-hot-toast';
+import { Turnstile, type TurnstileInstance } from '@marsidev/react-turnstile';
 
 export default function AdminLogin() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const turnstileRef = useRef<TurnstileInstance | null>(null);
+
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get('redirect') || '/admin/dashboard';
+
+  useEffect(() => {
+    // keep your existing session check logic here if any
+  }, []);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    if (!turnstileToken) {
+      toast.error('Please complete the security check');
+      return;
+    }
     setLoading(true);
-
     try {
       const res = await fetch('/api/admin/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: username.trim(), password }),
-        credentials: 'include', // Important for cookies
+        body: JSON.stringify({ username, password, turnstileToken }),
       });
-
       const data = await res.json();
-
       if (!res.ok) {
-        throw new Error(data.error || 'Login failed');
+        toast.error(data?.message || 'Invalid credentials');
+        turnstileRef.current?.reset();
+        setTurnstileToken(null);
+        return;
       }
-
-      toast.success('Welcome back!');
-      
-      // Redirect based on role
-      if (data.data?.role === 'admin') {
-        router.push('/admin/dashboard');
-      } else {
-        router.push('/admin/staff');
-      }
-      
-      router.refresh();
-    } catch (error: any) {
-      toast.error(error.message || 'Invalid credentials');
+      toast.success('Welcome back');
+      router.push(redirectTo);
+    } catch {
+      toast.error('Something went wrong. Please try again.');
+      turnstileRef.current?.reset();
+      setTurnstileToken(null);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <>
-      <Toaster 
+    <div className="min-h-screen w-full flex bg-[#f7f4ee]">
+      <Toaster
         position="top-center"
         toastOptions={{
           style: {
             background: '#1a1209',
-            color: '#fff',
-            border: '1px solid #8B6914',
+            color: '#f3e3b8',
+            border: '1px solid rgba(201,161,74,0.3)',
+            fontSize: '13px',
+            letterSpacing: '0.02em',
           },
         }}
       />
-      
-      <div className="min-h-screen flex items-center justify-center bg-[#faf7f0] px-4">
-        <div className="w-full max-w-md">
-          {/* Logo */}
-          <div className="text-center mb-8">
-            <h1 className="font-['Cormorant_Garamond'] text-3xl font-semibold text-[#1a1209] tracking-wide">
-              WINSOR
-            </h1>
-            <p className="font-['Jost'] text-sm text-[#8B6914] tracking-[0.2em] mt-2">
-              ADMIN PORTAL
+
+      {/* LEFT — Brand image panel */}
+      <div className="hidden lg:flex relative w-1/2 overflow-hidden">
+        {/* Background image */}
+        <Image
+          src="/discover-partners.jpg"
+          alt="Winsor luxury timepiece"
+          fill
+          priority
+          className="object-cover"
+        />
+        {/* Dark gradient overlay for readability */}
+        <div className="absolute inset-0 bg-gradient-to-br from-black/80 via-black/55 to-black/85" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(201,161,74,0.18),transparent_55%)]" />
+
+        {/* Content overlay */}
+        <div className="relative z-10 flex flex-col justify-between w-full p-12 xl:p-16 text-white">
+          {/* Top — logo */}
+          <div className="flex items-center gap-3">
+            <Image
+              src="/yellow.webp"
+              alt="Winsor"
+              width={140}
+              height={44}
+              className="h-10 w-auto object-contain"
+              priority
+            />
+          </div>
+
+          {/* Middle — tagline (smaller, refined) */}
+          <div className="max-w-md">
+            <div className="h-px w-12 bg-[#c9a14a] mb-6" />
+            <h2 className="font-serif text-2xl xl:text-3xl leading-snug text-white/95">
+              Crafted for those who value{' '}
+              <span className="italic text-[#d9b878]">timeless</span> excellence.
+            </h2>
+            <p className="mt-5 text-sm text-white/65 leading-relaxed max-w-sm">
+              Manage luxury timepiece collections, monitor business insights, and deliver
+              exceptional experiences to your discerning clientele.
             </p>
           </div>
 
-          {/* Login Card */}
-          <div className="bg-white rounded-lg shadow-lg border border-[#1a1209]/10 p-8">
-            <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Bottom */}
+          <p className="text-[11px] tracking-[0.35em] text-white/50 uppercase">
+            © 2026 Winsor — Private Admin Access
+          </p>
+        </div>
+      </div>
+
+      {/* RIGHT — Login form */}
+      <div className="flex-1 flex items-center justify-center px-6 py-12 lg:px-16">
+        <div className="w-full max-w-md">
+          {/* Logo + Admin Portal */}
+          <div className="flex flex-col items-center mb-10">
+            <Image
+              src="/winsor-logo.png"
+              alt="Winsor"
+              width={180}
+              height={56}
+              priority
+              className="h-14 w-auto object-contain"
+            />
+            <div className="flex items-center gap-3 mt-5">
+              <span className="h-px w-8 bg-[#c9a14a]" />
+              <span className="text-[11px] tracking-[0.4em] uppercase text-[#8B6914] font-medium">
+                Admin Portal
+              </span>
+              <span className="h-px w-8 bg-[#c9a14a]" />
+            </div>
+          </div>
+
+          {/* Card */}
+          <div className="bg-white border border-[#1a1209]/10 rounded-2xl shadow-[0_20px_60px_-20px_rgba(26,18,9,0.25)] p-8 sm:p-10">
+            <div className="mb-7">
+              <h1 className="font-serif text-2xl text-[#1a1209]">Sign in to your account</h1>
+              <p className="text-sm text-[#1a1209]/55 mt-1">Enter your credentials to continue</p>
+            </div>
+
+            <form onSubmit={handleSubmit} className="space-y-5">
               {/* Username */}
               <div>
-                <label className="block font-['Jost'] text-sm font-medium text-[#1a1209] mb-2">
+                <label className="block text-[11px] font-semibold tracking-[0.3em] uppercase text-[#1a1209]/70 mb-2">
                   Username
                 </label>
                 <input
                   type="text"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  className="w-full px-4 py-3 border border-[#1a1209]/20 rounded-md 
-                           font-['Jost'] text-[#1a1209] placeholder-[#1a1209]/40
-                           focus:outline-none focus:ring-2 focus:ring-[#8B6914] focus:border-transparent
-                           transition-all duration-200"
-                  placeholder="Enter username"
                   required
-                  minLength={3}
-                  maxLength={30}
-                  pattern="[a-zA-Z0-9_]+"
                   autoComplete="username"
-                  disabled={loading}
+                  className="w-full px-4 py-3 bg-[#fbf9f4] border border-[#1a1209]/15 rounded-lg text-[#1a1209] placeholder-[#1a1209]/30 focus:outline-none focus:border-[#8B6914] focus:ring-2 focus:ring-[#8B6914]/20 transition"
+                  placeholder="admin"
                 />
               </div>
 
               {/* Password */}
               <div>
-                <label className="block font-['Jost'] text-sm font-medium text-[#1a1209] mb-2">
+                <label className="block text-[11px] font-semibold tracking-[0.3em] uppercase text-[#1a1209]/70 mb-2">
                   Password
                 </label>
                 <div className="relative">
@@ -107,65 +172,69 @@ export default function AdminLogin() {
                     type={showPassword ? 'text' : 'password'}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full px-4 py-3 border border-[#1a1209]/20 rounded-md 
-                             font-['Jost'] text-[#1a1209] placeholder-[#1a1209]/40
-                             focus:outline-none focus:ring-2 focus:ring-[#8B6914] focus:border-transparent
-                             transition-all duration-200 pr-12"
-                    placeholder="Enter password"
                     required
-                    minLength={8}
                     autoComplete="current-password"
-                    disabled={loading}
+                    className="w-full px-4 py-3 pr-16 bg-[#fbf9f4] border border-[#1a1209]/15 rounded-lg text-[#1a1209] placeholder-[#1a1209]/30 focus:outline-none focus:border-[#8B6914] focus:ring-2 focus:ring-[#8B6914]/20 transition"
+                    placeholder="••••••••"
                   />
                   <button
                     type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[#1a1209]/60 
-                             hover:text-[#8B6914] transition-colors text-sm font-['Jost']"
-                    tabIndex={-1}
+                    onClick={() => setShowPassword((s) => !s)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] tracking-[0.2em] uppercase text-[#8B6914] hover:text-[#1a1209] transition"
                   >
                     {showPassword ? 'Hide' : 'Show'}
                   </button>
                 </div>
               </div>
 
+              {/* Turnstile */}
+              <div className="flex justify-center pt-1">
+                <Turnstile
+                  ref={turnstileRef}
+                  siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
+                  onSuccess={(token) => setTurnstileToken(token)}
+                  onError={() => setTurnstileToken(null)}
+                  onExpire={() => setTurnstileToken(null)}
+                  options={{ theme: 'light', size: 'flexible' }}
+                />
+              </div>
+
               {/* Submit */}
               <button
                 type="submit"
-                disabled={loading}
-                className="w-full bg-[#1a1209] text-[#faf7f0] font-['Jost'] font-medium 
-                         py-3 px-4 rounded-md hover:bg-[#8B6914] 
-                         disabled:opacity-50 disabled:cursor-not-allowed
-                         transition-all duration-200 tracking-wide"
+                disabled={Boolean(loading || !turnstileToken)}
+                suppressHydrationWarning
+                className="w-full py-3.5 bg-gradient-to-r from-[#1a1209] to-[#2a1d10] hover:from-[#2a1d10] hover:to-[#3a2815] text-white text-sm font-semibold tracking-[0.3em] uppercase rounded-lg shadow-lg shadow-[#1a1209]/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
               >
                 {loading ? (
-                  <span className="flex items-center justify-center gap-2">
-                    <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"/>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+                  <>
+                    <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
+                      <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" className="opacity-25" />
+                      <path d="M4 12a8 8 0 018-8" stroke="currentColor" strokeWidth="3" className="opacity-75" />
                     </svg>
-                    Signing in...
-                  </span>
+                    Signing in…
+                  </>
                 ) : (
                   'Sign In'
                 )}
               </button>
-            </form>
 
-            {/* Security Notice */}
-            <div className="mt-6 pt-6 border-t border-[#1a1209]/10">
-              <p className="font-['Jost'] text-xs text-[#1a1209]/50 text-center">
-                🔒 Secure connection • Session expires in 15 minutes
-              </p>
-            </div>
+              {/* Security notice */}
+              <div className="pt-4 border-t border-[#1a1209]/10 flex items-center justify-center gap-2 text-[11px] text-[#1a1209]/50">
+                <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <rect x="4" y="11" width="16" height="10" rx="2" />
+                  <path d="M8 11V7a4 4 0 118 0v4" />
+                </svg>
+                Secure connection · 15 min session · Cloudflare protected
+              </div>
+            </form>
           </div>
 
-          {/* Footer */}
-          <p className="text-center mt-8 font-['Jost'] text-xs text-[#1a1209]/40">
-            © {new Date().getFullYear()} Winsor. All rights reserved.
+          <p className="text-center text-xs text-[#1a1209]/45 mt-6">
+            Having trouble? Contact your administrator
           </p>
         </div>
       </div>
-    </>
+    </div>
   );
 }

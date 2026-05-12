@@ -14,7 +14,8 @@ export async function POST(req: NextRequest) {
       body = await req.json();
       console.log('🔐 [LOGIN] Parsed body:', { 
         username: body?.username, 
-        passwordLength: body?.password?.length 
+        passwordLength: body?.password?.length,
+        hasTurnstileToken: !!body?.turnstileToken
       });
     } catch (parseError) {
       console.error('🔐 [LOGIN] Failed to parse JSON:', parseError);
@@ -24,7 +25,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { username, password } = body;
+    const { username, password, turnstileToken } = body;
 
     // Validate input
     if (!username || !password) {
@@ -34,6 +35,46 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
+
+    // 🔐 Verify Cloudflare Turnstile token
+    if (!turnstileToken) {
+      console.warn('🔐 [LOGIN] Missing Turnstile token');
+      return NextResponse.json(
+        { success: false, error: 'Security verification required' },
+        { status: 400 }
+      );
+    }
+
+    console.log('🔐 [LOGIN] Verifying Turnstile token...');
+    const turnstileResponse = await fetch(
+      'https://challenges.cloudflare.com/turnstile/v0/siteverify',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          secret: process.env.TURNSTILE_SECRET_KEY,
+          response: turnstileToken,
+          remoteip: req.headers.get('x-forwarded-for') || req.headers.get('cf-connecting-ip'),
+        }),
+      }
+    );
+
+    const turnstileData = await turnstileResponse.json();
+    console.log('🔐 [LOGIN] Turnstile verification response:', { 
+      success: turnstileData?.success, 
+      'error-codes': turnstileData?.['error-codes'] 
+    });
+
+    if (!turnstileData.success) {
+      console.warn('🔐 [LOGIN] Turnstile verification failed');
+      return NextResponse.json(
+        { success: false, error: 'Security verification failed. Please try again.' },
+        { status: 400 }
+      );
+    }
+    console.log('🔐 [LOGIN] ✅ Turnstile verified');
 
     // Connect to database
     console.log('🔐 [LOGIN] Connecting to DB...');
