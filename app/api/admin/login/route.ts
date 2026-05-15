@@ -3,11 +3,52 @@ import { NextRequest, NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db';
 import Admin from '@/lib/models/Admin';
 import { generateAccessToken, generateRefreshToken } from '@/lib/jwt';
+import { RateLimiterMemory } from 'rate-limiter-flexible';
+
+// 🔐 RATE LIMITER: 5 attempts per 15 minutes per IP
+const loginLimiter = new RateLimiterMemory({
+  points: parseInt(process.env.LOGIN_RATE_LIMIT_POINTS || '5'),
+  duration: parseInt(process.env.LOGIN_RATE_LIMIT_DURATION || '900'), // seconds
+});
 
 export async function POST(req: NextRequest) {
   console.log('🔐 [LOGIN] Request received');
   
   try {
+    // 🔐 RATE LIMITING CHECK - MUST BE FIRST
+    const ip = req.headers.get('x-forwarded-for')?.split(',')[0] || 
+               req.headers.get('x-real-ip') || 
+               req.headers.get('cf-connecting-ip') ||
+               'unknown';
+    
+    console.log(`🔐 [LOGIN] Rate limit check for IP: ${ip}`);
+    
+    try {
+      await loginLimiter.consume(ip);
+      console.log('🔐 [LOGIN] Rate limit OK');
+    } catch (rateLimiterRes: any) {
+      const retrySecs = Math.round(rateLimiterRes.msBeforeNext / 1000) || 1;
+      
+      console.warn(`🔐 [LOGIN] Rate limit exceeded for IP: ${ip}, retry after ${retrySecs}s`);
+      
+      return NextResponse.json(
+        { 
+          success: false, 
+          error: 'Too many login attempts. Please try again later.',
+          retryAfter: retrySecs,
+        },
+        { 
+          status: 429,
+          headers: {
+            'Retry-After': retrySecs.toString(),
+            'X-RateLimit-Limit': loginLimiter.points.toString(),
+            'X-RateLimit-Remaining': '0',
+            'X-RateLimit-Reset': (Date.now() + rateLimiterRes.msBeforeNext).toString(),
+          }
+        }
+      );
+    }
+
     // Parse request body
     let body;
     try {
@@ -56,7 +97,7 @@ export async function POST(req: NextRequest) {
         body: JSON.stringify({
           secret: process.env.TURNSTILE_SECRET_KEY,
           response: turnstileToken,
-          remoteip: req.headers.get('x-forwarded-for') || req.headers.get('cf-connecting-ip'),
+          remoteip: ip,
         }),
       }
     );
@@ -92,6 +133,8 @@ export async function POST(req: NextRequest) {
 
     if (!admin) {
       console.warn('🔐 [LOGIN] Admin not found or inactive');
+      // ⚠️ Still consume a rate limit point for failed attempts
+      await loginLimiter.penalty(ip).catch(() => {});
       return NextResponse.json(
         { success: false, error: 'Invalid credentials' },
         { status: 401 }
@@ -105,6 +148,8 @@ export async function POST(req: NextRequest) {
 
     if (!isMatch) {
       console.warn('🔐 [LOGIN] Password mismatch');
+      // ⚠️ Still consume a rate limit point for failed attempts
+      await loginLimiter.penalty(ip).catch(() => {});
       return NextResponse.json(
         { success: false, error: 'Invalid credentials' },
         { status: 401 }
@@ -160,7 +205,10 @@ export async function POST(req: NextRequest) {
       path: '/',
     });
 
-    console.log('🔐 [LOGIN] ✅ Success - cookies set');
+    // ✅ Reset rate limit on successful login
+    await loginLimiter.delete(ip).catch(() => {});
+    
+    console.log('🔐 [LOGIN] ✅ Success - cookies set, rate limit reset');
     return response;
 
   } catch (error: any) {
