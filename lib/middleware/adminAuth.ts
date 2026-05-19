@@ -8,26 +8,38 @@ export interface AdminSession {
 }
 
 export async function getAdminSession(req: NextRequest): Promise<AdminSession | null> {
-  const accessToken = req.cookies.get('admin_access_token')?.value;
-  
-  if (!accessToken) return null;
-  
-  const payload = verifyAccessToken(accessToken);
-  if (!payload) return null;
-  
-  return {
-    adminId: payload.adminId,
-    username: payload.username,
-    role: payload.role,
-  };
+  try {
+    const accessToken = req.cookies.get('admin_access_token')?.value;
+    
+    if (!accessToken) {
+      console.log('🔐 [AUTH] No access token found');
+      return null;
+    }
+    
+    const payload = verifyAccessToken(accessToken);
+    
+    if (!payload) {
+      console.log('🔐 [AUTH] Invalid or expired token');
+      return null;
+    }
+    
+    console.log('🔐 [AUTH] Valid session for:', payload.username);
+    return {
+      adminId: payload.adminId,
+      username: payload.username,
+      role: payload.role,
+    };
+  } catch (error) {
+    console.error('🔐 [AUTH] Session validation error:', error);
+    return null;
+  }
 }
 
-// ✅ FIXED: Make this function async and await getAdminSession
 export async function requireAdmin(
   req: NextRequest, 
   allowedRoles?: ('admin' | 'staff')[]
 ): Promise<AdminSession | Response> {
-  const session = await getAdminSession(req); // ✅ Added await
+  const session = await getAdminSession(req);
   
   if (!session) {
     return new Response(JSON.stringify({ error: 'Unauthorized' }), {

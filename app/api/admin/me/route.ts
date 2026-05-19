@@ -1,17 +1,22 @@
-// app/api/admin/me/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import { getAdminSession } from '@/lib/middleware/adminAuth';
+import { verifyAccessToken } from '@/lib/jwt';
 
 export async function GET(req: NextRequest) {
-  const session = await getAdminSession(req);
+  const accessToken = req.cookies.get('admin_access_token')?.value;
 
-  if (!session) {
+  if (!accessToken) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  const payload = verifyAccessToken(accessToken);
+  
+  if (!payload) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
   return NextResponse.json({
-    username: session.username,
-    role: session.role,
-    adminId: session.adminId,
+    username: payload.username,
+    role: payload.role,
+    adminId: payload.adminId,
   });
 }
