@@ -1,6 +1,5 @@
 // types/index.ts
 
-// ── Warranty ────────────────────────────────────────────────────────────────
 export type WarrantyOption =
   | 'no_warranty'
   | '3_months'
@@ -16,7 +15,6 @@ export const WARRANTY_LABELS: Record<WarrantyOption, string> = {
   '2_years':   '2 Years',
 };
 
-// ── Collection sections ─────────────────────────────────────────────────────
 export type CollectionSection =
   | 'sports'
   | 'new'
@@ -24,71 +22,61 @@ export type CollectionSection =
   | 'limited'
   | 'bestsellers';
 
-// ── Gift categories ─────────────────────────────────────────────────────────
-// Stored as slugs referencing the GiftCategory collection
-// e.g. "christmas" | "valentines-day" | "graduation" | any admin-created slug
 export type GiftCategorySlug = string;
 
-// ── Cloudinary ──────────────────────────────────────────────────────────────
 export interface CloudinaryAsset {
   url:      string;
   publicId: string;
 }
 
-// ── Color variant ───────────────────────────────────────────────────────────
 export interface ColorVariant {
   colorName: string;
-  colorHex:  string;   // e.g. "#C5A028" for gold
+  colorHex:  string;
   qty:       number;
-  inStock:   boolean;  // auto-computed: qty > 0
-  image:     CloudinaryAsset;
+  inStock:   boolean;
+  image?:    CloudinaryAsset; // ✅ Optional to prevent validation errors
 }
 
-// ── Gift Category (from GiftCategory collection) ────────────────────────────
 export interface IGiftCategory {
   _id:       string;
-  slug:      string;   // e.g. "valentines-day"
-  label:     string;   // e.g. "Valentine's Day"
-  emoji:     string;   // e.g. "💝"
+  slug:      string;
+  label:     string;
+  emoji:     string;
   isActive:  boolean;
   sortOrder: number;
   createdAt?: Date;
   updatedAt?: Date;
 }
 
-// ── Product ─────────────────────────────────────────────────────────────────
 export interface IProduct {
   _id?:        string;
   title:       string;
-  brand:       'Winsor';           // always fixed — immutable in schema
-  modelNo:     string;             // e.g. "WS:2019"
-  watchShape:  string;             // e.g. "Round", "Square", "Oval"
-  price:       number;             // stored in LKR always
-  description: string;             // max 500 words
+  brand:       'Winsor';
+  modelNo:     string;
+  watchShape:  string;
+  price:       number;
+  description: string;
   warranty:    WarrantyOption;
-  specifications: Record<string, string>;  // free-form key-value pairs
+  specifications: Record<string, string>;
   colorVariants:  ColorVariant[];
 
-  // ── Homepage sections ────────────────────────────────────────────────────
-  collectionSections: CollectionSection[];   // Sports / New / Luxury / Limited / Bestsellers
-  giftCategories:     GiftCategorySlug[];    // e.g. ["christmas", "valentines-day"]
+  collectionSections: CollectionSection[];
+  giftCategories:     GiftCategorySlug[];
 
-  // ── Media (Cloudinary) ───────────────────────────────────────────────────
   thumbnail: CloudinaryAsset;
-  images:    CloudinaryAsset[];    // max 10
-  video?:    CloudinaryAsset;      // optional 1 video
+  images:    CloudinaryAsset[];
+  video?:    CloudinaryAsset;
 
-  // ── Admin controls ───────────────────────────────────────────────────────
-  isActive:       boolean;         // master publish toggle
-  showOnHome:     boolean;         // show in collections section
-  stickerEnabled: boolean;         // show badge sticker on card
-  stickerText:    string;          // e.g. "New Year Offer" (max 40 chars)
+  isActive:       boolean;
+  isSoldOut:      boolean; // ✅ NEW: Sold out status
+  showOnHome:     boolean;
+  stickerEnabled: boolean;
+  stickerText:    string;
 
   createdAt?: Date;
   updatedAt?: Date;
 }
 
-// ── API response wrapper ─────────────────────────────────────────────────────
 export interface ApiResponse<T> {
   success: boolean;
   data?:   T;
