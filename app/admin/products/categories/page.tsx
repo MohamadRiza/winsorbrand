@@ -25,6 +25,7 @@ export default function CategoriesPage() {
     isActive: true,
   });
 
+  // ✅ FIX: Use index + emoji as key to avoid duplicates from empty strings
   const emojiOptions = ['🎁', '🎄', '💝', '🎂', '🎓', '💍', '👔', '👗', '🏆', '', '', ''];
 
   useEffect(() => {
@@ -164,9 +165,10 @@ export default function CategoriesPage() {
                   Emoji Icon
                 </label>
                 <div className="grid grid-cols-6 gap-2">
-                  {emojiOptions.map((emoji) => (
+                  {/* ✅ FIX: Use index as key to avoid duplicate key warnings */}
+                  {emojiOptions.map((emoji, index) => (
                     <button
-                      key={emoji}
+                      key={`${emoji}-${index}`} // ✅ Unique key: emoji + index
                       type="button"
                       onClick={() => setFormData({ ...formData, emoji })}
                       className={`p-2 text-2xl rounded-lg border transition-all ${
@@ -175,7 +177,7 @@ export default function CategoriesPage() {
                           : 'border-[#1a1209]/10 hover:border-[#8B6914]/50'
                       }`}
                     >
-                      {emoji}
+                      {emoji || '⬜'} {/* Show placeholder for empty */}
                     </button>
                   ))}
                 </div>
