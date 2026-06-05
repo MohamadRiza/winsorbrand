@@ -3,7 +3,9 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { usePathname } from 'next/navigation';
 import { useCurrency, CURRENCIES, CurrencyOption } from '@/app/context/CurrencyContext';
+import { SignInButton, UserButton, useUser } from '@clerk/nextjs';
 
 const TOP_LEFT_LINKS  = [
   { label: 'Collections',   href: '/collections'   },
@@ -141,6 +143,10 @@ function MegaMenu({ visible, activeKey, showCurrency, onClose }: { visible:boole
 
 export default function Navbar() {
   const { selected, setCurrency } = useCurrency();
+  const { isSignedIn } = useUser();
+  const pathname = usePathname();
+  const isHomepage = pathname === '/';
+
   const [isTransparent,      setIsTransparent]      = useState(true);
   const [isVisible,          setIsVisible]          = useState(true);
   const [mobileOpen,         setMobileOpen]         = useState(false);
@@ -156,21 +162,30 @@ export default function Navbar() {
   const closeTimer  = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    const hero = document.getElementById('hero');
-    heroHeight.current = hero ? hero.offsetHeight : window.innerHeight;
-  }, []);
+    if (!isHomepage) {
+      setIsTransparent(false);
+    } else {
+      const hero = document.getElementById('hero');
+      heroHeight.current = hero ? hero.offsetHeight : window.innerHeight;
+      setIsTransparent(window.scrollY < heroHeight.current - 80);
+    }
+  }, [isHomepage]);
 
   useEffect(() => {
     const onScroll = () => {
       const cur = window.scrollY;
-      setIsTransparent(cur < heroHeight.current - 80);
+      if (isHomepage) {
+        setIsTransparent(cur < heroHeight.current - 80);
+      } else {
+        setIsTransparent(false);
+      }
       if (cur > lastScrollY.current && cur > 120) { setIsVisible(false); setMegaVisible(false); }
       else setIsVisible(true);
       lastScrollY.current = cur;
     };
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
-  }, []);
+  }, [isHomepage]);
 
   useEffect(() => {
     document.body.style.overflow = mobileOpen ? 'hidden' : '';
@@ -280,7 +295,7 @@ export default function Navbar() {
             <div className="wn-mob-only" style={{ display:'flex', alignItems:'center', minWidth:'130px' }}>
               <Link href="/" className="wn-logo-link">
                 <Image 
-                  src={LOGO_TRANSPARENT}
+                  src={isWhite ? LOGO_TRANSPARENT : LOGO_SOLID}
                   alt="Winsor"
                   width={130}
                   height={44}
@@ -359,9 +374,27 @@ export default function Navbar() {
               </div>
               
               {/* Account & Cart */}
-              <Link href="/account" style={{ ...ibS, padding:'4px' }} className="wn-ib">
-                <UserIcon />
-              </Link>
+              {!isSignedIn ? (
+                <SignInButton mode="modal">
+                  <button style={{ ...ibS, padding:'4px' }} className="wn-ib" aria-label="Sign In">
+                    <UserIcon />
+                  </button>
+                </SignInButton>
+              ) : (
+                <div style={{ display:'flex', alignItems:'center', padding:'4px' }}>
+                  <UserButton 
+                    appearance={{
+                      elements: {
+                        avatarBox: {
+                          width: '20px',
+                          height: '20px',
+                          border: '1px solid rgba(139,105,20,0.3)',
+                        }
+                      }
+                    }}
+                  />
+                </div>
+              )}
               <Link href="/cart" style={{ position:'relative', color: tc, display:'flex' }} className="wn-ib">
                 <BagIcon />
                 <span style={{ position:'absolute', top:'-3px', right:'-5px', width:'14px', height:'14px', borderRadius:'50%', background:'#8B6914', color:'#fff', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'8px', fontFamily:"'Jost',sans-serif" }}>
@@ -630,10 +663,29 @@ export default function Navbar() {
           alignItems:'center',
           background: '#faf7f0'
         }}>
-          <Link href="/account" style={{ color:'#1a1209', display:'flex', alignItems:'center', gap:'8px' }}>
-            <UserIcon />
-            <span style={{ fontFamily:"'Jost',sans-serif", fontSize:'12px', color:'#1a1209' }}>Account</span>
-          </Link>
+          {!isSignedIn ? (
+            <SignInButton mode="modal">
+              <button style={{ background:'none', border:'none', padding:0, cursor:'pointer', color:'#1a1209', display:'flex', alignItems:'center', gap:'8px' }}>
+                <UserIcon />
+                <span style={{ fontFamily:"'Jost',sans-serif", fontSize:'12px', color:'#1a1209' }}>Account</span>
+              </button>
+            </SignInButton>
+          ) : (
+            <div style={{ display:'flex', alignItems:'center', gap:'8px' }}>
+              <UserButton 
+                appearance={{
+                  elements: {
+                    avatarBox: {
+                      width: '20px',
+                      height: '20px',
+                      border: '1px solid rgba(139,105,20,0.3)',
+                    }
+                  }
+                }}
+              />
+              <span style={{ fontFamily:"'Jost',sans-serif", fontSize:'12px', color:'#1a1209' }}>Account</span>
+            </div>
+          )}
           <Link href="/cart" style={{ color:'#1a1209', position:'relative', display:'flex', alignItems:'center', gap:'8px' }}>
             <BagIcon />
             <span style={{ fontFamily:"'Jost',sans-serif", fontSize:'12px', color:'#1a1209' }}>Cart</span>
