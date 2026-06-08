@@ -5,6 +5,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useCurrency } from '@/app/context/CurrencyContext';
 import { IProduct, ColorVariant, WARRANTY_LABELS } from '@/types';
+import { useCart } from '@/app/context/CartContext';
+import { useRouter } from 'next/navigation';
 
 interface ProductDetailsClientProps {
   id: string;
@@ -12,6 +14,8 @@ interface ProductDetailsClientProps {
 
 export default function ProductDetailsClient({ id }: ProductDetailsClientProps) {
   const { convertPrice } = useCurrency();
+  const { addToCart } = useCart();
+  const router = useRouter();
 
   // API States
   const [product, setProduct] = useState<IProduct | null>(null);
@@ -25,6 +29,7 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
   // Cart Mock Interaction States
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [showToast, setShowToast] = useState(false);
+  const [suggestions, setSuggestions] = useState<IProduct[]>([]);
 
   // Fetch product data on mount/id change
   useEffect(() => {
@@ -92,12 +97,81 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
     }
   };
 
-  // Mock Add to Cart trigger
+  // Helper to determine product gender (Gents / Ladies / Unisex)
+  const getProductGender = (prod: IProduct): 'Gents' | 'Ladies' | 'Unisex' => {
+    const specs = prod.specifications || {};
+    for (const key of Object.keys(specs)) {
+      if (key.toLowerCase() === 'gender') {
+        const val = specs[key].toLowerCase();
+        if (val.includes('lady') || val.includes('women') || val.includes('female') || val.includes('ladies')) {
+          return 'Ladies';
+        }
+        if (val.includes('gent') || val.includes('men') || val.includes('male') || val.includes('gents')) {
+          return 'Gents';
+        }
+        return 'Unisex';
+      }
+    }
+
+    const titleLower = prod.title.toLowerCase();
+    const descLower = prod.description.toLowerCase();
+    if (
+      titleLower.includes('ladies') || 
+      titleLower.includes('women') || 
+      titleLower.includes('diamond') || 
+      descLower.includes('ladies') || 
+      descLower.includes('women')
+    ) {
+      return 'Ladies';
+    }
+
+    return 'Gents';
+  };
+
+  // Fetch suggestions
+  useEffect(() => {
+    if (!product) return;
+    const currentProduct = product;
+    async function loadSuggestions() {
+      try {
+        const res = await fetch('/api/products');
+        const data = await res.json();
+        if (data.success && data.data) {
+          const allProd: IProduct[] = data.data;
+          const filtered = allProd.filter(p => p._id !== currentProduct._id);
+          
+          const currentGender = getProductGender(currentProduct);
+          const matchingGender = filtered.filter(p => getProductGender(p) === currentGender);
+          const otherGender = filtered.filter(p => getProductGender(p) !== currentGender);
+          
+          const combined = [...matchingGender, ...otherGender].slice(0, 4);
+          setSuggestions(combined);
+        }
+      } catch (err) {
+        console.error('Failed to load suggestions:', err);
+      }
+    }
+    loadSuggestions();
+  }, [product]);
+
+  // Real Add to Cart trigger
   const handleAddToCart = () => {
     if (!product) return;
+    const colorVariantName = selectedVariant?.colorName || '';
+    addToCart(product._id!, 1, colorVariantName, product);
+
     const variantStr = selectedVariant ? ` (${selectedVariant.colorName})` : '';
     setToastMessage(`"${product.title}${variantStr}" has been added to your cart.`);
     setShowToast(true);
+  };
+
+  // Real Buy Now trigger
+  const handleBuyNow = () => {
+    if (!product) return;
+    const colorVariantName = selectedVariant?.colorName || '';
+    addToCart(product._id!, 1, colorVariantName, product);
+    
+    router.push('/cart');
   };
 
   // Close toast automatically after 4 seconds
@@ -309,9 +383,15 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
           border-radius: 50%;
         }
         
-        /* ADD TO CART BUTTON */
-        .cart-action-btn {
+        /* ACTION BUTTONS CONTAINER */
+        .actions-buttons-container {
+          display: flex;
+          gap: 16px;
+          margin-bottom: 32px;
           width: 100%;
+        }
+        .cart-action-btn {
+          flex: 1;
           background: #1a1209;
           color: #faf7f0;
           border: none;
@@ -324,13 +404,36 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
           text-transform: uppercase;
           cursor: pointer;
           transition: all 0.3s;
-          margin-bottom: 32px;
         }
         .cart-action-btn:hover:not(:disabled) {
           background: #8B6914;
           box-shadow: 0 4px 12px rgba(139,105,20,0.2);
         }
         .cart-action-btn:disabled {
+          background: rgba(26, 18, 9, 0.15);
+          color: rgba(26, 18, 9, 0.4);
+          cursor: not-allowed;
+        }
+        .buy-now-btn {
+          flex: 1;
+          background: #8B6914;
+          color: #fff;
+          border: none;
+          border-radius: 4px;
+          padding: 16px;
+          font-family: 'Jost', sans-serif;
+          font-size: 13px;
+          font-weight: 500;
+          letter-spacing: 0.15em;
+          text-transform: uppercase;
+          cursor: pointer;
+          transition: all 0.3s;
+        }
+        .buy-now-btn:hover:not(:disabled) {
+          background: #1a1209;
+          box-shadow: 0 4px 12px rgba(26,18,9,0.25);
+        }
+        .buy-now-btn:disabled {
           background: rgba(26, 18, 9, 0.15);
           color: rgba(26, 18, 9, 0.4);
           cursor: not-allowed;
@@ -388,6 +491,92 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
           color: #1a1209;
         }
 
+        /* LARGE IMAGES DETAILS GRID */
+        .large-gallery-section {
+          margin-top: 60px;
+          border-top: 1px solid rgba(26,18,9,0.08);
+          padding-top: 50px;
+        }
+        .large-gallery-section h3 {
+          font-family: 'Cormorant Garamond', serif;
+          font-size: 28px;
+          font-weight: 500;
+          text-align: center;
+          margin-bottom: 36px;
+          letter-spacing: 0.05em;
+        }
+        .large-gallery-container {
+          max-width: 1000px;
+          margin: 0 auto;
+          display: flex;
+          flex-direction: column;
+          gap: 40px;
+        }
+        .large-gallery-item {
+          width: 100%;
+          position: relative;
+          aspect-ratio: 1.5;
+          border-radius: 8px;
+          overflow: hidden;
+          box-shadow: 0 8px 24px rgba(26,18,9,0.04);
+          border: 1px solid rgba(26,18,9,0.03);
+          background-color: rgba(26,18,9,0.01);
+        }
+        .large-gallery-video-item {
+          width: 100%;
+          aspect-ratio: 1.777;
+          border-radius: 8px;
+          overflow: hidden;
+          box-shadow: 0 8px 24px rgba(26,18,9,0.04);
+          background: #000;
+          margin-bottom: 20px;
+        }
+        .large-video-element {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+
+        /* SUGGESTIONS SECTION */
+        .suggestions-section {
+          margin-top: 80px;
+          border-top: 1px solid rgba(26,18,9,0.08);
+          padding-top: 60px;
+          margin-bottom: 40px;
+        }
+        .suggestions-section h3 {
+          font-family: 'Cormorant Garamond', serif;
+          font-size: 28px;
+          font-weight: 500;
+          text-align: center;
+          margin-bottom: 36px;
+          letter-spacing: 0.05em;
+        }
+        .suggestions-grid {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 28px;
+        }
+        .suggested-card {
+          display: flex;
+          flex-direction: column;
+          transition: transform 0.3s;
+        }
+        .suggested-img-container {
+          position: relative;
+          aspect-ratio: 1;
+          border-radius: 4px;
+          overflow: hidden;
+          background: rgba(26,18,9,0.02);
+          border: 1px solid rgba(26, 18, 9, 0.03);
+        }
+        .suggested-card:hover .suggested-img {
+          transform: scale(1.05);
+        }
+        .suggested-card:hover {
+          transform: translateY(-4px);
+        }
+
         /* TOAST SUCCESS BOX */
         .toast-box {
           position: fixed;
@@ -429,6 +618,10 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
           .info-container {
             width: 100%;
           }
+          .suggestions-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+          }
         }
         
         @media (max-width: 640px) {
@@ -451,6 +644,14 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
           }
           .specs-grid {
             grid-template-columns: 1fr;
+          }
+          .actions-buttons-container {
+            flex-direction: column;
+            gap: 12px;
+          }
+          .suggestions-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
           }
         }
       `}</style>
@@ -549,14 +750,23 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
               </span>
             </div>
 
-            {/* Add to Cart button */}
-            <button
-              onClick={handleAddToCart}
-              disabled={isSoldOut}
-              className="cart-action-btn"
-            >
-              {isSoldOut ? 'Out of Stock' : 'Add to Cart'}
-            </button>
+            {/* Action Buttons: Add to Cart & Buy Now */}
+            <div className="actions-buttons-container">
+              <button
+                onClick={handleAddToCart}
+                disabled={isSoldOut}
+                className="cart-action-btn"
+              >
+                {isSoldOut ? 'Out of Stock' : 'Add to Cart'}
+              </button>
+              <button
+                onClick={handleBuyNow}
+                disabled={isSoldOut}
+                className="buy-now-btn"
+              >
+                {isSoldOut ? 'Out of Stock' : 'Buy Now'}
+              </button>
+            </div>
 
             {/* Description */}
             <p style={{ fontSize: '14px', lineHeight: 1.6, color: 'rgba(26,18,9,0.7)', margin: '0 0 24px' }}>
@@ -591,6 +801,90 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
                     <span className="spec-value">{value}</span>
                   </div>
                 ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* LARGE IMAGES DETAILS GRID */}
+        {galleryImages.length > 0 && (
+          <div className="detail-wrapper large-gallery-section">
+            <div style={{ width: '100%' }}>
+              <h3>The Timepiece in Focus</h3>
+              
+              {/* Product video if uploaded */}
+              {product.video?.url && (
+                <div className="large-gallery-video-item">
+                  <video 
+                    src={product.video.url} 
+                    controls 
+                    muted 
+                    loop 
+                    autoPlay 
+                    playsInline 
+                    className="large-video-element" 
+                  />
+                </div>
+              )}
+
+              <div className="large-gallery-container">
+                {galleryImages.map((imgUrl, i) => (
+                  <div key={i} className="large-gallery-item">
+                    <Image
+                      src={imgUrl}
+                      alt={`${product.title} detailed zoom ${i}`}
+                      fill
+                      sizes="(max-width: 1024px) 100vw, 1000px"
+                      style={{ objectFit: 'cover' }}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* SUGGESTED WATCHES / Timeless Pairings */}
+        {suggestions.length > 0 && (
+          <div className="detail-wrapper suggestions-section">
+            <div style={{ width: '100%' }}>
+              <h3>Timeless Pairings</h3>
+              <div className="suggestions-grid">
+                {suggestions.map((p) => {
+                  const gender = getProductGender(p);
+                  return (
+                    <Link
+                      key={p._id}
+                      href={`/collections/${p._id}`}
+                      style={{ textDecoration: 'none', color: 'inherit' }}
+                      className="suggested-card"
+                    >
+                      <div className="suggested-img-container">
+                        {p.thumbnail?.url && (
+                          <Image
+                            src={p.thumbnail.url}
+                            alt={p.title}
+                            fill
+                            sizes="(max-width: 768px) 50vw, 25vw"
+                            style={{ objectFit: 'cover', transition: 'transform 0.4s' }}
+                            className="suggested-img"
+                          />
+                        )}
+                      </div>
+                      <div style={{ padding: '12px 4px 4px' }}>
+                        <span style={{ fontSize: '9px', fontWeight: 600, letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(26,18,9,0.4)', display: 'block', marginBottom: '4px' }}>
+                          {gender}
+                        </span>
+                        <h4 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '16px', fontWeight: 500, margin: '0 0 6px', color: '#1a1209' }}>
+                          {p.title}
+                        </h4>
+                        <span style={{ fontSize: '12.5px', fontWeight: 500, color: '#8B6914' }}>
+                          {convertPrice(p.price)}
+                        </span>
+                      </div>
+                    </Link>
+                  );
+                })}
               </div>
             </div>
           </div>

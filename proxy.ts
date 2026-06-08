@@ -6,7 +6,7 @@ import { verifyAccessToken } from '@/lib/jwt';
 async function handleAdminAuth(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
-  // ✅ ALLOW access to login page (no redirect loop)
+  // ✅ ALLOW access to login page
   if (pathname === '/admin/login') {
     const accessToken = req.cookies.get('admin_access_token')?.value;
     
@@ -63,10 +63,10 @@ async function handleAdminAuth(req: NextRequest) {
     }
   }
 
-  return null; // Let clerkMiddleware run if not an admin route or did not return redirect/response
+  return null;
 }
 
-export default async function middleware(req: NextRequest, event: NextFetchEvent) {
+export async function proxy(req: NextRequest, event: NextFetchEvent) {
   const { pathname } = req.nextUrl;
 
   // Run admin authentication check first if path is for admin area
@@ -75,7 +75,20 @@ export default async function middleware(req: NextRequest, event: NextFetchEvent
     if (adminRes) return adminRes;
   }
 
-  // Otherwise, run Clerk middleware
+  // ✅ BYPASS Clerk middleware for all API routes and public page routes to prevent external server timeouts/CORS blocks
+  const isPublicPath = 
+    pathname === '/' ||
+    pathname.startsWith('/collections') ||
+    pathname.startsWith('/our-story') ||
+    (pathname.startsWith('/api') && !pathname.startsWith('/api/customer')) ||
+    pathname.startsWith('/_next') ||
+    pathname.includes('.');
+
+  if (isPublicPath) {
+    return NextResponse.next();
+  }
+
+  // Otherwise, run Clerk middleware for other page routes
   return clerkMiddleware()(req, event);
 }
 

@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db';
 import Admin from '@/lib/models/Admin';
+import AdminLoginAttempt from '@/lib/models/AdminLoginAttempt';
 import { generateAccessToken, generateRefreshToken } from '@/lib/jwt';
 import { RateLimiterMemory } from 'rate-limiter-flexible';
 
@@ -15,7 +16,7 @@ export async function POST(req: NextRequest) {
   console.log('🔐 [LOGIN] Request received');
   
   try {
-    // 🔐 RATE LIMITING CHECK - MUST BE FIRST
+    // 🔐 Resolve IP address
     const ip = req.headers.get('x-forwarded-for')?.split(',')[0] || 
                req.headers.get('x-real-ip') || 
                req.headers.get('cf-connecting-ip') ||
@@ -23,14 +24,38 @@ export async function POST(req: NextRequest) {
     
     console.log(`🔐 [LOGIN] Rate limit check for IP: ${ip}`);
     
+    // Connect to database
+    await connectDB();
+
+    // 🔐 Check database-backed IP block list
+    const attemptRecord = await AdminLoginAttempt.findOne({ ip });
+    if (attemptRecord && attemptRecord.blockedUntil && attemptRecord.blockedUntil > new Date()) {
+      const msLeft = attemptRecord.blockedUntil.getTime() - Date.now();
+      const hoursLeft = Math.floor(msLeft / (1000 * 60 * 60));
+      const minsLeft = Math.ceil((msLeft % (1000 * 60 * 60)) / (1000 * 60));
+      
+      let durationStr = `${minsLeft} minutes`;
+      if (hoursLeft > 0) {
+        durationStr = `${hoursLeft} hours and ${minsLeft} minutes`;
+      }
+      
+      console.warn(`🔐 [LOGIN] Blocked IP attempt: ${ip}. Remaining block time: ${durationStr}`);
+      return NextResponse.json(
+        { 
+          success: false, 
+          error: `Too many wrong password attempts. This IP has been blocked. Remaining time: ${durationStr}.` 
+        },
+        { status: 423 } // 423 Locked
+      );
+    }
+
+    // 🔐 Second tier rate limiter (raw hits count)
     try {
       await loginLimiter.consume(ip);
       console.log('🔐 [LOGIN] Rate limit OK');
     } catch (rateLimiterRes: any) {
       const retrySecs = Math.round(rateLimiterRes.msBeforeNext / 1000) || 1;
-      
       console.warn(`🔐 [LOGIN] Rate limit exceeded for IP: ${ip}, retry after ${retrySecs}s`);
-      
       return NextResponse.json(
         { 
           success: false, 
@@ -103,11 +128,6 @@ export async function POST(req: NextRequest) {
     );
 
     const turnstileData = await turnstileResponse.json();
-    console.log('🔐 [LOGIN] Turnstile verification response:', { 
-      success: turnstileData?.success, 
-      'error-codes': turnstileData?.['error-codes'] 
-    });
-
     if (!turnstileData.success) {
       console.warn('🔐 [LOGIN] Turnstile verification failed');
       return NextResponse.json(
@@ -117,10 +137,35 @@ export async function POST(req: NextRequest) {
     }
     console.log('🔐 [LOGIN] ✅ Turnstile verified');
 
-    // Connect to database
-    console.log('🔐 [LOGIN] Connecting to DB...');
-    await connectDB();
-    console.log('🔐 [LOGIN] DB connected');
+    // Helper to handle and increment failed attempts
+    const handleFailedAttempt = async () => {
+      let record = await AdminLoginAttempt.findOne({ ip });
+      if (!record) {
+        record = new AdminLoginAttempt({ ip });
+      }
+      
+      if (record.blockedUntil && record.blockedUntil <= new Date()) {
+        record.failedCount = 0;
+      }
+      
+      record.failedCount += 1;
+      record.lastAttemptAt = new Date();
+      
+      let isBlocked = false;
+      let duration = 24;
+      
+      if (record.failedCount > 3) {
+        duration = record.previousBlockDuration === 24 ? 48 : 24;
+        record.blockedUntil = new Date(Date.now() + duration * 60 * 60 * 1000);
+        record.previousBlockDuration = duration;
+        record.failedCount = 0;
+        isBlocked = true;
+      }
+      
+      await record.save();
+      const nextDuration = record.previousBlockDuration === 24 ? 48 : 24;
+      return { isBlocked, duration, failedCount: record.failedCount, nextDuration };
+    };
 
     // Find admin (explicitly select password field)
     console.log(`🔐 [LOGIN] Searching for user: ${username.trim()}`);
@@ -133,10 +178,22 @@ export async function POST(req: NextRequest) {
 
     if (!admin) {
       console.warn('🔐 [LOGIN] Admin not found or inactive');
-      // ⚠️ Still consume a rate limit point for failed attempts
       await loginLimiter.penalty(ip).catch(() => {});
+      
+      const { isBlocked, duration, failedCount, nextDuration } = await handleFailedAttempt();
+      if (isBlocked) {
+        return NextResponse.json(
+          { success: false, error: `Too many wrong password attempts. This IP has been blocked for ${duration} hours.` },
+          { status: 423 }
+        );
+      }
+      
+      let attemptMsg = `Invalid credentials. Attempt ${failedCount} of 3.`;
+      if (failedCount === 3) {
+        attemptMsg = `Invalid credentials. Attempt 3 of 3 (Warning: next wrong attempt will block your IP for ${nextDuration}h).`;
+      }
       return NextResponse.json(
-        { success: false, error: 'Invalid credentials' },
+        { success: false, error: attemptMsg },
         { status: 401 }
       );
     }
@@ -148,10 +205,22 @@ export async function POST(req: NextRequest) {
 
     if (!isMatch) {
       console.warn('🔐 [LOGIN] Password mismatch');
-      // ⚠️ Still consume a rate limit point for failed attempts
       await loginLimiter.penalty(ip).catch(() => {});
+      
+      const { isBlocked, duration, failedCount, nextDuration } = await handleFailedAttempt();
+      if (isBlocked) {
+        return NextResponse.json(
+          { success: false, error: `Too many wrong password attempts. This IP has been blocked for ${duration} hours.` },
+          { status: 423 }
+        );
+      }
+      
+      let attemptMsg = `Invalid credentials. Attempt ${failedCount} of 3.`;
+      if (failedCount === 3) {
+        attemptMsg = `Invalid credentials. Attempt 3 of 3 (Warning: next wrong attempt will block your IP for ${nextDuration}h).`;
+      }
       return NextResponse.json(
-        { success: false, error: 'Invalid credentials' },
+        { success: false, error: attemptMsg },
         { status: 401 }
       );
     }
@@ -205,14 +274,14 @@ export async function POST(req: NextRequest) {
       path: '/',
     });
 
-    // ✅ Reset rate limit on successful login
+    // ✅ Reset rate limit and blocks on successful login
     await loginLimiter.delete(ip).catch(() => {});
+    await AdminLoginAttempt.deleteOne({ ip }).catch(() => {});
     
-    console.log('🔐 [LOGIN] ✅ Success - cookies set, rate limit reset');
+    console.log('🔐 [LOGIN] ✅ Success - cookies set, rate limit and blocks reset');
     return response;
 
   } catch (error: any) {
-    // 🚨 CRITICAL: Log full error to terminal
     console.error('🔐 [LOGIN] ❌ SERVER ERROR:', {
       message: error?.message || String(error),
       stack: error?.stack,

@@ -39,6 +39,7 @@ export default function AddProductPage() {
     colorVariants: [] as ColorVariant[],
     thumbnail: EMPTY_ASSET,
     images: [] as CloudinaryAsset[],
+    video: EMPTY_ASSET,
     collectionSections: [] as CollectionSection[],
     giftCategories: [] as string[],
     isActive: true,
@@ -86,21 +87,19 @@ export default function AddProductPage() {
           modelNo: formData.modelNo,
           watchShape: formData.watchShape,
           price: formData.price,
+          thumbnailUrl: formData.thumbnail?.url || '',
         }),
       });
 
       const data = await res.json();
       
       if (!res.ok) {
-        if (res.status === 429) {
-          toast.error('Too many requests. Please wait a moment and try again.');
-        } else {
-          throw new Error(data.error || 'Failed to generate description');
-        }
-        return;
+        throw new Error(data.error || 'Failed to generate description');
       }
 
-      if (data.cached) {
+      if (data.warning) {
+        toast(data.warning, { icon: '⚠️' });
+      } else if (data.cached) {
         toast.success('Using cached description ✨');
       } else {
         toast.success('Description generated successfully!');
@@ -116,8 +115,8 @@ export default function AddProductPage() {
     }
   };
 
-  // ✅ FIXED: Handle multiple file uploads for gallery
-  const handleImageUpload = async (files: FileList | File[], type: 'thumbnail' | 'gallery' | 'color', variantIndex?: number) => {
+  // ✅ FIXED: Handle multiple file uploads for gallery + video
+  const handleImageUpload = async (files: FileList | File[], type: 'thumbnail' | 'gallery' | 'color' | 'video', variantIndex?: number) => {
     const fileArray = Array.from(files);
     if (fileArray.length === 0) return;
 
@@ -149,6 +148,8 @@ export default function AddProductPage() {
               } else if (type === 'gallery') {
                 // ✅ Add multiple images to gallery
                 setFormData(prev => ({ ...prev, images: [...prev.images, data.data] }));
+              } else if (type === 'video') {
+                setFormData(prev => ({ ...prev, video: data.data }));
               } else if (type === 'color' && variantIndex !== undefined) {
                 // ✅ Set image for specific color variant
                 setFormData(prev => ({
@@ -283,7 +284,8 @@ export default function AddProductPage() {
         colorVariants: formData.colorVariants.map(v => ({
           ...v,
           image: (v.image?.url) ? v.image : undefined
-        }))
+        })),
+        video: (formData.video?.url) ? formData.video : undefined
       };
 
       const res = await fetch('/api/products', {
@@ -373,10 +375,10 @@ export default function AddProductPage() {
           </div>
         </div>
 
-        {/* Images */}
+        {/* Images & Video */}
         <div className="bg-white rounded-xl border border-[#1a1209]/10 p-6">
-          <h3 className="font-['Jost'] font-semibold text-[#1a1209] mb-4">Product Images</h3>
-          <div className="space-y-4">
+          <h3 className="font-['Jost'] font-semibold text-[#1a1209] mb-4">Product Media</h3>
+          <div className="space-y-6">
             {/* Thumbnail */}
             <div>
               <label className="block text-[11px] font-semibold tracking-[0.2em] uppercase text-[#1a1209]/70 mb-2">Thumbnail Image *</label>
@@ -403,10 +405,10 @@ export default function AddProductPage() {
               </div>
             </div>
 
-            {/* Gallery - ✅ FIXED: Multiple file upload */}
+            {/* Gallery - ✅ Max 6 images */}
             <div>
               <label className="block text-[11px] font-semibold tracking-[0.2em] uppercase text-[#1a1209]/70 mb-2">
-                Gallery Images (Max 10)
+                Gallery Images (Max 6)
               </label>
               <div className="flex gap-4 flex-wrap">
                 {formData.images.map((img, idx) => (
@@ -421,23 +423,47 @@ export default function AddProductPage() {
                     </button>
                   </div>
                 ))}
-                {formData.images.length < 10 && (
+                {formData.images.length < 6 && (
                   <label className="flex flex-col items-center justify-center w-24 h-24 border-2 border-dashed border-[#1a1209]/20 rounded-lg cursor-pointer hover:border-[#8B6914] transition-colors">
                     <svg className="w-6 h-6 text-[#1a1209]/40 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
                     <span className="text-xs text-[#1a1209]/60">Add</span>
-                    {/* ✅ FIXED: multiple attribute for batch upload */}
                     <input 
                       type="file" 
                       accept="image/*" 
                       multiple
                       onChange={(e) => e.target.files && handleImageUpload(e.target.files, 'gallery')} 
-                      disabled={uploadingImage || formData.images.length >= 10} 
+                      disabled={uploadingImage || formData.images.length >= 6} 
                       className="hidden" 
                     />
                   </label>
                 )}
               </div>
-              <p className="text-xs text-[#1a1209]/40 mt-1">Select multiple files to upload at once (Ctrl/Cmd + Click)</p>
+              <p className="text-xs text-[#1a1209]/40 mt-1">Select up to 6 files to upload at once (Ctrl/Cmd + Click)</p>
+            </div>
+
+            {/* Video (Optional) */}
+            <div>
+              <label className="block text-[11px] font-semibold tracking-[0.2em] uppercase text-[#1a1209]/70 mb-2">Product Video (Optional)</label>
+              <div className="flex items-center gap-4">
+                {formData.video?.url ? (
+                  <div className="relative w-48 h-32 rounded-lg overflow-hidden border border-[#1a1209]/10">
+                    <video src={formData.video.url} controls className="w-full h-full object-cover" />
+                    <button type="button" onClick={() => setFormData(prev => ({ ...prev, video: EMPTY_ASSET }))} className="absolute top-1 right-1 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600">×</button>
+                  </div>
+                ) : (
+                  <label className="flex flex-col items-center justify-center w-48 h-32 border-2 border-dashed border-[#1a1209]/20 rounded-lg cursor-pointer hover:border-[#8B6914] transition-colors">
+                    <svg className="w-8 h-8 text-[#1a1209]/40 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+                    <span className="text-xs text-[#1a1209]/60">Upload Video</span>
+                    <input 
+                      type="file" 
+                      accept="video/*" 
+                      onChange={(e) => e.target.files && handleImageUpload(e.target.files, 'video')} 
+                      disabled={uploadingImage} 
+                      className="hidden" 
+                    />
+                  </label>
+                )}
+              </div>
             </div>
           </div>
         </div>

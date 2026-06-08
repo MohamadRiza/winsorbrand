@@ -1,7 +1,6 @@
 // app/our-story/page.tsx
 // ── Server Component (no "use client") ──────────────────────────────────────
 import Link from "next/link";
-import Image from "next/image";
 import VideoPlayer from "./VideoPlayer"; // ← Client component in same folder
 
 export const metadata = {
@@ -15,12 +14,6 @@ export const metadata = {
     type: "website",
   },
 };
-
-const heroImg       = "/discover-partners.jpg";
-const craftImg      = "/discover-partners.jpg";
-const handsImg      = "/discover-partners.jpg";
-const worldImg      = "/watch-card.jpg";
-const ambassadorImg = "/discover-partners.jpg";
 
 const GOLD     = "#8B6914";
 const INK      = "#1a1209";
@@ -87,11 +80,39 @@ export default function OurStoryPage() {
         .ws-fade-up { animation: wsFadeUp .9s ease both; }
         @keyframes wsFadeUp { from { opacity:0; transform:translateY(18px);} to { opacity:1; transform:none;} }
 
-        .ws-img { transition: transform 1.4s ease; will-change: transform; }
-        .ws-img-wrap:hover .ws-img { transform: scale(1.04); }
-
         .ws-btn { transition: all .25s ease; }
         .ws-btn:hover { background: ${GOLD}; color:#fff !important; border-color:${GOLD} !important; }
+
+        /* Parallax Background Frames */
+        .ws-parallax-bg {
+          background-size: cover;
+          background-position: center;
+          background-repeat: no-repeat;
+          background-attachment: fixed;
+        }
+
+        /* Timeline Connector Rules */
+        .ws-timeline-line {
+          position: absolute;
+          left: 120px;
+          top: 24px;
+          bottom: 24px;
+          width: 1.5px;
+          background: linear-gradient(to bottom, transparent, rgba(139,105,20,0.3) 10%, rgba(139,105,20,0.3) 90%, transparent);
+          display: block;
+        }
+        .ws-timeline-marker {
+          position: absolute;
+          left: 116px;
+          width: 9px;
+          height: 9px;
+          border-radius: 50%;
+          background: #8B6914;
+          border: 2.5px solid #fcfbf8;
+          z-index: 2;
+          box-shadow: 0 0 0 3px rgba(139,105,20,0.15);
+          display: block;
+        }
 
         /* ── Minimal luxury video player styles (Longines-inspired) ── */
         .ws-player {
@@ -191,13 +212,25 @@ export default function OurStoryPage() {
         }
 
         @media (max-width: 900px) {
+          .ws-parallax-bg {
+            background-attachment: scroll !important;
+          }
+          .ws-timeline-line, .ws-timeline-marker {
+            display: none !important;
+          }
+          .ws-timeline-row {
+            grid-template-columns: 1fr !important;
+            gap: 12px !important;
+            padding: 30px 0 !important;
+          }
+          .ws-timeline-row .ws-tl-year { 
+            font-size:42px !important; 
+          }
           .ws-grid-2 { grid-template-columns: 1fr !important; gap: 40px !important; }
           .ws-hero-title { font-size: clamp(46px,12vw,80px) !important; }
           .ws-section-title { font-size: clamp(32px,8vw,48px) !important; }
           .ws-pad { padding-left:22px !important; padding-right:22px !important; }
           .ws-stats { grid-template-columns: repeat(2,1fr) !important; }
-          .ws-timeline-row { grid-template-columns: 1fr !important; }
-          .ws-timeline-row .ws-tl-year { font-size:56px !important; }
           .ws-player-controls { bottom: 10px; right: 10px; }
           .ws-ctrl-btn { width: 28px; height: 28px; }
           .ws-ctrl-btn svg { width: 12px; height: 12px; }
@@ -205,11 +238,18 @@ export default function OurStoryPage() {
       `}</style>
 
       {/* ── HERO ── */}
-      <section style={{ position:"relative", minHeight:"min(86vh,760px)", display:"flex", alignItems:"center", justifyContent:"center", overflow:"hidden", background:"#0a0805" }}>
-        <Image src={heroImg} alt="Winsor watchmakers in the founding atelier" width={1600} height={1100}
-          style={{ position:"absolute", inset:0, width:"100%", height:"100%", objectFit:"cover", opacity:0.55, filter:"grayscale(20%)" }}
-          priority />
-        <div style={{ position:"absolute", inset:0, background:"linear-gradient(180deg,rgba(10,8,5,0.35) 0%,rgba(10,8,5,0.15) 40%,rgba(10,8,5,0.85) 100%)" }} />
+      <section 
+        className="ws-parallax-bg"
+        style={{ 
+          position:"relative", 
+          minHeight:"min(86vh,760px)", 
+          display:"flex", 
+          alignItems:"center", 
+          justifyContent:"center", 
+          overflow:"hidden", 
+          backgroundImage: `linear-gradient(180deg, rgba(10,8,5,0.35) 0%, rgba(10,8,5,0.15) 40%, rgba(10,8,5,0.85) 100%), url('/watch-hero.jpg')`,
+        }}
+      >
         <div className="ws-fade-up ws-pad" style={{ position:"relative", textAlign:"center", color:"#fff", padding:"120px 40px", maxWidth:900 }}>
           <div style={{ fontFamily:fontSans, fontSize:12, letterSpacing:"0.4em", color:"rgba(255,255,255,0.75)", marginBottom:22, textTransform:"uppercase" }}>
             The Winsor Maison
@@ -240,15 +280,22 @@ export default function OurStoryPage() {
           craft, patience, and the unhurried elegance of a moment lived fully. Today, over 25
           authorised retailers carry the Winsor name, each one a custodian of that original promise.
         </p>
+        <div style={{ height: 60, width: 1, background: GOLD, opacity: 0.35, margin: "48px auto 0" }} />
       </section>
 
       {/* ── HISTORY SPLIT ── */}
       <section style={{ background:"#fff", borderTop:`1px solid ${HAIRLINE}`, borderBottom:`1px solid ${HAIRLINE}` }}>
         <div className="ws-pad ws-grid-2" style={{ maxWidth:1400, margin:"0 auto", padding:"100px 40px", display:"grid", gridTemplateColumns:"1.05fr 1fr", gap:80, alignItems:"center" }}>
-          <div className="ws-img-wrap" style={{ overflow:"hidden", aspectRatio:"4/5", background:"#eee" }}>
-            <Image className="ws-img" src={craftImg} alt="A Winsor mechanical timepiece" width={1600} height={1100}
-              style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }} />
-          </div>
+          <div 
+            className="ws-parallax-bg" 
+            style={{ 
+              backgroundImage: `url('/discover-partners.jpg')`,
+              height: "560px",
+              borderRadius: "4px",
+              boxShadow: "0 12px 30px rgba(26,18,9,0.06)",
+              border: "1px solid rgba(139,105,20,0.12)"
+            }} 
+          />
           <div>
             <div style={{ fontFamily:fontSans, fontSize:11, letterSpacing:"0.32em", color:GOLD, textTransform:"uppercase", marginBottom:18 }}>Our Heritage</div>
             <h3 className="ws-section-title" style={{ fontFamily:fontSerif, fontSize:"clamp(34px,4vw,52px)", fontWeight:500, lineHeight:1.1, margin:"0 0 26px" }}>
@@ -271,15 +318,22 @@ export default function OurStoryPage() {
       </section>
 
       {/* ── STATS ── */}
-      <section style={{ position:"relative", padding:"110px 0", backgroundImage:`url(${worldImg})`, backgroundSize:"cover", backgroundPosition:"center", backgroundColor:CREAM }}>
-        <div className="ws-pad" style={{ maxWidth:1200, margin:"0 auto", padding:"0 40px", textAlign:"center" }}>
+      <section 
+        className="ws-parallax-bg" 
+        style={{ 
+          position:"relative", 
+          padding:"120px 0", 
+          backgroundImage:`linear-gradient(rgba(252,251,248,0.88), rgba(252,251,248,0.88)), url('/watch-card.jpg')`, 
+        }}
+      >
+        <div className="ws-pad" style={{ maxWidth:1200, margin:"0 auto", padding:"0 40px", position:"relative", zIndex:2 }}>
           <SectionLabel>Around the World</SectionLabel>
-          <h2 className="ws-section-title" style={{ fontFamily:fontSerif, fontSize:"clamp(36px,5vw,56px)", fontWeight:500, lineHeight:1.12, margin:"0 0 60px" }}>
+          <h2 className="ws-section-title" style={{ fontFamily:fontSerif, fontSize:"clamp(36px,5vw,56px)", fontWeight:500, lineHeight:1.12, margin:"0 0 60px", textAlign:"center" }}>
             A maison present wherever moments matter.
           </h2>
-          <div className="ws-stats" style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:30 }}>
+          <div className="ws-stats" style={{ display:"flex", justifyContent:"space-around", gap:30, flexWrap: "wrap" }}>
             {STATS.map((s) => (
-              <div key={s.label} style={{ padding:"30px 16px", borderTop:`1px solid ${HAIRLINE}`, borderBottom:`1px solid ${HAIRLINE}` }}>
+              <div key={s.label} style={{ padding:"30px 24px", borderTop:`1px solid ${HAIRLINE}`, borderBottom:`1px solid ${HAIRLINE}`, textAlign:"center", flex: 1, maxWidth: "240px" }}>
                 <div style={{ fontFamily:fontSerif, fontSize:"clamp(36px,4vw,56px)", fontWeight:500, color:GOLD, lineHeight:1 }}>{s.value}</div>
                 <div style={{ marginTop:14, fontFamily:fontSans, fontSize:11, letterSpacing:"0.28em", color:MUTED, textTransform:"uppercase" }}>{s.label}</div>
               </div>
@@ -296,11 +350,31 @@ export default function OurStoryPage() {
             Moments that shaped the maison.
           </h2>
         </div>
-        <div>
+        <div style={{ position: "relative" }}>
+          {/* Connected timeline trace */}
+          <div className="ws-timeline-line" />
+          
           {TIMELINE.map((m, i) => (
-            <div key={m.year} className="ws-timeline-row" style={{ display:"grid", gridTemplateColumns:"180px 1fr", gap:50, padding:"36px 0", borderTop:i===0?`1px solid ${HAIRLINE}`:"none", borderBottom:`1px solid ${HAIRLINE}`, alignItems:"baseline" }}>
-              <div className="ws-tl-year" style={{ fontFamily:fontSerif, fontSize:64, fontWeight:500, color:GOLD, lineHeight:1, letterSpacing:"0.01em" }}>{m.year}</div>
-              <div>
+            <div 
+              key={m.year} 
+              className="ws-timeline-row" 
+              style={{ 
+                display:"grid", 
+                gridTemplateColumns:"180px 1fr", 
+                gap:50, 
+                padding:"40px 0", 
+                borderBottom: i === TIMELINE.length - 1 ? "none" : `1px solid ${HAIRLINE}`, 
+                alignItems:"baseline",
+                position: "relative" 
+              }}
+            >
+              {/* Year & Circle Dot Marker */}
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                <span className="ws-tl-year" style={{ fontFamily:fontSerif, fontSize:58, fontWeight:500, color:GOLD, lineHeight:1, letterSpacing:"0.01em" }}>{m.year}</span>
+                <div className="ws-timeline-marker" style={{ top: "34px" }} />
+              </div>
+              
+              <div style={{ paddingLeft: "10px" }}>
                 <h3 style={{ fontFamily:fontSerif, fontSize:"clamp(22px,2.4vw,30px)", fontWeight:500, margin:"0 0 12px", color:INK }}>{m.title}</h3>
                 <p style={{ fontFamily:fontSerif, fontSize:18, lineHeight:1.8, color:MUTED, margin:0, fontWeight:300, maxWidth:720 }}>{m.text}</p>
               </div>
@@ -310,11 +384,16 @@ export default function OurStoryPage() {
       </section>
 
       {/* ── CRAFT IMAGE FULL ── */}
-      <section className="ws-img-wrap" style={{ overflow:"hidden", height:"min(80vh,720px)", position:"relative" }}>
-        <Image className="ws-img" src={handsImg} alt="A watchmaker placing a ruby jewel into a Winsor caliber" width={1400} height={1600}
-          style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }} />
-        <div style={{ position:"absolute", inset:0, background:"linear-gradient(90deg,rgba(10,8,5,0.6) 0%,rgba(10,8,5,0.2) 50%,rgba(10,8,5,0) 100%)", display:"flex", alignItems:"center" }}>
-          <div className="ws-pad" style={{ maxWidth:620, padding:"0 60px", color:"#fff" }}>
+      <section 
+        className="ws-parallax-bg" 
+        style={{ 
+          position:"relative",
+          height:"540px", 
+          backgroundImage:`linear-gradient(90deg,rgba(10,8,5,0.7) 0%,rgba(10,8,5,0.3) 50%,rgba(10,8,5,0.1) 100%), url('/discover-service.jpg')`,
+        }}
+      >
+        <div style={{ position:"absolute", inset:0, display:"flex", alignItems:"center" }}>
+          <div className="ws-pad" style={{ maxWidth:640, padding:"0 60px", color:"#fff" }}>
             <div style={{ fontFamily:fontSans, fontSize:11, letterSpacing:"0.32em", color:"rgba(255,255,255,0.8)", marginBottom:18, textTransform:"uppercase" }}>The Craft</div>
             <h2 style={{ fontFamily:fontSerif, fontSize:"clamp(34px,5vw,56px)", fontWeight:500, lineHeight:1.1, margin:"0 0 22px" }}>
               Patience is our finest material.
@@ -366,10 +445,16 @@ export default function OurStoryPage() {
               </Link>
             </div>
           </div>
-          <div className="ws-img-wrap" style={{ overflow:"hidden", aspectRatio:"5/6", background:"#eee" }}>
-            <Image className="ws-img" src={ambassadorImg} alt="A Winsor wearer at the coast" width={1600} height={1000}
-              style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }} />
-          </div>
+          <div 
+            className="ws-parallax-bg" 
+            style={{ 
+              backgroundImage: `url('/discover-store.jpg')`,
+              height: "560px",
+              borderRadius: "4px",
+              boxShadow: "0 12px 30px rgba(26,18,9,0.06)",
+              border: "1px solid rgba(139,105,20,0.12)"
+            }} 
+          />
         </div>
       </section>
 

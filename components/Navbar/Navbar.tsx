@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useCurrency, CURRENCIES, CurrencyOption } from '@/app/context/CurrencyContext';
 import { SignInButton, UserButton, useUser } from '@clerk/nextjs';
+import { useCart } from '@/app/context/CartContext';
 
 const TOP_LEFT_LINKS  = [
   { label: 'Collections',   href: '/collections'   },
@@ -144,6 +145,7 @@ function MegaMenu({ visible, activeKey, showCurrency, onClose }: { visible:boole
 export default function Navbar() {
   const { selected, setCurrency } = useCurrency();
   const { isSignedIn } = useUser();
+  const { totalItemsCount } = useCart();
   const pathname = usePathname();
   const isHomepage = pathname === '/';
 
@@ -392,13 +394,21 @@ export default function Navbar() {
                         }
                       }
                     }}
-                  />
+                  >
+                    <UserButton.MenuItems>
+                      <UserButton.Link
+                        label="My Profile"
+                        labelIcon={<UserIcon />}
+                        href="/profile"
+                      />
+                    </UserButton.MenuItems>
+                  </UserButton>
                 </div>
               )}
               <Link href="/cart" style={{ position:'relative', color: tc, display:'flex' }} className="wn-ib">
                 <BagIcon />
                 <span style={{ position:'absolute', top:'-3px', right:'-5px', width:'14px', height:'14px', borderRadius:'50%', background:'#8B6914', color:'#fff', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'8px', fontFamily:"'Jost',sans-serif" }}>
-                  0
+                  {totalItemsCount > 9 ? '9+' : totalItemsCount}
                 </span>
               </Link>
               
@@ -631,6 +641,25 @@ export default function Navbar() {
           <p style={{ fontFamily:"'Jost',sans-serif", fontSize:'9px', letterSpacing:'0.28em', color:'#8B6914', marginTop:'24px', marginBottom:'10px', fontWeight:600 }}>
             EXPLORE
           </p>
+          {isSignedIn && (
+            <Link 
+              href="/profile" 
+              onClick={() => setMobileOpen(false)}
+              style={{ 
+                fontFamily:"'Jost',sans-serif", 
+                fontSize:'12.5px', 
+                letterSpacing:'0.09em', 
+                color:'#8B6914',
+                padding:'10px 0', 
+                borderBottom:'1px solid rgba(26,18,9,0.04)', 
+                textDecoration:'none',
+                fontWeight: 500,
+                display: 'block'
+              }}
+            >
+              My Profile Details
+            </Link>
+          )}
           {[...TOP_LEFT_LINKS,...TOP_RIGHT_LINKS].map(l => (
             <Link 
               key={l.href} 
@@ -682,7 +711,15 @@ export default function Navbar() {
                     }
                   }
                 }}
-              />
+              >
+                <UserButton.MenuItems>
+                  <UserButton.Link
+                    label="My Profile"
+                    labelIcon={<UserIcon />}
+                    href="/profile"
+                  />
+                </UserButton.MenuItems>
+              </UserButton>
               <span style={{ fontFamily:"'Jost',sans-serif", fontSize:'12px', color:'#1a1209' }}>Account</span>
             </div>
           )}
@@ -690,7 +727,7 @@ export default function Navbar() {
             <BagIcon />
             <span style={{ fontFamily:"'Jost',sans-serif", fontSize:'12px', color:'#1a1209' }}>Cart</span>
             <span style={{ position:'absolute', top:'-4px', right:'-8px', width:'16px', height:'16px', borderRadius:'50%', background:'#8B6914', color:'#fff', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'9px', fontFamily:"'Jost',sans-serif", fontWeight:500 }}>
-              0
+              {totalItemsCount > 9 ? '9+' : totalItemsCount}
             </span>
           </Link>
         </div>

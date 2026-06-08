@@ -18,6 +18,54 @@ export default function AdminLogin() {
   const searchParams = useSearchParams();
   const redirectTo = searchParams.get('redirect') || '/admin/dashboard';
 
+  // 3D Parallax Mouse Tracking State
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const containerRef = useRef<HTMLDivElement>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [tiltStyle, setTiltStyle] = useState<React.CSSProperties>({});
+
+  const handleGlobalMouseMove = (e: React.MouseEvent) => {
+    if (!containerRef.current) return;
+    const { clientX, clientY } = e;
+    const { innerWidth, innerHeight } = window;
+    
+    // Normalize coordinates from -0.5 to 0.5
+    const x = (clientX / innerWidth) - 0.5;
+    const y = (clientY / innerHeight) - 0.5;
+    
+    setMousePos({ x, y });
+  };
+
+  const handleCardMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!cardRef.current) return;
+    const card = cardRef.current;
+    const rect = card.getBoundingClientRect();
+    const x = e.clientX - rect.left - rect.width / 2;
+    const y = e.clientY - rect.top - rect.height / 2;
+    
+    // Rotation angles (max 10 degrees tilt)
+    const rotateX = -(y / (rect.height / 2)) * 10;
+    const rotateY = (x / (rect.width / 2)) * 10;
+    
+    // Shift card shadow slightly in opposite direction of tilt for 3D depth
+    const shadowX = -(x / (rect.width / 2)) * 15;
+    const shadowY = -(y / (rect.height / 2)) * 15;
+    
+    setTiltStyle({
+      transform: `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.015, 1.015, 1.015)`,
+      boxShadow: `${shadowX}px ${shadowY}px 40px -15px rgba(26,18,9,0.3), 0 25px 70px -20px rgba(26,18,9,0.25)`,
+      transition: 'transform 0.05s ease, box-shadow 0.05s ease',
+    });
+  };
+
+  const handleCardMouseLeave = () => {
+    setTiltStyle({
+      transform: 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)',
+      boxShadow: '0 20px 60px -20px rgba(26,18,9,0.25)',
+      transition: 'transform 0.5s ease-out, box-shadow 0.5s ease-out',
+    });
+  };
+
   useEffect(() => {
     // keep your existing session check logic here if any
   }, []);
@@ -37,7 +85,7 @@ export default function AdminLogin() {
       });
       const data = await res.json();
       if (!res.ok) {
-        toast.error(data?.message || 'Invalid credentials');
+        toast.error(data?.error || data?.message || 'Invalid credentials');
         turnstileRef.current?.reset();
         setTurnstileToken(null);
         return;
@@ -54,7 +102,11 @@ export default function AdminLogin() {
   };
 
   return (
-    <div className="min-h-screen w-full flex bg-[#f7f4ee]">
+    <div 
+      ref={containerRef}
+      onMouseMove={handleGlobalMouseMove}
+      className="min-h-screen w-full flex bg-[#f7f4ee] overflow-hidden select-none"
+    >
       <Toaster
         position="top-center"
         toastOptions={{
@@ -68,22 +120,36 @@ export default function AdminLogin() {
         }}
       />
 
-      {/* LEFT — Brand image panel */}
+      {/* LEFT — Brand image panel with 3D Parallax */}
       <div className="hidden lg:flex relative w-1/2 overflow-hidden">
-        {/* Background image */}
-        <Image
-          src="/discover-partners.jpg"
-          alt="Winsor luxury timepiece"
-          fill
-          priority
-          className="object-cover"
-        />
+        {/* Background image (moves opposite to cursor) */}
+        <div 
+          className="absolute inset-0 w-full h-full"
+          style={{
+            transform: `scale(1.1) translate(${mousePos.x * -20}px, ${mousePos.y * -20}px)`,
+            transition: 'transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+          }}
+        >
+          <Image
+            src="/discover-partners.jpg"
+            alt="Winsor luxury timepiece"
+            fill
+            priority
+            className="object-cover"
+          />
+        </div>
         {/* Dark gradient overlay for readability */}
-        <div className="absolute inset-0 bg-gradient-to-br from-black/80 via-black/55 to-black/85" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(201,161,74,0.18),transparent_55%)]" />
+        <div className="absolute inset-0 bg-gradient-to-br from-black/85 via-black/60 to-black/90 z-0" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(201,161,74,0.2),transparent_55%)] z-0" />
 
-        {/* Content overlay */}
-        <div className="relative z-10 flex flex-col justify-between w-full p-12 xl:p-16 text-white">
+        {/* Content overlay (moves in direction of cursor to create 3D depth) */}
+        <div 
+          className="relative z-10 flex flex-col justify-between w-full p-12 xl:p-16 text-white"
+          style={{
+            transform: `translate(${mousePos.x * 15}px, ${mousePos.y * 15}px)`,
+            transition: 'transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+          }}
+        >
           {/* Top — logo */}
           <div className="flex items-center gap-3">
             <Image
@@ -116,11 +182,26 @@ export default function AdminLogin() {
         </div>
       </div>
 
-      {/* RIGHT — Login form */}
-      <div className="flex-1 flex items-center justify-center px-6 py-12 lg:px-16">
-        <div className="w-full max-w-md">
-          {/* Logo + Admin Portal */}
-          <div className="flex flex-col items-center mb-10">
+      {/* RIGHT — Login form with 3D Card Tilt */}
+      <div className="flex-1 flex items-center justify-center px-6 py-12 lg:px-16 z-10">
+        <div className="w-full max-w-md relative" style={{ perspective: '1000px' }}>
+          
+          {/* Ambient background glow that shifts with the mouse */}
+          <div 
+            className="absolute -inset-4 bg-gradient-to-r from-[#c9a14a]/10 to-[#8B6914]/10 rounded-2xl blur-2xl opacity-70 pointer-events-none transition-transform duration-300"
+            style={{
+              transform: `translate(${mousePos.x * 12}px, ${mousePos.y * 12}px)`,
+            }}
+          />
+
+          {/* Logo + Admin Portal (floating) */}
+          <div 
+            className="flex flex-col items-center mb-8"
+            style={{
+              transform: `translate(${mousePos.x * 8}px, ${mousePos.y * 8}px)`,
+              transition: 'transform 0.15s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+            }}
+          >
             <Image
               src="/winsor-logo.png"
               alt="Winsor"
@@ -129,7 +210,7 @@ export default function AdminLogin() {
               priority
               className="h-14 w-auto object-contain"
             />
-            <div className="flex items-center gap-3 mt-5">
+            <div className="flex items-center gap-3 mt-4">
               <span className="h-px w-8 bg-[#c9a14a]" />
               <span className="text-[11px] tracking-[0.4em] uppercase text-[#8B6914] font-medium">
                 Admin Portal
@@ -138,14 +219,23 @@ export default function AdminLogin() {
             </div>
           </div>
 
-          {/* Card */}
-          <div className="bg-white border border-[#1a1209]/10 rounded-2xl shadow-[0_20px_60px_-20px_rgba(26,18,9,0.25)] p-8 sm:p-10">
-            <div className="mb-7">
+          {/* 3D Tilt Card */}
+          <div 
+            ref={cardRef}
+            onMouseMove={handleCardMouseMove}
+            onMouseLeave={handleCardMouseLeave}
+            style={{
+              ...tiltStyle,
+              transformStyle: 'preserve-3d',
+            }}
+            className="bg-white border border-[#1a1209]/10 rounded-2xl p-8 sm:p-10 shadow-[0_20px_60px_-20px_rgba(26,18,9,0.25)] relative overflow-hidden"
+          >
+            <div className="mb-7" style={{ transform: 'translateZ(30px)' }}>
               <h1 className="font-serif text-2xl text-[#1a1209]">Sign in to your account</h1>
               <p className="text-sm text-[#1a1209]/55 mt-1">Enter your credentials to continue</p>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-5">
+            <form onSubmit={handleSubmit} className="space-y-5" style={{ transform: 'translateZ(20px)' }}>
               {/* Username */}
               <div>
                 <label className="block text-[11px] font-semibold tracking-[0.3em] uppercase text-[#1a1209]/70 mb-2">
@@ -230,7 +320,13 @@ export default function AdminLogin() {
             </form>
           </div>
 
-          <p className="text-center text-xs text-[#1a1209]/45 mt-6">
+          <p 
+            className="text-center text-xs text-[#1a1209]/45 mt-6"
+            style={{
+              transform: `translate(${mousePos.x * 6}px, ${mousePos.y * 6}px)`,
+              transition: 'transform 0.15s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+            }}
+          >
             Having trouble? Contact your administrator
           </p>
         </div>

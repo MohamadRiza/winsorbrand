@@ -20,8 +20,9 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json({ success: true, data: asset });
-  } catch (error: unknown) {
-    const msg = error instanceof Error ? error.message : 'Upload failed';
+  } catch (error: any) {
+    console.error('Upload API Error:', error);
+    const msg = error?.message || (typeof error === 'string' ? error : JSON.stringify(error)) || 'Upload failed';
     return NextResponse.json({ success: false, error: msg }, { status: 500 });
   }
 }

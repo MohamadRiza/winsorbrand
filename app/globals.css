@@ -24,3 +24,32 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Custom Hot Toast Styles to ensure it displays top-right under the navbar on all screens including mobile */
+.winsor-toaster {
+  z-index: 999999 !important;
+}
+
+/* Force container position to remain top-right under navbar on all viewports */
+.winsor-toaster > div {
+  top: 96px !important; /* Under desktop navbar (86px height + offset) */
+  right: 24px !important;
+  left: auto !important;
+  justify-content: flex-end !important;
+  align-items: flex-end !important;
+}
+
+@media (max-width: 1024px) {
+  .winsor-toaster > div {
+    top: 60px !important; /* Under mobile navbar (44px height + offset) */
+    right: 16px !important;
+    left: auto !important;
+    align-items: flex-end !important;
+  }
+}
+

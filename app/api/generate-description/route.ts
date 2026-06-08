@@ -1,15 +1,21 @@
 // app/api/generate-description/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 
-// Simple in-memory cache (use Redis in production)
+// Simple in-memory cache
 const cache = new Map<string, { response: string; timestamp: number }>();
 const CACHE_TTL = 1000 * 60 * 60; // 1 hour
 
+// Fallback template generator in case Gemini API is rate-limited or key has expired
+const generateFallback = (title: string, modelNo: string, watchShape: string, price: number) => {
+  const formattedPrice = price ? `LKR ${price.toLocaleString()}` : '';
+  return `Introducing the Winsor ${title} (Model: ${modelNo}). Masterfully crafted to embody timeless sophistication, this exquisite timepiece features a distinguished ${watchShape.toLowerCase()} silhouette. Every detail, from the pristine dial finish to the precision-engineered movement, reflects our commitment to horological excellence. Offered at ${formattedPrice}, it stands as a statement of luxury and refined taste, designed for the modern connoisseur who values both style and performance.`;
+};
+
 export async function POST(req: NextRequest) {
   try {
-    const { title, modelNo, watchShape, price } = await req.json();
+    const { title, modelNo, watchShape, price, thumbnailUrl } = await req.json();
     
-    const cacheKey = `${title}-${modelNo}`;
+    const cacheKey = `${title}-${modelNo}-${thumbnailUrl ? 'withImage' : 'noImage'}`;
     
     // Check cache first
     const cached = cache.get(cacheKey);
@@ -20,16 +26,55 @@ export async function POST(req: NextRequest) {
     const apiKey = process.env.GEMINI_API_KEY;
     
     if (!apiKey) {
-      return NextResponse.json({ error: 'API key not configured' }, { status: 500 });
+      console.warn('GEMINI_API_KEY not configured. Using luxurious template fallback.');
+      const fallbackDesc = generateFallback(title, modelNo, watchShape, price);
+      return NextResponse.json({ 
+        description: fallbackDesc, 
+        cached: false, 
+        warning: 'API key not configured. Generated template description.' 
+      });
     }
 
-    const prompt = `Generate a luxurious, compelling product description for a premium watch:
+    // 1. Fetch the image and convert to base64 if available
+    let imagePart = null;
+    if (thumbnailUrl) {
+      try {
+        const imgRes = await fetch(thumbnailUrl);
+        if (imgRes.ok) {
+          const buffer = await imgRes.arrayBuffer();
+          const base64 = Buffer.from(buffer).toString('base64');
+          
+          let mimeType = 'image/jpeg';
+          if (thumbnailUrl.toLowerCase().endsWith('.png')) mimeType = 'image/png';
+          else if (thumbnailUrl.toLowerCase().endsWith('.webp')) mimeType = 'image/webp';
+          
+          imagePart = {
+            inlineData: {
+              mimeType,
+              data: base64
+            }
+          };
+        }
+      } catch (err) {
+        console.error('Failed to fetch image for Gemini analysis:', err);
+      }
+    }
+
+    // 2. Build multimodal prompt
+    const prompt = `Generate a luxurious, compelling product description for a premium watch.
+${imagePart ? 'Please analyze the provided image of the watch to describe its specific visual features (e.g., dial texture, color scheme, indices, bezel style, strap/bracelet finish, and metal highlights) accurately.' : ''}
+Details:
 - Title: ${title}
 - Model: ${modelNo}
 - Shape: ${watchShape}
 - Price: LKR ${price?.toLocaleString()}
 
-Write a sophisticated 150-200 word description highlighting craftsmanship, elegance, precision, and luxury. Use persuasive language suitable for a high-end watch brand.`;
+Write a sophisticated 150-200 word description highlighting craftsmanship, design highlights, precision, and elegance. Use persuasive language suitable for a high-end luxury brand. Do not start with generic greetings.`;
+
+    const parts: any[] = [{ text: prompt }];
+    if (imagePart) {
+      parts.push(imagePart);
+    }
 
     const res = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
@@ -37,32 +82,35 @@ Write a sophisticated 150-200 word description highlighting craftsmanship, elega
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
+          contents: [{ parts }],
           generationConfig: { temperature: 0.7, maxOutputTokens: 500 },
         }),
       }
     );
 
-    if (res.status === 429) {
-      return NextResponse.json(
-        { error: 'Rate limit exceeded. Please wait a moment and try again.' },
-        { status: 429 }
-      );
-    }
-
     if (!res.ok) {
       const errorData = await res.json().catch(() => ({}));
-      return NextResponse.json(
-        { error: errorData.error?.message || 'Failed to generate description' },
-        { status: res.status }
-      );
+      console.error('Gemini API request failed:', errorData);
+      
+      // Gratefully fallback to local template generator
+      const fallbackDesc = generateFallback(title, modelNo, watchShape, price);
+      return NextResponse.json({
+        description: fallbackDesc,
+        cached: false,
+        warning: 'Gemini API limit reached. Generated template description instead.'
+      });
     }
 
     const data = await res.json();
     const description = data.candidates?.[0]?.content?.parts?.[0]?.text;
     
     if (!description) {
-      return NextResponse.json({ error: 'No description generated' }, { status: 500 });
+      const fallbackDesc = generateFallback(title, modelNo, watchShape, price);
+      return NextResponse.json({ 
+        description: fallbackDesc, 
+        cached: false,
+        warning: 'Gemini response empty. Generated template description.'
+      });
     }
 
     // Cache the result

@@ -14,7 +14,8 @@ export async function GET(req: NextRequest) {
 
     const products = await Product.find(filter).sort({ createdAt: -1 });
     return NextResponse.json({ success: true, data: products });
-  } catch {
+  } catch (error: any) {
+    console.error('API Products GET Error:', error);
     return NextResponse.json({ success: false, error: 'Server error' }, { status: 500 });
   }
 }

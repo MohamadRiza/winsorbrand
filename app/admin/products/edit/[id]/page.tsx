@@ -15,6 +15,7 @@ export default function EditProductPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
+  const [generatingDescription, setGeneratingDescription] = useState(false);
   const [giftCategories, setGiftCategories] = useState<Array<{ _id: string; slug: string; label: string; emoji: string }>>([]);
   
   const [formData, setFormData] = useState({
@@ -29,6 +30,7 @@ export default function EditProductPage() {
     colorVariants: [] as ColorVariant[],
     thumbnail: EMPTY_ASSET,
     images: [] as CloudinaryAsset[],
+    video: EMPTY_ASSET,
     collectionSections: [] as CollectionSection[],
     giftCategories: [] as string[],
     isActive: false,
@@ -77,6 +79,7 @@ export default function EditProductPage() {
         colorVariants: product.colorVariants || [],
         thumbnail: product.thumbnail || EMPTY_ASSET,
         images: product.images || [],
+        video: product.video || EMPTY_ASSET,
         collectionSections: product.collectionSections || [],
         giftCategories: product.giftCategories || [],
         isActive: product.isActive,
@@ -93,7 +96,52 @@ export default function EditProductPage() {
     }
   };
 
-  const handleImageUpload = async (file: File, type: 'thumbnail' | 'gallery' | 'color') => {
+  // ✅ Server-side AI description generation with image analysis
+  const generateDescription = async () => {
+    if (!formData.title?.trim() || !formData.modelNo?.trim()) {
+      toast.error('Please enter product title and model number first');
+      return;
+    }
+
+    setGeneratingDescription(true);
+    try {
+      const res = await fetch('/api/generate-description', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: formData.title,
+          modelNo: formData.modelNo,
+          watchShape: formData.watchShape,
+          price: formData.price,
+          thumbnailUrl: formData.thumbnail?.url || '',
+        }),
+      });
+
+      const data = await res.json();
+      
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to generate description');
+      }
+
+      if (data.warning) {
+        toast(data.warning, { icon: '⚠️' });
+      } else if (data.cached) {
+        toast.success('Using cached description ✨');
+      } else {
+        toast.success('Description generated successfully!');
+      }
+      
+      setFormData(prev => ({ ...prev, description: data.description }));
+      
+    } catch (error: any) {
+      console.error('AI Generation error:', error);
+      toast.error(error.message || 'Failed to generate description');
+    } finally {
+      setGeneratingDescription(false);
+    }
+  };
+
+  const handleImageUpload = async (file: File, type: 'thumbnail' | 'gallery' | 'color' | 'video') => {
     setUploadingImage(true);
     try {
       const reader = new FileReader();
@@ -118,9 +166,11 @@ export default function EditProductPage() {
             setFormData(prev => ({ ...prev, thumbnail: data.data }));
           } else if (type === 'gallery') {
             setFormData(prev => ({ ...prev, images: [...prev.images, data.data] }));
+          } else if (type === 'video') {
+            setFormData(prev => ({ ...prev, video: data.data }));
           }
 
-          toast.success('Image uploaded successfully');
+          toast.success('File uploaded successfully');
         } catch (error: any) {
           toast.error(error.message || 'Upload failed');
         } finally {
@@ -221,10 +271,19 @@ export default function EditProductPage() {
 
     setSaving(true);
     try {
+      const payload = {
+        ...formData,
+        colorVariants: formData.colorVariants.map(v => ({
+          ...v,
+          image: (v.image?.url) ? v.image : undefined
+        })),
+        video: (formData.video?.url) ? formData.video : undefined
+      };
+
       const res = await fetch(`/api/products/${productId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
       });
 
       const data = await res.json();
@@ -354,26 +413,33 @@ export default function EditProductPage() {
             </div>
 
             <div className="md:col-span-2">
-              <label className="block text-[11px] font-semibold tracking-[0.2em] uppercase text-[#1a1209]/70 mb-2">
-                Description *
-              </label>
-              <textarea
-                value={formData.description}
-                onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                placeholder="Describe the product features, materials, craftsmanship..."
-                required
-                rows={4}
-                className="w-full px-4 py-2.5 bg-[#fbf9f4] border border-[#1a1209]/15 rounded-lg text-[#1a1209] placeholder-[#1a1209]/30 focus:outline-none focus:border-[#8B6914] focus:ring-2 focus:ring-[#8B6914]/20 transition font-['Jost'] text-sm resize-none"
-              />
+              <div className="flex items-center justify-between mb-2">
+                <label className="block text-[11px] font-semibold tracking-[0.2em] uppercase text-[#1a1209]/70">Description *</label>
+                <button 
+                  type="button" 
+                  onClick={generateDescription} 
+                  disabled={generatingDescription || !formData.title?.trim() || !formData.modelNo?.trim()}
+                  suppressHydrationWarning={true}
+                  className="px-3 py-1.5 bg-gradient-to-r from-[#8B6914] to-[#a07d1a] text-white text-xs rounded-lg hover:from-[#6f5410] hover:to-[#8B6914] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 font-['Jost']"
+                >
+                  {generatingDescription ? (
+                    <><svg className="animate-spin h-4 w-4" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>Generating...</>
+                  ) : (
+                    <><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>AI Generate</>
+                  )}
+                </button>
+              </div>
+              <textarea value={formData.description} onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))} placeholder="Describe the product features, materials, craftsmanship... or click AI Generate" required rows={5} className="w-full px-4 py-2.5 bg-[#fbf9f4] border border-[#1a1209]/15 rounded-lg text-[#1a1209] placeholder-[#1a1209]/30 focus:outline-none focus:border-[#8B6914] focus:ring-2 focus:ring-[#8B6914]/20 transition font-['Jost'] text-sm resize-none" />
+              <p className="text-xs text-[#1a1209]/40 mt-1">AI-powered description generation using Gemini (Server-side)</p>
             </div>
           </div>
         </div>
 
-        {/* Images */}
+        {/* Images & Video */}
         <div className="bg-white rounded-xl border border-[#1a1209]/10 p-6">
-          <h3 className="font-['Jost'] font-semibold text-[#1a1209] mb-4">Product Images</h3>
+          <h3 className="font-['Jost'] font-semibold text-[#1a1209] mb-4">Product Media</h3>
           
-          <div className="space-y-4">
+          <div className="space-y-6">
             <div>
               <label className="block text-[11px] font-semibold tracking-[0.2em] uppercase text-[#1a1209]/70 mb-2">
                 Thumbnail Image *
@@ -411,7 +477,7 @@ export default function EditProductPage() {
 
             <div>
               <label className="block text-[11px] font-semibold tracking-[0.2em] uppercase text-[#1a1209]/70 mb-2">
-                Gallery Images
+                Gallery Images (Max 6)
               </label>
               <div className="flex gap-4 flex-wrap">
                 {formData.images.map((img, idx) => (
@@ -429,7 +495,7 @@ export default function EditProductPage() {
                     </button>
                   </div>
                 ))}
-                {formData.images.length < 10 && (
+                {formData.images.length < 6 && (
                   <label className="flex flex-col items-center justify-center w-24 h-24 border-2 border-dashed border-[#1a1209]/20 rounded-lg cursor-pointer hover:border-[#8B6914] transition-colors">
                     <svg className="w-6 h-6 text-[#1a1209]/40 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -439,6 +505,41 @@ export default function EditProductPage() {
                       type="file"
                       accept="image/*"
                       onChange={(e) => e.target.files?.[0] && handleImageUpload(e.target.files[0], 'gallery')}
+                      disabled={uploadingImage}
+                      className="hidden"
+                    />
+                  </label>
+                )}
+              </div>
+            </div>
+
+            {/* Video (Optional) */}
+            <div>
+              <label className="block text-[11px] font-semibold tracking-[0.2em] uppercase text-[#1a1209]/70 mb-2">
+                Product Video (Optional)
+              </label>
+              <div className="flex items-center gap-4">
+                {formData.video?.url ? (
+                  <div className="relative w-48 h-32 rounded-lg overflow-hidden border border-[#1a1209]/10">
+                    <video src={formData.video.url} controls className="w-full h-full object-cover" />
+                    <button
+                      type="button"
+                      onClick={() => setFormData(prev => ({ ...prev, video: EMPTY_ASSET }))}
+                      className="absolute top-1 right-1 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600"
+                    >
+                      ×
+                    </button>
+                  </div>
+                ) : (
+                  <label className="flex flex-col items-center justify-center w-48 h-32 border-2 border-dashed border-[#1a1209]/20 rounded-lg cursor-pointer hover:border-[#8B6914] transition-colors">
+                    <svg className="w-8 h-8 text-[#1a1209]/40 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    </svg>
+                    <span className="text-xs text-[#1a1209]/60">Upload Video</span>
+                    <input
+                      type="file"
+                      accept="video/*"
+                      onChange={(e) => e.target.files?.[0] && handleImageUpload(e.target.files[0], 'video')}
                       disabled={uploadingImage}
                       className="hidden"
                     />
