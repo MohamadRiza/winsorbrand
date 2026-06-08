@@ -41,6 +41,97 @@ export default function AdminRetailersPage() {
     isActive: true,
   });
 
+  const [checkingSpelling, setCheckingSpelling] = useState<Record<string, boolean>>({});
+  const [spellCheckResult, setSpellCheckResult] = useState<{
+    field: string;
+    originalText: string;
+    correctedText: string;
+    errorDetails: string;
+  } | null>(null);
+
+  const [resolvingLink, setResolvingLink] = useState(false);
+  const [extractedMapDetails, setExtractedMapDetails] = useState<{
+    name: string;
+    address: string;
+    city: string;
+    country: string;
+    latitude?: number;
+    longitude?: number;
+  } | null>(null);
+
+  const checkSpelling = async (fieldName: string, text: string) => {
+    if (!text || !text.trim()) {
+      toast.error('Field is empty');
+      return;
+    }
+    setCheckingSpelling(prev => ({ ...prev, [fieldName]: true }));
+    try {
+      const res = await fetch('/api/admin/check-spelling', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) throw new Error(data.error || 'Request failed');
+      
+      if (data.warning) {
+        toast(data.warning, { icon: '⚠️', duration: 6000 });
+        return;
+      }
+      
+      if (data.errorsFound && data.correctedText.trim().toLowerCase() !== text.trim().toLowerCase()) {
+        setSpellCheckResult({
+          field: fieldName,
+          originalText: text,
+          correctedText: data.correctedText,
+          errorDetails: data.errorDetails || 'Detected spelling/grammar mistypes.'
+        });
+      } else {
+        toast.success('No spelling errors detected!');
+      }
+    } catch (err: any) {
+      console.error(err);
+      toast.error('Failed to run AI spell check');
+    } finally {
+      setCheckingSpelling(prev => ({ ...prev, [fieldName]: false }));
+    }
+  };
+
+  const handleApplySpelling = (field: string, val: string) => {
+    setFormData(prev => ({ ...prev, [field]: val }));
+    toast.success('Spelling correction applied!');
+  };
+
+  const handleResolveMapsLink = async () => {
+    const url = formData.googleMapsLink;
+    if (!url || !url.trim()) {
+      toast.error('Please paste a Google Maps Link first');
+      return;
+    }
+    
+    setResolvingLink(true);
+    try {
+      const res = await fetch('/api/admin/resolve-maps-link', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) throw new Error(data.error || 'Failed to extract details');
+      
+      if (data.warning) {
+        toast(data.warning, { icon: '⚠️', duration: 6000 });
+      }
+      
+      setExtractedMapDetails(data.data);
+    } catch (err: any) {
+      console.error(err);
+      toast.error(err.message || 'Could not extract shop details from Maps link');
+    } finally {
+      setResolvingLink(false);
+    }
+  };
+
   useEffect(() => {
     fetchRetailers();
   }, []);
@@ -286,9 +377,21 @@ export default function AdminRetailersPage() {
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-[11px] font-semibold tracking-[0.2em] uppercase text-[#1a1209]/70 mb-2">
-                  Shop Name *
-                </label>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="block text-[11px] font-semibold tracking-[0.2em] uppercase text-[#1a1209]/70">
+                    Shop Name *
+                  </label>
+                  {formData.name.trim() && (
+                    <button
+                      type="button"
+                      onClick={() => checkSpelling('name', formData.name)}
+                      disabled={checkingSpelling['name']}
+                      className="text-[10px] text-[#8B6914] hover:text-[#1a1209] transition font-semibold flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                    >
+                      {checkingSpelling['name'] ? 'Checking...' : '✨ AI Check'}
+                    </button>
+                  )}
+                </div>
                 <input
                   type="text"
                   value={formData.name}
@@ -300,9 +403,21 @@ export default function AdminRetailersPage() {
               </div>
 
               <div>
-                <label className="block text-[11px] font-semibold tracking-[0.2em] uppercase text-[#1a1209]/70 mb-2">
-                  Street Address *
-                </label>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="block text-[11px] font-semibold tracking-[0.2em] uppercase text-[#1a1209]/70">
+                    Street Address *
+                  </label>
+                  {formData.address.trim() && (
+                    <button
+                      type="button"
+                      onClick={() => checkSpelling('address', formData.address)}
+                      disabled={checkingSpelling['address']}
+                      className="text-[10px] text-[#8B6914] hover:text-[#1a1209] transition font-semibold flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                    >
+                      {checkingSpelling['address'] ? 'Checking...' : '✨ AI Check'}
+                    </button>
+                  )}
+                </div>
                 <input
                   type="text"
                   value={formData.address}
@@ -343,9 +458,21 @@ export default function AdminRetailersPage() {
               </div>
 
               <div>
-                <label className="block text-[11px] font-semibold tracking-[0.2em] uppercase text-[#1a1209]/70 mb-2">
-                  Google Maps Link *
-                </label>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="block text-[11px] font-semibold tracking-[0.2em] uppercase text-[#1a1209]/70">
+                    Google Maps Link *
+                  </label>
+                  {formData.googleMapsLink.trim() && (
+                    <button
+                      type="button"
+                      onClick={handleResolveMapsLink}
+                      disabled={resolvingLink}
+                      className="text-[10px] text-[#8B6914] hover:text-[#1a1209] transition font-semibold flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                    >
+                      {resolvingLink ? 'Resolving...' : '✨ AI Auto-Fill'}
+                    </button>
+                  )}
+                </div>
                 <input
                   type="url"
                   value={formData.googleMapsLink}
@@ -621,6 +748,137 @@ export default function AdminRetailersPage() {
           </div>
         </div>
       </div>
+
+      {spellCheckResult && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[99999] p-4">
+          <div className="bg-white border border-[#8B6914]/30 rounded-xl max-w-md w-full p-6 shadow-2xl animate-in fade-in zoom-in duration-200">
+            <div className="flex items-center gap-2 text-[#8B6914] mb-3">
+              <span className="text-xl">✨</span>
+              <h3 className="font-semibold text-lg font-['Jost']">AI Spelling Suggestion</h3>
+            </div>
+            
+            <p className="text-xs text-gray-500 mb-4 font-['Jost']">
+              Reason: {spellCheckResult.errorDetails}
+            </p>
+
+            <div className="space-y-3 mb-6 font-['Jost']">
+              <div>
+                <span className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Original Text</span>
+                <p className="text-sm text-red-600 bg-red-50 p-2.5 rounded-lg border border-red-100 font-medium">
+                  {spellCheckResult.originalText}
+                </p>
+              </div>
+              <div>
+                <span className="block text-[10px] font-bold text-green-600 uppercase tracking-wider mb-1">Suggested Correction</span>
+                <p className="text-sm text-green-700 bg-green-50 p-2.5 rounded-lg border border-green-100 font-medium">
+                  {spellCheckResult.correctedText}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={() => setSpellCheckResult(null)}
+                className="flex-1 py-2 px-4 border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50 font-['Jost'] cursor-pointer"
+              >
+                Keep Original
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  handleApplySpelling(spellCheckResult.field, spellCheckResult.correctedText);
+                  setSpellCheckResult(null);
+                }}
+                className="flex-1 py-2 px-4 bg-[#1a1209] hover:bg-[#8B6914] text-white font-semibold rounded-lg text-sm transition-colors font-['Jost'] cursor-pointer"
+              >
+                Apply Correction
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {extractedMapDetails && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[99999] p-4">
+          <div className="bg-white border border-[#8B6914]/30 rounded-xl max-w-lg w-full p-6 shadow-2xl animate-in fade-in zoom-in duration-200">
+            <div className="flex items-center gap-2 text-[#8B6914] mb-3">
+              <span className="text-xl">🗺️</span>
+              <h3 className="font-semibold text-lg font-['Jost']">AI Extracted Boutique Details</h3>
+            </div>
+            
+            <p className="text-xs text-gray-500 mb-4 font-['Jost']">
+              Gemini analyzed the Google Maps link and extracted the details below. Please review before importing them into your form.
+            </p>
+
+            <div className="space-y-3 mb-6 font-['Jost'] text-sm">
+              <div className="grid grid-cols-3 border-b border-[#1a1209]/10 pb-2">
+                <span className="text-xs font-bold text-gray-400 uppercase tracking-wider self-center">Shop Name</span>
+                <span className="col-span-2 font-medium text-[#1a1209] bg-[#faf7f0] px-2.5 py-1.5 rounded-lg border border-[#1a1209]/5">
+                  {extractedMapDetails.name || '(Not detected)'}
+                </span>
+              </div>
+              <div className="grid grid-cols-3 border-b border-[#1a1209]/10 pb-2">
+                <span className="text-xs font-bold text-gray-400 uppercase tracking-wider self-center">Street Address</span>
+                <span className="col-span-2 font-medium text-[#1a1209] bg-[#faf7f0] px-2.5 py-1.5 rounded-lg border border-[#1a1209]/5">
+                  {extractedMapDetails.address || '(Not detected)'}
+                </span>
+              </div>
+              <div className="grid grid-cols-3 border-b border-[#1a1209]/10 pb-2">
+                <span className="text-xs font-bold text-gray-400 uppercase tracking-wider self-center">City</span>
+                <span className="col-span-2 font-medium text-[#1a1209] bg-[#faf7f0] px-2.5 py-1.5 rounded-lg border border-[#1a1209]/5">
+                  {extractedMapDetails.city || '(Not detected)'}
+                </span>
+              </div>
+              <div className="grid grid-cols-3 border-b border-[#1a1209]/10 pb-2">
+                <span className="text-xs font-bold text-gray-400 uppercase tracking-wider self-center">Country</span>
+                <span className="col-span-2 font-medium text-[#1a1209] bg-[#faf7f0] px-2.5 py-1.5 rounded-lg border border-[#1a1209]/5">
+                  {extractedMapDetails.country || '(Not detected)'}
+                </span>
+              </div>
+              <div className="grid grid-cols-3 pb-2">
+                <span className="text-xs font-bold text-gray-400 uppercase tracking-wider self-center">Coordinates</span>
+                <span className="col-span-2 font-medium text-[#1a1209] bg-[#faf7f0] px-2.5 py-1.5 rounded-lg border border-[#1a1209]/5">
+                  {extractedMapDetails.latitude !== undefined && extractedMapDetails.longitude !== undefined ? (
+                    <code className="font-mono text-xs">{extractedMapDetails.latitude}, {extractedMapDetails.longitude}</code>
+                  ) : (
+                    <span className="text-gray-400 italic">None</span>
+                  )}
+                </span>
+              </div>
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={() => setExtractedMapDetails(null)}
+                className="flex-1 py-2 px-4 border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50 font-['Jost'] cursor-pointer"
+              >
+                Discard
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setFormData(prev => ({
+                    ...prev,
+                    name: extractedMapDetails.name || prev.name,
+                    address: extractedMapDetails.address || prev.address,
+                    city: extractedMapDetails.city || prev.city,
+                    country: extractedMapDetails.country || prev.country,
+                    latitude: extractedMapDetails.latitude !== undefined ? extractedMapDetails.latitude : prev.latitude,
+                    longitude: extractedMapDetails.longitude !== undefined ? extractedMapDetails.longitude : prev.longitude,
+                  }));
+                  toast.success('Boutique details auto-filled!');
+                  setExtractedMapDetails(null);
+                }}
+                className="flex-1 py-2 px-4 bg-[#1a1209] hover:bg-[#8B6914] text-white font-semibold rounded-lg text-sm transition-colors font-['Jost'] cursor-pointer"
+              >
+                Confirm & Import
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

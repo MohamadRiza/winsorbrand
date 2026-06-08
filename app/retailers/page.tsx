@@ -227,111 +227,125 @@ export default function StoreLocatorPage() {
   return (
     <div style={{ backgroundColor: '#faf7f0', minHeight: '100vh', paddingBottom: '80px' }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Jost:wght@300;400;500;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Jost:wght@300;400;500;600&display=swap');
         
         .locator-banner {
-          height: 320px;
+          height: 380px;
           position: relative;
-          background-image: linear-gradient(rgba(26,18,9,0.45), rgba(26,18,9,0.65)), url('https://images.unsplash.com/photo-1540555700478-4be289fbecef?q=80&w=1600&auto=format&fit=crop');
+          background-image: linear-gradient(rgba(26,18,9,0.5), rgba(26,18,9,0.7)), url('/discover-store.jpg');
           background-size: cover;
           background-position: center;
+          background-attachment: fixed;
           display: flex;
           flex-direction: column;
           align-items: center;
           justify-content: center;
           text-align: center;
           color: #ffffff;
-          padding: 0 20px;
+          padding: 0 24px;
+          border-bottom: 2px solid #8B6914;
         }
         .locator-banner h1 {
           font-family: 'Cormorant Garamond', serif;
-          font-size: clamp(32px, 6vw, 48px);
+          font-size: clamp(34px, 5vw, 50px);
           font-weight: 300;
-          letter-spacing: 0.1em;
+          letter-spacing: 0.12em;
           text-transform: uppercase;
-          margin: 0 0 12px;
+          margin: 0 0 14px;
+          text-shadow: 0 2px 10px rgba(0,0,0,0.3);
         }
         .locator-banner p {
           font-family: 'Jost', sans-serif;
-          font-size: 14px;
+          font-size: clamp(12px, 3.5vw, 14px);
           font-weight: 300;
-          letter-spacing: 0.15em;
+          letter-spacing: 0.18em;
           text-transform: uppercase;
-          color: rgba(255,255,255,0.8);
-          max-width: 600px;
-          line-height: 1.5;
+          color: rgba(255,255,255,0.9);
+          max-width: 640px;
+          line-height: 1.6;
         }
         .locator-toolbar {
           max-width: 1200px;
-          margin: -30px auto 40px;
+          margin: -40px auto 48px;
           width: calc(100% - 32px);
           background: #ffffff;
-          border: 1px solid rgba(26,18,9,0.08);
-          border-radius: 8px;
-          padding: 24px;
-          box-shadow: 0 8px 30px rgba(26,18,9,0.05);
+          border: 1px solid rgba(139, 105, 20, 0.16);
+          border-radius: 12px;
+          padding: 20px 28px;
+          box-shadow: 0 12px 40px rgba(26,18,9,0.06);
           display: flex;
           flex-wrap: wrap;
-          gap: 16px;
+          gap: 18px;
           align-items: center;
+          z-index: 10;
+          position: relative;
         }
         .locator-search-wrapper {
           position: relative;
-          flex: 1;
+          flex: 1.5;
           min-width: 280px;
         }
         .locator-search-input {
           width: 100%;
-          background: #fbf9f4;
-          border: 1px solid rgba(26,18,9,0.1);
-          border-radius: 6px;
-          padding: 12px 16px 12px 42px;
+          background: #fdfaf6;
+          border: 1px solid rgba(26,18,9,0.12);
+          border-radius: 8px;
+          padding: 13px 18px 13px 46px;
           font-family: 'Jost', sans-serif;
           font-size: 13.5px;
           color: #1a1209;
           outline: none;
-          transition: border-color 0.2s;
+          transition: all 0.3s ease;
         }
         .locator-search-input:focus {
           border-color: #8B6914;
+          background: #ffffff;
+          box-shadow: 0 0 0 3px rgba(139,105,20,0.1);
         }
         .locator-search-icon {
           position: absolute;
-          left: 14px;
+          left: 16px;
           top: 50%;
           transform: translateY(-50%);
-          color: rgba(26,18,9,0.4);
+          color: #8B6914;
           pointer-events: none;
+          opacity: 0.75;
         }
         .locator-select {
           background: #ffffff;
-          border: 1px solid rgba(26,18,9,0.1);
-          border-radius: 6px;
-          padding: 12px 16px;
+          border: 1px solid rgba(26,18,9,0.12);
+          border-radius: 8px;
+          padding: 13px 36px 13px 18px;
           font-family: 'Jost', sans-serif;
           font-size: 13.5px;
           color: #1a1209;
           cursor: pointer;
           outline: none;
           min-width: 180px;
-          transition: border-color 0.2s;
+          transition: all 0.3s ease;
+          appearance: none;
+          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%238B6914' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19.5 8.25l-7.5 7.5-7.5-7.5'/%3E%3C/svg%3E");
+          background-repeat: no-repeat;
+          background-position: right 14px center;
+          background-size: 15px;
         }
         .locator-select:focus {
           border-color: #8B6914;
+          box-shadow: 0 0 0 3px rgba(139,105,20,0.1);
         }
         .locator-reset-btn {
-          background: none;
-          border: 1px solid rgba(26,18,9,0.15);
+          background: transparent;
+          border: 1px solid rgba(26,18,9,0.18);
           color: #1a1209;
-          padding: 12px 24px;
+          padding: 13px 26px;
           font-family: 'Jost', sans-serif;
           font-size: 12px;
           font-weight: 500;
           letter-spacing: 0.1em;
           text-transform: uppercase;
-          border-radius: 6px;
+          border-radius: 8px;
           cursor: pointer;
-          transition: all 0.2s;
+          transition: all 0.25s ease;
         }
         .locator-reset-btn:hover {
           background: #1a1209;
@@ -344,30 +358,38 @@ export default function StoreLocatorPage() {
           width: calc(100% - 32px);
           display: grid;
           grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-          gap: 28px;
+          gap: 32px;
         }
         .boutique-card {
           background: #ffffff;
-          border: 1px solid rgba(26,18,9,0.06);
-          border-radius: 8px;
+          border: 1px solid rgba(139,105,20,0.12);
+          border-radius: 12px;
           overflow: hidden;
-          box-shadow: 0 4px 16px rgba(26,18,9,0.02);
-          transition: transform 0.3s ease, box-shadow 0.3s ease;
+          box-shadow: 0 4px 20px rgba(26,18,9,0.02);
+          transition: all 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
           display: flex;
           flex-direction: column;
         }
         .boutique-card:hover {
-          transform: translateY(-4px);
-          box-shadow: 0 16px 36px rgba(26,18,9,0.05);
+          transform: translateY(-6px);
+          box-shadow: 0 20px 40px rgba(26,18,9,0.07);
+          border-color: #8B6914;
         }
         .boutique-img-container {
           position: relative;
           width: 100%;
           aspect-ratio: 16/10;
           background: #fbf9f4;
+          overflow: hidden;
+        }
+        .boutique-img-container img {
+          transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        .boutique-card:hover .boutique-img-container img {
+          transform: scale(1.05);
         }
         .boutique-card-content {
-          padding: 24px;
+          padding: 28px;
           flex: 1;
           display: flex;
           flex-direction: column;
@@ -375,38 +397,40 @@ export default function StoreLocatorPage() {
         .boutique-badge {
           display: inline-block;
           font-family: 'Jost', sans-serif;
-          font-size: 9px;
+          font-size: 9.5px;
           font-weight: 600;
-          letter-spacing: 0.12em;
+          letter-spacing: 0.14em;
           text-transform: uppercase;
           color: #8B6914;
-          background: rgba(139,105,20,0.1);
-          padding: 4px 10px;
+          background: rgba(139,105,20,0.08);
+          padding: 5px 12px;
           border-radius: 4px;
-          margin-bottom: 12px;
+          margin-bottom: 14px;
           width: fit-content;
+          border: 0.5px solid rgba(139,105,20,0.15);
         }
         .boutique-name {
           font-family: 'Cormorant Garamond', serif;
-          font-size: 22px;
+          font-size: 24px;
           font-weight: 500;
           color: #1a1209;
-          margin: 0 0 8px;
+          margin: 0 0 10px;
           line-height: 1.25;
+          letter-spacing: 0.02em;
         }
         .boutique-address {
           font-family: 'Jost', sans-serif;
-          font-size: 13.5px;
+          font-size: 14px;
           color: rgba(26,18,9,0.6);
-          line-height: 1.5;
-          margin: 0 0 20px;
+          line-height: 1.55;
+          margin: 0 0 24px;
           flex: 1;
         }
         .boutique-button {
           display: block;
           width: 100%;
           text-align: center;
-          padding: 12px;
+          padding: 13px;
           background: #1a1209;
           color: #ffffff;
           font-family: 'Jost', sans-serif;
@@ -416,10 +440,13 @@ export default function StoreLocatorPage() {
           text-transform: uppercase;
           text-decoration: none;
           border-radius: 6px;
-          transition: background-color 0.2s;
+          transition: all 0.25s ease;
+          border: 1px solid #1a1209;
         }
         .boutique-button:hover {
           background: #8B6914;
+          border-color: #8B6914;
+          box-shadow: 0 4px 12px rgba(139, 105, 20, 0.2);
         }
         .gps-float-btn {
           position: fixed;
@@ -742,17 +769,17 @@ export default function StoreLocatorPage() {
         }
         .gps-modal-card {
           background: #ffffff;
-          border: 1px solid rgba(26,18,9,0.08);
-          border-radius: 12px;
-          max-width: 400px;
+          border: 1px solid rgba(139, 105, 20, 0.2);
+          border-radius: 16px;
+          max-width: 420px;
           width: 100%;
-          padding: 28px;
+          padding: 32px;
           text-align: center;
-          box-shadow: 0 20px 50px rgba(0,0,0,0.3);
-          animation: modalIn 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+          box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+          animation: modalIn 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
         }
         @keyframes modalIn {
-          from { opacity: 0; transform: scale(0.96); }
+          from { opacity: 0; transform: scale(0.95); }
           to { opacity: 1; transform: scale(1); }
         }
       `}</style>

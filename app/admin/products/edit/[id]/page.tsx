@@ -42,6 +42,57 @@ export default function EditProductPage() {
   const [specKey, setSpecKey] = useState('');
   const [specValue, setSpecValue] = useState('');
 
+  const [checkingSpelling, setCheckingSpelling] = useState<Record<string, boolean>>({});
+  const [spellCheckResult, setSpellCheckResult] = useState<{
+    field: string;
+    originalText: string;
+    correctedText: string;
+    errorDetails: string;
+  } | null>(null);
+
+  const checkSpelling = async (fieldName: string, text: string) => {
+    if (!text || !text.trim()) {
+      toast.error('Field is empty');
+      return;
+    }
+    setCheckingSpelling(prev => ({ ...prev, [fieldName]: true }));
+    try {
+      const res = await fetch('/api/admin/check-spelling', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) throw new Error(data.error || 'Request failed');
+      
+      if (data.warning) {
+        toast(data.warning, { icon: '⚠️', duration: 6000 });
+        return;
+      }
+      
+      if (data.errorsFound && data.correctedText.trim().toLowerCase() !== text.trim().toLowerCase()) {
+        setSpellCheckResult({
+          field: fieldName,
+          originalText: text,
+          correctedText: data.correctedText,
+          errorDetails: data.errorDetails || 'Detected spelling/grammar mistypes.'
+        });
+      } else {
+        toast.success('No spelling errors detected!');
+      }
+    } catch (err: any) {
+      console.error(err);
+      toast.error('Failed to run AI spell check');
+    } finally {
+      setCheckingSpelling(prev => ({ ...prev, [fieldName]: false }));
+    }
+  };
+
+  const handleApplySpelling = (field: string, val: string) => {
+    setFormData(prev => ({ ...prev, [field]: val }));
+    toast.success('Spelling correction applied!');
+  };
+
   useEffect(() => {
     fetchGiftCategories();
     fetchProduct();
@@ -336,9 +387,21 @@ export default function EditProductPage() {
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="md:col-span-2">
-              <label className="block text-[11px] font-semibold tracking-[0.2em] uppercase text-[#1a1209]/70 mb-2">
-                Product Title *
-              </label>
+              <div className="flex items-center justify-between mb-2">
+                <label className="block text-[11px] font-semibold tracking-[0.2em] uppercase text-[#1a1209]/70">
+                  Product Title *
+                </label>
+                {formData.title.trim() && (
+                  <button
+                    type="button"
+                    onClick={() => checkSpelling('title', formData.title)}
+                    disabled={checkingSpelling['title']}
+                    className="text-[10px] text-[#8B6914] hover:text-[#1a1209] transition font-semibold flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                  >
+                    {checkingSpelling['title'] ? 'Checking...' : '✨ AI Check'}
+                  </button>
+                )}
+              </div>
               <input
                 type="text"
                 value={formData.title}
@@ -414,7 +477,19 @@ export default function EditProductPage() {
 
             <div className="md:col-span-2">
               <div className="flex items-center justify-between mb-2">
-                <label className="block text-[11px] font-semibold tracking-[0.2em] uppercase text-[#1a1209]/70">Description *</label>
+                <div className="flex items-center gap-2">
+                  <label className="block text-[11px] font-semibold tracking-[0.2em] uppercase text-[#1a1209]/70">Description *</label>
+                  {formData.description.trim() && (
+                    <button
+                      type="button"
+                      onClick={() => checkSpelling('description', formData.description)}
+                      disabled={checkingSpelling['description']}
+                      className="text-[10px] text-[#8B6914] hover:text-[#1a1209] transition font-semibold flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                    >
+                      {checkingSpelling['description'] ? 'Checking...' : '✨ AI Check'}
+                    </button>
+                  )}
+                </div>
                 <button 
                   type="button" 
                   onClick={generateDescription} 
@@ -799,6 +874,55 @@ export default function EditProductPage() {
           </button>
         </div>
       </form>
+      {spellCheckResult && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[99999] p-4">
+          <div className="bg-white border border-[#8B6914]/30 rounded-xl max-w-md w-full p-6 shadow-2xl animate-in fade-in zoom-in duration-200">
+            <div className="flex items-center gap-2 text-[#8B6914] mb-3">
+              <span className="text-xl">✨</span>
+              <h3 className="font-semibold text-lg">AI Spelling Suggestion</h3>
+            </div>
+            
+            <p className="text-xs text-gray-500 mb-4">
+              Reason: {spellCheckResult.errorDetails}
+            </p>
+
+            <div className="space-y-3 mb-6 font-['Jost']">
+              <div>
+                <span className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Original Text</span>
+                <p className="text-sm text-red-600 bg-red-50 p-2.5 rounded-lg border border-red-100 font-medium">
+                  {spellCheckResult.originalText}
+                </p>
+              </div>
+              <div>
+                <span className="block text-[10px] font-bold text-green-600 uppercase tracking-wider mb-1">Suggested Correction</span>
+                <p className="text-sm text-green-700 bg-green-50 p-2.5 rounded-lg border border-green-100 font-medium">
+                  {spellCheckResult.correctedText}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={() => setSpellCheckResult(null)}
+                className="flex-1 py-2 px-4 border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50 font-['Jost']"
+              >
+                Keep Original
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  handleApplySpelling(spellCheckResult.field, spellCheckResult.correctedText);
+                  setSpellCheckResult(null);
+                }}
+                className="flex-1 py-2 px-4 bg-[#1a1209] hover:bg-[#8B6914] text-white font-semibold rounded-lg text-sm transition-colors font-['Jost']"
+              >
+                Apply Correction
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
