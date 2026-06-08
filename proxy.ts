@@ -80,6 +80,7 @@ export async function proxy(req: NextRequest, event: NextFetchEvent) {
     pathname === '/' ||
     pathname.startsWith('/collections') ||
     pathname.startsWith('/our-story') ||
+    pathname.startsWith('/retailers') ||
     (pathname.startsWith('/api') && !pathname.startsWith('/api/customer')) ||
     pathname.startsWith('/_next') ||
     pathname.includes('.');

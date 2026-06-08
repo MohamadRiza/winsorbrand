@@ -223,7 +223,7 @@ function HeroStage({
         )}
         {active && (
           <Link
-            href={`/products/${active._id}`}
+            href={`/collections/${active._id}`}
             style={{
               display: 'inline-flex',
               alignItems: 'center',

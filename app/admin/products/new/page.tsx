@@ -5,16 +5,6 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast';
 import { IProduct, CollectionSection, WarrantyOption, CloudinaryAsset, ColorVariant } from '@/types';
 
-const PREDEFINED_GIFT_CATEGORIES = [
-  { slug: 'mothers-day', label: "Mother's Day", emoji: '👩' },
-  { slug: 'valentines-day', label: "Valentine's Day", emoji: '💝' },
-  { slug: 'graduation', label: 'Graduation', emoji: '🎓' },
-  { slug: 'new-year', label: 'New Year', emoji: '🎉' },
-  { slug: 'fathers-day', label: "Father's Day", emoji: '👨' },
-  { slug: 'christmas', label: 'Christmas', emoji: '🎄' },
-  { slug: 'eid', label: 'Eid', emoji: '🌙' },
-];
-
 const EMPTY_ASSET: CloudinaryAsset = { url: '', publicId: '' };
 
 export default function AddProductPage() {
@@ -24,8 +14,6 @@ export default function AddProductPage() {
   const [generatingDescription, setGeneratingDescription] = useState(false);
   const [isClient, setIsClient] = useState(false);
   const [giftCategories, setGiftCategories] = useState<Array<{ _id: string; slug: string; label: string; emoji: string }>>([]);
-  const [customCategory, setCustomCategory] = useState('');
-  const [showCustomInput, setShowCustomInput] = useState(false);
   
   const [formData, setFormData] = useState({
     title: '',
@@ -239,17 +227,6 @@ export default function AddProductPage() {
     });
   };
 
-  const addCustomCategory = () => {
-    if (customCategory.trim()) {
-      const slug = customCategory.toLowerCase().trim().replace(/\s+/g, '-');
-      if (!formData.giftCategories.includes(slug)) {
-        setFormData(prev => ({ ...prev, giftCategories: [...prev.giftCategories, slug] }));
-        setCustomCategory('');
-        setShowCustomInput(false);
-        toast.success(`Added "${customCategory}" category`);
-      }
-    }
-  };
 
   const getTotalStock = () => formData.colorVariants.reduce((sum, v) => sum + v.qty, 0);
 
@@ -618,26 +595,11 @@ export default function AddProductPage() {
             <div>
               <label className="block text-[11px] font-semibold tracking-[0.2em] uppercase text-[#1a1209]/70 mb-3">Gift Categories / Occasions</label>
               <div className="space-y-2 max-h-64 overflow-y-auto p-3 bg-[#faf7f0] rounded-lg border border-[#1a1209]/10">
-                {PREDEFINED_GIFT_CATEGORIES.map((cat) => (
-                  <label key={cat.slug} className="flex items-center gap-3 cursor-pointer">
+                {giftCategories.map((cat) => (
+                  <label key={cat._id} className="flex items-center gap-3 cursor-pointer">
                     <input type="checkbox" checked={formData.giftCategories.includes(cat.slug)} onChange={() => toggleGiftCategory(cat.slug)} className="w-4 h-4 text-[#8B6914] border-[#1a1209]/20 rounded focus:ring-[#8B6914]" />
                     <span className="text-sm font-['Jost']">{cat.emoji} {cat.label}</span>
                   </label>
-                ))}
-                {showCustomInput ? (
-                  <div className="flex gap-2 mt-2 p-2 bg-white rounded border border-[#8B6914]/30">
-                    <input type="text" value={customCategory} onChange={(e) => setCustomCategory(e.target.value)} placeholder="Enter custom occasion..." className="flex-1 px-2 py-1 text-sm border border-[#1a1209]/15 rounded focus:outline-none focus:border-[#8B6914]" onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addCustomCategory())} autoFocus />
-                    <button type="button" onClick={addCustomCategory} className="px-3 py-1 bg-[#8B6914] text-white text-xs rounded hover:bg-[#6f5410]">Add</button>
-                    <button type="button" onClick={() => { setShowCustomInput(false); setCustomCategory(''); }} className="px-3 py-1 bg-gray-300 text-gray-700 text-xs rounded hover:bg-gray-400">Cancel</button>
-                  </div>
-                ) : (
-                  <button type="button" onClick={() => setShowCustomInput(true)} className="w-full mt-2 px-3 py-2 border-2 border-dashed border-[#8B6914]/40 text-[#8B6914] text-sm rounded-lg hover:border-[#8B6914] hover:bg-[#8B6914]/5 transition-all font-['Jost']">+ Add Custom Occasion</button>
-                )}
-                {formData.giftCategories.filter(slug => !PREDEFINED_GIFT_CATEGORIES.some(c => c.slug === slug)).map(slug => (
-                  <div key={slug} className="flex items-center justify-between p-2 bg-white rounded border border-[#8B6914]/20">
-                    <span className="text-sm font-['Jost'] capitalize">🎉 {slug.replace(/-/g, ' ')}</span>
-                    <button type="button" onClick={() => toggleGiftCategory(slug)} className="text-red-600 hover:text-red-700 text-xs">Remove</button>
-                  </div>
                 ))}
               </div>
             </div>

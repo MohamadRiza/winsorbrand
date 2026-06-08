@@ -33,52 +33,74 @@ interface Section {
 // ── Section config ─────────────────────────────────────────────────────────
 const SECTIONS: Section[] = [
   { key:'sports',      label:'Sports',       heading:'Built for Motion',       sub:'Precision engineering for the active lifestyle' },
-  { key:'new',         label:'New',          heading:'Just Arrived',           sub:'The latest additions to the Winsor family'     },
+  { key:'new',         label:'New Arrivals',  heading:'Just Arrived',           sub:'The latest additions to the Winsor family'     },
   { key:'luxury',      label:'Luxury',       heading:'Masterful Craftsmanship', sub:'Where haute horlogerie meets timeless design'  },
-  { key:'limited',     label:'Limited',      heading:'Rare by Design',         sub:'Exclusive editions crafted in finite numbers'  },
+  { key:'limited',     label:'Limited Edition', heading:'Rare by Design',         sub:'Exclusive editions crafted in finite numbers'  },
   { key:'bestsellers', label:'Best Sellers', heading:'Beloved Timepieces',     sub:'The watches our clients return to again and again' },
 ];
-
-// Sticker colour map - Updated for Longines style
-const STICKER_COLORS: Record<string, { bg: string; text: string }> = {
-  default:      { bg: '#ffffff', text: '#1a1a1a'     },
-  new:          { bg: '#ffffff', text: '#1a1a1a'     },
-  limited:      { bg: '#ffffff', text: '#1a1a1a'     },
-  bestsellers:  { bg: '#ffffff', text: '#1a1a1a'     },
-  sports:       { bg: '#ffffff', text: '#1a1a1a'     },
-  luxury:       { bg: '#ffffff', text: '#1a1a1a'     },
-  exclusive:    { bg: '#ffffff', text: '#1a1a1a'     },
-};
-
-function getStickerStyle(stickerText: string, sections: SectionKey[]) {
-  const t = stickerText.toLowerCase();
-  if (t.includes('exclusive')) return STICKER_COLORS.exclusive;
-  if (sections.includes('new'))         return STICKER_COLORS.new;
-  if (sections.includes('limited'))     return STICKER_COLORS.limited;
-  if (sections.includes('bestsellers')) return STICKER_COLORS.bestsellers;
-  if (sections.includes('sports'))      return STICKER_COLORS.sports;
-  if (sections.includes('luxury'))      return STICKER_COLORS.luxury;
-  return STICKER_COLORS.default;
-}
 
 // ── Skeleton Card ──────────────────────────────────────────────────────────
 function SkeletonCard() {
   return (
     <div style={{ 
-      minWidth: '260px', 
-      maxWidth: '260px',
+      minWidth: '290px', 
+      maxWidth: '290px',
       flexShrink: 0,
       display:'flex', 
       flexDirection:'column', 
-      gap:'12px',
-      background: '#f5f5f5',
-      padding: '20px',
+      gap:'16px',
+      background: '#ffffff',
+      border: '1px solid rgba(26, 18, 9, 0.05)',
+      borderRadius: '8px',
+      padding: '24px',
     }}>
-      <div style={{ aspectRatio:'3/4', background:'rgba(26,18,9,0.06)', animation:'wn-pulse 1.5s ease-in-out infinite' }}/>
-      <div style={{ height:'10px', width:'40%', background:'rgba(26,18,9,0.06)', animation:'wn-pulse 1.5s ease-in-out infinite' }}/>
-      <div style={{ height:'14px', width:'75%', background:'rgba(26,18,9,0.06)', animation:'wn-pulse 1.5s ease-in-out infinite' }}/>
-      <div style={{ height:'12px', width:'35%', background:'rgba(26,18,9,0.06)', animation:'wn-pulse 1.5s ease-in-out infinite' }}/>
+      <div style={{ aspectRatio:'1', background:'rgba(26,18,9,0.04)', borderRadius: '6px', animation:'wn-pulse 1.5s ease-in-out infinite' }}/>
+      <div style={{ height:'12px', width:'30%', background:'rgba(26,18,9,0.04)', alignSelf: 'center', animation:'wn-pulse 1.5s ease-in-out infinite' }}/>
+      <div style={{ height:'20px', width:'70%', background:'rgba(26,18,9,0.04)', alignSelf: 'center', animation:'wn-pulse 1.5s ease-in-out infinite' }}/>
+      <div style={{ height:'12px', width:'40%', background:'rgba(26,18,9,0.04)', alignSelf: 'center', animation:'wn-pulse 1.5s ease-in-out infinite' }}/>
     </div>
+  );
+}
+
+// ── Scroll Button Component ────────────────────────────────────────────────
+interface ScrollBtnProps {
+  direction: 'left' | 'right';
+  onClick: () => void;
+}
+
+function ScrollBtn({ direction, onClick }: ScrollBtnProps) {
+  const [hovered, setHovered] = useState(false);
+  return (
+    <button
+      onClick={onClick}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{
+        position: 'absolute',
+        [direction === 'left' ? 'left' : 'right']: '16px',
+        top: '50%',
+        transform: 'translateY(-50%)',
+        zIndex: 10,
+        backgroundColor: hovered ? '#8B6914' : 'rgba(255, 255, 255, 0.95)',
+        border: '1px solid #8B6914',
+        width: '40px',
+        height: '40px',
+        borderRadius: '50%',
+        cursor: 'pointer',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        boxShadow: hovered ? '0 4px 12px rgba(139, 105, 20, 0.25)' : '0 2px 8px rgba(0,0,0,0.06)',
+        fontSize: '20px',
+        color: hovered ? '#ffffff' : '#8B6914',
+        transition: 'all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+        outline: 'none',
+      }}
+      className="desktop-only"
+      aria-label={`Scroll products ${direction}`}
+    >
+      {direction === 'left' ? '‹' : '›'}
+    </button>
   );
 }
 
@@ -86,21 +108,28 @@ function SkeletonCard() {
 function WatchCard({ product, index }: { product: WatchProduct; index: number }) {
   const { convertPrice } = useCurrency();
   const [hovered, setHovered] = useState(false);
-  const stickerStyle = getStickerStyle(product.stickerText, product.collectionSections);
 
   return (
     <Link
-      href={`/watches/${product._id}`}
+      href={`/collections/${product._id}`} // ✅ FIXED ROUTE: correctly link to detail page
       style={{ 
-        textDecoration:'none', 
-        display:'flex',
+        textDecoration: 'none', 
+        display: 'flex',
         flexDirection: 'column',
-        minWidth: '260px',
-        maxWidth: '260px',
+        minWidth: '290px',
+        maxWidth: '290px',
         flexShrink: 0,
-        animationDelay:`${index * 80}ms`,
-        background: '#f5f5f5',
-        padding: '20px',
+        animationDelay: `${index * 80}ms`,
+        background: '#ffffff',
+        border: '1px solid rgba(26, 18, 9, 0.06)',
+        borderRadius: '8px',
+        padding: '24px',
+        transition: 'transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.4s ease, border-color 0.4s ease',
+        transform: hovered ? 'translateY(-8px)' : 'none',
+        boxShadow: hovered 
+          ? '0 16px 36px rgba(26, 18, 9, 0.08)' 
+          : '0 4px 20px rgba(26, 18, 9, 0.02)',
+        borderColor: hovered ? 'rgba(139, 105, 20, 0.35)' : 'rgba(26, 18, 9, 0.06)',
       }}
       className="wn-card-fade"
       onMouseEnter={() => setHovered(true)}
@@ -108,41 +137,47 @@ function WatchCard({ product, index }: { product: WatchProduct; index: number })
     >
       {/* Image container */}
       <div style={{ 
-        position:'relative', 
-        aspectRatio:'3/4', 
-        overflow:'hidden', 
-        background:'#f5f5f5', 
-        marginBottom:'16px',
+        position: 'relative', 
+        aspectRatio: '1', 
+        overflow: 'hidden', 
+        background: '#ffffff', 
+        marginBottom: '20px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
       }}>
-
         {/* Thumbnail */}
         <Image
           src={product.thumbnail.url}
           alt={product.title}
           fill
-          sizes="260px"
+          sizes="290px"
           style={{
-            objectFit:  'contain',
-            transform:  hovered ? 'scale(1.05)' : 'scale(1)',
-            transition: 'transform 0.7s cubic-bezier(0.25,0.46,0.45,0.94)',
+            objectFit: 'contain',
+            transform: hovered ? 'scale(1.08)' : 'scale(1)',
+            transition: 'transform 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+            padding: '12px',
           }}
+          priority={index < 4}
         />
 
         {/* Sticker badge */}
         {product.stickerEnabled && product.stickerText && (
           <div style={{
-            position:'absolute', 
-            top:'0', 
-            left:'0',
-            background: stickerStyle.bg, 
-            color: stickerStyle.text,
-            fontFamily:"'Jost',sans-serif", 
-            fontSize:'9px', 
-            fontWeight:500,
-            letterSpacing:'0.1em', 
-            padding:'6px 12px',
-            textTransform:'uppercase',
-            border: '1px solid rgba(0,0,0,0.1)',
+            position: 'absolute', 
+            top: '0', 
+            left: '0',
+            background: '#8B6914', 
+            color: '#ffffff',
+            fontFamily: "'Jost', sans-serif", 
+            fontSize: '8px', 
+            fontWeight: 600,
+            letterSpacing: '0.15em', 
+            padding: '4px 8px',
+            textTransform: 'uppercase',
+            borderRadius: '2px',
+            boxShadow: '0 2px 6px rgba(0,0,0,0.1)',
+            zIndex: 2,
           }}>
             {product.stickerText}
           </div>
@@ -150,40 +185,87 @@ function WatchCard({ product, index }: { product: WatchProduct; index: number })
       </div>
 
       {/* Info */}
-      <div style={{ textAlign: 'left' }}>
-        <p style={{
-          fontFamily:"'Jost',sans-serif", 
-          fontSize:'11px', 
-          fontWeight:600,
-          letterSpacing:'0.15em', 
-          color:'#1a1a1a',
-          marginBottom:'8px', 
-          textTransform:'uppercase',
+      <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
+        {/* Model Identifier */}
+        <span style={{
+          fontFamily: "'Jost', sans-serif",
+          fontSize: '10px',
+          fontWeight: 600,
+          letterSpacing: '0.15em',
+          color: '#8B6914',
+          textTransform: 'uppercase',
+          marginBottom: '6px',
+          display: 'block',
         }}>
-          {product.title.toUpperCase()}
+          {product.modelNo ? `WINSOR ${product.modelNo}` : 'WINSOR CLASSIC'}
+        </span>
+
+        {/* Serif Watch Title */}
+        <h3 style={{
+          fontFamily: "'Cormorant Garamond', serif",
+          fontSize: '19px',
+          fontWeight: 500,
+          color: '#1a1209',
+          lineHeight: '1.3',
+          margin: '0 0 6px 0',
+          minHeight: '50px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}>
+          {product.title}
+        </h3>
+        
+        {/* Specifications Descriptor */}
+        <p style={{
+          fontFamily: "'Jost', sans-serif", 
+          fontSize: '11px', 
+          fontWeight: 400,
+          letterSpacing: '0.05em', 
+          color: 'rgba(26,18,9,0.5)',
+          margin: '0 0 16px 0',
+          lineHeight: 1.4,
+        }}>
+          Luxury Timepiece • Swiss Heritage
         </p>
         
-        <p style={{
-          fontFamily:"'Jost',sans-serif", 
-          fontSize:'11px', 
-          fontWeight:400,
-          letterSpacing:'0.05em', 
-          color:'#666666',
-          marginBottom:'12px',
-          lineHeight: 1.5,
-        }}>
-          42 mm - Automatic watch - Stainless steel and ceramic bezel
-        </p>
-        
-        <p style={{
-          fontFamily:"'Jost',sans-serif", 
-          fontSize:'13px', 
-          fontWeight:500,
-          letterSpacing:'0.05em', 
-          color:'#1a1a1a',
-        }}>
-          {convertPrice(product.price)}
-        </p>
+        {/* Pricing and Action Row */}
+        <div style={{ marginTop: 'auto' }}>
+          <p style={{
+            fontFamily: "'Jost', sans-serif", 
+            fontSize: '14px', 
+            fontWeight: 600,
+            letterSpacing: '0.05em', 
+            color: '#1a1209',
+            margin: 0,
+          }}>
+            {convertPrice(product.price)}
+          </p>
+
+          {/* Action indicator line */}
+          <div style={{
+            marginTop: '16px',
+            paddingTop: '12px',
+            borderTop: '1px solid rgba(26,18,9,0.06)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '4px',
+            color: hovered ? '#8B6914' : '#1a1209',
+            fontSize: '11px',
+            fontWeight: 600,
+            letterSpacing: '0.1em',
+            textTransform: 'uppercase',
+            transition: 'color 0.2s ease',
+          }}>
+            <span>Discover</span>
+            <span style={{ 
+              transform: hovered ? 'translateX(4px)' : 'none', 
+              transition: 'transform 0.2s ease',
+              display: 'inline-block'
+            }}>→</span>
+          </div>
+        </div>
       </div>
     </Link>
   );
@@ -235,7 +317,7 @@ export default function CollectionsSection() {
   // Scroll left/right handlers for product carousel
   const scrollProducts = (direction: 'left' | 'right') => {
     if (scrollContainerRef.current) {
-      const scrollAmount = 280; // card width + gap
+      const scrollAmount = 306; // card width (290) + gap (16)
       scrollContainerRef.current.scrollBy({
         left: direction === 'left' ? -scrollAmount : scrollAmount,
         behavior: 'smooth'
@@ -257,10 +339,11 @@ export default function CollectionsSection() {
   const activeSectionData = SECTIONS.find(s => s.key === activeSection);
 
   return (
-    <section style={{ 
+    <section id="collections" style={{ 
       background:'#ffffff', 
       padding:'0',
       fontFamily: "'Jost', sans-serif",
+      borderBottom: '1px solid rgba(26,18,9,0.06)',
     }}>
       <style>{`
         @keyframes wn-pulse {
@@ -270,7 +353,7 @@ export default function CollectionsSection() {
         .wn-card-fade {
           opacity: 0;
           transform: translateY(24px);
-          animation: wn-card-in 0.6s ease forwards;
+          animation: wn-card-in 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
         }
         @keyframes wn-card-in {
           to { opacity:1; transform:translateY(0); }
@@ -293,12 +376,12 @@ export default function CollectionsSection() {
 
       <div style={{ maxWidth:'1400px', margin:'0 auto' }}>
 
-        {/* Horizontal Navigation Tabs - Longines Style */}
+        {/* Horizontal Navigation Tabs */}
         <div style={{
           display:'flex',
           justifyContent: 'center',
           alignItems: 'center',
-          borderBottom: '1px solid #e0e0e0',
+          borderBottom: '1px solid rgba(26,18,9,0.08)',
           padding: '0 16px',
           background: '#ffffff',
         }}>
@@ -312,8 +395,8 @@ export default function CollectionsSection() {
               border: 'none',
               cursor: 'pointer',
               padding: '8px',
-              fontSize: '16px',
-              color: '#666666',
+              fontSize: '18px',
+              color: '#8B6914',
               zIndex: 5,
             }}
             className="mobile-tab-arrow"
@@ -328,7 +411,7 @@ export default function CollectionsSection() {
             style={{
               display:'flex',
               justifyContent: 'center',
-              gap: '0',
+              gap: '8px',
               maxWidth: '100%',
               overflowX: 'auto',
               scrollBehavior: 'smooth',
@@ -344,16 +427,16 @@ export default function CollectionsSection() {
                 onClick={() => setActiveSection(section.key)}
                 style={{
                   fontFamily:"'Jost',sans-serif",
-                  fontSize: '13px',
+                  fontSize: '12px',
                   fontWeight: activeSection === section.key ? 600 : 400,
-                  letterSpacing:'0.1em',
+                  letterSpacing:'0.15em',
                   textTransform:'uppercase',
-                  padding: '18px 20px',
+                  padding: '20px 24px',
                   border:'none',
                   background:'none',
                   cursor:'pointer',
-                  color: activeSection === section.key ? '#1a1a1a' : '#666666',
-                  borderBottom: activeSection === section.key ? '2px solid #1a1a1a' : '2px solid transparent',
+                  color: activeSection === section.key ? '#8B6914' : 'rgba(26, 18, 9, 0.6)',
+                  borderBottom: activeSection === section.key ? '2px solid #8B6914' : '2px solid transparent',
                   transition:'all 0.3s ease',
                   whiteSpace:'nowrap',
                   flexShrink:0,
@@ -361,12 +444,12 @@ export default function CollectionsSection() {
                 }}
                 onMouseEnter={(e) => {
                   if (activeSection !== section.key) {
-                    e.currentTarget.style.color = '#1a1a1a';
+                    e.currentTarget.style.color = '#8B6914';
                   }
                 }}
                 onMouseLeave={(e) => {
                   if (activeSection !== section.key) {
-                    e.currentTarget.style.color = '#666666';
+                    e.currentTarget.style.color = 'rgba(26, 18, 9, 0.6)';
                   }
                 }}
               >
@@ -383,8 +466,8 @@ export default function CollectionsSection() {
               border: 'none',
               cursor: 'pointer',
               padding: '8px',
-              fontSize: '16px',
-              color: '#666666',
+              fontSize: '18px',
+              color: '#8B6914',
               zIndex: 5,
             }}
             className="mobile-tab-arrow"
@@ -397,70 +480,47 @@ export default function CollectionsSection() {
         {/* Section Header */}
         {activeSectionData && (
           <div style={{
-            padding: '32px 20px 24px',
+            padding: '44px 20px 28px',
             textAlign: 'center',
             background: '#ffffff',
           }}>
             <h2 style={{
-              fontFamily:"'Jost',sans-serif",
-              fontSize: 'clamp(20px, 4vw, 28px)',
-              fontWeight:600,
-              color:'#1a1a1a',
-              letterSpacing:'0.1em',
-              margin:'0 0 8px 0',
-              textTransform:'uppercase',
-              lineHeight: 1.3,
+              fontFamily: "'Cormorant Garamond', serif",
+              fontSize: 'clamp(28px, 4.5vw, 36px)',
+              fontWeight: 300,
+              fontStyle: 'italic',
+              color: '#1a1209',
+              letterSpacing: '0.04em',
+              margin: '0 0 10px 0',
+              lineHeight: 1.2,
             }}>
               {activeSectionData.heading}
             </h2>
             <p style={{
-              fontFamily:"'Jost',sans-serif",
-              fontSize:'13px',
-              color:'#666666',
-              letterSpacing:'0.05em',
-              margin:0,
+              fontFamily: "'Jost', sans-serif",
+              fontSize: '11px',
+              fontWeight: 500,
+              color: 'rgba(26, 18, 9, 0.45)',
+              letterSpacing: '0.12em',
+              margin: 0,
               lineHeight: 1.5,
+              textTransform: 'uppercase',
             }}>
               {activeSectionData.sub}
             </p>
           </div>
         )}
 
-        {/* Horizontal Scrollable Product Grid */}
+        {/* Horizontal Carousel */}
         <div style={{
           position: 'relative',
-          background: '#f5f5f5',
-          padding: '24px 0 40px',
+          background: '#fbf9f5', // ✅ Soft warm cream background
+          padding: '40px 0 54px',
+          borderTop: '1px solid rgba(26,18,9,0.04)',
+          borderBottom: '1px solid rgba(26,18,9,0.04)',
         }}>
-          {/* Scroll Left Button - Hidden on Mobile */}
-          <button
-            onClick={() => scrollProducts('left')}
-            style={{
-              position: 'absolute',
-              left: '12px',
-              top: '50%',
-              transform: 'translateY(-50%)',
-              zIndex: 10,
-              background: 'rgba(255,255,255,0.95)',
-              border: '1px solid #e0e0e0',
-              width: '36px',
-              height: '36px',
-              borderRadius: '50%',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-              fontSize: '16px',
-              color: '#1a1a1a',
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.background = '#ffffff'}
-            onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.95)'}
-            className="desktop-only"
-            aria-label="Scroll products left"
-          >
-            ‹
-          </button>
+          {/* Scroll Left */}
+          <ScrollBtn direction="left" onClick={() => scrollProducts('left')} />
 
           {/* Scroll Container */}
           <div
@@ -469,90 +529,29 @@ export default function CollectionsSection() {
               display:'flex',
               gap:'16px',
               overflowX:'auto',
-              padding: '0 60px',
+              padding: '0 80px',
               scrollBehavior: 'smooth',
               WebkitOverflowScrolling: 'touch',
-              scrollPaddingLeft: '16px',
-              scrollPaddingRight: '16px',
+              scrollPaddingLeft: '24px',
+              scrollPaddingRight: '24px',
             }}
             className="hide-scrollbar"
           >
             {loading
-              ? Array.from({ length: 5 }).map((_, i) => <SkeletonCard key={i} />)
+              ? Array.from({ length: 4 }).map((_, i) => <SkeletonCard key={i} />)
               : products.map((p, i) => (
                   <WatchCard key={p._id} product={p} index={i} />
                 ))
             }
           </div>
 
-          {/* Scroll Right Button - Hidden on Mobile */}
-          <button
-            onClick={() => scrollProducts('right')}
-            style={{
-              position: 'absolute',
-              right: '12px',
-              top: '50%',
-              transform: 'translateY(-50%)',
-              zIndex: 10,
-              background: 'rgba(255,255,255,0.95)',
-              border: '1px solid #e0e0e0',
-              width: '36px',
-              height: '36px',
-              borderRadius: '50%',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-              fontSize: '16px',
-              color: '#1a1a1a',
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.background = '#ffffff'}
-            onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.95)'}
-            className="desktop-only"
-            aria-label="Scroll products right"
-          >
-            ›
-          </button>
+          {/* Scroll Right */}
+          <ScrollBtn direction="right" onClick={() => scrollProducts('right')} />
         </div>
-
-        {/* View All Link */}
-        {/* <div style={{
-          textAlign: 'center',
-          padding: '20px 20px 40px',
-          background: '#ffffff',
-        }}>
-          <Link
-            href={`/collections/${activeSection}`}
-            style={{
-              fontFamily:"'Jost',sans-serif",
-              fontSize:'11px',
-              fontWeight:600,
-              letterSpacing:'0.15em',
-              color:'#1a1a1a',
-              textDecoration:'none',
-              textTransform:'uppercase',
-              borderBottom: '1px solid #1a1a1a',
-              paddingBottom: '2px',
-              display: 'inline-block',
-              transition:'all 0.2s ease',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.color = '#666666';
-              e.currentTarget.style.borderColor = '#666666';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.color = '#1a1a1a';
-              e.currentTarget.style.borderColor = '#1a1a1a';
-            }}
-          >
-            View All {activeSectionData?.label} →
-          </Link>
-        </div> */}
 
       </div>
 
-      {/* Mobile Styles - Fixed tab visibility */}
+      {/* Mobile Styles */}
       <style>{`
         @media (max-width: 768px) {
           .desktop-only {
@@ -561,7 +560,6 @@ export default function CollectionsSection() {
           .mobile-tab-arrow {
             display: flex !important;
           }
-          /* Fix: On mobile, align tabs to the left so SPORTS is always visible */
           #tabs-container {
             justify-content: flex-start !important;
             padding-left: 16px !important;
