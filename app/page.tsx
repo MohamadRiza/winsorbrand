@@ -64,7 +64,7 @@ export default function Home() {
             className="text-white/80 tracking-[0.25em] text-xs md:text-sm mb-12 max-w-md mx-auto"
             style={{ fontFamily: "'Jost', sans-serif", fontWeight: 300 }}
           >
-            WHERE PRECISION MEETS ELEGANCE
+            WHERE PRECISION MEETS ELEGANCE.com
           </p>
 
           {/* Underlined Links - Longines Style */}
