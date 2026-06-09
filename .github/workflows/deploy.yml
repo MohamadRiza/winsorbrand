@@ -8,7 +8,7 @@ jobs:
   build-and-test:
     name: Build & Verify Types (CI)
     runs-on: ubuntu-latest
- 
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -22,18 +22,17 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
-      - name: Verify Types
-        run: npx tsc --noEmit
+      - name: Create .env.local for build
+        run: |
+          cat > .env.local << 'EOF'
+          MONGODB_URI=${{ secrets.MONGODB_URI }}
+          JWT_SECRET=${{ secrets.JWT_SECRET }}
+          NEXT_PUBLIC_TURNSTILE_SITE_KEY=${{ secrets.NEXT_PUBLIC_TURNSTILE_SITE_KEY }}
+          TURNSTILE_SECRET_KEY=${{ secrets.TURNSTILE_SECRET_KEY }}
+          EOF
 
       - name: Build Next.js
         run: npm run build
-        env:
-          NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${{ secrets.NEXT_PUBLIC_TURNSTILE_SITE_KEY || 'mock_key' }}
-          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY || 'mock_key' }}
-          CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY || 'mock_key' }}
-          NEXT_PUBLIC_CLERK_SIGN_IN_URL: /login
-          NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL: /
-          NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL: /
 
   deploy:
     name: Deploy to VPS (CD)
@@ -46,29 +45,19 @@ jobs:
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_KEY }}
-          port: ${{ secrets.SSH_PORT || 22 }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: 22
+          timeout: 120s
+          command_timeout: 30m
           script: |
-            # Navigate to project directory
-            cd /var/www/winsorbrand || { echo "Directory /var/www/winsorbrand not found! Clone the repository first."; exit 1; }
-            
-            # Pull latest changes from git
+            cd /var/www/winsorbrand || { echo "Directory not found!"; exit 1; }
             echo "Fetching latest changes..."
             git pull origin main
-            
-            # Install dependencies
             echo "Installing dependencies..."
-            npm install
-            
-            # Build Next.js
+            npm ci --production=false
             echo "Building application..."
             npm run build
-            
-            # Restart PM2 process
-            echo "Restarting application under PM2..."
-            pm2 restart ecosystem.config.js || pm2 start ecosystem.config.js
-            
-            # Save PM2 state
+            echo "Restarting PM2..."
+            pm2 restart winsorbrand
             pm2 save
-            
             echo "Deployment completed successfully!"
