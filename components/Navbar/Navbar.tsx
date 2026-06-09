@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useCurrency, CURRENCIES, CurrencyOption } from '@/app/context/CurrencyContext';
 import { SignInButton, UserButton, useUser } from '@clerk/nextjs';
 import { useCart } from '@/app/context/CartContext';
@@ -143,10 +143,11 @@ function MegaMenu({ visible, activeKey, showCurrency, onClose }: { visible:boole
 }
 
 export default function Navbar() {
-  const { selected, setCurrency } = useCurrency();
+  const { selected, setCurrency, convertPrice } = useCurrency();
   const { isSignedIn } = useUser();
   const { totalItemsCount } = useCart();
   const pathname = usePathname();
+  const router = useRouter();
   const isHomepage = pathname === '/';
 
   const [isTransparent,      setIsTransparent]      = useState(true);
@@ -154,10 +155,27 @@ export default function Navbar() {
   const [mobileOpen,         setMobileOpen]         = useState(false);
   const [searchOpen,         setSearchOpen]         = useState(false);
   const [searchQuery,        setSearchQuery]        = useState('');
+  const [products,           setProducts]           = useState<any[]>([]);
+  const [searching,          setSearching]          = useState(false);
+
+  // Client-side search filtering
+  const filteredProducts = searchQuery.trim()
+    ? products.filter(p => {
+        const query = searchQuery.toLowerCase();
+        const titleMatch = p.title?.toLowerCase().includes(query);
+        const modelMatch = p.modelNo?.toLowerCase().includes(query);
+        const descMatch = p.description?.toLowerCase().includes(query);
+        const variantMatch = p.colorVariants?.some((v: any) => v.colorName?.toLowerCase().includes(query));
+        return titleMatch || modelMatch || descMatch || variantMatch;
+      }).slice(0, 5)
+    : [];
+
   const [activeKey,          setActiveKey]          = useState<string | null>(null);
   const [showCurrency,       setShowCurrency]       = useState(false);
   const [megaVisible,        setMegaVisible]        = useState(false);
   const [mobileCurrencyOpen, setMobileCurrencyOpen] = useState(false);
+
+  const searchContainerRef = useRef<HTMLDivElement>(null);
 
   const lastScrollY = useRef(0);
   const heroHeight  = useRef(0);
@@ -193,6 +211,37 @@ export default function Navbar() {
     document.body.style.overflow = mobileOpen ? 'hidden' : '';
     return () => { document.body.style.overflow = ''; };
   }, [mobileOpen]);
+
+  // Fetch all active products once search is opened to support fast client-side filtering
+  useEffect(() => {
+    if (searchOpen && products.length === 0) {
+      setSearching(true);
+      fetch('/api/products')
+        .then(res => res.json())
+        .then(data => {
+          if (data.success && Array.isArray(data.data)) {
+            setProducts(data.data);
+          }
+        })
+        .catch(err => console.error('Error fetching products for search:', err))
+        .finally(() => setSearching(false));
+    }
+  }, [searchOpen, products.length]);
+
+  // Click outside search container to close it
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (searchContainerRef.current && !searchContainerRef.current.contains(event.target as Node)) {
+        setSearchOpen(false);
+      }
+    }
+    if (searchOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [searchOpen]);
 
   const openCollection = useCallback((key: string) => {
     if (closeTimer.current) clearTimeout(closeTimer.current);
@@ -271,6 +320,14 @@ export default function Navbar() {
         }
         
         .wn-logo-link{display:flex;align-items:center;justify-content:center;}
+        .wn-search-item{transition:background 0.2s ease;}
+        .wn-search-item:hover{background:rgba(139,105,20,0.05)!important;}
+        @keyframes wn-spin {
+          to { transform: rotate(360deg); }
+        }
+        .wn-search-spinner {
+          animation: wn-spin 0.8s linear infinite;
+        }
       `}</style>
 
       <header 
@@ -348,7 +405,7 @@ export default function Navbar() {
               <div className="wn-desk-only" style={{ width:'1px', height:'14px', background: div }}/>
               
               {/* Search Toggle */}
-              <div style={{ display:'flex', alignItems:'center', gap:'4px' }}>
+              <div ref={searchContainerRef} style={{ display:'flex', alignItems:'center', gap:'4px', position:'relative' }}>
                 {searchOpen && (
                   <input 
                     autoFocus 
@@ -373,6 +430,89 @@ export default function Navbar() {
                 <button className="wn-ib" style={ibS} onClick={() => setSearchOpen(v => !v)}>
                   <SearchIcon />
                 </button>
+                {/* Search Dropdown */}
+                {searchOpen && searchQuery.trim() && (
+                  <div 
+                    style={{
+                      position: 'absolute',
+                      top: 'calc(100% + 8px)',
+                      right: 0,
+                      width: '300px',
+                      background: 'rgba(250, 247, 240, 0.98)',
+                      backdropFilter: 'blur(16px)',
+                      WebkitBackdropFilter: 'blur(16px)',
+                      border: '1px solid rgba(139, 105, 20, 0.15)',
+                      borderRadius: '8px',
+                      boxShadow: '0 12px 32px rgba(26, 18, 9, 0.15)',
+                      zIndex: 100,
+                      overflow: 'hidden',
+                      transition: 'all 0.2s ease',
+                    }}
+                  >
+                    {searching ? (
+                      <div style={{ padding: '20px', textAlign: 'center', color: '#8B6914', fontFamily: "'Jost', sans-serif", fontSize: '12px' }}>
+                        <span className="wn-search-spinner" style={{ display: 'inline-block', width: '16px', height: '16px', border: '2px solid rgba(139, 105, 20, 0.2)', borderTopColor: '#8B6914', borderRadius: '50%', marginRight: '8px', verticalAlign: 'middle' }} />
+                        Searching timepieces...
+                      </div>
+                    ) : filteredProducts.length > 0 ? (
+                      <div style={{ display: 'flex', flexDirection: 'column' }}>
+                        <div style={{ padding: '10px 14px', borderBottom: '1px solid rgba(26, 18, 9, 0.06)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <span style={{ fontFamily: "'Jost', sans-serif", fontSize: '9px', letterSpacing: '0.15em', color: 'rgba(26, 18, 9, 0.4)', fontWeight: 600 }}>SEARCH RESULTS</span>
+                          <span style={{ fontFamily: "'Jost', sans-serif", fontSize: '9px', color: '#8B6914' }}>{filteredProducts.length} found</span>
+                        </div>
+                        <div style={{ maxHeight: '320px', overflowY: 'auto' }}>
+                          {filteredProducts.map(p => (
+                            <Link
+                              key={p._id}
+                              href={`/collections/${p._id}`}
+                              onClick={() => {
+                                setSearchOpen(false);
+                                setSearchQuery('');
+                              }}
+                              style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '12px',
+                                padding: '12px 14px',
+                                borderBottom: '1px solid rgba(26, 18, 9, 0.04)',
+                                textDecoration: 'none',
+                                transition: 'background 0.2s ease',
+                              }}
+                              className="wn-search-item"
+                            >
+                              {p.thumbnail?.url && (
+                                <div style={{ width: '40px', height: '40px', position: 'relative', borderRadius: '4px', overflow: 'hidden', background: '#fff', border: '1px solid rgba(26, 18, 9, 0.06)', flexShrink: 0 }}>
+                                  <Image
+                                    src={p.thumbnail.url}
+                                    alt={p.title || 'watch'}
+                                    fill
+                                    sizes="40px"
+                                    style={{ objectFit: 'cover' }}
+                                  />
+                                </div>
+                              )}
+                              <div style={{ flex: 1, minWidth: 0 }}>
+                                <h4 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '14px', fontWeight: 600, color: '#1a1209', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', lineHeight: 1.2 }}>
+                                  {p.title}
+                                </h4>
+                                <p style={{ fontFamily: "'Jost', sans-serif", fontSize: '10px', color: 'rgba(26, 18, 9, 0.45)', margin: '2px 0 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                  Model: {p.modelNo}
+                                </p>
+                              </div>
+                              <div style={{ fontFamily: "'Jost', sans-serif", fontSize: '12px', fontWeight: 500, color: '#8B6914', flexShrink: 0 }}>
+                                {convertPrice(p.price)}
+                              </div>
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+                    ) : (
+                      <div style={{ padding: '24px 16px', textAlign: 'center', color: 'rgba(26, 18, 9, 0.5)', fontFamily: "'Jost', sans-serif", fontSize: '12px' }}>
+                        No timepieces found matching <span style={{ color: '#1a1209', fontWeight: 500 }}>"{searchQuery}"</span>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
               
               {/* Account & Cart */}
