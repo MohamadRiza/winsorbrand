@@ -9,7 +9,7 @@ export async function connectDB() {
   if (cached.conn) return cached.conn;
 
   const MONGODB_URI = process.env.MONGODB_URI as string;
-
+ 
   if (!MONGODB_URI) {
     throw new Error('Please define MONGODB_URI in .env.local');
   }
