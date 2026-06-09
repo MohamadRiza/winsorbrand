@@ -1,12 +1,12 @@
 'use client';
 
-import { useState, FormEvent, useEffect, useRef } from 'react';
+import { useState, FormEvent, useEffect, useRef, Suspense } from 'react';
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Toaster, toast } from 'react-hot-toast';
 import { Turnstile, type TurnstileInstance } from '@marsidev/react-turnstile';
 
-export default function AdminLogin() {
+function AdminLoginContent() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -332,5 +332,17 @@ export default function AdminLogin() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function AdminLogin() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen w-full flex items-center justify-center bg-[#f7f4ee]">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#8B6914]"></div>
+      </div>
+    }>
+      <AdminLoginContent />
+    </Suspense>
   );
 }
