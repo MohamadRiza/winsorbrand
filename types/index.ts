@@ -83,3 +83,36 @@ export interface ApiResponse<T> {
   error?:  string;
   message?: string;
 }
+
+export type OrderStatus = 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+
+export interface IOrderItem {
+  productId: string;
+  productTitle: string;
+  productModelNo: string;
+  productThumbnail: string;
+  colorVariant?: string;
+  quantity: number;
+  price: number;
+}
+
+export interface IOrderShippingAddress {
+  address: string;
+  city: string;
+  postalCode: string;
+  country: string;
+  mobile: string;
+  mobileCode: string;
+}
+
+export interface IOrder {
+  _id?: string;
+  clerkId: string;
+  orderRef: string;
+  items: IOrderItem[];
+  shippingAddress: IOrderShippingAddress;
+  subtotal: number;
+  status: OrderStatus;
+  createdAt?: Date;
+  updatedAt?: Date;
+}

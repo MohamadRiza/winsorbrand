@@ -148,8 +148,41 @@ export default function CartPage() {
   // Place order mock action
   const handlePlaceOrder = async () => {
     try {
-      // Mock order placement reference
       const ref = `WNS-2026-${Math.floor(100000 + Math.random() * 900000)}`;
+      
+      const orderItems = selectedItemsList.map(item => ({
+        productId: item.productId,
+        productTitle: item.product?.title || 'Unknown Timepiece',
+        productModelNo: item.product?.modelNo || 'N/A',
+        productThumbnail: item.product?.thumbnail?.url || '',
+        colorVariant: item.colorVariant,
+        quantity: item.quantity,
+        price: item.product?.price || 0,
+      }));
+
+      const res = await fetch('/api/customer/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          orderRef: ref,
+          items: orderItems,
+          shippingAddress: {
+            address: profile.address,
+            city: profile.city,
+            postalCode: profile.postalCode,
+            country: profile.country,
+            mobile: profile.mobile,
+            mobileCode: profile.mobileCode,
+          },
+          subtotal: selectedSubtotal,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Failed to record timepiece purchase');
+      }
+
       setOrderRef(ref);
       
       // Clear the items from cart context (mutates DB if signed in)
@@ -158,9 +191,9 @@ export default function CartPage() {
       setOrderSuccess(true);
       setShowConfirmModal(false);
       toast.success('Timepiece purchase successful!');
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      toast.error('Order placement failed. Please try again.');
+      toast.error(err?.message || 'Order placement failed. Please try again.');
     }
   };
 

@@ -541,6 +541,11 @@ export default function Navbar() {
                         labelIcon={<UserIcon />}
                         href="/profile"
                       />
+                      <UserButton.Link
+                        label="My Orders"
+                        labelIcon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>}
+                        href="/orders"
+                      />
                     </UserButton.MenuItems>
                   </UserButton>
                 </div>
@@ -782,23 +787,42 @@ export default function Navbar() {
             EXPLORE
           </p>
           {isSignedIn && (
-            <Link 
-              href="/profile" 
-              onClick={() => setMobileOpen(false)}
-              style={{ 
-                fontFamily:"'Jost',sans-serif", 
-                fontSize:'12.5px', 
-                letterSpacing:'0.09em', 
-                color:'#8B6914',
-                padding:'10px 0', 
-                borderBottom:'1px solid rgba(26,18,9,0.04)', 
-                textDecoration:'none',
-                fontWeight: 500,
-                display: 'block'
-              }}
-            >
-              My Profile Details
-            </Link>
+            <>
+              <Link 
+                href="/profile" 
+                onClick={() => setMobileOpen(false)}
+                style={{ 
+                  fontFamily:"'Jost',sans-serif", 
+                  fontSize:'12.5px', 
+                  letterSpacing:'0.09em', 
+                  color:'#8B6914',
+                  padding:'10px 0', 
+                  borderBottom:'1px solid rgba(26,18,9,0.04)', 
+                  textDecoration:'none',
+                  fontWeight: 500,
+                  display: 'block'
+                }}
+              >
+                My Profile Details
+              </Link>
+              <Link 
+                href="/orders" 
+                onClick={() => setMobileOpen(false)}
+                style={{ 
+                  fontFamily:"'Jost',sans-serif", 
+                  fontSize:'12.5px', 
+                  letterSpacing:'0.09em', 
+                  color:'#8B6914',
+                  padding:'10px 0', 
+                  borderBottom:'1px solid rgba(26,18,9,0.04)', 
+                  textDecoration:'none',
+                  fontWeight: 500,
+                  display: 'block'
+                }}
+              >
+                My Orders
+              </Link>
+            </>
           )}
           {[...TOP_LEFT_LINKS,...TOP_RIGHT_LINKS].map(l => (
             <Link 
@@ -857,6 +881,11 @@ export default function Navbar() {
                     label="My Profile"
                     labelIcon={<UserIcon />}
                     href="/profile"
+                  />
+                  <UserButton.Link
+                    label="My Orders"
+                    labelIcon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>}
+                    href="/orders"
                   />
                 </UserButton.MenuItems>
               </UserButton>
