@@ -84,7 +84,7 @@ export interface ApiResponse<T> {
   message?: string;
 }
 
-export type OrderStatus = 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+export type OrderStatus = 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled' | 'cancel_requested';
 
 export interface IOrderItem {
   productId: string;
@@ -113,6 +113,7 @@ export interface IOrder {
   shippingAddress: IOrderShippingAddress;
   subtotal: number;
   status: OrderStatus;
+  cancelReason?: string;
   createdAt?: Date;
   updatedAt?: Date;
 }

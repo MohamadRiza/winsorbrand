@@ -53,10 +53,14 @@ const OrderSchema = new Schema<IOrderDocument>({
   },
   status: {
     type: String,
-    enum: ['pending', 'processing', 'shipped', 'delivered', 'cancelled'],
+    enum: ['pending', 'processing', 'shipped', 'delivered', 'cancelled', 'cancel_requested'],
     default: 'pending',
     required: true,
     index: true,
+  },
+  cancelReason: {
+    type: String,
+    trim: true,
   },
 }, { timestamps: true });
 

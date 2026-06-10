@@ -5,6 +5,7 @@ import { useUser, SignInButton } from '@clerk/nextjs';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useCurrency } from '@/app/context/CurrencyContext';
+import toast from 'react-hot-toast';
 
 interface OrderItem {
   productId: string;
@@ -31,7 +32,8 @@ interface Order {
   items: OrderItem[];
   shippingAddress: OrderAddress;
   subtotal: number;
-  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled' | 'cancel_requested';
+  cancelReason?: string;
   createdAt: string;
 }
 
@@ -41,6 +43,7 @@ const STATUS_LABELS: Record<string, { label: string; color: string; bg: string; 
   shipped: { label: 'Shipped', color: '#0f6e52', bg: 'rgba(15, 110, 82, 0.06)', border: 'rgba(15, 110, 82, 0.2)' },
   delivered: { label: 'Delivered', color: '#1b5e20', bg: 'rgba(27, 94, 32, 0.06)', border: 'rgba(27, 94, 32, 0.2)' },
   cancelled: { label: 'Cancelled', color: '#c62828', bg: 'rgba(198, 40, 40, 0.06)', border: 'rgba(198, 40, 40, 0.2)' },
+  cancel_requested: { label: 'Cancellation Requested', color: '#c9a14a', bg: 'rgba(201, 161, 74, 0.08)', border: 'rgba(201, 161, 74, 0.25)' },
 };
 
 export default function CustomerOrdersPage() {
@@ -49,6 +52,14 @@ export default function CustomerOrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Cancellation Modal States
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [selectedOrderForCancel, setSelectedOrderForCancel] = useState<Order | null>(null);
+  const [cancelReason, setCancelReason] = useState('Wrong variant selected');
+  const [customCancelReason, setCustomCancelReason] = useState('');
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
+  const [submittingCancel, setSubmittingCancel] = useState(false);
 
   useEffect(() => {
     if (!isSignedIn) {
@@ -76,6 +87,57 @@ export default function CustomerOrdersPage() {
 
     fetchOrders();
   }, [isSignedIn]);
+
+  // Open Cancel Request Dialog
+  const handleCancelRequestClick = (order: Order) => {
+    setSelectedOrderForCancel(order);
+    setCancelReason('Wrong variant selected');
+    setCustomCancelReason('');
+    setAgreedToTerms(false);
+    setShowCancelModal(true);
+  };
+
+  // Submit Cancel Request to Backend
+  const handleConfirmCancel = async () => {
+    if (!selectedOrderForCancel) return;
+
+    const finalReason = cancelReason === 'Other' ? customCancelReason.trim() : cancelReason;
+    if (!finalReason) {
+      toast.error('Please specify a cancellation reason.');
+      return;
+    }
+
+    try {
+      setSubmittingCancel(true);
+      const res = await fetch(`/api/customer/orders/${selectedOrderForCancel._id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ cancelReason: finalReason }),
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Failed to request order cancellation.');
+      }
+
+      // Update local state
+      setOrders(prevOrders => 
+        prevOrders.map(o => 
+          o._id === selectedOrderForCancel._id 
+            ? { ...o, status: 'cancel_requested', cancelReason: finalReason }
+            : o
+        )
+      );
+
+      toast.success('Order cancellation requested successfully.');
+      setShowCancelModal(false);
+    } catch (err: any) {
+      console.error(err);
+      toast.error(err.message || 'Failed to submit cancellation request.');
+    } finally {
+      setSubmittingCancel(false);
+    }
+  };
 
   if (!isLoaded || loading) {
     return (
@@ -324,6 +386,130 @@ export default function CustomerOrdersPage() {
           margin-bottom: 4px;
         }
 
+        .orders-cancel-btn {
+          background: transparent;
+          border: 1px solid rgba(198, 40, 40, 0.4);
+          color: #c62828;
+          padding: 8px 18px;
+          font-family: 'Jost', sans-serif;
+          font-size: 11.5px;
+          font-weight: 600;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          border-radius: 20px;
+          cursor: pointer;
+          transition: all 0.2s;
+        }
+
+        .orders-cancel-btn:hover {
+          background: rgba(198, 40, 40, 0.05);
+          border-color: #c62828;
+        }
+
+        /* MODALS */
+        .modal-overlay {
+          position: fixed;
+          inset: 0;
+          z-index: 100;
+          background-color: rgba(26, 18, 9, 0.5);
+          backdrop-filter: blur(4px);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 24px;
+        }
+
+        .modal-box {
+          background-color: #ffffff;
+          border-radius: 8px;
+          width: 100%;
+          max-width: 500px;
+          padding: 30px;
+          box-shadow: 0 20px 48px rgba(0, 0, 0, 0.15);
+          position: relative;
+          border: 1px solid rgba(26, 18, 9, 0.08);
+        }
+
+        .modal-title {
+          font-family: 'Cormorant Garamond', serif;
+          font-size: 26px;
+          font-weight: 600;
+          color: #1a1209;
+          margin: 0 0 8px;
+          text-align: center;
+        }
+
+        .modal-subtitle {
+          font-size: 13px;
+          color: rgba(26, 18, 9, 0.45);
+          text-align: center;
+          margin: 0 0 24px;
+          line-height: 1.4;
+        }
+
+        .modal-block {
+          border: 1px solid rgba(26, 18, 9, 0.08);
+          background-color: rgba(26, 18, 9, 0.01);
+          border-radius: 6px;
+          padding: 16px;
+          margin-bottom: 18px;
+          font-size: 12.5px;
+          line-height: 1.5;
+        }
+
+        .modal-block-header {
+          font-size: 10.5px;
+          font-weight: 600;
+          color: #8B6914;
+          text-transform: uppercase;
+          letter-spacing: 0.08em;
+          margin-bottom: 6px;
+        }
+
+        .modal-actions {
+          display: flex;
+          gap: 12px;
+          margin-top: 24px;
+        }
+
+        .modal-btn {
+          flex: 1;
+          padding: 12px;
+          font-family: 'Jost', sans-serif;
+          font-size: 12.5px;
+          font-weight: 600;
+          text-transform: uppercase;
+          border-radius: 20px;
+          cursor: pointer;
+          transition: all 0.2s;
+          text-align: center;
+        }
+
+        .modal-btn.cancel {
+          border: 1px solid rgba(26, 18, 9, 0.15);
+          background: #ffffff;
+          color: #1a1209;
+        }
+
+        .modal-btn.cancel:hover:not(:disabled) {
+          background-color: rgba(26, 18, 9, 0.04);
+        }
+
+        .modal-btn.confirm {
+          border: none;
+          background-color: #8B6914;
+          color: #ffffff;
+        }
+
+        .modal-btn.confirm:hover:not(:disabled) {
+          background-color: #1a1209;
+        }
+        
+        .modal-btn:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+
         /* EMPTY VIEW */
         .empty-orders-view {
           text-align: center;
@@ -407,6 +593,115 @@ export default function CustomerOrdersPage() {
           }
         }
       `}</style>
+
+      {/* CANCELLATION REQUEST MODAL */}
+      {showCancelModal && selectedOrderForCancel && (
+        <div className="modal-overlay" onClick={() => setShowCancelModal(false)}>
+          <div className="modal-box" onClick={e => e.stopPropagation()} style={{ maxWidth: '550px' }}>
+            <h3 className="modal-title" style={{ color: '#c62828' }}>Cancel Order Request</h3>
+            <p className="modal-subtitle">
+              Order Ref: <strong style={{ color: '#1a1209', fontFamily: 'monospace' }}>{selectedOrderForCancel.orderRef}</strong>
+            </p>
+
+            <div className="modal-block">
+              <div className="modal-block-header">Reason for Cancellation</div>
+              <select
+                value={cancelReason}
+                onChange={e => setCancelReason(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '10px 12px',
+                  borderRadius: '6px',
+                  border: '1px solid rgba(26, 18, 9, 0.15)',
+                  background: '#ffffff',
+                  fontFamily: "'Jost', sans-serif",
+                  fontSize: '13.5px',
+                  color: '#1a1209',
+                  marginBottom: '12px',
+                  outline: 'none',
+                }}
+              >
+                <option value="Wrong variant selected">Wrong variant/color selected</option>
+                <option value="Changed my mind">Changed my mind / Do not need anymore</option>
+                <option value="Found better price elsewhere">Found better price elsewhere</option>
+                <option value="Delivery time too long">Delivery time is too long</option>
+                <option value="Other">Other (specify below)</option>
+              </select>
+
+              {(cancelReason === 'Other' || cancelReason === '') && (
+                <textarea
+                  value={customCancelReason}
+                  onChange={e => setCustomCancelReason(e.target.value)}
+                  placeholder="Please describe your reason for cancellation..."
+                  maxLength={300}
+                  rows={3}
+                  style={{
+                    width: '100%',
+                    padding: '10px 12px',
+                    borderRadius: '6px',
+                    border: '1px solid rgba(26, 18, 9, 0.15)',
+                    background: '#ffffff',
+                    fontFamily: "'Jost', sans-serif",
+                    fontSize: '13px',
+                    color: '#1a1209',
+                    outline: 'none',
+                    resize: 'none',
+                  }}
+                />
+              )}
+            </div>
+
+            <div className="modal-block" style={{ fontSize: '12px', color: 'rgba(26, 18, 9, 0.7)' }}>
+              <div className="modal-block-header" style={{ color: '#c62828' }}>Cancellation Terms & Conditions</div>
+              <ul style={{ margin: 0, paddingLeft: '20px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <li>Cancellation requests are subject to approval by the store administrator.</li>
+                <li>If the order has already been shipped or processed, the request might be rejected.</li>
+                <li>Once approved by the admin, a full refund will be processed back to your original payment source within **24 hours**.</li>
+                <li>Reserved timepiece variant stock quantities will be restored automatically upon approval.</li>
+              </ul>
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', margin: '20px 4px 28px' }}>
+              <input
+                type="checkbox"
+                id="agree-terms"
+                checked={agreedToTerms}
+                onChange={e => setAgreedToTerms(e.target.checked)}
+                style={{
+                  width: '16px',
+                  height: '16px',
+                  accentColor: '#8B6914',
+                  cursor: 'pointer',
+                }}
+              />
+              <label htmlFor="agree-terms" style={{ fontSize: '13px', color: '#1a1209', cursor: 'pointer', fontWeight: 500 }}>
+                I agree to the cancellation terms and conditions
+              </label>
+            </div>
+
+            <div className="modal-actions">
+              <button 
+                className="modal-btn cancel" 
+                onClick={() => setShowCancelModal(false)}
+                disabled={submittingCancel}
+              >
+                Close
+              </button>
+              <button 
+                className="modal-btn confirm" 
+                onClick={handleConfirmCancel}
+                disabled={submittingCancel || !agreedToTerms || (cancelReason === 'Other' && !customCancelReason.trim())}
+                style={{
+                  backgroundColor: '#c62828',
+                  color: '#ffffff',
+                }}
+              >
+                {submittingCancel ? 'Submitting...' : 'Confirm Request'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="orders-container">
         <div className="orders-wrapper">
@@ -541,6 +836,29 @@ export default function CustomerOrdersPage() {
                       {order.shippingAddress.mobileCode} {order.shippingAddress.mobile}
                     </div>
                   </div>
+
+                  {/* CUSTOMER ACTIONS ROW */}
+                  {(order.status === 'pending' || order.status === 'processing') && (
+                    <div style={{ padding: '16px 24px', borderTop: '1px solid rgba(26, 18, 9, 0.06)', display: 'flex', justifyContent: 'flex-end', background: 'rgba(26, 18, 9, 0.005)' }}>
+                      <button 
+                        onClick={() => handleCancelRequestClick(order)}
+                        className="orders-cancel-btn"
+                      >
+                        Request Cancellation
+                      </button>
+                    </div>
+                  )}
+
+                  {order.status === 'cancel_requested' && (
+                    <div style={{ padding: '16px 24px', borderTop: '1px solid rgba(26, 18, 9, 0.06)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(201, 161, 74, 0.02)' }}>
+                      <span style={{ fontSize: '12.5px', color: 'rgba(26, 18, 9, 0.55)', fontStyle: 'italic' }}>
+                        Reason: {order.cancelReason || 'Not provided'}
+                      </span>
+                      <span style={{ fontSize: '12px', color: '#8B6914', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                        Awaiting Admin Approval
+                      </span>
+                    </div>
+                  )}
 
                 </div>
               );
