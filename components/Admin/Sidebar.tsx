@@ -165,6 +165,7 @@ const NAV_ITEMS: NavItem[] = [
 interface SidebarProps {
   adminName?: string;
   adminRole?: 'admin' | 'staff';
+  permissions?: string[];
   stats?: {
     pendingOrders?: number;
     newMessages?: number;
@@ -173,7 +174,7 @@ interface SidebarProps {
   };
 }
 
-export default function Sidebar({ adminName = 'Admin', adminRole = 'admin', stats = {} }: SidebarProps): React.JSX.Element {
+export default function Sidebar({ adminName = 'Admin', adminRole = 'admin', permissions = [], stats = {} }: SidebarProps): React.JSX.Element {
   const pathname = usePathname();
   const router = useRouter();
   const [openSubmenu, setOpenSubmenu] = useState<string | null>(null);
@@ -195,6 +196,58 @@ export default function Sidebar({ adminName = 'Admin', adminRole = 'admin', stat
   };
 
   const isActive = (href: string) => pathname === href || pathname?.startsWith(href + '/');
+
+  // Permission filtering logic
+  const hasAccess = (itemLabel: string): boolean => {
+    if (adminRole === 'admin') return true;
+    const userPermissions = permissions || [];
+    
+    switch (itemLabel) {
+      case 'Dashboard':
+        return true;
+      case 'Products':
+        return userPermissions.some(p => ['products_read', 'products_create', 'categories_manage'].includes(p));
+      case 'All Products':
+        return userPermissions.includes('products_read');
+      case 'Add New':
+        return userPermissions.includes('products_create');
+      case 'Categories':
+        return userPermissions.includes('categories_manage');
+      case 'Orders':
+        return userPermissions.includes('orders_manage');
+      case 'Customers':
+        return userPermissions.includes('customers_read');
+      case 'Messages':
+        return userPermissions.includes('messages_manage');
+      case 'Careers':
+        return userPermissions.some(p => ['careers_applications', 'careers_vacancies'].includes(p));
+      case 'Applications':
+        return userPermissions.includes('careers_applications');
+      case 'Vacancies':
+        return userPermissions.includes('careers_vacancies');
+      case 'Inventory':
+        return userPermissions.includes('inventory_manage');
+      case 'Retailers':
+        return userPermissions.includes('retailers_manage');
+      case 'Settings':
+        return true; // Always visible for self credentials management
+      default:
+        return false;
+    }
+  };
+
+  const visibleNavItems = NAV_ITEMS.map(item => {
+    if (item.children) {
+      const filteredChildren = item.children.filter(child => hasAccess(child.label));
+      return { ...item, children: filteredChildren };
+    }
+    return item;
+  }).filter(item => {
+    if (item.children && item.children.length === 0) {
+      return false; // Hide parent if all children are hidden
+    }
+    return hasAccess(item.label);
+  });
 
   return (
     <>
@@ -326,7 +379,7 @@ export default function Sidebar({ adminName = 'Admin', adminRole = 'admin', stat
           flexDirection: 'column',
           gap: '4px'
         }} className="sb-scrollbar">
-          {NAV_ITEMS.map((item) => {
+          {visibleNavItems.map((item) => {
             const active = isActive(item.href);
             const hasChildren = item.children?.length;
             const submenuOpen = openSubmenu === item.label;

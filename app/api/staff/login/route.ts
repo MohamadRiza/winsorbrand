@@ -1,4 +1,3 @@
-// app/api/admin/login/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db';
 import Admin from '@/lib/models/Admin';
@@ -8,12 +7,12 @@ import { RateLimiterMemory } from 'rate-limiter-flexible';
 
 // 🔐 RATE LIMITER: 5 attempts per 15 minutes per IP
 const loginLimiter = new RateLimiterMemory({
-  points: parseInt(process.env.LOGIN_RATE_LIMIT_POINTS || '5'),
-  duration: parseInt(process.env.LOGIN_RATE_LIMIT_DURATION || '900'), // seconds
+  points: 5,
+  duration: 900, // seconds
 });
 
 export async function POST(req: NextRequest) {
-  console.log('🔐 [LOGIN] Request received');
+  console.log('🔐 [STAFF LOGIN] Request received');
   
   try {
     // 🔐 Resolve IP address
@@ -21,8 +20,6 @@ export async function POST(req: NextRequest) {
                req.headers.get('x-real-ip') || 
                req.headers.get('cf-connecting-ip') ||
                'unknown';
-    
-    console.log(`🔐 [LOGIN] Rate limit check for IP: ${ip}`);
     
     // Connect to database
     await connectDB();
@@ -39,7 +36,6 @@ export async function POST(req: NextRequest) {
         durationStr = `${hoursLeft} hours and ${minsLeft} minutes`;
       }
       
-      console.warn(`🔐 [LOGIN] Blocked IP attempt: ${ip}. Remaining block time: ${durationStr}`);
       return NextResponse.json(
         { 
           success: false, 
@@ -52,10 +48,8 @@ export async function POST(req: NextRequest) {
     // 🔐 Second tier rate limiter (raw hits count)
     try {
       await loginLimiter.consume(ip);
-      console.log('🔐 [LOGIN] Rate limit OK');
     } catch (rateLimiterRes: any) {
       const retrySecs = Math.round(rateLimiterRes.msBeforeNext / 1000) || 1;
-      console.warn(`🔐 [LOGIN] Rate limit exceeded for IP: ${ip}, retry after ${retrySecs}s`);
       return NextResponse.json(
         { 
           success: false, 
@@ -66,36 +60,17 @@ export async function POST(req: NextRequest) {
           status: 429,
           headers: {
             'Retry-After': retrySecs.toString(),
-            'X-RateLimit-Limit': loginLimiter.points.toString(),
-            'X-RateLimit-Remaining': '0',
-            'X-RateLimit-Reset': (Date.now() + rateLimiterRes.msBeforeNext).toString(),
           }
         }
       );
     }
 
     // Parse request body
-    let body;
-    try {
-      body = await req.json();
-      console.log('🔐 [LOGIN] Parsed body:', { 
-        username: body?.username, 
-        passwordLength: body?.password?.length,
-        hasTurnstileToken: !!body?.turnstileToken
-      });
-    } catch (parseError) {
-      console.error('🔐 [LOGIN] Failed to parse JSON:', parseError);
-      return NextResponse.json(
-        { success: false, error: 'Invalid request format' },
-        { status: 400 }
-      );
-    }
-
+    const body = await req.json();
     const { username, password, turnstileToken } = body;
 
     // Validate input
     if (!username || !password) {
-      console.warn('🔐 [LOGIN] Missing credentials');
       return NextResponse.json(
         { success: false, error: 'Username and password required' },
         { status: 400 }
@@ -104,14 +79,12 @@ export async function POST(req: NextRequest) {
 
     // 🔐 Verify Cloudflare Turnstile token
     if (!turnstileToken) {
-      console.warn('🔐 [LOGIN] Missing Turnstile token');
       return NextResponse.json(
         { success: false, error: 'Security verification required' },
         { status: 400 }
       );
     }
 
-    console.log('🔐 [LOGIN] Verifying Turnstile token...');
     const turnstileResponse = await fetch(
       'https://challenges.cloudflare.com/turnstile/v0/siteverify',
       {
@@ -129,13 +102,11 @@ export async function POST(req: NextRequest) {
 
     const turnstileData = await turnstileResponse.json();
     if (!turnstileData.success) {
-      console.warn('🔐 [LOGIN] Turnstile verification failed');
       return NextResponse.json(
         { success: false, error: 'Security verification failed. Please try again.' },
         { status: 400 }
       );
     }
-    console.log('🔐 [LOGIN] ✅ Turnstile verified');
 
     // Helper to handle and increment failed attempts
     const handleFailedAttempt = async () => {
@@ -167,20 +138,14 @@ export async function POST(req: NextRequest) {
       return { isBlocked, duration, failedCount: record.failedCount, nextDuration };
     };
 
-    // Find admin (explicitly select password field and enforce role 'admin')
-    console.log(`🔐 [LOGIN] Searching for admin user: ${username.trim()}`);
-    const admin = await Admin.findOne({ 
+    // Find staff user
+    const staff = await Admin.findOne({ 
       username: username.trim(), 
-      role: 'admin',
-      isActive: true 
+      role: 'staff'
     }).select('+password');
-    
-    console.log('🔐 [LOGIN] Admin found:', !!admin);
 
-    if (!admin) {
-      console.warn('🔐 [LOGIN] Admin not found or inactive');
+    if (!staff) {
       await loginLimiter.penalty(ip).catch(() => {});
-      
       const { isBlocked, duration, failedCount, nextDuration } = await handleFailedAttempt();
       if (isBlocked) {
         return NextResponse.json(
@@ -193,21 +158,29 @@ export async function POST(req: NextRequest) {
       if (failedCount === 3) {
         attemptMsg = `Invalid credentials. Attempt 3 of 3 (Warning: next wrong attempt will block your IP for ${nextDuration}h).`;
       }
+      return NextResponse.json({ success: false, error: attemptMsg }, { status: 401 });
+    }
+
+    // Check if account is active
+    if (!staff.isActive) {
       return NextResponse.json(
-        { success: false, error: attemptMsg },
-        { status: 401 }
+        { success: false, error: 'Your staff account is deactivated. Please contact your administrator.' },
+        { status: 403 }
+      );
+    }
+
+    // Check if account is expired
+    if (staff.isTemporary && staff.expiresAt && new Date(staff.expiresAt) < new Date()) {
+      return NextResponse.json(
+        { success: false, error: 'Your staff account has expired. Please contact your administrator to renew access.' },
+        { status: 403 }
       );
     }
 
     // Compare password
-    console.log('🔐 [LOGIN] Comparing password...');
-    const isMatch = await admin.comparePassword(password);
-    console.log('🔐 [LOGIN] Password match:', isMatch);
-
+    const isMatch = await staff.comparePassword(password);
     if (!isMatch) {
-      console.warn('🔐 [LOGIN] Password mismatch');
       await loginLimiter.penalty(ip).catch(() => {});
-      
       const { isBlocked, duration, failedCount, nextDuration } = await handleFailedAttempt();
       if (isBlocked) {
         return NextResponse.json(
@@ -220,45 +193,37 @@ export async function POST(req: NextRequest) {
       if (failedCount === 3) {
         attemptMsg = `Invalid credentials. Attempt 3 of 3 (Warning: next wrong attempt will block your IP for ${nextDuration}h).`;
       }
-      return NextResponse.json(
-        { success: false, error: attemptMsg },
-        { status: 401 }
-      );
+      return NextResponse.json({ success: false, error: attemptMsg }, { status: 401 });
     }
 
     // Update last login
-    admin.lastLogin = new Date();
-    await admin.save();
-    console.log('🔐 [LOGIN] Last login updated');
+    staff.lastLogin = new Date();
+    await staff.save();
 
     // Generate tokens
-    console.log('🔐 [LOGIN] Generating tokens...');
     const accessToken = generateAccessToken({
-      adminId: admin._id.toString(),
-      username: admin.username,
-      role: admin.role as 'admin' | 'staff',
+      adminId: staff._id.toString(),
+      username: staff.username,
+      role: 'staff',
     });
     
     const refreshToken = generateRefreshToken({ 
-      adminId: admin._id.toString() 
+      adminId: staff._id.toString() 
     });
-    console.log('🔐 [LOGIN] Tokens generated');
 
-    // Create response with cookies
-    console.log('🔐 [LOGIN] Setting cookies...');
     const response = NextResponse.json(
       { 
         success: true, 
         data: { 
-          username: admin.username, 
-          role: admin.role,
+          username: staff.username, 
+          role: 'staff',
           message: 'Login successful' 
         } 
       },
       { status: 200 }
     );
 
-    // Set HTTP-only cookies
+    // Set cookies
     response.cookies.set('admin_access_token', accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
@@ -275,21 +240,14 @@ export async function POST(req: NextRequest) {
       path: '/',
     });
 
-    // ✅ Reset rate limit and blocks on successful login
+    // Reset attempts on success
     await loginLimiter.delete(ip).catch(() => {});
     await AdminLoginAttempt.deleteOne({ ip }).catch(() => {});
     
-    console.log('🔐 [LOGIN] ✅ Success - cookies set, rate limit and blocks reset');
     return response;
 
   } catch (error: any) {
-    console.error('🔐 [LOGIN] ❌ SERVER ERROR:', {
-      message: error?.message || String(error),
-      stack: error?.stack,
-      name: error?.name,
-      code: error?.code,
-    });
-    
+    console.error('🔐 [STAFF LOGIN] Server error:', error);
     return NextResponse.json(
       { success: false, error: 'Authentication failed' },
       { status: 500 }

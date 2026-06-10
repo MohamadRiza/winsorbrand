@@ -56,6 +56,12 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
+    const { verifyPermissions } = await import('@/lib/authHelper');
+    const auth = await verifyPermissions(req, ['categories_manage']);
+    if (!auth.authorized) {
+      return NextResponse.json({ success: false, error: auth.error }, { status: auth.status });
+    }
+
     await connectDB();
     const body = await req.json();
     const slug = body.label

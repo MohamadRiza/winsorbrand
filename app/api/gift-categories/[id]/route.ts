@@ -4,9 +4,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db';
 import GiftCategory from '@/lib/models/GiftCategory';
+import { verifyPermissions } from '@/lib/authHelper';
 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const auth = await verifyPermissions(req, ['categories_manage']);
+    if (!auth.authorized) {
+      return NextResponse.json({ success: false, error: auth.error }, { status: auth.status });
+    }
+
     await connectDB();
     const { id } = await params;
     const body = await req.json();
@@ -20,8 +26,13 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
   }
 }
 
-export async function DELETE(_: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const auth = await verifyPermissions(req, ['categories_manage']);
+    if (!auth.authorized) {
+      return NextResponse.json({ success: false, error: auth.error }, { status: auth.status });
+    }
+
     await connectDB();
     const { id } = await params;
     const category = await GiftCategory.findByIdAndUpdate(

@@ -6,6 +6,9 @@ export interface IAdmin extends Document {
   password: string;
   role: 'admin' | 'staff';
   isActive: boolean;
+  isTemporary: boolean;
+  expiresAt?: Date;
+  permissions: string[];
   lastLogin?: Date;
   createdAt: Date;
   updatedAt: Date;
@@ -37,6 +40,17 @@ const AdminSchema = new Schema<IAdmin>(
     isActive: {
       type: Boolean,
       default: true,
+    },
+    isTemporary: {
+      type: Boolean,
+      default: false,
+    },
+    expiresAt: {
+      type: Date,
+    },
+    permissions: {
+      type: [String],
+      default: [],
     },
     lastLogin: {
       type: Date,

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db';
 import Product from '@/lib/models/Product';
+import { verifyPermissions } from '@/lib/authHelper';
 
 // GET
 export async function GET(
@@ -37,6 +38,11 @@ export async function PUT(
   const { id } = await context.params;
 
   try {
+    const auth = await verifyPermissions(req, ['products_update']);
+    if (!auth.authorized) {
+      return NextResponse.json({ success: false, error: auth.error }, { status: auth.status });
+    }
+
     await connectDB();
     const body = await req.json();
 
@@ -65,12 +71,17 @@ export async function PUT(
 
 // DELETE
 export async function DELETE(
-  _: NextRequest,
+  req: NextRequest,
   context: { params: Promise<{ id: string }> }
 ) {
   const { id } = await context.params;
 
   try {
+    const auth = await verifyPermissions(req, ['products_delete']);
+    if (!auth.authorized) {
+      return NextResponse.json({ success: false, error: auth.error }, { status: auth.status });
+    }
+
     await connectDB();
     await Product.findByIdAndDelete(id);
 

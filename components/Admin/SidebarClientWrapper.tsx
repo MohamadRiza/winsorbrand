@@ -7,7 +7,7 @@ import Sidebar from './Sidebar';
 import { getUpcomingOccasions, SpecialOccasion } from '@/lib/occasionHelper';
 
 export default function SidebarClientWrapper() {
-  const [adminData, setAdminData] = useState<{ name?: string; role?: 'admin' | 'staff' }>({});
+  const [adminData, setAdminData] = useState<{ name?: string; role?: 'admin' | 'staff'; permissions?: string[] }>({});
   const [stats, setStats] = useState({
     pendingOrders: 0,
     newMessages: 0,
@@ -46,7 +46,11 @@ export default function SidebarClientWrapper() {
 
         if (profileRes.ok) {
           const profile = await profileRes.json();
-          setAdminData({ name: profile.username, role: profile.role });
+          setAdminData({ 
+            name: profile.username, 
+            role: profile.role,
+            permissions: profile.permissions || []
+          });
         }
         
         if (statsRes.ok) {
@@ -105,6 +109,7 @@ export default function SidebarClientWrapper() {
       <SidebarComp 
         adminName={adminData.name} 
         adminRole={adminData.role} 
+        permissions={adminData.permissions}
         stats={stats} 
       />
 
