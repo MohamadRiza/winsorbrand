@@ -286,7 +286,7 @@ export default function PermissionGate({
               Go Back
             </button>
             <button
-              onClick={() => router.push('/admin/dashboard')}
+              onClick={() => router.push(profile?.role === 'staff' ? '/admin/settings' : '/admin/dashboard')}
               style={{
                 padding: '12px 24px',
                 backgroundColor: '#1a1209',
@@ -303,7 +303,7 @@ export default function PermissionGate({
               onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#3a2815'}
               onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#1a1209'}
             >
-              Dashboard
+              {profile?.role === 'staff' ? 'Settings' : 'Dashboard'}
             </button>
           </div>
         </div>

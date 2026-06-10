@@ -40,7 +40,7 @@ async function handleAdminAuth(req: NextRequest) {
 
     // Role-based access
     if (pathname.startsWith('/admin/dashboard') && payload.role !== 'admin') {
-      return NextResponse.redirect(new URL('/admin/staff', req.url));
+      return NextResponse.redirect(new URL('/admin/settings', req.url));
     }
   }
 
