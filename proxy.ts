@@ -23,9 +23,11 @@ async function handleAdminAuth(req: NextRequest) {
   // ✅ PROTECT all other /admin routes
   if (pathname.startsWith('/admin')) {
     const accessToken = req.cookies.get('admin_access_token')?.value;
+    const userType = req.cookies.get('winsor_user_type')?.value;
+    const loginPath = userType === 'staff' ? '/staff/login' : '/admin/login';
     
     if (!accessToken) {
-      const loginUrl = new URL('/admin/login', req.url);
+      const loginUrl = new URL(loginPath, req.url);
       loginUrl.searchParams.set('redirect', pathname);
       return NextResponse.redirect(loginUrl);
     }
@@ -33,7 +35,7 @@ async function handleAdminAuth(req: NextRequest) {
     const payload = verifyAccessToken(accessToken);
     
     if (!payload) {
-      const loginUrl = new URL('/admin/login', req.url);
+      const loginUrl = new URL(loginPath, req.url);
       loginUrl.searchParams.set('redirect', pathname);
       return NextResponse.redirect(loginUrl);
     }

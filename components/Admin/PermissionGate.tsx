@@ -36,8 +36,12 @@ export default function PermissionGate({
         const res = await fetch('/api/admin/me', { credentials: 'include' });
         
         if (res.status === 401) {
-          // Redirect to appropriate login based on path
-          const loginPath = pathname.startsWith('/admin') ? '/admin/login' : '/staff/login';
+          // Read winsor_user_type cookie from client document
+          const cookies = typeof document !== 'undefined' ? document.cookie.split('; ') : [];
+          const userTypeCookie = cookies.find(row => row.startsWith('winsor_user_type='));
+          const userType = userTypeCookie ? userTypeCookie.split('=')[1] : null;
+          const loginPath = userType === 'staff' ? '/staff/login' : '/admin/login';
+          
           router.push(`${loginPath}?redirect=${encodeURIComponent(pathname)}`);
           return;
         }
@@ -51,7 +55,12 @@ export default function PermissionGate({
         }
 
         if (!res.ok || !data.success) {
-          router.push(`/admin/login?redirect=${encodeURIComponent(pathname)}`);
+          const cookies = typeof document !== 'undefined' ? document.cookie.split('; ') : [];
+          const userTypeCookie = cookies.find(row => row.startsWith('winsor_user_type='));
+          const userType = userTypeCookie ? userTypeCookie.split('=')[1] : null;
+          const loginPath = userType === 'staff' ? '/staff/login' : '/admin/login';
+
+          router.push(`${loginPath}?redirect=${encodeURIComponent(pathname)}`);
           return;
         }
 

@@ -158,6 +158,11 @@ const NAV_ITEMS: NavItem[] = [
     href: '/admin/retailers', 
     icon: RetailerIcon 
   },
+  { 
+    label: 'Staff Management', 
+    href: '/admin/staff', 
+    icon: CustomersIcon 
+  },
   { label: 'Settings', href: '/admin/settings', icon: SettingsIcon },
 ];
 
@@ -204,7 +209,9 @@ export default function Sidebar({ adminName = 'Admin', adminRole = 'admin', perm
     
     switch (itemLabel) {
       case 'Dashboard':
-        return true;
+        return false; // Staff never gets access to dashboard
+      case 'Staff Management':
+        return false; // Staff never gets access to staff management page
       case 'Products':
         return userPermissions.some(p => ['products_read', 'products_create', 'categories_manage'].includes(p));
       case 'All Products':

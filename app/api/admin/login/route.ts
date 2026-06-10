@@ -275,6 +275,14 @@ export async function POST(req: NextRequest) {
       path: '/',
     });
 
+    response.cookies.set('winsor_user_type', 'admin', {
+      httpOnly: false,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60, // 7 days
+      path: '/',
+    });
+
     // ✅ Reset rate limit and blocks on successful login
     await loginLimiter.delete(ip).catch(() => {});
     await AdminLoginAttempt.deleteOne({ ip }).catch(() => {});
