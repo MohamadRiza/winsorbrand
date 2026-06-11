@@ -104,7 +104,7 @@ export default function StoreLocatorPage() {
         toast.success('Location matched! Sorting stores by proximity.');
       },
       (error) => {
-        console.error('Geolocation error:', error);
+        console.warn('Geolocation error:', error.message || error);
         setGpsLoading(false);
         setGpsActive(false);
         setUserCoords(null);
@@ -115,7 +115,7 @@ export default function StoreLocatorPage() {
         }
         toast.error(msg);
       },
-      { enableHighAccuracy: true, timeout: 8000 }
+      { enableHighAccuracy: false, timeout: 15000, maximumAge: 60000 }
     );
   };
 
