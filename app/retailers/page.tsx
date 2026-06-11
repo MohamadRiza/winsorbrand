@@ -81,16 +81,61 @@ export default function StoreLocatorPage() {
   };
 
   const handleActivateGPS = () => {
-    if (!navigator.geolocation) {
-      toast.error('Geolocation is not supported by your browser');
-      return;
-    }
     setShowGPSModal(true);
   };
 
   const handleConfirmGPS = () => {
     setShowGPSModal(false);
     setGpsLoading(true);
+
+    const runFallbackIPLocation = async () => {
+      console.warn('Attempting IP-based geolocation fallback...');
+      
+      // Fallback 1: ipapi.co
+      try {
+        const res = await fetch('https://ipapi.co/json/');
+        if (res.ok) {
+          const data = await res.json();
+          if (data && typeof data.latitude === 'number' && typeof data.longitude === 'number') {
+            setUserCoords({ latitude: data.latitude, longitude: data.longitude });
+            setGpsActive(true);
+            setGpsLoading(false);
+            toast.success('Location resolved via IP address! Sorting stores by proximity.');
+            return true;
+          }
+        }
+      } catch (err) {
+        console.warn('ipapi.co failed, trying freeipapi...', err);
+      }
+
+      // Fallback 2: freeipapi.com
+      try {
+        const res = await fetch('https://freeipapi.com/api/json');
+        if (res.ok) {
+          const data = await res.json();
+          if (data && typeof data.latitude === 'number' && typeof data.longitude === 'number') {
+            setUserCoords({ latitude: data.latitude, longitude: data.longitude });
+            setGpsActive(true);
+            setGpsLoading(false);
+            toast.success('Location resolved via IP address! Sorting stores by proximity.');
+            return true;
+          }
+        }
+      } catch (err) {
+        console.warn('freeipapi.com failed too', err);
+      }
+
+      setGpsLoading(false);
+      setGpsActive(false);
+      setUserCoords(null);
+      toast.error('Could not access your location. Displaying standard listing.');
+      return false;
+    };
+
+    if (typeof window === 'undefined' || !navigator.geolocation) {
+      runFallbackIPLocation();
+      return;
+    }
 
     navigator.geolocation.getCurrentPosition(
       (position) => {
@@ -104,18 +149,10 @@ export default function StoreLocatorPage() {
         toast.success('Location matched! Sorting stores by proximity.');
       },
       (error) => {
-        console.warn('Geolocation error:', error.message || error);
-        setGpsLoading(false);
-        setGpsActive(false);
-        setUserCoords(null);
-        
-        let msg = 'Could not access your location.';
-        if (error.code === error.PERMISSION_DENIED) {
-          msg = 'Location permission denied. Displaying standard listing.';
-        }
-        toast.error(msg);
+        console.warn('Browser Geolocation failed, trying IP fallback:', error.message || error);
+        runFallbackIPLocation();
       },
-      { enableHighAccuracy: false, timeout: 15000, maximumAge: 60000 }
+      { enableHighAccuracy: false, timeout: 6000, maximumAge: 60000 }
     );
   };
 
