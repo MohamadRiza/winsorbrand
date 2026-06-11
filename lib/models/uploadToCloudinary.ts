@@ -19,7 +19,7 @@ export async function uploadToCloudinary(
   const result = await cloudinary.uploader.upload(fileData, {
     folder:        options.folder,
     resource_type: options.resourceType ?? 'image',
-    transformation: options.resourceType === 'video'
+    transformation: (options.resourceType === 'video' || options.resourceType === 'raw')
       ? undefined
       : [{ quality: 'auto', fetch_format: 'auto' }],
   });

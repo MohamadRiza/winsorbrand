@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db';
 import Product from '@/lib/models/Product';
 import Admin from '@/lib/models/Admin';
+import Vacancy from '@/lib/models/Vacancy';
+import JobApplication from '@/lib/models/JobApplication';
 import { verifyAccessToken } from '@/lib/jwt';
 
 export async function GET(req: NextRequest) {
@@ -25,6 +27,8 @@ export async function GET(req: NextRequest) {
       totalProducts,
       totalCustomers,
       lowStockCount,
+      openVacanciesCount,
+      pendingApplicationsCount,
     ] = await Promise.all([
       Product.countDocuments({ isActive: true }),
       Admin.countDocuments({ role: 'staff', isActive: true }),
@@ -32,6 +36,8 @@ export async function GET(req: NextRequest) {
         isActive: true, 
         colorVariants: { $elemMatch: { qty: { $lte: 10, $gt: 0 } } } 
       }),
+      Vacancy.countDocuments({ status: 'active' }),
+      JobApplication.countDocuments({ status: 'pending' }),
     ]);
 
     return NextResponse.json({
@@ -40,8 +46,8 @@ export async function GET(req: NextRequest) {
         totalProducts,
         totalCustomers,
         pendingOrders: 0,
-        openVacancies: 0,
-        jobApplications: 0,
+        openVacancies: openVacanciesCount,
+        jobApplications: pendingApplicationsCount,
         newMessages: 0,
         lowStockItems: lowStockCount,
         onlineCustomers: 0,
