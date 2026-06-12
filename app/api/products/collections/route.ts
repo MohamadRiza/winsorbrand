@@ -26,7 +26,7 @@ export async function GET(req: NextRequest) {
 
     const products = await Product
       .find(filter)
-      .select('title modelNo price thumbnail colorVariants stickerEnabled stickerText collectionSections')
+      .select('title modelNo price thumbnail colorVariants stickerEnabled stickerText collectionSections images specifications description')
       .limit(Math.min(limit, 10)) // max 10 per section
       .sort({ createdAt: -1 })
       .lean();

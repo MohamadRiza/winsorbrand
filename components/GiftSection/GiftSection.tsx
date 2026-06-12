@@ -35,10 +35,23 @@ interface GiftProduct {
 const FALLBACK_BACKGROUNDS = [
   'https://photographylife.com/wp-content/uploads/2017/01/Dark-landscape-photo.jpg',
   'https://photographylife.com/wp-content/uploads/2018/10/Final-Result-of-Jokulsarlon-Photo.jpg',
-  // '/gif2.jpeg',
-  // '/gif2.jpeg',
-  // '/gif2.jpeg',
 ];
+
+// Curated luxury background images for each preset gift category
+const OCCASION_BACKGROUNDS: Record<string, string> = {
+  'eid': 'https://images.unsplash.com/photo-1564507592333-c60657eea523?auto=format&fit=crop&q=80&w=2000',
+  'new-year': 'https://images.unsplash.com/photo-1467810563316-b547d9d57b3b?auto=format&fit=crop&q=80&w=2000',
+  'valentines-day': 'https://images.unsplash.com/photo-1518199266791-5375a83190b7?auto=format&fit=crop&q=80&w=2000',
+  'christmas': 'https://images.unsplash.com/photo-1513885535751-8b9238bd345a?auto=format&fit=crop&q=80&w=2000',
+  'graduation': 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&q=80&w=2000',
+  'womens-day': 'https://images.unsplash.com/photo-1490750967868-88aa4486c946?auto=format&fit=crop&q=80&w=2000',
+  'easter-sunday': 'https://images.unsplash.com/photo-1522336572018-97d5761f20a3?auto=format&fit=crop&q=80&w=2000',
+  'mothers-day': 'https://images.unsplash.com/photo-1543269865-cbf427effbad?auto=format&fit=crop&q=80&w=2000',
+  'fathers-day': 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&q=80&w=2000',
+  'thai-pongal': 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&q=80&w=2000',
+  'sinhala-tamil-new-year': 'https://images.unsplash.com/photo-1601662528567-526cf06f6582?auto=format&fit=crop&q=80&w=2000',
+  'esala-perahera': 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=2000',
+};
 
 // ── Hero stage: one big background + swipeable watch (book-page feel) ─────
 function HeroStage({
@@ -58,6 +71,24 @@ function HeroStage({
 }) {
   const dragStartX = useRef<number | null>(null);
   const [direction, setDirection] = useState<1 | -1>(1);
+
+  // States for background cross-fading
+  const [bg1, setBg1] = useState(background);
+  const [bg2, setBg2] = useState('');
+  const [showBg2, setShowBg2] = useState(false);
+
+  useEffect(() => {
+    if (background === bg1 && !showBg2) return;
+    if (background === bg2 && showBg2) return;
+
+    if (showBg2) {
+      setBg1(background);
+      setShowBg2(false);
+    } else {
+      setBg2(background);
+      setShowBg2(true);
+    }
+  }, [background, bg1, bg2, showBg2]);
 
   const goTo = useCallback(
     (next: number) => {
@@ -106,21 +137,47 @@ function HeroStage({
         width: '100%',
         minHeight: 'min(98vh, 920px)',
         overflow: 'hidden',
-        backgroundImage: `url(${background})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
         userSelect: 'none',
         cursor: products.length > 1 ? 'grab' : 'default',
+        background: '#0a0a0a',
       }}
     >
+      {/* Background Layer 1 */}
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          backgroundImage: bg1 ? `url(${bg1})` : 'none',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          opacity: showBg2 ? 0 : 1,
+          transition: 'opacity 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+          zIndex: 0,
+        }}
+      />
+      {/* Background Layer 2 */}
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          backgroundImage: bg2 ? `url(${bg2})` : 'none',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          opacity: showBg2 ? 1 : 0,
+          transition: 'opacity 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+          zIndex: 0,
+        }}
+      />
+
       {/* Soft vignette so text + watch read clearly on any image */}
       <div
         style={{
           position: 'absolute',
           inset: 0,
           background:
-            'linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0) 35%, rgba(0,0,0,0) 60%, rgba(0,0,0,0.45) 100%)',
+            'linear-gradient(180deg, rgba(0,0,0,0.25) 0%, rgba(0,0,0,0) 35%, rgba(0,0,0,0) 60%, rgba(0,0,0,0.55) 100%)',
           pointerEvents: 'none',
+          zIndex: 1,
         }}
       />
 
@@ -133,6 +190,7 @@ function HeroStage({
           alignItems: 'center',
           justifyContent: 'center',
           pointerEvents: 'none',
+          zIndex: 1,
         }}
       >
         <span
@@ -160,8 +218,22 @@ function HeroStage({
           alignItems: 'center',
           justifyContent: 'center',
           pointerEvents: 'none',
+          zIndex: 2,
         }}
       >
+        {/* Soft Radial Backing Glow behind the watch to enhance depth */}
+        <div
+          style={{
+            position: 'absolute',
+            width: 'min(450px, 75vw)',
+            height: 'min(450px, 75vw)',
+            borderRadius: '50%',
+            background: 'radial-gradient(circle, rgba(139, 105, 20, 0.22) 0%, rgba(139, 105, 20, 0.06) 50%, rgba(0, 0, 0, 0) 70%)',
+            filter: 'blur(30px)',
+            pointerEvents: 'none',
+            mixBlendMode: 'screen',
+          }}
+        />
         {active && (
           <div
             key={active._id}
@@ -171,7 +243,7 @@ function HeroStage({
               width: 'min(420px, 60vw)',
               height: 'min(560px, 70vh)',
               position: 'relative',
-              filter: 'drop-shadow(0 30px 50px rgba(0,0,0,0.45))',
+              filter: 'drop-shadow(0 35px 55px rgba(0,0,0,0.55))',
             }}
           >
             <Image
@@ -195,6 +267,7 @@ function HeroStage({
           color: '#fff',
           maxWidth: '520px',
           textShadow: '0 2px 12px rgba(0,0,0,0.4)',
+          zIndex: 3,
         }}
       >
         <h2
@@ -251,14 +324,14 @@ function HeroStage({
           <button
             onClick={prev}
             aria-label="Previous watch"
-            style={arrowStyle('left')}
+            style={{ ...arrowStyle('left'), zIndex: 5 }}
           >
             ‹
           </button>
           <button
             onClick={next}
             aria-label="Next watch"
-            style={arrowStyle('right')}
+            style={{ ...arrowStyle('right'), zIndex: 5 }}
           >
             ›
           </button>
@@ -275,6 +348,7 @@ function HeroStage({
             display: 'flex',
             gap: '8px',
             alignItems: 'center',
+            zIndex: 3,
           }}
         >
           <span
@@ -330,7 +404,6 @@ const arrowStyle = (side: 'left' | 'right'): React.CSSProperties => ({
   alignItems: 'center',
   justifyContent: 'center',
   backdropFilter: 'blur(6px)',
-  zIndex: 5,
 });
 
 // ── Main component ─────────────────────────────────────────────────────────
@@ -393,11 +466,15 @@ export default function GiftSection() {
   );
 
   // One background per category. Use admin-provided heroBackground if present;
-  // otherwise pick a stable fallback based on category slug (so it doesn't
-  // flicker between renders).
+  // otherwise check the custom lookups for our 12 default presets, falling back
+  // to a stable gradient fallback as needed.
   const background = useMemo(() => {
     if (activeCat?.heroBackground) return activeCat.heroBackground;
     if (!activeCat) return FALLBACK_BACKGROUNDS[0];
+    const slugLower = activeCat.slug.toLowerCase();
+    if (OCCASION_BACKGROUNDS[slugLower]) {
+      return OCCASION_BACKGROUNDS[slugLower];
+    }
     const idx =
       Math.abs(
         activeCat.slug.split('').reduce((a, c) => a + c.charCodeAt(0), 0),
@@ -418,68 +495,114 @@ export default function GiftSection() {
         }
         .hero-watch-in[data-dir="right"] { animation: hero-watch-from-right 0.6s cubic-bezier(.2,.7,.2,1) both; }
         .hero-watch-in[data-dir="left"]  { animation: hero-watch-from-left  0.6s cubic-bezier(.2,.7,.2,1) both; }
-        .gift-tabs::-webkit-scrollbar { display: none; }
-        .gift-tabs { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        .gift-tabs {
+          display: flex;
+          gap: 10px;
+          overflow-x: auto;
+          padding: 12px 20px 24px;
+          scrollbar-width: none;
+          -ms-overflow-style: none;
+          justify-content: center;
+          flex-wrap: wrap;
+        }
+        .gift-tabs::-webkit-scrollbar {
+          display: none;
+        }
+        .gift-tab-btn {
+          background: #fff;
+          border: 1px solid rgba(26, 18, 9, 0.08);
+          color: #1a1209;
+          padding: 8px 18px;
+          font-family: 'Jost', sans-serif;
+          font-size: 12px;
+          font-weight: 500;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          border-radius: 30px;
+          cursor: pointer;
+          transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+          white-space: nowrap;
+          display: flex;
+          align-items: center;
+          gap: 6px;
+        }
+        .gift-tab-btn.active {
+          background: #8B6914;
+          border-color: #8B6914;
+          color: #fff;
+          box-shadow: 0 4px 15px rgba(139, 105, 20, 0.25);
+        }
+        .gift-tab-btn:hover:not(.active) {
+          border-color: #8B6914;
+          color: #8B6914;
+          background: rgba(139, 105, 20, 0.04);
+        }
+        @media (max-width: 768px) {
+          .gift-tabs {
+            justify-content: flex-start;
+            flex-wrap: nowrap;
+            -webkit-overflow-scrolling: touch;
+            padding: 8px 16px 16px;
+          }
+          .gift-tab-btn {
+            padding: 6px 14px;
+            font-size: 11px;
+          }
+        }
       `}</style>
 
       {/* Top tabs (categories from admin) */}
       <div style={{
-            padding: '32px 20px 24px',
-            textAlign: 'center',
-            background: '#ffffff',
-          }}>
-            <h2 style={{
-              fontFamily:"'Jost',sans-serif",
-              fontSize: 'clamp(20px, 4vw, 28px)',
-              fontWeight:600,
-              color:'#1a1a1a',
-              letterSpacing:'0.1em',
-              margin:'0 0 8px 0',
-              textTransform:'uppercase',
-              lineHeight: 1.3,
-            }}>
-              Celebrate moments with elegance
-            </h2>
-            <p style={{
-              fontFamily:"'Jost',sans-serif",
-              fontSize:'13px',
-              color:'#666666',
-              letterSpacing:'0.05em',
-              margin:0,
-              lineHeight: 1.5,
-            }}>
-              A gift that lasts forever
-            </p>
-          </div>
+        padding: '48px 20px 32px',
+        textAlign: 'center',
+        background: '#ffffff',
+      }}>
+        <h2 style={{
+          fontFamily: "'Cormorant Garamond', serif",
+          fontSize: 'clamp(28px, 5vw, 42px)',
+          fontWeight: 300,
+          color: '#1a1a1a',
+          letterSpacing: '0.06em',
+          margin: '0 0 10px 0',
+          textTransform: 'uppercase',
+          lineHeight: 1.2,
+        }}>
+          Celebrate moments with elegance
+        </h2>
+        <p style={{
+          fontFamily: "'Cormorant Garamond', serif",
+          fontSize: 'clamp(15px, 2.5vw, 18px)',
+          fontStyle: 'italic',
+          color: '#8B6914',
+          letterSpacing: '0.08em',
+          margin: 0,
+          lineHeight: 1.5,
+        }}>
+          A gift that lasts forever
+        </p>
+      </div>
+
       <div
         style={{
-          borderBottom: '1px solid #eee',
+          borderBottom: '1px solid rgba(26, 18, 9, 0.05)',
           background: '#fff',
           position: 'sticky',
           top: 0,
           zIndex: 20,
         }}
       >
-        <div
-          className="gift-tabs"
-          style={{
-            display: 'flex',
-            gap: '4px',
-            overflowX: 'auto',
-            justifyContent: 'center',
-            padding: '0 20px',
-          }}
-        >
+        <div className="gift-tabs">
           {loadingCats
             ? Array.from({ length: 5 }).map((_, i) => (
                 <div
                   key={i}
                   style={{
                     width: 120,
-                    height: 18,
-                    margin: '20px 12px',
-                    background: '#eee',
-                    borderRadius: 4,
+                    height: 36,
+                    margin: '8px',
+                    background: '#f5f5f5',
+                    borderRadius: 30,
                     animation: 'pulse 1.4s infinite',
                   }}
                 />
@@ -490,27 +613,10 @@ export default function GiftSection() {
                   <button
                     key={cat._id}
                     onClick={() => setActiveSlug(cat.slug)}
-                    style={{
-                      fontFamily: "'Jost', sans-serif",
-                      fontSize: '13px',
-                      fontWeight: isActive ? 600 : 400,
-                      letterSpacing: '0.1em',
-                      textTransform: 'uppercase',
-                      padding: '18px 20px',
-                      border: 'none',
-                      background: 'none',
-                      cursor: 'pointer',
-                      color: isActive ? '#1a1a1a' : '#666',
-                      borderBottom: isActive
-                        ? '2px solid #1a1a1a'
-                        : '2px solid transparent',
-                      transition: 'all 0.3s ease',
-                      whiteSpace: 'nowrap',
-                      flexShrink: 0,
-                      marginBottom: '-1px',
-                    }}
+                    className={`gift-tab-btn ${isActive ? 'active' : ''}`}
                   >
-                    {cat.emoji} {cat.label}
+                    <span>{cat.emoji}</span>
+                    <span>{cat.label}</span>
                   </button>
                 );
               })}

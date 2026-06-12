@@ -166,13 +166,14 @@ function GenderSection({ gender, title, image, video, isMobile }: GenderSectionP
       >
         <h2
           style={{
-            fontFamily: "'Jost', sans-serif",
-            fontSize: 'clamp(28px, 5vw, 48px)',
-            fontWeight: 400,
+            fontFamily: "'Cormorant Garamond', serif",
+            fontSize: 'clamp(24px, 3.5vw, 36px)',
+            fontWeight: 300,
             color: '#ffffff',
-            marginBottom: '16px',
-            letterSpacing: '0.05em',
-            textShadow: '0 2px 8px rgba(0,0,0,0.3)',
+            marginBottom: '14px',
+            letterSpacing: '0.08em',
+            textTransform: 'uppercase',
+            textShadow: '0 2px 8px rgba(0,0,0,0.45)',
           }}
         >
           {title}
@@ -239,7 +240,6 @@ export default function GenderCollectionSection() {
     <section
       style={{
         width: '100%',
-        padding: '0',
         background: '#ffffff',
       }}
     >
@@ -248,8 +248,11 @@ export default function GenderCollectionSection() {
           display: 'flex',
           flexDirection: isMobile ? 'column' : 'row',
           width: '100%',
-          height: isMobile ? 'auto' : '90vh',
-          minHeight: isMobile ? 'auto' : '600px',
+          height: isMobile ? 'auto' : '85vh',
+          minHeight: isMobile ? 'auto' : '550px',
+          gap: isMobile ? '16px' : '24px',
+          padding: isMobile ? '16px' : '40px 80px',
+          boxSizing: 'border-box',
         }}
       >
         {/* Men's Section */}
@@ -257,8 +260,8 @@ export default function GenderCollectionSection() {
           style={{
             flex: '1',
             width: '100%',
-            height: isMobile ? '50vh' : '100%',
-            minHeight: isMobile ? '400px' : 'auto',
+            height: isMobile ? '45vh' : '100%',
+            minHeight: isMobile ? '350px' : 'auto',
           }}
         >
           <GenderSection
@@ -270,24 +273,13 @@ export default function GenderCollectionSection() {
           />
         </div>
 
-        {/* Divider for desktop */}
-        {!isMobile && (
-          <div
-            style={{
-              width: '1px',
-              background: '#e0e0e0',
-              height: '100%',
-            }}
-          />
-        )}
-
         {/* Women's Section */}
         <div
           style={{
             flex: '1',
             width: '100%',
-            height: isMobile ? '50vh' : '100%',
-            minHeight: isMobile ? '400px' : 'auto',
+            height: isMobile ? '45vh' : '100%',
+            minHeight: isMobile ? '350px' : 'auto',
           }}
         >
           <GenderSection
@@ -303,8 +295,8 @@ export default function GenderCollectionSection() {
       <style>{`
         @media (max-width: 768px) {
           .gender-section {
-            height: 50vh !important;
-            min-height: 400px !important;
+            height: 45vh !important;
+            min-height: 350px !important;
           }
         }
       `}</style>
