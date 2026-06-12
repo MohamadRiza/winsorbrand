@@ -4,6 +4,7 @@ import Product from '@/lib/models/Product';
 import Admin from '@/lib/models/Admin';
 import Vacancy from '@/lib/models/Vacancy';
 import JobApplication from '@/lib/models/JobApplication';
+import InventorySettings from '@/lib/models/InventorySettings';
 import { verifyAccessToken } from '@/lib/jwt';
 
 export async function GET(req: NextRequest) {
@@ -23,21 +24,47 @@ export async function GET(req: NextRequest) {
   try {
     await connectDB();
 
+    // Load Inventory settings for dynamic thresholds
+    let settings = await InventorySettings.findOne();
+    if (!settings) {
+      settings = await InventorySettings.create({
+        lowStockThreshold: 10,
+        outOfStockThreshold: 0,
+        alertNotificationsEnabled: true,
+      });
+    }
+
     const [
       totalProducts,
       totalCustomers,
       lowStockCount,
       openVacanciesCount,
       pendingApplicationsCount,
+      hasLowStockOrOutOfStock,
     ] = await Promise.all([
       Product.countDocuments({ isActive: true }),
       Admin.countDocuments({ role: 'staff', isActive: true }),
       Product.countDocuments({ 
         isActive: true, 
-        colorVariants: { $elemMatch: { qty: { $lte: 10, $gt: 0 } } } 
+        colorVariants: { 
+          $elemMatch: { 
+            qty: { 
+              $lte: settings.lowStockThreshold, 
+              $gt: settings.outOfStockThreshold 
+            } 
+          } 
+        } 
       }),
       Vacancy.countDocuments({ status: 'active' }),
       JobApplication.countDocuments({ status: 'pending' }),
+      Product.exists({
+        isActive: true,
+        colorVariants: {
+          $elemMatch: {
+            qty: { $lte: settings.lowStockThreshold }
+          }
+        }
+      })
     ]);
 
     return NextResponse.json({
@@ -52,6 +79,8 @@ export async function GET(req: NextRequest) {
         lowStockItems: lowStockCount,
         onlineCustomers: 0,
         lastUpdated: new Date().toISOString(),
+        alertNotificationsEnabled: settings.alertNotificationsEnabled,
+        hasLowStockOrOutOfStock: !!hasLowStockOrOutOfStock,
       },
     });
 

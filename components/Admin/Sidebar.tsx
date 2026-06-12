@@ -390,7 +390,13 @@ export default function Sidebar({ adminName = 'Admin', adminRole = 'admin', perm
             const active = isActive(item.href);
             const hasChildren = item.children?.length;
             const submenuOpen = openSubmenu === item.label;
-            const badge = item.badge !== undefined ? (stats as any)[item.label.toLowerCase().replace(' ', '') + 's'] ?? item.badge : undefined;
+            const badge = item.badge !== undefined ? (
+              item.label === 'Orders' ? stats.pendingOrders :
+              item.label === 'Messages' ? stats.newMessages :
+              item.label === 'Careers' ? stats.jobApplications :
+              item.label === 'Inventory' ? stats.lowStockItems :
+              (stats as any)[item.label.toLowerCase().replace(' ', '') + 's'] ?? item.badge
+            ) : undefined;
 
             return (
               <div key={item.href}>

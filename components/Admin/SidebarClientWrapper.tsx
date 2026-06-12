@@ -8,11 +8,13 @@ import { getUpcomingOccasions, SpecialOccasion } from '@/lib/occasionHelper';
 
 export default function SidebarClientWrapper() {
   const [adminData, setAdminData] = useState<{ name?: string; role?: 'admin' | 'staff'; permissions?: string[] }>({});
-  const [stats, setStats] = useState({
+  const [stats, setStats] = useState<any>({
     pendingOrders: 0,
     newMessages: 0,
     lowStockItems: 0,
     jobApplications: 0,
+    alertNotificationsEnabled: false,
+    hasLowStockOrOutOfStock: false,
   });
   const [SidebarComp, setSidebarComp] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -22,6 +24,9 @@ export default function SidebarClientWrapper() {
   // Occasion Reminder Modal state
   const [occasions, setOccasions] = useState<SpecialOccasion[]>([]);
   const [showOccasionModal, setShowOccasionModal] = useState(false);
+  
+  // Stock Alert state
+  const [showInventoryAlert, setShowInventoryAlert] = useState(false);
 
   // Dynamically import Sidebar
   useEffect(() => {
@@ -95,6 +100,30 @@ export default function SidebarClientWrapper() {
     setShowOccasionModal(false);
     sessionStorage.setItem('winsor_admin_occasions_dismissed', 'true');
     router.push('/admin/products/categories');
+  };
+
+  // Check for low stock alert on stats load
+  useEffect(() => {
+    if (isLoading || !isAuthenticated) return;
+    
+    const isAuthorized = adminData.role === 'admin' || (adminData.permissions && adminData.permissions.includes('inventory_manage'));
+    if (isAuthorized && stats.alertNotificationsEnabled && stats.hasLowStockOrOutOfStock) {
+      const dismissed = sessionStorage.getItem('winsor_admin_inventory_dismissed');
+      if (!dismissed) {
+        setShowInventoryAlert(true);
+      }
+    }
+  }, [isLoading, isAuthenticated, adminData, stats]);
+
+  const handleDismissInventory = () => {
+    setShowInventoryAlert(false);
+    sessionStorage.setItem('winsor_admin_inventory_dismissed', 'true');
+  };
+
+  const handleManageInventory = () => {
+    setShowInventoryAlert(false);
+    sessionStorage.setItem('winsor_admin_inventory_dismissed', 'true');
+    router.push('/admin/inventory');
   };
 
   // Show nothing while loading or if not authenticated
@@ -252,6 +281,138 @@ export default function SidebarClientWrapper() {
               to { opacity: 1; transform: scale(1); }
             }
           `}</style>
+        </div>
+      )}
+
+      {/* Inventory Stock Alert Modal */}
+      {showInventoryAlert && (
+        <div style={{
+          position: 'fixed',
+          inset: 0,
+          backgroundColor: 'rgba(26, 18, 9, 0.7)',
+          backdropFilter: 'blur(8px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 9998,
+          padding: '20px',
+        }}>
+          <div style={{
+            width: '100%',
+            maxWidth: '440px',
+            backgroundColor: '#1a1209',
+            border: '1px solid rgba(220, 50, 50, 0.4)',
+            borderRadius: '16px',
+            padding: '32px 24px',
+            boxShadow: '0 24px 48px rgba(0, 0, 0, 0.6), inset 0 0 20px rgba(220, 50, 50, 0.05)',
+            textAlign: 'center',
+            fontFamily: "'Jost', sans-serif",
+            animation: 'scaleUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both',
+          }}>
+            {/* Warning indicator */}
+            <div style={{
+              width: '80px',
+              height: '80px',
+              borderRadius: '50%',
+              border: '2px solid #dc3232',
+              backgroundColor: 'rgba(220, 50, 50, 0.12)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '40px',
+              margin: '0 auto 20px',
+              boxShadow: '0 8px 20px rgba(220, 50, 50, 0.25)',
+              userSelect: 'none',
+            }}>
+              ⚠️
+            </div>
+
+            {/* Header */}
+            <h2 style={{
+              fontFamily: "'Cormorant Garamond', serif",
+              fontSize: '24px',
+              fontWeight: 600,
+              color: '#f3e3b8',
+              margin: '0 0 6px',
+              letterSpacing: '0.02em',
+            }}>
+              Refill Stock Required
+            </h2>
+            
+            <p style={{
+              fontSize: '11px',
+              fontWeight: 600,
+              letterSpacing: '0.15em',
+              textTransform: 'uppercase',
+              color: '#dc3232',
+              margin: '0 0 20px',
+            }}>
+              Low / Out of Stock Alert
+            </p>
+
+            {/* Message */}
+            <p style={{
+              fontSize: '13.5px',
+              color: 'rgba(243, 227, 184, 0.85)',
+              lineHeight: '1.6',
+              margin: '0 0 28px',
+              padding: '0 10px',
+            }}>
+              Some timepiece variants have reached low stock thresholds or are completely out of stock. Please check the inventory catalog and restock them.
+            </p>
+
+            {/* Actions */}
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <button
+                onClick={handleDismissInventory}
+                style={{
+                  flex: 1,
+                  padding: '12px 16px',
+                  backgroundColor: 'transparent',
+                  border: '1px solid rgba(243, 227, 184, 0.25)',
+                  borderRadius: '8px',
+                  color: 'rgba(243, 227, 184, 0.8)',
+                  fontSize: '13px',
+                  fontWeight: 500,
+                  cursor: 'pointer',
+                  fontFamily: "'Jost', sans-serif",
+                  transition: 'all 0.2s',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = 'rgba(243, 227, 184, 0.5)';
+                  e.currentTarget.style.color = '#f3e3b8';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = 'rgba(243, 227, 184, 0.25)';
+                  e.currentTarget.style.color = 'rgba(243, 227, 184, 0.8)';
+                }}
+              >
+                Ignore for now
+              </button>
+              
+              <button
+                onClick={handleManageInventory}
+                style={{
+                  flex: 1,
+                  padding: '12px 16px',
+                  backgroundColor: '#dc3232',
+                  border: 'none',
+                  borderRadius: '8px',
+                  color: '#ffffff',
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  fontFamily: "'Jost', sans-serif",
+                  transition: 'background-color 0.2s, transform 0.1s',
+                  boxShadow: '0 4px 12px rgba(220, 50, 50, 0.3)',
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#e54b4b'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#dc3232'}
+              >
+                Manage Stock
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </>
