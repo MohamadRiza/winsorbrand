@@ -340,10 +340,10 @@ export default function Navbar() {
           zIndex:50, 
           transform: isVisible?'translateY(0)':'translateY(-100%)', 
           transition:'transform 0.42s cubic-bezier(0.25,0.46,0.45,0.94), background 0.35s ease, border-color 0.35s ease', 
-          background: isWhite?'transparent':'rgba(250,247,240,0.97)', 
-          backdropFilter: isWhite?'none':'blur(14px)', 
-          WebkitBackdropFilter: isWhite?'none':'blur(14px)', 
-          borderBottom:`1px solid ${isWhite?'rgba(255,255,255,0.1)':'rgba(26,18,9,0.07)'}` 
+          background: isWhite?'rgba(255, 255, 255, 0.08)':'rgba(250,247,240,0.97)', 
+          backdropFilter: 'blur(14px)', 
+          WebkitBackdropFilter: 'blur(14px)', 
+          borderBottom:`1px solid ${isWhite?'rgba(255,255,255,0.12)':'rgba(26,18,9,0.07)'}` 
         }}
       >
         {/* TOP ROW */}

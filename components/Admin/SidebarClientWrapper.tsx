@@ -2,7 +2,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import Sidebar from './Sidebar';
 import { getUpcomingOccasions, SpecialOccasion } from '@/lib/occasionHelper';
 
@@ -20,6 +20,12 @@ export default function SidebarClientWrapper() {
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(true);
   const router = useRouter();
+  const pathname = usePathname();
+
+  // Responsive state management
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
 
   // Occasion Reminder Modal state
   const [occasions, setOccasions] = useState<SpecialOccasion[]>([]);
@@ -32,6 +38,25 @@ export default function SidebarClientWrapper() {
   useEffect(() => {
     import('./Sidebar').then(mod => setSidebarComp(() => mod.default));
   }, []);
+
+  // Manage CSS variables for main layout responsiveness
+  useEffect(() => {
+    const handleResize = () => {
+      const isMob = window.innerWidth <= 1024;
+      setIsMobile(isMob);
+      document.documentElement.style.setProperty('--sidebar-width', isMob ? '0px' : (isCollapsed ? '72px' : '260px'));
+      document.documentElement.style.setProperty('--main-padding', isMob ? '84px 16px 24px' : '24px 32px');
+    };
+    
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [isCollapsed]);
+
+  // Close mobile drawer on route change
+  useEffect(() => {
+    setIsMobileDrawerOpen(false);
+  }, [pathname]);
 
   // Fetch admin profile & stats
   useEffect(() => {
@@ -135,11 +160,103 @@ export default function SidebarClientWrapper() {
   
   return (
     <>
+      {/* Mobile Top Navigation Bar */}
+      {isMobile && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          height: '60px',
+          backgroundColor: '#1a1209',
+          borderBottom: '1px solid rgba(139, 105, 20, 0.25)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '0 16px',
+          zIndex: 30,
+          boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+        }}>
+          {/* Hamburger Menu Toggle Button */}
+          <button
+            onClick={() => setIsMobileDrawerOpen(true)}
+            style={{
+              background: 'transparent',
+              border: 'none',
+              cursor: 'pointer',
+              color: '#f3e3b8',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '8px',
+              borderRadius: '4px',
+            }}
+            aria-label="Open Menu"
+          >
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+              <line x1="3" y1="12" x2="21" y2="12" />
+              <line x1="3" y1="6" x2="21" y2="6" />
+              <line x1="3" y1="18" x2="21" y2="18" />
+            </svg>
+          </button>
+          
+          {/* Winsor Title & Logo */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{
+              fontFamily: "'Cormorant Garamond', serif",
+              fontSize: '18px',
+              fontWeight: 600,
+              color: '#f3e3b8',
+              letterSpacing: '0.08em',
+              textTransform: 'uppercase'
+            }}>
+              WINSOR MAISON
+            </span>
+          </div>
+
+          {/* Spacer/Profile indicator */}
+          <div style={{
+            width: '28px',
+            height: '28px',
+            borderRadius: '50%',
+            background: 'rgba(139, 105, 20, 0.2)',
+            border: '1.5px solid #8B6914',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: '#f3e3b8',
+            fontSize: '11px',
+            fontWeight: 600,
+          }}>
+            {adminData.name?.charAt(0).toUpperCase()}
+          </div>
+        </div>
+      )}
+
+      {/* Mobile Drawer Overlay Backdrop */}
+      {isMobile && isMobileDrawerOpen && (
+        <div 
+          onClick={() => setIsMobileDrawerOpen(false)}
+          style={{
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: 'rgba(26, 18, 9, 0.65)',
+            backdropFilter: 'blur(4px)',
+            zIndex: 35,
+          }}
+        />
+      )}
+
+      {/* Sidebar Component */}
       <SidebarComp 
         adminName={adminData.name} 
         adminRole={adminData.role} 
         permissions={adminData.permissions}
         stats={stats} 
+        isCollapsed={isCollapsed}
+        setIsCollapsed={setIsCollapsed}
+        isMobileDrawerOpen={isMobileDrawerOpen}
+        setIsMobileDrawerOpen={setIsMobileDrawerOpen}
       />
 
       {/* Occasion Reminder Modal */}

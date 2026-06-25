@@ -177,13 +177,30 @@ interface SidebarProps {
     lowStockItems?: number;
     jobApplications?: number;
   };
+  isCollapsed?: boolean;
+  setIsCollapsed?: (collapsed: boolean) => void;
+  isMobileDrawerOpen?: boolean;
+  setIsMobileDrawerOpen?: (open: boolean) => void;
 }
 
-export default function Sidebar({ adminName = 'Admin', adminRole = 'admin', permissions = [], stats = {} }: SidebarProps): React.JSX.Element {
+export default function Sidebar({ 
+  adminName = 'Admin', 
+  adminRole = 'admin', 
+  permissions = [], 
+  stats = {},
+  isCollapsed = false,
+  setIsCollapsed,
+  isMobileDrawerOpen = false,
+  setIsMobileDrawerOpen
+}: SidebarProps): React.JSX.Element {
   const pathname = usePathname();
   const router = useRouter();
   const [openSubmenu, setOpenSubmenu] = useState<string | null>(null);
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  
+  // Local state fallback if not managed by parent
+  const [localCollapsed, setLocalCollapsed] = useState(false);
+  const collapsed = setIsCollapsed ? isCollapsed : localCollapsed;
+  const setCollapsed = setIsCollapsed || setLocalCollapsed;
 
   const handleLogout = async () => {
     try {
@@ -267,12 +284,29 @@ export default function Sidebar({ adminName = 'Admin', adminRole = 'admin', perm
         .sb-scrollbar::-webkit-scrollbar-track { background: transparent; }
         .sb-scrollbar::-webkit-scrollbar-thumb { background: rgba(139,105,20,0.3); border-radius: 2px; }
         .sb-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(139,105,20,0.5); }
+
+        @media (max-width: 1024px) {
+          .sb-aside {
+            width: 280px !important;
+            min-width: 280px !important;
+            transform: ${isMobileDrawerOpen ? 'translateX(0)' : 'translateX(-100%)'} !important;
+            left: 0 !important;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            box-shadow: ${isMobileDrawerOpen ? '0 0 30px rgba(0,0,0,0.5)' : 'none'} !important;
+          }
+          .sb-aside-collapsed-btn {
+            display: none !important;
+          }
+          .sb-mobile-close-btn {
+            display: block !important;
+          }
+        }
       `}</style>
 
       <aside 
         style={{
-          width: isCollapsed ? '72px' : '260px',
-          minWidth: isCollapsed ? '72px' : '260px',
+          width: collapsed ? '72px' : '260px',
+          minWidth: collapsed ? '72px' : '260px',
           height: '100vh',
           position: 'fixed',
           left: 0,
@@ -281,22 +315,22 @@ export default function Sidebar({ adminName = 'Admin', adminRole = 'admin', perm
           borderRight: '1px solid rgba(139,105,20,0.2)',
           display: 'flex',
           flexDirection: 'column',
-          transition: 'width 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+          transition: 'width 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
           zIndex: 40,
           fontFamily: "'Jost', sans-serif",
         }}
-        className="sb-scrollbar"
+        className="sb-scrollbar sb-aside"
       >
         {/* Header */}
         <div style={{ 
-          padding: isCollapsed ? '16px 12px' : '20px 24px', 
+          padding: collapsed ? '16px 12px' : '20px 24px', 
           borderBottom: '1px solid rgba(139,105,20,0.15)',
           display: 'flex',
           alignItems: 'center',
-          justifyContent: isCollapsed ? 'center' : 'space-between',
+          justifyContent: collapsed ? 'center' : 'space-between',
           minHeight: '72px'
         }}>
-          {!isCollapsed && (
+          {!collapsed && (
             <Link href="/admin/dashboard" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
               <Image src="/yellow.webp" alt="Winsor" width={32} height={32} style={{ objectFit: 'contain' }} priority />
               <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '18px', fontWeight: 600, color: '#f3e3b8', letterSpacing: '0.05em' }}>
@@ -304,32 +338,57 @@ export default function Sidebar({ adminName = 'Admin', adminRole = 'admin', perm
               </span>
             </Link>
           )}
-          <button
-            onClick={() => setIsCollapsed(!isCollapsed)}
-            style={{
-              background: 'rgba(139,105,20,0.15)',
-              border: 'none',
-              borderRadius: '6px',
-              width: '28px',
-              height: '28px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: 'pointer',
-              color: '#c9a14a',
-              fontSize: '14px',
-              transition: 'background 0.2s ease'
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(139,105,20,0.25)'}
-            onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(139,105,20,0.15)'}
-            aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-          >
-            {isCollapsed ? '›' : '‹'}
-          </button>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            {/* Mobile close button */}
+            <button
+              onClick={() => {
+                if (setIsMobileDrawerOpen) setIsMobileDrawerOpen(false);
+              }}
+              className="sb-mobile-close-btn"
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: '#f3e3b8',
+                fontSize: '18px',
+                cursor: 'pointer',
+                padding: '4px 8px',
+                display: 'none',
+              }}
+              aria-label="Close menu"
+            >
+              ✕
+            </button>
+
+            {/* Desktop collapse button */}
+            <button
+              onClick={() => setCollapsed(!collapsed)}
+              className="sb-aside-collapsed-btn"
+              style={{
+                background: 'rgba(139,105,20,0.15)',
+                border: 'none',
+                borderRadius: '6px',
+                width: '28px',
+                height: '28px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                color: '#c9a14a',
+                fontSize: '14px',
+                transition: 'background 0.2s ease'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(139,105,20,0.25)'}
+              onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(139,105,20,0.15)'}
+              aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+            >
+              {collapsed ? '›' : '‹'}
+            </button>
+          </div>
         </div>
 
         {/* Admin Profile */}
-        {!isCollapsed && (
+        {!collapsed && (
           <div style={{ 
             padding: '16px 24px', 
             borderBottom: '1px solid rgba(139,105,20,0.1)',
@@ -413,7 +472,7 @@ export default function Sidebar({ adminName = 'Admin', adminRole = 'admin', perm
                     display: 'flex',
                     alignItems: 'center',
                     gap: '12px',
-                    padding: isCollapsed ? '12px' : '12px 16px',
+                    padding: collapsed ? '12px' : '12px 16px',
                     color: active ? '#8B6914' : 'rgba(243,227,184,0.85)',
                     textDecoration: 'none',
                     fontSize: '12px',
@@ -423,7 +482,7 @@ export default function Sidebar({ adminName = 'Admin', adminRole = 'admin', perm
                     borderRadius: '0 4px 4px 0',
                     borderLeft: active && !hasChildren ? '3px solid #8B6914' : '3px solid transparent',
                     position: 'relative',
-                    whiteSpace: isCollapsed ? 'nowrap' : 'normal',
+                    whiteSpace: collapsed ? 'nowrap' : 'normal',
                     overflow: 'hidden'
                   }}
                   onMouseEnter={(e) => {
@@ -434,7 +493,7 @@ export default function Sidebar({ adminName = 'Admin', adminRole = 'admin', perm
                   }}
                 >
                   <item.icon active={active} />
-                  {!isCollapsed && (
+                  {!collapsed && (
                     <>
                       <span style={{ flex: 1 }}>{item.label}</span>
                       {badge !== undefined && badge > 0 && (
@@ -455,9 +514,9 @@ export default function Sidebar({ adminName = 'Admin', adminRole = 'admin', perm
                     </>
                   )}
                 </Link>
-
+ 
                 {/* Submenu */}
-                {!isCollapsed && hasChildren && submenuOpen && (
+                {!collapsed && hasChildren && submenuOpen && (
                   <div style={{ 
                     marginLeft: '34px', 
                     marginTop: '4px', 
@@ -499,10 +558,10 @@ export default function Sidebar({ adminName = 'Admin', adminRole = 'admin', perm
             );
           })}
         </nav>
-
+ 
         {/* Footer / Logout */}
         <div style={{ 
-          padding: isCollapsed ? '12px' : '16px 24px', 
+          padding: collapsed ? '12px' : '16px 24px', 
           borderTop: '1px solid rgba(139,105,20,0.15)',
           background: 'rgba(26,18,9,0.5)'
         }}>
@@ -511,9 +570,9 @@ export default function Sidebar({ adminName = 'Admin', adminRole = 'admin', perm
             style={{
               display: 'flex',
               alignItems: 'center',
-              gap: isCollapsed ? 0 : '12px',
+              gap: collapsed ? 0 : '12px',
               width: '100%',
-              padding: isCollapsed ? '12px' : '12px 16px',
+              padding: collapsed ? '12px' : '12px 16px',
               background: 'transparent',
               border: '1px solid rgba(139,105,20,0.3)',
               borderRadius: '6px',
@@ -524,7 +583,7 @@ export default function Sidebar({ adminName = 'Admin', adminRole = 'admin', perm
               textTransform: 'uppercase',
               cursor: 'pointer',
               transition: 'all 0.2s ease',
-              justifyContent: isCollapsed ? 'center' : 'flex-start'
+              justifyContent: collapsed ? 'center' : 'flex-start'
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.background = 'rgba(220,50,50,0.15)';
@@ -538,10 +597,10 @@ export default function Sidebar({ adminName = 'Admin', adminRole = 'admin', perm
             }}
           >
             <LogoutIcon />
-            {!isCollapsed && <span>Logout</span>}
+            {!collapsed && <span>Logout</span>}
           </button>
           
-          {!isCollapsed && (
+          {!collapsed && (
             <p style={{ 
               textAlign: 'center', 
               fontSize: '10px', 

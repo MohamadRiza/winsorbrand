@@ -23,11 +23,11 @@ export default function Home() {
           poster="https://images.unsplash.com/photo-1523170335258-f5ed11844a49?q=80&w=2080&auto=format&fit=crop"
         >
           {/* Replace with your actual video file */}
-          <source src="/longines.webm" type="video/webm" />
+          <source src="/winsor_vid.mp4" type="video/mp4" />
           {/* Fallback image if video doesn't load */}
-          <img 
-            src="https://images.unsplash.com/photo-1523170335258-f5ed11844a49?q=80&w=2080&auto=format&fit=crop" 
-            alt="Winsor Luxury Watch" 
+          <img
+            src="https://images.unsplash.com/photo-1523170335258-f5ed11844a49?q=80&w=2080&auto=format&fit=crop"
+            alt="Winsor Luxury Watch"
             className="w-full h-full object-cover"
           />
         </video>
@@ -50,10 +50,10 @@ export default function Home() {
           <h1
             className="text-white text-5xl md:text-7xl lg:text-6xl mb-6"
             style={{
-              fontFamily:    "'Cormorant Garamond', serif",
-              fontWeight:    300,
+              fontFamily: "'Cormorant Garamond', serif",
+              fontWeight: 300,
               letterSpacing: '0.15em',
-              lineHeight:    1.1,
+              lineHeight: 1.1,
             }}
           >
             WINSOR
@@ -113,7 +113,7 @@ export default function Home() {
             <div
               className="absolute top-0 left-0 w-full bg-white/70"
               style={{
-                height:    '35%',
+                height: '35%',
                 animation: 'scrollDrop 2s ease-in-out infinite',
               }}
             />
@@ -136,13 +136,13 @@ export default function Home() {
       <WatchbyGender />
 
       {/* Shop CTA Section */}
-      <GiftSection/>
+      <GiftSection />
 
       {/* Additional sections can be added here */}
       <WatchShowcase />
 
       <Ourdetails />
-      
+
     </main>
   );
 }

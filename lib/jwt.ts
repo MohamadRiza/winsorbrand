@@ -33,8 +33,8 @@ const getRefreshSecret = (): string => {
 const JWT_EXPIRY = '15m';
 const REFRESH_EXPIRY = '7d';
 
-export const generateAccessToken = (payload: JWTPayload): string => {
-  return jwt.sign(payload, getJwtSecret(), { expiresIn: JWT_EXPIRY });
+export const generateAccessToken = (payload: JWTPayload, expiresIn?: string | number): string => {
+  return jwt.sign(payload, getJwtSecret(), { expiresIn: (expiresIn || JWT_EXPIRY) as any });
 };
 
 export const generateRefreshToken = (payload: { adminId: string }): string => {

@@ -41,10 +41,13 @@ export default async function AdminLayout({ children }: { children: ReactNode })
       
       <main style={{ 
         flex: 1, 
-        marginLeft: '260px',
-        transition: 'margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-        padding: '24px 32px',
-        minHeight: '100vh'
+        marginLeft: 'var(--sidebar-width, 260px)',
+        padding: 'var(--main-padding, 24px 32px)',
+        transition: 'margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1), padding 0.3s ease',
+        minHeight: '100vh',
+        boxSizing: 'border-box',
+        width: '100%',
+        overflowX: 'hidden'
       }}>
         {children}
       </main>

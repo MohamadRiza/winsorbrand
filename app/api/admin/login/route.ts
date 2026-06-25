@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db';
 import Admin from '@/lib/models/Admin';
 import AdminLoginAttempt from '@/lib/models/AdminLoginAttempt';
-import { generateAccessToken, generateRefreshToken } from '@/lib/jwt';
+import { generateAccessToken, generateRefreshToken, verifyAccessToken } from '@/lib/jwt';
 import { RateLimiterMemory } from 'rate-limiter-flexible';
 
 // 🔐 RATE LIMITER: 5 attempts per 15 minutes per IP
@@ -91,7 +91,93 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { username, password, turnstileToken } = body;
+    const { username, password, turnstileToken, loginToken, sessionDuration } = body;
+
+    // ── Session Confirmation Step ──────────────────────────────────────────
+    if (loginToken && sessionDuration) {
+      console.log('🔐 [LOGIN] Session duration confirmation received:', sessionDuration);
+      
+      const decoded = verifyAccessToken(loginToken);
+      if (!decoded) {
+        return NextResponse.json(
+          { success: false, error: 'Login session expired. Please enter credentials again.' },
+          { status: 401 }
+        );
+      }
+
+      await connectDB();
+      const admin = await Admin.findById(decoded.adminId);
+      if (!admin || !admin.isActive) {
+        return NextResponse.json(
+          { success: false, error: 'Admin account is disabled or does not exist.' },
+          { status: 401 }
+        );
+      }
+
+      // Map session duration to maxAge and expiresIn values
+      const SESSION_DURATIONS: Record<string, { maxAge: number; expiresIn: string | undefined }> = {
+        '15m': { maxAge: 15 * 60, expiresIn: '15m' },
+        '30m': { maxAge: 30 * 60, expiresIn: '30m' },
+        '1h': { maxAge: 60 * 60, expiresIn: '1h' },
+        '2h': { maxAge: 2 * 60 * 60, expiresIn: '2h' },
+        'unlimited': { maxAge: 10 * 365 * 24 * 60 * 60, expiresIn: '3650d' }, // 10 years
+      };
+
+      const durationKey = SESSION_DURATIONS[sessionDuration] ? sessionDuration : '15m';
+      const durationConfig = SESSION_DURATIONS[durationKey];
+
+      console.log(`🔐 [LOGIN] Creating final session. Duration: ${durationKey}, maxAge: ${durationConfig.maxAge}s`);
+
+      // Generate access token with dynamic expiration
+      const accessToken = generateAccessToken({
+        adminId: admin._id.toString(),
+        username: admin.username,
+        role: admin.role as 'admin' | 'staff',
+      }, durationConfig.expiresIn);
+
+      const refreshToken = generateRefreshToken({ 
+        adminId: admin._id.toString() 
+      });
+
+      const response = NextResponse.json(
+        { 
+          success: true, 
+          data: { 
+            username: admin.username, 
+            role: admin.role,
+            message: 'Login successful' 
+          } 
+        },
+        { status: 200 }
+      );
+
+      // Set cookies with dynamic maxAge
+      response.cookies.set('admin_access_token', accessToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        maxAge: durationConfig.maxAge,
+        path: '/',
+      });
+
+      response.cookies.set('admin_refresh_token', refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        maxAge: Math.max(durationConfig.maxAge, 7 * 24 * 60 * 60),
+        path: '/',
+      });
+
+      response.cookies.set('winsor_user_type', 'admin', {
+        httpOnly: false,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        maxAge: Math.max(durationConfig.maxAge, 7 * 24 * 60 * 60),
+        path: '/',
+      });
+
+      return response;
+    }
 
     // Validate input
     if (!username || !password) {
@@ -231,64 +317,25 @@ export async function POST(req: NextRequest) {
     await admin.save();
     console.log('🔐 [LOGIN] Last login updated');
 
-    // Generate tokens
-    console.log('🔐 [LOGIN] Generating tokens...');
-    const accessToken = generateAccessToken({
+    // Generate temporary verification token for session selection popup
+    console.log('🔐 [LOGIN] Credentials valid, generating temporary token...');
+    const tempToken = generateAccessToken({
       adminId: admin._id.toString(),
       username: admin.username,
       role: admin.role as 'admin' | 'staff',
-    });
-    
-    const refreshToken = generateRefreshToken({ 
-      adminId: admin._id.toString() 
-    });
-    console.log('🔐 [LOGIN] Tokens generated');
+    }, '2m'); // Expires in 2 minutes
 
-    // Create response with cookies
-    console.log('🔐 [LOGIN] Setting cookies...');
-    const response = NextResponse.json(
-      { 
-        success: true, 
-        data: { 
-          username: admin.username, 
-          role: admin.role,
-          message: 'Login successful' 
-        } 
-      },
-      { status: 200 }
-    );
-
-    // Set HTTP-only cookies
-    response.cookies.set('admin_access_token', accessToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 15 * 60, // 15 minutes
-      path: '/',
-    });
-
-    response.cookies.set('admin_refresh_token', refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 7 * 24 * 60 * 60, // 7 days
-      path: '/',
-    });
-
-    response.cookies.set('winsor_user_type', 'admin', {
-      httpOnly: false,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 7 * 24 * 60 * 60, // 7 days
-      path: '/',
-    });
-
-    // ✅ Reset rate limit and blocks on successful login
+    // ✅ Reset rate limit and blocks on successful login/verification
     await loginLimiter.delete(ip).catch(() => {});
     await AdminLoginAttempt.deleteOne({ ip }).catch(() => {});
     
-    console.log('🔐 [LOGIN] ✅ Success - cookies set, rate limit and blocks reset');
-    return response;
+    console.log('🔐 [LOGIN] ✅ Credentials verified, temporary token generated');
+    return NextResponse.json({
+      success: true,
+      verified: true,
+      loginToken: tempToken,
+      username: admin.username
+    });
 
   } catch (error: any) {
     console.error('🔐 [LOGIN] ❌ SERVER ERROR:', {
