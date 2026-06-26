@@ -3,6 +3,7 @@ import GiftSection from "@/components/GiftSection/GiftSection";
 import Ourdetails from "@/components/OurDetails/Ourdetails";
 import WatchbyGender from "@/components/WatchbyGender/WatchbyGender";
 import WatchShowcase from "@/components/WatchShowcase/WatchShowcase";
+import Watch3DAssembly from "@/components/Watch3DAssembly/Watch3DAssembly";
 
 // app/page.tsx
 export default function Home() {
@@ -128,6 +129,9 @@ export default function Home() {
           }
         `}</style>
       </section>
+
+      {/* Immersive 3D Watch Scroll Assembly Section */}
+      <Watch3DAssembly />
 
       {/* Collections Section */}
       <CollectionsSection />

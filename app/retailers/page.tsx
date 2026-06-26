@@ -100,7 +100,7 @@ export default function StoreLocatorPage() {
             setUserCoords({ latitude: data.latitude, longitude: data.longitude });
             setGpsActive(true);
             setGpsLoading(false);
-            toast.success('Location resolved via IP address! Sorting stores by proximity.');
+            toast.success('Location resolved! Sorting boutiques by proximity.');
             return true;
           }
         }
@@ -117,7 +117,7 @@ export default function StoreLocatorPage() {
             setUserCoords({ latitude: data.latitude, longitude: data.longitude });
             setGpsActive(true);
             setGpsLoading(false);
-            toast.success('Location resolved via IP address! Sorting stores by proximity.');
+            toast.success('Location resolved! Sorting boutiques by proximity.');
             return true;
           }
         }
@@ -128,7 +128,7 @@ export default function StoreLocatorPage() {
       setGpsLoading(false);
       setGpsActive(false);
       setUserCoords(null);
-      toast.error('Could not access your location. Displaying standard listing.');
+      toast.error('Could not resolve your location. Showing standard listings.');
       return false;
     };
 
@@ -146,7 +146,7 @@ export default function StoreLocatorPage() {
         setUserCoords(coords);
         setGpsActive(true);
         setGpsLoading(false);
-        toast.success('Location matched! Sorting stores by proximity.');
+        toast.success('Proximity search matched! Sorting boutiques.');
       },
       (error) => {
         console.warn('Browser Geolocation failed, trying IP fallback:', error.message || error);
@@ -348,6 +348,14 @@ export default function StoreLocatorPage() {
           pointer-events: none;
           opacity: 0.75;
         }
+        
+        /* Dropdowns group for responsive side-by-side on mobile */
+        .locator-filters-row {
+          display: flex;
+          gap: 18px;
+          flex: 2;
+          min-width: 280px;
+        }
         .locator-select {
           background: #ffffff;
           border: 1px solid rgba(26,18,9,0.12);
@@ -358,7 +366,8 @@ export default function StoreLocatorPage() {
           color: #1a1209;
           cursor: pointer;
           outline: none;
-          min-width: 180px;
+          flex: 1;
+          min-width: 150px;
           transition: all 0.3s ease;
           appearance: none;
           background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%238B6914' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19.5 8.25l-7.5 7.5-7.5-7.5'/%3E%3C/svg%3E");
@@ -378,11 +387,12 @@ export default function StoreLocatorPage() {
           font-family: 'Jost', sans-serif;
           font-size: 12px;
           font-weight: 500;
-          letter-spacing: 0.1em;
+          letter-spacing: 0.08em;
           text-transform: uppercase;
           border-radius: 8px;
           cursor: pointer;
           transition: all 0.25s ease;
+          flex-shrink: 0;
         }
         .locator-reset-btn:hover {
           background: #1a1209;
@@ -451,39 +461,33 @@ export default function StoreLocatorPage() {
           font-size: 24px;
           font-weight: 500;
           color: #1a1209;
-          margin: 0 0 10px;
+          margin: 0 0 14px;
           line-height: 1.25;
           letter-spacing: 0.02em;
-        }
-        .boutique-address {
-          font-family: 'Jost', sans-serif;
-          font-size: 14px;
-          color: rgba(26,18,9,0.6);
-          line-height: 1.55;
-          margin: 0 0 24px;
-          flex: 1;
         }
         .boutique-button {
           display: block;
           width: 100%;
           text-align: center;
           padding: 13px;
-          background: #1a1209;
-          color: #ffffff;
+          background: #ffffff;
+          color: #1a1209;
           font-family: 'Jost', sans-serif;
           font-size: 12px;
-          font-weight: 500;
+          font-weight: 600;
           letter-spacing: 0.1em;
           text-transform: uppercase;
           text-decoration: none;
           border-radius: 6px;
           transition: all 0.25s ease;
-          border: 1px solid #1a1209;
+          border: 1px solid rgba(26,18,9,0.15);
+          margin-top: auto;
         }
         .boutique-button:hover {
-          background: #8B6914;
-          border-color: #8B6914;
-          box-shadow: 0 4px 12px rgba(139, 105, 20, 0.2);
+          background: #1a1209;
+          color: #ffffff;
+          border-color: #1a1209;
+          box-shadow: 0 4px 12px rgba(26, 18, 9, 0.15);
         }
         .gps-float-btn {
           position: fixed;
@@ -659,9 +663,9 @@ export default function StoreLocatorPage() {
           gap: 10px;
         }
         .info-icon {
-          font-size: 16px;
           line-height: 1;
           margin-top: 2px;
+          flex-shrink: 0;
         }
         .info-text {
           font-family: 'Jost', sans-serif;
@@ -716,11 +720,19 @@ export default function StoreLocatorPage() {
           border-color: #1a1209;
           transform: scale(1.05);
         }
+        
+        /* Album controls bar with chevrons and dots */
+        .album-controls-bar {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 16px;
+          margin-top: 28px;
+        }
         .album-dots-container {
           display: flex;
           justify-content: center;
           gap: 8px;
-          margin-top: 24px;
         }
         .album-dot-btn {
           width: 8px;
@@ -735,6 +747,25 @@ export default function StoreLocatorPage() {
         .album-dot-btn.active {
           background: #8B6914;
           transform: scale(1.35);
+        }
+        .album-touch-nav-btn {
+          display: none;
+          width: 44px;
+          height: 44px;
+          border-radius: 50%;
+          background: #ffffff;
+          border: 1px solid rgba(26,18,9,0.12);
+          color: #1a1209;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          box-shadow: 0 4px 10px rgba(0,0,0,0.04);
+        }
+        .album-touch-nav-btn:hover {
+          background: #1a1209;
+          color: #ffffff;
+          border-color: #1a1209;
         }
         .swipe-helper {
           display: none;
@@ -775,6 +806,36 @@ export default function StoreLocatorPage() {
         }
 
         @media (max-width: 768px) {
+          .locator-toolbar {
+            flex-direction: column;
+            align-items: stretch;
+            padding: 16px 20px;
+            gap: 12px;
+            margin: -24px auto 32px;
+            width: calc(100% - 24px);
+          }
+          .locator-search-wrapper {
+            width: 100%;
+            min-width: 0;
+            flex: none;
+          }
+          .locator-filters-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            width: 100%;
+            min-width: 0;
+            flex: none;
+          }
+          .locator-select {
+            width: 100% !important;
+            min-width: 0 !important;
+          }
+          .locator-reset-btn {
+            width: 100%;
+            padding: 12px;
+            text-align: center;
+          }
           .album-card-layout {
             grid-template-columns: 1fr;
           }
@@ -786,6 +847,9 @@ export default function StoreLocatorPage() {
           }
           .album-nav-btn {
             display: none !important;
+          }
+          .album-touch-nav-btn {
+            display: flex;
           }
           .swipe-helper {
             display: block !important;
@@ -842,37 +906,40 @@ export default function StoreLocatorPage() {
           <svg className="locator-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
         </div>
 
-        {/* City Filter */}
-        {cities.length > 0 && (
-          <select
-            value={selectedCity}
-            onChange={(e) => setSelectedCity(e.target.value)}
-            className="locator-select"
-          >
-            <option value="all">All Cities</option>
-            {cities.map((city) => (
-              <option key={city} value={city}>
-                {city}
-              </option>
-            ))}
-          </select>
-        )}
+        {/* Dropdowns group for responsive layout on mobile */}
+        <div className="locator-filters-row">
+          {/* City Filter */}
+          {cities.length > 0 && (
+            <select
+              value={selectedCity}
+              onChange={(e) => setSelectedCity(e.target.value)}
+              className="locator-select"
+            >
+              <option value="all">All Cities</option>
+              {cities.map((city) => (
+                <option key={city} value={city}>
+                  {city}
+                </option>
+              ))}
+            </select>
+          )}
 
-        {/* Country Filter */}
-        {countries.length > 0 && (
-          <select
-            value={selectedCountry}
-            onChange={(e) => setSelectedCountry(e.target.value)}
-            className="locator-select"
-          >
-            <option value="all">All Countries</option>
-            {countries.map((country) => (
-              <option key={country} value={country}>
-                {country}
-              </option>
-            ))}
-          </select>
-        )}
+          {/* Country Filter */}
+          {countries.length > 0 && (
+            <select
+              value={selectedCountry}
+              onChange={(e) => setSelectedCountry(e.target.value)}
+              className="locator-select"
+            >
+              <option value="all">All Countries</option>
+              {countries.map((country) => (
+                <option key={country} value={country}>
+                  {country}
+                </option>
+              ))}
+            </select>
+          )}
+        </div>
 
         {/* Reset Filter Button */}
         {(searchQuery || selectedCity !== 'all' || selectedCountry !== 'all') && (
@@ -912,7 +979,12 @@ export default function StoreLocatorPage() {
               borderRadius: '8px',
             }}
           >
-            <span style={{ fontSize: '48px', display: 'block', marginBottom: '16px' }}>🏬</span>
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '20px', color: 'rgba(139,105,20,0.5)' }}>
+              <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="2" y="2" width="20" height="20" rx="2" ry="2" />
+                <path d="M5 17h14M5 12h14M5 7h14" />
+              </svg>
+            </div>
             <h3 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '24px', color: '#1a1209', margin: '0 0 8px' }}>
               No Boutiques Found
             </h3>
@@ -937,14 +1009,14 @@ export default function StoreLocatorPage() {
                   style={{ width: '16px', height: '16px' }}
                 >
                   <circle cx="12" cy="12" r="7" />
-                  <circle cx="12" cy="12" r="2" fill="currentColor" />
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 2v2M12 18v2M2 12h2M18 12h2" />
+                  <circle cx="12" cy="12" r="2.2" fill="currentColor" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 2v3M12 19v3M2 12h3M19 12h3" />
                 </svg>
                 <span>GPS Proximity Sorting Active</span>
               </div>
               <h2 className="album-title">Nearest Showrooms</h2>
               <p className="album-subtitle">
-                Showing boutique {currentIndex + 1} of {processedRetailers.length}, sorted by proximity to your coordinates.
+                Showing boutique {currentIndex + 1} of {processedRetailers.length}, sorted by proximity.
               </p>
             </div>
 
@@ -971,12 +1043,13 @@ export default function StoreLocatorPage() {
               >
                 {/* Distance Banner */}
                 <div className="album-card-distance-banner">
+                  <span>Approximately </span>
                   <span className="distance-bold">
                     {processedRetailers[currentIndex]?.distance !== undefined
                       ? `${processedRetailers[currentIndex].distance!.toFixed(1)} km`
                       : 'N/A'}
                   </span>
-                  <span> long distance from you</span>
+                  <span> away from you</span>
                 </div>
 
                 <div className="album-card-layout">
@@ -987,7 +1060,7 @@ export default function StoreLocatorPage() {
                       className="album-card-image"
                     />
                     {currentIndex === 0 && (
-                      <span className="nearest-label-badge">Nearest Option</span>
+                      <span className="nearest-label-badge">Nearest Showroom</span>
                     )}
                   </div>
                   <div className="album-card-info-sec">
@@ -998,11 +1071,23 @@ export default function StoreLocatorPage() {
 
                     <div className="album-card-location-details">
                       <div className="info-row">
-                        <span className="info-icon">📍</span>
+                        <span className="info-icon" style={{ color: '#8B6914' }}>
+                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline-block', verticalAlign: 'middle' }}>
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                            <circle cx="12" cy="10" r="3" />
+                          </svg>
+                        </span>
                         <span className="info-text">{processedRetailers[currentIndex]?.address}</span>
                       </div>
                       <div className="info-row">
-                        <span className="info-icon">🏙️</span>
+                        <span className="info-icon" style={{ color: '#8B6914' }}>
+                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline-block', verticalAlign: 'middle' }}>
+                            <rect x="4" y="2" width="16" height="20" rx="2" ry="2" />
+                            <line x1="9" y1="22" x2="9" y2="16" />
+                            <line x1="15" y1="22" x2="15" y2="16" />
+                            <path d="M8 6h.01M16 6h.01M8 10h.01" />
+                          </svg>
+                        </span>
                         <span className="info-text">
                           <strong style={{ color: '#1a1209' }}>
                             {processedRetailers[currentIndex]?.city}, {processedRetailers[currentIndex]?.country}
@@ -1018,7 +1103,7 @@ export default function StoreLocatorPage() {
                         rel="noopener noreferrer"
                         className="album-card-btn directions"
                       >
-                        <span>Get Directions & View Map</span>
+                        <span>Get Directions</span>
                         <svg className="w-4 h-4 ml-1.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" style={{ width: '16px', height: '16px', marginLeft: '6px' }}>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
                         </svg>
@@ -1041,19 +1126,41 @@ export default function StoreLocatorPage() {
               </button>
             </div>
 
-            {/* Dots */}
-            {processedRetailers.length > 1 && (
-              <div className="album-dots-container">
-                {processedRetailers.map((_, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => setCurrentIndex(idx)}
-                    className={`album-dot-btn ${idx === currentIndex ? 'active' : ''}`}
-                    aria-label={`Go to slide ${idx + 1}`}
-                  />
-                ))}
-              </div>
-            )}
+            {/* Mobile Touch-Friendly Controls Bar */}
+            <div className="album-controls-bar">
+              <button
+                onClick={handlePrevSlide}
+                className="album-touch-nav-btn"
+                aria-label="Previous boutique"
+              >
+                <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+                </svg>
+              </button>
+
+              {processedRetailers.length > 1 && (
+                <div className="album-dots-container">
+                  {processedRetailers.map((_, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setCurrentIndex(idx)}
+                      className={`album-dot-btn ${idx === currentIndex ? 'active' : ''}`}
+                      aria-label={`Go to slide ${idx + 1}`}
+                    />
+                  ))}
+                </div>
+              )}
+
+              <button
+                onClick={handleNextSlide}
+                className="album-touch-nav-btn"
+                aria-label="Next boutique"
+              >
+                <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                </svg>
+              </button>
+            </div>
 
             <div className="swipe-helper">
               <span>← Swipe card to browse nearest options →</span>
@@ -1083,18 +1190,39 @@ export default function StoreLocatorPage() {
 
                 <div className="boutique-card-content">
                   <span className="boutique-badge">
-                    🏛️ Winsor Partner
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                        <polyline points="9 22 9 12 15 12 15 22" />
+                      </svg>
+                      Winsor Boutique Partner
+                    </span>
                   </span>
 
                   <h3 className="boutique-name">{r.name}</h3>
 
-                  <p className="boutique-address">
-                    {r.address}
-                    <br />
-                    <strong style={{ color: '#1a1209' }}>
-                      {r.city}, {r.country}
-                    </strong>
-                  </p>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', flex: 1, marginBottom: '24px' }}>
+                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: '3px' }}>
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                        <circle cx="12" cy="10" r="3" />
+                      </svg>
+                      <span style={{ fontSize: '13.5px', color: 'rgba(26,18,9,0.65)', fontFamily: "'Jost', sans-serif", lineHeight: 1.45 }}>
+                        {r.address}
+                      </span>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                        <rect x="4" y="2" width="16" height="20" rx="2" ry="2" />
+                        <line x1="9" y1="22" x2="9" y2="16" />
+                        <line x1="15" y1="22" x2="15" y2="16" />
+                        <path d="M8 6h.01M16 6h.01M8 10h.01" />
+                      </svg>
+                      <span style={{ fontSize: '13.5px', fontWeight: 600, color: '#1a1209', fontFamily: "'Jost', sans-serif" }}>
+                        {r.city}, {r.country}
+                      </span>
+                    </div>
+                  </div>
 
                   <a
                     href={r.googleMapsLink}
@@ -1102,7 +1230,7 @@ export default function StoreLocatorPage() {
                     rel="noopener noreferrer"
                     className="boutique-button"
                   >
-                    Get Directions ↗
+                    Get Directions
                   </a>
                 </div>
               </div>
