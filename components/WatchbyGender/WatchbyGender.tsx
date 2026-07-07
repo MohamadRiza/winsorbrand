@@ -4,14 +4,30 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 
 interface GenderSectionProps {
-  gender: 'men' | 'women';
+  gender: string;
   title: string;
+  subtitle?: string;
+  description?: string;
   image: string;
-  video: string;
+  video?: string;
   isMobile: boolean;
+  buttonText: string;
+  buttonType?: 'outline' | 'link';
+  objectPosition?: string;
 }
 
-function GenderSection({ gender, title, image, video, isMobile }: GenderSectionProps) {
+function GenderSection({
+  gender,
+  title,
+  subtitle,
+  description,
+  image,
+  video,
+  isMobile,
+  buttonText,
+  buttonType = 'outline',
+  objectPosition = 'center'
+}: GenderSectionProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [isVideoLoaded, setIsVideoLoaded] = useState(false);
   const [shouldPlayVideo, setShouldPlayVideo] = useState(false);
@@ -20,7 +36,6 @@ function GenderSection({ gender, title, image, video, isMobile }: GenderSectionP
   const hoverTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    // Reset video state when switching between mobile/desktop
     setShouldPlayVideo(false);
     setIsHovered(false);
     if (videoRef.current) {
@@ -31,16 +46,13 @@ function GenderSection({ gender, title, image, video, isMobile }: GenderSectionP
 
   useEffect(() => {
     if (isMobile && sectionRef.current) {
-      // Mobile: Auto-play video after 5 seconds of visibility
       const observer = new IntersectionObserver(
         ([entry]) => {
           if (entry.isIntersecting) {
-            // Start timer when section is visible
             hoverTimerRef.current = setTimeout(() => {
               setShouldPlayVideo(true);
             }, 5000);
           } else {
-            // Clear timer if section goes out of view
             if (hoverTimerRef.current) {
               clearTimeout(hoverTimerRef.current);
             }
@@ -64,9 +76,7 @@ function GenderSection({ gender, title, image, video, isMobile }: GenderSectionP
   useEffect(() => {
     if (videoRef.current) {
       if (shouldPlayVideo || (isHovered && !isMobile)) {
-        videoRef.current.play().catch(() => {
-          // Autoplay was prevented
-        });
+        videoRef.current.play().catch(() => { });
       } else {
         videoRef.current.pause();
         videoRef.current.currentTime = 0;
@@ -93,7 +103,7 @@ function GenderSection({ gender, title, image, video, isMobile }: GenderSectionP
   return (
     <div
       ref={sectionRef}
-      className="gender-section"
+      className="gender-section group"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       style={{
@@ -104,51 +114,61 @@ function GenderSection({ gender, title, image, video, isMobile }: GenderSectionP
         cursor: 'pointer',
       }}
     >
-      {/* Loading Image */}
+      {/* Zoomable Media Container Wrapper */}
       <div
         style={{
           position: 'absolute',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '100%',
-          background: `url(${image}) center/cover no-repeat`,
-          opacity: isVideoLoaded && (shouldPlayVideo || isHovered) ? 0 : 1,
-          transition: 'opacity 0.5s ease',
+          top: '-25%',
+          left: '-25%',
+          width: '150%',
+          height: '150%',
+          transform: isHovered ? 'scale(0.73)' : 'scale(0.68)',
+          transition: 'transform 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
         }}
-      />
+      >
+        {/* Loading Image */}
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            background: `url(${image}) ${objectPosition}/cover no-repeat`,
+            opacity: isVideoLoaded && (shouldPlayVideo || isHovered) ? 0 : 1,
+            transition: 'opacity 0.6s ease-in-out',
+          }}
+        />
 
-      {/* Video */}
-      <video
-        ref={videoRef}
-        src={video}
-        muted
-        loop
-        playsInline
-        preload="auto"
-        onLoadedData={handleVideoLoad}
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '100%',
-          objectFit: 'cover',
-          opacity: isVideoLoaded && (shouldPlayVideo || isHovered) ? 1 : 0,
-          transition: 'opacity 0.5s ease',
-        }}
-      />
+        {/* Video */}
+        {video && (
+          <video
+            ref={videoRef}
+            src={video}
+            muted
+            loop
+            playsInline
+            preload="auto"
+            onLoadedData={handleVideoLoad}
+            style={{
+              position: 'absolute',
+              inset: 0,
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              objectPosition: objectPosition,
+              opacity: isVideoLoaded && (shouldPlayVideo || isHovered) ? 1 : 0,
+              transition: 'opacity 0.6s ease-in-out',
+            }}
+          />
+        )}
+      </div>
 
-      {/* Overlay Gradient */}
+      {/* Left-to-Right Shading Gradient for enhanced text readability */}
       <div
         style={{
           position: 'absolute',
-          bottom: 0,
-          left: 0,
-          right: 0,
-          height: '50%',
-          background: 'linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 100%)',
+          inset: 0,
+          background: 'linear-gradient(to right, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.3) 45%, transparent 90%)',
           pointerEvents: 'none',
+          zIndex: 1,
         }}
       />
 
@@ -156,54 +176,117 @@ function GenderSection({ gender, title, image, video, isMobile }: GenderSectionP
       <div
         style={{
           position: 'absolute',
-          bottom: '40px',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          textAlign: 'center',
-          width: '100%',
+          top: '50%',
+          left: isMobile ? '6%' : '8%',
+          transform: 'translateY(-50%)',
+          textAlign: 'left',
+          width: '88%',
+          maxWidth: buttonType === 'link' ? '500px' : (isMobile ? '160px' : '420px'),
           zIndex: 2,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'flex-start',
         }}
       >
+        {subtitle && (
+          <span
+            style={{
+              fontFamily: "'Jost', sans-serif",
+              fontSize: isMobile ? '7.5px' : '10px',
+              fontWeight: 600,
+              color: '#dfb15b',
+              textTransform: 'uppercase',
+              letterSpacing: '0.22em',
+              marginBottom: isMobile ? '4px' : '10px',
+              display: 'block',
+            }}
+          >
+            {subtitle}
+          </span>
+        )}
+
         <h2
           style={{
             fontFamily: "'Cormorant Garamond', serif",
-            fontSize: 'clamp(24px, 3.5vw, 36px)',
+            fontSize: buttonType === 'link'
+              ? (isMobile ? 'clamp(18px, 4vw, 24px)' : 'clamp(28px, 4.5vw, 42px)')
+              : (isMobile ? 'clamp(12px, 3.2vw, 15px)' : 'clamp(20px, 3vw, 28px)'),
             fontWeight: 300,
             color: '#ffffff',
-            marginBottom: '14px',
-            letterSpacing: '0.08em',
-            textTransform: 'uppercase',
-            textShadow: '0 2px 8px rgba(0,0,0,0.45)',
+            marginBottom: buttonType === 'link' ? '4px' : (isMobile ? '10px' : '22px'),
+            letterSpacing: '0.04em',
+            lineHeight: 1.25,
           }}
         >
           {title}
         </h2>
-        <Link
-          href={`/collections/${gender}`}
-          style={{
-            fontFamily: "'Jost', sans-serif",
-            fontSize: '12px',
-            fontWeight: 500,
-            color: '#ffffff',
-            textDecoration: 'none',
-            textTransform: 'uppercase',
-            letterSpacing: '0.15em',
-            borderBottom: '1px solid #ffffff',
-            paddingBottom: '4px',
-            display: 'inline-block',
-            transition: 'all 0.3s ease',
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.borderBottomColor = 'transparent';
-            e.currentTarget.style.opacity = '0.8';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.borderBottomColor = '#ffffff';
-            e.currentTarget.style.opacity = '1';
-          }}
-        >
-          Shop now
-        </Link>
+
+        {description && (
+          <p
+            style={{
+              fontFamily: "'Jost', sans-serif",
+              fontSize: isMobile ? '9.5px' : '13px',
+              fontWeight: 300,
+              color: 'rgba(255, 255, 255, 0.75)',
+              letterSpacing: '0.04em',
+              marginBottom: isMobile ? '12px' : '22px',
+              lineHeight: 1.4,
+            }}
+          >
+            {description}
+          </p>
+        )}
+
+        {buttonType === 'link' ? (
+          <Link
+            href={`/collections/${gender}`}
+            style={{
+              fontFamily: "'Jost', sans-serif",
+              fontSize: isMobile ? '8.5px' : '11px',
+              fontWeight: 500,
+              color: '#ffffff',
+              textDecoration: 'none',
+              textTransform: 'uppercase',
+              letterSpacing: '0.15em',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              transition: 'opacity 0.3s ease',
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.opacity = '0.8')}
+            onMouseLeave={(e) => (e.currentTarget.style.opacity = '1')}
+          >
+            {buttonText}
+          </Link>
+        ) : (
+          <Link
+            href={`/collections/${gender}`}
+            style={{
+              fontFamily: "'Jost', sans-serif",
+              fontSize: isMobile ? '7.5px' : '10px',
+              fontWeight: 500,
+              color: '#ffffff',
+              textDecoration: 'none',
+              textTransform: 'uppercase',
+              letterSpacing: '0.18em',
+              border: '1px solid #8B6914',
+              padding: isMobile ? '6px 14px' : '11px 24px',
+              display: 'inline-block',
+              transition: 'all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+              background: 'transparent',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = '#8B6914';
+              e.currentTarget.style.borderColor = '#8B6914';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'transparent';
+              e.currentTarget.style.borderColor = '#8B6914';
+            }}
+          >
+            {buttonText}
+          </Link>
+        )}
       </div>
     </div>
   );
@@ -223,83 +306,114 @@ export default function GenderCollectionSection() {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Replace these with your actual image and video URLs
   const menData = {
-    image: 'https://cms.longines.com/media/3533/download/2col-men-watches-d.jpg?v=1&w=1920', // Your men's watches image
-    video: '/longines.webm', // Your men's watches video
-    title: "Men's watches",
+    image: '/winsor_man.png',
+    video: '/longines.webm',
+    title: "Engineered for those who never settle.",
   };
 
   const womenData = {
-    image: 'https://cms.longines.com/media/3303/download/3col-women-watches-d.jpg?v=1&w=1920', // Your women's watches image
-    video: '/longines.webm', // Your women's watches video
-    title: "Women's Watches",
+    image: '/winsor_girl_G.png',
+    video: '/longines.webm',
+    title: "Timeless beauty that complements every you.",
+  };
+
+  const giftData = {
+    image: '/graduation_gift.png',
+    video: '/longines.webm',
+    title: "The Perfect Gift",
   };
 
   return (
     <section
       style={{
         width: '100%',
-        background: '#ffffff',
+        background: '#faf7f0',
       }}
     >
       <div
         style={{
           display: 'flex',
-          flexDirection: isMobile ? 'column' : 'row',
+          flexDirection: 'column',
           width: '100%',
-          height: isMobile ? 'auto' : '85vh',
-          minHeight: isMobile ? 'auto' : '550px',
-          gap: isMobile ? '16px' : '24px',
-          padding: isMobile ? '16px' : '40px 80px',
+          gap: isMobile ? '12px' : '24px',
+          padding: isMobile ? '12px' : '40px 40px',
           boxSizing: 'border-box',
         }}
       >
-        {/* Men's Section */}
+        {/* Top Row: Men & Women side-by-side on both mobile and desktop */}
         <div
           style={{
-            flex: '1',
+            display: 'flex',
+            flexDirection: 'row',
+            gap: isMobile ? '12px' : '24px',
             width: '100%',
-            height: isMobile ? '45vh' : '100%',
-            minHeight: isMobile ? '350px' : 'auto',
+            height: isMobile ? '28vh' : '62vh',
+            minHeight: isMobile ? '180px' : '460px',
           }}
         >
-          <GenderSection
-            gender="men"
-            title={menData.title}
-            image={menData.image}
-            video={menData.video}
-            isMobile={isMobile}
-          />
+          {/* Men's Card */}
+          <div
+            style={{
+              flex: '1',
+              height: '100%',
+            }}
+          >
+            <GenderSection
+              gender="men"
+              subtitle="BUILT FOR ADVENTURE"
+              title={menData.title}
+              image={menData.image}
+              video={menData.video}
+              buttonText="Explore Mens →"
+              buttonType="outline"
+              objectPosition="center 15%"
+              isMobile={isMobile}
+            />
+          </div>
+
+          {/* Women's Card */}
+          <div
+            style={{
+              flex: '1',
+              height: '100%',
+            }}
+          >
+            <GenderSection
+              gender="women"
+              subtitle="DESIGNED FOR GRACE"
+              title={womenData.title}
+              image={womenData.image}
+              video={womenData.video}
+              buttonText="Explore Womens →"
+              buttonType="outline"
+              objectPosition="center 18%"
+              isMobile={isMobile}
+            />
+          </div>
         </div>
 
-        {/* Women's Section */}
+        {/* Bottom Row: Full-width Gift Card */}
         <div
           style={{
-            flex: '1',
             width: '100%',
-            height: isMobile ? '45vh' : '100%',
-            minHeight: isMobile ? '350px' : 'auto',
+            height: isMobile ? '22vh' : '38vh',
+            minHeight: isMobile ? '140px' : '280px',
           }}
         >
           <GenderSection
-            gender="women"
-            title={womenData.title}
-            image={womenData.image}
-            video={womenData.video}
+            gender="gifts"
+            title={giftData.title}
+            description="Give more than time. Give a memory."
+            image={giftData.image}
+            video={giftData.video}
+            buttonText="Explore Gift Sets →"
+            buttonType="link"
+            objectPosition="center 30%"
             isMobile={isMobile}
           />
         </div>
       </div>
-
-      <style>{`
-        @media (max-width: 768px) {
-          .gender-section {
-            height: 45vh !important;
-            min-height: 350px !important;
-          }
-        }
-      `}</style>
     </section>
   );
 }

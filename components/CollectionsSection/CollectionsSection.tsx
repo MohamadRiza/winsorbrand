@@ -78,7 +78,9 @@ function SkeletonCard() {
       flexDirection:'column', 
       gap:'16px',
       background: '#ffffff',
-      padding: '24px 0',
+      padding: '24px 16px',
+      border: '1px solid rgba(26, 18, 9, 0.06)',
+      boxSizing: 'border-box',
     }}>
       <div style={{ aspectRatio:'4/5', background:'rgba(26,18,9,0.04)', borderRadius: '0', animation:'wn-pulse 1.5s ease-in-out infinite' }}/>
       <div style={{ height:'14px', width:'60%', background:'rgba(26,18,9,0.04)', animation:'wn-pulse 1.5s ease-in-out infinite' }}/>
@@ -107,7 +109,7 @@ function CardImage({ src, alt, cardHovered, priority, isMobile }: { src: string,
     }
   }, [src, img1, img2, showImg2]);
 
-  const padSize = isMobile ? '16px' : '24px';
+  const padSize = isMobile ? '12px' : '20px';
 
   return (
     <div style={{ position: 'absolute', inset: 0 }}>
@@ -241,38 +243,41 @@ function WatchCard({ product, index }: { product: WatchProduct; index: number })
         minWidth: cardWidth,
         maxWidth: cardWidth,
         flexShrink: 0,
+        borderRadius: '16px',
+        overflow: 'hidden',
         animationDelay: `${index * 80}ms`,
         background: '#ffffff',
-        padding: '0 0 24px 0',
-        transition: 'transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.4s ease',
+        transition: 'transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.4s ease, border-color 0.4s ease',
         transform: (!isMobile && cardHovered) ? 'translateY(-6px)' : 'none',
-        boxShadow: (!isMobile && cardHovered) ? '0 12px 28px rgba(0, 0, 0, 0.05)' : 'none',
+        boxShadow: (!isMobile && cardHovered) ? '0 16px 32px rgba(26, 18, 9, 0.06)' : '0 4px 12px rgba(0,0,0,0.02)',
+        border: '1px solid rgba(26, 18, 9, 0.06)',
+        borderColor: (!isMobile && cardHovered) ? '#8B6914' : 'rgba(26, 18, 9, 0.06)',
+        boxSizing: 'border-box',
       }}
       className="wn-card-fade"
       onMouseEnter={() => setCardHovered(true)}
       onMouseLeave={() => setCardHovered(false)}
     >
-      {/* Image container */}
+      {/* Upper Image Container */}
       <div 
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
         style={{ 
           position: 'relative', 
           width: '100%',
-          aspectRatio: '4/5', 
+          height: isMobile ? '200px' : '270px',
+          background: '#ffffff', 
           overflow: 'hidden', 
-          background: '#f5f5f5', 
-          marginBottom: '14px',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
+          borderBottom: '1px solid rgba(26, 18, 9, 0.04)',
         }}
       >
         <Link 
           href={`/collections/${product._id}`}
           style={{ position: 'absolute', inset: 0, zIndex: 1 }}
         >
-          {/* Main Thumbnail image with slow fading transition */}
           <CardImage
             src={allImages[imgIndex] || product.thumbnail.url}
             alt={product.title}
@@ -286,18 +291,18 @@ function WatchCard({ product, index }: { product: WatchProduct; index: number })
         {product.stickerEnabled && product.stickerText && (
           <div style={{
             position: 'absolute', 
-            top: '12px', 
-            left: '12px',
-            background: '#ffffff', 
-            color: '#1a1209',
+            top: '16px', 
+            left: '16px',
+            background: '#8B6914', 
+            color: '#ffffff',
             fontFamily: "'Jost', sans-serif", 
             fontSize: '9px', 
-            fontWeight: 500,
+            fontWeight: 600,
             letterSpacing: '0.1em', 
             padding: '4px 8px',
             textTransform: 'uppercase',
             zIndex: 2,
-            border: '1px solid rgba(0,0,0,0.06)',
+            borderRadius: '4px',
           }}>
             {product.stickerText}
           </div>
@@ -348,13 +353,14 @@ function WatchCard({ product, index }: { product: WatchProduct; index: number })
         <div style={{
           display: 'flex',
           gap: '6px',
-          padding: cardHovered ? '4px 0 12px' : '0px',
+          padding: cardHovered ? '8px 16px' : '0px 16px',
           justifyContent: 'flex-start',
           overflowX: 'auto',
           opacity: cardHovered ? 1 : 0,
           maxHeight: cardHovered ? '48px' : '0px',
           transition: 'all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
           overflowY: 'hidden',
+          background: '#ffffff',
         }}>
           {allImages.slice(0, 5).map((imgUrl, i) => {
             const isActive = i === imgIndex;
@@ -367,9 +373,10 @@ function WatchCard({ product, index }: { product: WatchProduct; index: number })
                   setImgIndex(i);
                 }}
                 style={{
-                  width: '36px',
-                  height: '36px',
-                  border: isActive ? '1px solid #1a1209' : '1px solid rgba(26, 18, 9, 0.12)',
+                  width: '32px',
+                  height: '32px',
+                  border: isActive ? '1px solid #8B6914' : '1px solid rgba(26, 18, 9, 0.12)',
+                  borderRadius: '4px',
                   background: '#ffffff',
                   padding: '2px',
                   cursor: 'pointer',
@@ -384,57 +391,44 @@ function WatchCard({ product, index }: { product: WatchProduct; index: number })
                     src={imgUrl}
                     alt={`${product.title} view ${i + 1}`}
                     fill
-                    sizes="36px"
+                    sizes="32px"
                     style={{ objectFit: 'contain' }}
                   />
                 </div>
               </button>
             );
           })}
-          {allImages.length > 5 && (
-            <Link
-              href={`/collections/${product._id}`}
-              style={{
-                width: '36px',
-                height: '36px',
-                border: '1px solid rgba(26, 18, 9, 0.12)',
-                background: '#f5f5f5',
-                color: '#1a1209',
-                fontFamily: "'Jost', sans-serif",
-                fontSize: '11px',
-                fontWeight: 600,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                textDecoration: 'none',
-              }}
-            >
-              +{allImages.length - 5}
-            </Link>
-          )}
         </div>
       )}
 
-      {/* Info and text area */}
-      <Link href={`/collections/${product._id}`} style={{ textDecoration: 'none', display: 'block' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', textAlign: 'left' }}>
+      {/* Bottom Content Area */}
+      <Link href={`/collections/${product._id}`} style={{ textDecoration: 'none' }}>
+        <div style={{
+          padding: '20px 20px 24px 20px',
+          display: 'flex',
+          flexDirection: 'column',
+          textAlign: 'left',
+          boxSizing: 'border-box',
+          background: '#ffffff',
+        }}>
           {/* Watch Title */}
           <h3 style={{
             fontFamily: "'Jost', sans-serif",
             fontSize: '13px',
             fontWeight: 600,
-            color: '#1a1209',
+            color: cardHovered ? '#8B6914' : '#1a1209',
             letterSpacing: '0.08em',
             textTransform: 'uppercase',
             lineHeight: '1.4',
             margin: '0 0 6px 0',
             minHeight: '38px',
             overflow: 'hidden',
+            transition: 'color 0.3s ease',
           }}>
             {product.title}
           </h3>
           
-          {/* Specifications subtitle formatted dynamically */}
+          {/* Specifications subtitle */}
           <p style={{
             fontFamily: "'Jost', sans-serif", 
             fontSize: '12px', 
@@ -453,24 +447,27 @@ function WatchCard({ product, index }: { product: WatchProduct; index: number })
           <p style={{
             fontFamily: "'Jost', sans-serif", 
             fontSize: '14px', 
-            fontWeight: 500,
-            color: '#1a1209',
-            margin: 0,
+            fontWeight: 600,
+            color: '#8B6914',
+            margin: '0 0 12px 0',
           }}>
             {convertPrice(product.price)}
           </p>
 
-          {/* Underlined action link */}
+          {/* Golden animated action link */}
           <div style={{
-            marginTop: '12px',
-            fontSize: '13px',
-            color: '#1a1209',
+            fontSize: '12px',
+            color: cardHovered ? '#8B6914' : '#1a1209',
             fontFamily: "'Jost', sans-serif",
-            textDecoration: 'underline',
-            textUnderlineOffset: '4px',
-            fontWeight: 500,
+            textDecoration: 'none',
+            fontWeight: 600,
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '4px',
+            transition: 'all 0.3s ease',
+            transform: cardHovered ? 'translateX(4px)' : 'none',
           }}>
-            Discover timepiece
+            Discover timepiece <span style={{ transition: 'transform 0.3s ease', transform: cardHovered ? 'translateX(2px)' : 'none' }}>→</span>
           </div>
         </div>
       </Link>
@@ -482,9 +479,8 @@ const miniArrowStyle: React.CSSProperties = {
   width: '32px',
   height: '32px',
   borderRadius: '50%',
-  border: 'none',
+  border: '1px solid rgba(26, 18, 9, 0.08)',
   background: 'rgba(255, 255, 255, 0.95)',
-  boxShadow: '0 2px 6px rgba(0,0,0,0.1)',
   color: '#1a1209',
   fontSize: '18px',
   display: 'flex',
@@ -492,6 +488,7 @@ const miniArrowStyle: React.CSSProperties = {
   justifyContent: 'center',
   cursor: 'pointer',
   pointerEvents: 'auto',
+  transition: 'all 0.2s ease',
 };
 
 // ── Main Section Component ─────────────────────────────────────────────────
@@ -603,7 +600,7 @@ export default function CollectionsSection() {
 
   return (
     <section id="collections" style={{ 
-      background:'#ffffff', 
+      background:'#faf7f0', 
       padding:'0 0 54px',
       fontFamily: "'Jost', sans-serif",
       borderBottom: '1px solid rgba(26,18,9,0.06)',
@@ -646,7 +643,7 @@ export default function CollectionsSection() {
           alignItems: 'center',
           borderBottom: '1px solid rgba(26,18,9,0.08)',
           padding: '0 16px',
-          background: '#ffffff',
+          background: '#faf7f0',
         }}>
           
           {/* Mobile scroll arrows */}
@@ -707,6 +704,12 @@ export default function CollectionsSection() {
                     flexShrink:0,
                     marginBottom:'-1px',
                   }}
+                  onMouseEnter={(e) => {
+                    if (!isActive) e.currentTarget.style.color = 'rgba(26, 18, 9, 0.85)';
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isActive) e.currentTarget.style.color = 'rgba(26, 18, 9, 0.55)';
+                  }}
                 >
                   {section.label}
                 </button>
@@ -738,7 +741,7 @@ export default function CollectionsSection() {
           <div style={{
             padding: '44px 20px 28px',
             textAlign: 'center',
-            background: '#ffffff',
+            background: '#faf7f0',
           }}>
             <h2 style={{
               fontFamily: "'Cormorant Garamond', serif",
@@ -770,7 +773,7 @@ export default function CollectionsSection() {
         {/* Horizontal Carousel */}
         <div style={{
           position: 'relative',
-          background: '#ffffff', 
+          background: '#faf7f0', 
           padding: '10px 0 24px',
         }}>
           {/* Scroll Container */}
@@ -832,10 +835,12 @@ export default function CollectionsSection() {
               style={bottomArrowStyle}
               onMouseEnter={(e) => {
                 e.currentTarget.style.borderColor = '#8B6914';
-                e.currentTarget.style.color = '#8B6914';
+                e.currentTarget.style.background = '#8B6914';
+                e.currentTarget.style.color = '#ffffff';
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.borderColor = 'rgba(26, 18, 9, 0.12)';
+                e.currentTarget.style.background = '#ffffff';
                 e.currentTarget.style.color = '#1a1209';
               }}
             >
@@ -847,10 +852,12 @@ export default function CollectionsSection() {
               style={bottomArrowStyle}
               onMouseEnter={(e) => {
                 e.currentTarget.style.borderColor = '#8B6914';
-                e.currentTarget.style.color = '#8B6914';
+                e.currentTarget.style.background = '#8B6914';
+                e.currentTarget.style.color = '#ffffff';
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.borderColor = 'rgba(26, 18, 9, 0.12)';
+                e.currentTarget.style.background = '#ffffff';
                 e.currentTarget.style.color = '#1a1209';
               }}
             >
@@ -898,6 +905,6 @@ const bottomArrowStyle: React.CSSProperties = {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  transition: 'all 0.2s',
+  transition: 'all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
   outline: 'none',
 };
