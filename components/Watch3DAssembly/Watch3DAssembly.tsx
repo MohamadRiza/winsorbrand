@@ -2,19 +2,19 @@
 
 import { useState, useEffect, useRef } from 'react';
 
-const IMAGES_COUNT = 361;
+const IMAGES_COUNT = 600;
 
 export default function Watch3DAssembly() {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imagesRef = useRef<HTMLImageElement[]>([]);
-  
+
   const [loadedCount, setLoadedCount] = useState(0);
   const [imagesLoaded, setImagesLoaded] = useState(false);
   const [activeCallout, setActiveCallout] = useState<string | null>(null);
   const [progress, setProgress] = useState(0);
   const [assemblyPercent, setAssemblyPercent] = useState(0);
-  
+
   const targetFrameRef = useRef(1);
   const currentFrameRef = useRef(1);
 
@@ -32,7 +32,7 @@ export default function Watch3DAssembly() {
       const img = new Image();
       const frameNum = String(i).padStart(3, '0');
       img.src = `/frames_webp/frame_${frameNum}.webp`;
-      
+
       img.onload = () => {
         loaded++;
         setLoadedCount(loaded);
@@ -40,7 +40,7 @@ export default function Watch3DAssembly() {
           setImagesLoaded(true);
         }
       };
-      
+
       img.onerror = () => {
         loaded++;
         setLoadedCount(loaded);
@@ -48,10 +48,10 @@ export default function Watch3DAssembly() {
           setImagesLoaded(true);
         }
       };
-      
+
       imagesArray.push(img);
     }
-    
+
     imagesRef.current = imagesArray;
   }, []);
 
@@ -61,11 +61,11 @@ export default function Watch3DAssembly() {
 
     const handleScroll = () => {
       if (!containerRef.current) return;
-      
+
       const rect = containerRef.current.getBoundingClientRect();
       const scrollTop = -rect.top;
       const scrollHeight = rect.height - window.innerHeight;
-      
+
       let scrollPercent = scrollTop / scrollHeight;
       scrollPercent = Math.max(0, Math.min(1, scrollPercent));
       setProgress(scrollPercent);
@@ -127,10 +127,10 @@ export default function Watch3DAssembly() {
       ctx.fillStyle = bgGrad;
       ctx.fillRect(0, 0, width, height);
 
-      // Draw deconstructed components frame
+      // Draw deconstructed components frame (Cover Fit)
       const iw = img.width;
       const ih = img.height;
-      const r = Math.min(width / iw, height / ih);
+      const r = Math.max(width / iw, height / ih);
       const nw = iw * r;
       const nh = ih * r;
       const cx = (width - nw) / 2;
@@ -164,7 +164,7 @@ export default function Watch3DAssembly() {
   if (!imagesLoaded) {
     const loadedPercent = Math.round((loadedCount / IMAGES_COUNT) * 100);
     return (
-      <div 
+      <div
         style={{
           width: '100%',
           height: '100vh',
@@ -181,7 +181,7 @@ export default function Watch3DAssembly() {
       >
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '20px' }}>
           {/* Elegant loading spinner */}
-          <div 
+          <div
             style={{
               width: '40px',
               height: '40px',
@@ -196,8 +196,8 @@ export default function Watch3DAssembly() {
               to { transform: rotate(360deg); }
             }
           `}</style>
-          
-          <h2 
+
+          <h2
             style={{
               fontFamily: "'Cormorant Garamond', serif",
               fontSize: '24px',
@@ -210,7 +210,7 @@ export default function Watch3DAssembly() {
           >
             WINSOR
           </h2>
-          <p 
+          <p
             style={{
               fontFamily: "'Jost', sans-serif",
               fontSize: '10px',
@@ -229,19 +229,19 @@ export default function Watch3DAssembly() {
 
   // Interactive 3D Scroll Assembly Container
   return (
-    <div 
+    <div
       id="hero"
-      ref={containerRef} 
-      className="relative w-full bg-[#050302] border-b border-[#8B6914]/20" 
+      ref={containerRef}
+      className="relative w-full bg-[#050302] border-b border-[#8B6914]/20"
       style={{ height: '350vh' }}
     >
       {/* Sticky Canvas Box */}
       <div className="sticky top-0 left-0 w-full h-screen overflow-hidden flex items-center justify-center bg-[#050302]">
-        
+
         {/* Full-screen webp animation canvas */}
-        <canvas 
-          ref={canvasRef} 
-          className="w-full h-full object-contain"
+        <canvas
+          ref={canvasRef}
+          className="w-full h-full object-cover"
           style={{ maxHeight: '100vh', maxWidth: '100vw' }}
         />
 
@@ -249,10 +249,10 @@ export default function Watch3DAssembly() {
         <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_center,rgba(0,0,0,0)_20%,rgba(5,3,2,0.9)_90%)]" />
 
         {/* Brand/Hero text overlay */}
-        <div 
+        <div
           className="absolute inset-0 z-30 flex flex-col items-center justify-center text-center px-4"
-          style={{ 
-            opacity: heroOpacity, 
+          style={{
+            opacity: heroOpacity,
             pointerEvents: heroOpacity > 0 ? 'auto' : 'none',
             transition: 'opacity 0.15s ease-out'
           }}
@@ -321,10 +321,10 @@ export default function Watch3DAssembly() {
         </div>
 
         {/* Scroll Indicator */}
-        <div 
+        <div
           className="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3 z-30"
-          style={{ 
-            opacity: scrollIndicatorOpacity, 
+          style={{
+            opacity: scrollIndicatorOpacity,
             pointerEvents: 'none',
             transition: 'opacity 0.15s ease-out'
           }}
