@@ -5,13 +5,13 @@ const watchGmt = "/watch-gmt.jpg";
 
 const WatchShowcase = () => {
   return (
-    <section className="bg-background py-12 sm:py-16 lg:py-28">
+    <section className="py-12 sm:py-16 lg:py-28" style={{ background: '#faf7f0', color: '#1a1209' }}>
       {/* Heading */}
       <div className="mx-auto max-w-3xl px-4 text-center sm:px-6">
-        <h2 className="font-serif text-[28px] font-normal leading-tight tracking-tight text-foreground sm:text-3xl md:text-[40px] md:leading-tight">
+        <h2 className="font-serif text-[28px] font-normal leading-tight tracking-tight sm:text-3xl md:text-[40px] md:leading-tight" style={{ color: '#1a1209' }}>
           HYDROCONQUEST Exclusive Edition
         </h2>
-        <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-muted-foreground sm:mt-6 md:text-base">
+        <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed sm:mt-6 md:text-base" style={{ color: '#555555' }}>
           A captivating edition, available in 39-mm and 42-mm, offered in distinctive variants that stand apart from the core collection while maintaining the sporty elegance and technical excellence that define it.
         </p>
       </div>
@@ -19,9 +19,9 @@ const WatchShowcase = () => {
       {/* Hero block: product card + large lifestyle image */}
       <div className="mx-auto mt-8 grid max-w-7xl grid-cols-1 gap-6 px-4 sm:mt-14 sm:gap-8 sm:px-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,2.2fr)] lg:gap-10">
         {/* Product card */}
-        <article className="flex flex-col">
-          <div className="relative overflow-hidden bg-secondary">
-            <span className="absolute left-4 top-4 z-10 bg-background px-3 py-1 text-xs tracking-wide text-foreground sm:left-5 sm:top-5">
+        <article className="group flex flex-col cursor-pointer">
+          <div className="relative overflow-hidden bg-white p-4 sm:p-5 rounded-2xl border border-[rgba(26,18,9,0.06)] flex flex-col justify-between h-full shadow-[0_4px_20px_rgba(0,0,0,0.02)] transition-all duration-300 hover:shadow-[0_12px_32px_rgba(26,18,9,0.06)] hover:border-[#8B6914]/40">
+            <span className="absolute left-6 top-6 z-10 bg-[#1a1209] text-white px-3 py-1 text-[10px] tracking-widest uppercase font-medium">
               Exclusive
             </span>
             <img
@@ -30,22 +30,21 @@ const WatchShowcase = () => {
               loading="lazy"
               width={768}
               height={896}
-              className="aspect-[4/5] w-full object-cover transition-transform duration-700 hover:scale-[1.03]"
+              className="aspect-[4/5] w-full object-cover rounded-xl transition-transform duration-700 hover:scale-[1.03]"
             />
-            <div className="mt-6 space-y-2">
-            <h3 className="text-sm font-semibold tracking-[0.08em] text-foreground">
-              HYDROCONQUEST EXCLUSIVE EDITION
-            </h3>
-            <p className="text-sm leading-relaxed text-muted-foreground">
-              42 mm - Automatic watch - Stainless steel and ceramic bezel
-            </p>
-            {/* <p className="pt-2 text-sm text-foreground"></p> */}
-          </div>
+            <div className="mt-5 space-y-1">
+              <h3 className="text-sm font-medium tracking-[0.08em] uppercase transition-colors duration-300 group-hover:text-[#8B6914]" style={{ color: '#1a1209' }}>
+                HYDROCONQUEST EXCLUSIVE EDITION
+              </h3>
+              <p className="text-xs sm:text-sm leading-relaxed" style={{ color: '#666666' }}>
+                42 mm - Automatic watch - Stainless steel and ceramic bezel
+              </p>
+            </div>
           </div>
         </article>
 
         {/* Large lifestyle image */}
-        <div className="overflow-hidden">
+        <div className="overflow-hidden rounded-2xl border border-[rgba(26,18,9,0.06)] shadow-[0_4px_20px_rgba(0,0,0,0.02)]">
           <img
             src={watchHero}
             alt="Hydroconquest watch on a rocky landscape"
@@ -57,10 +56,10 @@ const WatchShowcase = () => {
         </div>
       </div>
 
-      {/* Two collection tiles */}
-      <div className="mx-auto mt-6 grid max-w-7xl grid-cols-1 gap-1 px-4 sm:mt-10 sm:px-6 md:grid-cols-2">
+      {/* Three collection tiles */}
+      <div className="mx-auto mt-8 grid max-w-7xl grid-cols-1 gap-6 px-4 sm:mt-12 sm:px-6 md:grid-cols-3 md:gap-8">
         {/* Conquest */}
-        <a href="#" className="group relative block aspect-[4/5] overflow-hidden">
+        <a href="#" className="group relative block aspect-[16/10] sm:aspect-[4/5] overflow-hidden rounded-2xl border border-[rgba(26,18,9,0.06)] shadow-[0_4px_20px_rgba(0,0,0,0.02)]">
           <img
             src={watchConquest}
             alt="Conquest collection"
@@ -70,17 +69,17 @@ const WatchShowcase = () => {
             className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
           />
           <div className="absolute inset-x-0 bottom-0 flex flex-col items-center pb-8 text-center sm:pb-12">
-            <h3 className="font-serif text-2xl tracking-wide text-foreground sm:text-3xl md:text-5xl">
+            <h3 className="font-serif text-2xl tracking-wide sm:text-3xl lg:text-4xl transition-colors duration-300 group-hover:text-[#8B6914]" style={{ color: '#1a1209' }}>
               PREMIUM
             </h3>
-            <span className="mt-3 border-b border-foreground pb-1 text-xs text-foreground transition-opacity group-hover:opacity-80 sm:mt-4 sm:text-sm">
+            <span className="mt-3 border-b border-[#1a1209]/40 pb-1 text-xs text-[#1a1209] transition-all duration-300 group-hover:text-[#8B6914] group-hover:border-[#8B6914] sm:mt-4 sm:text-sm">
               Discover
             </span>
           </div>
         </a>
 
         {/* Hydroconquest GMT */}
-        <a href="#" className="group relative block aspect-[4/5] overflow-hidden bg-black">
+        <a href="#" className="group relative block aspect-[16/10] sm:aspect-[4/5] overflow-hidden rounded-2xl border border-[rgba(26,18,9,0.06)] shadow-[0_4px_20px_rgba(0,0,0,0.02)] bg-black">
           <img
             src={watchGmt}
             alt="Hydroconquest GMT collection"
@@ -90,10 +89,30 @@ const WatchShowcase = () => {
             className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
           />
           <div className="absolute inset-x-0 bottom-0 flex flex-col items-center pb-8 text-center sm:pb-12">
-            <h3 className="font-serif text-2xl tracking-wide text-white sm:text-3xl md:text-5xl">
+            <h3 className="font-serif text-2xl tracking-wide text-white sm:text-3xl lg:text-4xl transition-colors duration-300 group-hover:text-[#dfb15b]">
               SPORTS
             </h3>
-            <span className="mt-3 border-b border-white pb-1 text-xs text-white transition-opacity group-hover:opacity-80 sm:mt-4 sm:text-sm">
+            <span className="mt-3 border-b border-white/50 pb-1 text-xs text-white transition-all duration-300 group-hover:text-[#dfb15b] group-hover:border-[#dfb15b] sm:mt-4 sm:text-sm">
+              Discover
+            </span>
+          </div>
+        </a>
+
+        {/* Limited Edition */}
+        <a href="#" className="group relative block aspect-[16/10] sm:aspect-[4/5] overflow-hidden rounded-2xl border border-[rgba(26,18,9,0.06)] shadow-[0_4px_20px_rgba(0,0,0,0.02)] bg-black">
+          <img
+            src={watchHero}
+            alt="Limited Edition collection"
+            loading="lazy"
+            width={1024}
+            height={1280}
+            className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
+          />
+          <div className="absolute inset-x-0 bottom-0 flex flex-col items-center pb-8 text-center sm:pb-12">
+            <h3 className="font-serif text-2xl tracking-wide text-white sm:text-3xl lg:text-4xl transition-colors duration-300 group-hover:text-[#dfb15b]">
+              LIMITED EDITION
+            </h3>
+            <span className="mt-3 border-b border-white/50 pb-1 text-xs text-white transition-all duration-300 group-hover:text-[#dfb15b] group-hover:border-[#dfb15b] sm:mt-4 sm:text-sm">
               Discover
             </span>
           </div>

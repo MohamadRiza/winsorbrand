@@ -148,7 +148,7 @@ export default function Navbar() {
   const { totalItemsCount } = useCart();
   const pathname = usePathname();
   const router = useRouter();
-  const isHomepage = pathname === '/';
+  const isTransparentPage = pathname === '/' || pathname === '/collections';
 
   const [isTransparent,      setIsTransparent]      = useState(true);
   const [isVisible,          setIsVisible]          = useState(true);
@@ -182,19 +182,19 @@ export default function Navbar() {
   const closeTimer  = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    if (!isHomepage) {
+    if (!isTransparentPage) {
       setIsTransparent(false);
     } else {
-      const hero = document.getElementById('hero');
-      heroHeight.current = hero ? hero.offsetHeight : window.innerHeight;
+      const hero = document.getElementById('hero') || document.querySelector('.collections-hero-banner');
+      heroHeight.current = hero ? (hero as HTMLElement).offsetHeight : window.innerHeight;
       setIsTransparent(window.scrollY < heroHeight.current - 80);
     }
-  }, [isHomepage]);
+  }, [isTransparentPage]);
 
   useEffect(() => {
     const onScroll = () => {
       const cur = window.scrollY;
-      if (isHomepage) {
+      if (isTransparentPage) {
         setIsTransparent(cur < heroHeight.current - 80);
       } else {
         setIsTransparent(false);
@@ -205,7 +205,7 @@ export default function Navbar() {
     };
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
-  }, [isHomepage]);
+  }, [isTransparentPage]);
 
   useEffect(() => {
     document.body.style.overflow = mobileOpen ? 'hidden' : '';

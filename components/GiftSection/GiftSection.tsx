@@ -37,20 +37,19 @@ const FALLBACK_BACKGROUNDS = [
   'https://photographylife.com/wp-content/uploads/2018/10/Final-Result-of-Jokulsarlon-Photo.jpg',
 ];
 
-// Curated luxury background images for each preset gift category
 const OCCASION_BACKGROUNDS: Record<string, string> = {
-  'eid': 'https://images.unsplash.com/photo-1564507592333-c60657eea523?auto=format&fit=crop&q=80&w=2000',
-  'new-year': 'https://images.unsplash.com/photo-1467810563316-b547d9d57b3b?auto=format&fit=crop&q=80&w=2000',
-  'valentines-day': 'https://images.unsplash.com/photo-1518199266791-5375a83190b7?auto=format&fit=crop&q=80&w=2000',
-  'christmas': 'https://images.unsplash.com/photo-1513885535751-8b9238bd345a?auto=format&fit=crop&q=80&w=2000',
-  'graduation': 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&q=80&w=2000',
-  'womens-day': 'https://images.unsplash.com/photo-1490750967868-88aa4486c946?auto=format&fit=crop&q=80&w=2000',
-  'easter-sunday': 'https://images.unsplash.com/photo-1522336572018-97d5761f20a3?auto=format&fit=crop&q=80&w=2000',
-  'mothers-day': 'https://images.unsplash.com/photo-1543269865-cbf427effbad?auto=format&fit=crop&q=80&w=2000',
-  'fathers-day': 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&q=80&w=2000',
-  'thai-pongal': 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&q=80&w=2000',
-  'sinhala-tamil-new-year': 'https://images.unsplash.com/photo-1601662528567-526cf06f6582?auto=format&fit=crop&q=80&w=2000',
-  'esala-perahera': 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=2000',
+  'eid': '/gift_categories/eid.png',
+  'new-year': '/gift_categories/new_year.avif',
+  'valentines-day': "/gift_categories/valentines_day.png",
+  'christmas': '/gift_categories/xmass.avif',
+  'graduation': '/gift_categories/Graduation.png',
+  'womens-day': '/gift_categories/womens_day.avif',
+  'easter-sunday': '/gift_categories/Easter_sunday.png',
+  'mothers-day': '/gift_categories/mothers_day.png',
+  'fathers-day': '/gift_categories/fathers_day.png',
+  'thai-pongal': '/gift_categories/taippongal.png',
+  'sinhala-tamil-new-year': '/gift_categories/sinhala_tamil_new_year.jpg',
+  'esala-perahera': '/gift_categories/esala_perahara.png',
 };
 
 // ── Hero stage: one big background + swipeable watch (book-page feel) ─────
@@ -135,7 +134,7 @@ function HeroStage({
       style={{
         position: 'relative',
         width: '100%',
-        minHeight: 'min(98vh, 920px)',
+        minHeight: 'clamp(460px, 72vh, 680px)',
         overflow: 'hidden',
         userSelect: 'none',
         cursor: products.length > 1 ? 'grab' : 'default',
@@ -169,13 +168,13 @@ function HeroStage({
         }}
       />
 
-      {/* Soft vignette so text + watch read clearly on any image */}
+      {/* Soft vignette + dark overlay so text + watch read clearly on any image */}
       <div
         style={{
           position: 'absolute',
           inset: 0,
           background:
-            'linear-gradient(180deg, rgba(0,0,0,0.25) 0%, rgba(0,0,0,0) 35%, rgba(0,0,0,0) 60%, rgba(0,0,0,0.55) 100%)',
+            'linear-gradient(180deg, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.25) 50%, rgba(0,0,0,0.65) 100%)',
           pointerEvents: 'none',
           zIndex: 1,
         }}
@@ -199,7 +198,7 @@ function HeroStage({
             fontWeight: 700,
             letterSpacing: '0.04em',
             textTransform: 'uppercase',
-            fontSize: 'clamp(80px, 18vw, 280px)',
+            fontSize: 'clamp(32px, 7.5vw, 105px)',
             color: 'rgba(255,255,255,0.18)',
             whiteSpace: 'nowrap',
             mixBlendMode: 'overlay',
@@ -240,8 +239,8 @@ function HeroStage({
             className="hero-watch-in"
             data-dir={direction === 1 ? 'right' : 'left'}
             style={{
-              width: 'min(420px, 60vw)',
-              height: 'min(560px, 70vh)',
+              width: 'min(360px, 50vw)',
+              height: 'min(460px, 50vh)',
               position: 'relative',
               filter: 'drop-shadow(0 35px 55px rgba(0,0,0,0.55))',
             }}
@@ -263,7 +262,7 @@ function HeroStage({
         style={{
           position: 'absolute',
           left: 'clamp(20px, 5vw, 64px)',
-          bottom: 'clamp(40px, 8vh, 96px)',
+          bottom: 'clamp(20px, 5vh, 60px)',
           color: '#fff',
           maxWidth: '520px',
           textShadow: '0 2px 12px rgba(0,0,0,0.4)',
