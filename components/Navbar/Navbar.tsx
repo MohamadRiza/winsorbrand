@@ -148,7 +148,7 @@ export default function Navbar() {
   const { totalItemsCount } = useCart();
   const pathname = usePathname();
   const router = useRouter();
-  const isTransparentPage = pathname === '/' || pathname === '/collections';
+  const isTransparentPage = pathname === '/' || pathname === '/collections' || pathname === '/customer-care' || pathname === '/gifts' || pathname === '/retailers';
 
   const [isTransparent,      setIsTransparent]      = useState(true);
   const [isVisible,          setIsVisible]          = useState(true);
@@ -185,7 +185,7 @@ export default function Navbar() {
     if (!isTransparentPage) {
       setIsTransparent(false);
     } else {
-      const hero = document.getElementById('hero') || document.querySelector('.collections-hero-banner');
+      const hero = document.getElementById('hero') || document.querySelector('.collections-hero-banner') || document.querySelector('.care-hero') || document.querySelector('.gifts-hero-banner') || document.querySelector('.locator-hero-banner');
       heroHeight.current = hero ? (hero as HTMLElement).offsetHeight : window.innerHeight;
       setIsTransparent(window.scrollY < heroHeight.current - 80);
     }

@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
     await connectDB();
     const body = await req.json();
 
-    const { name, address, city, country, googleMapsLink, image, latitude, longitude, isActive } = body;
+    const { name, address, city, country, googleMapsLink, phone, websiteUrl, operatingHours, image, latitude, longitude, isActive } = body;
 
     if (!name || !address || !city || !country || !googleMapsLink) {
       return NextResponse.json(
@@ -49,6 +49,9 @@ export async function POST(req: NextRequest) {
       city,
       country,
       googleMapsLink,
+      phone: phone || '',
+      websiteUrl: websiteUrl || '',
+      operatingHours,
       image: image || { url: '', publicId: '' },
       latitude: latitude !== undefined && latitude !== null && latitude !== '' ? Number(latitude) : undefined,
       longitude: longitude !== undefined && longitude !== null && longitude !== '' ? Number(longitude) : undefined,

@@ -92,8 +92,24 @@ export default function CollectionsPage() {
           fetch('/api/gift-categories'),
         ]);
 
-        const prodData = await prodRes.json();
-        const catData = await catRes.json();
+        let prodData: any = { success: false };
+        let catData: any = { success: false };
+
+        try {
+          if (prodRes.ok && prodRes.headers.get('content-type')?.includes('application/json')) {
+            prodData = await prodRes.json();
+          }
+        } catch (e) {
+          console.warn('Failed to parse products response:', e);
+        }
+
+        try {
+          if (catRes.ok && catRes.headers.get('content-type')?.includes('application/json')) {
+            catData = await catRes.json();
+          }
+        } catch (e) {
+          console.warn('Failed to parse categories response:', e);
+        }
 
         if (prodData.success) {
           setProducts(prodData.data || []);
@@ -114,13 +130,13 @@ export default function CollectionsPage() {
     }
     loadData();
 
-    // Read local wishlist on mount
+    // Read local wishlist safely on mount
     const savedWishlist = localStorage.getItem('winsor_wishlist');
     if (savedWishlist) {
       try {
         setWishlist(JSON.parse(savedWishlist));
       } catch (e) {
-        console.error(e);
+        console.warn('Failed to parse wishlist JSON:', e);
       }
     }
   }, []);

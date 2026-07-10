@@ -24,6 +24,9 @@ export async function PUT(
       city: body.city,
       country: body.country,
       googleMapsLink: body.googleMapsLink,
+      phone: body.phone,
+      websiteUrl: body.websiteUrl,
+      operatingHours: body.operatingHours,
       isActive: body.isActive,
     };
 

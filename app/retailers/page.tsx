@@ -1,8 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { toast } from 'react-hot-toast';
-import Image from 'next/image';
+import dynamic from 'next/dynamic';
+
+const RetailersMap = dynamic(() => import('@/components/RetailersMap'), { ssr: false });
 
 interface Retailer {
   _id: string;
@@ -11,6 +13,13 @@ interface Retailer {
   city: string;
   country: string;
   googleMapsLink: string;
+  phone?: string;
+  websiteUrl?: string;
+  operatingHours?: {
+    weekdays: { isOpen: boolean; openTime: string; closeTime: string };
+    saturday: { isOpen: boolean; openTime: string; closeTime: string };
+    sunday: { isOpen: boolean; openTime: string; closeTime: string };
+  };
   image?: {
     url: string;
     publicId: string;
@@ -22,6 +31,14 @@ interface Retailer {
 }
 
 const BOUTIQUE_PLACEHOLDER = 'https://images.unsplash.com/photo-1582037936109-1a06705d2334?q=80&w=800&auto=format&fit=crop';
+
+// Fallback luxury watch boutique interior pictures to populate thumbnail slider
+const SHOP_INTERIORS = [
+  'https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=800&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?q=80&w=800&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=800&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1582037936109-1a06705d2334?q=80&w=800&auto=format&fit=crop'
+];
 
 // Haversine distance formula in kilometers
 function calculateHaversineDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
@@ -38,11 +55,66 @@ function calculateHaversineDistance(lat1: number, lon1: number, lat2: number, lo
   return R * c;
 }
 
+function getTodayHours(operatingHours: Retailer['operatingHours']) {
+  const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  const todayIndex = new Date().getDay();
+  const todayName = days[todayIndex];
+
+  // Default fallback values matching client layout
+  const defaultHours = {
+    weekdays: { isOpen: true, openTime: '09:30', closeTime: '19:00' },
+    saturday: { isOpen: true, openTime: '09:30', closeTime: '19:00' },
+    sunday: { isOpen: false, openTime: '10:00', closeTime: '18:00' },
+  };
+
+  const schedule = operatingHours || defaultHours;
+
+  let currentDayHours;
+  if (todayIndex === 0) {
+    currentDayHours = schedule.sunday;
+  } else if (todayIndex === 6) {
+    currentDayHours = schedule.saturday;
+  } else {
+    currentDayHours = schedule.weekdays;
+  }
+
+  // Format times from 24h to 12h format
+  const formatTime = (timeStr: string) => {
+    if (!timeStr) return '';
+    const [hoursStr, minutesStr] = timeStr.split(':');
+    const hours = parseInt(hoursStr, 10);
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    const formattedHours = hours % 12 || 12;
+    return `${formattedHours}:${minutesStr} ${ampm}`;
+  };
+
+  if (!currentDayHours || !currentDayHours.isOpen) {
+    return {
+      statusText: 'Closed Today',
+      timeText: 'Closed',
+      dayName: todayName,
+      isOpen: false
+    };
+  }
+
+  const openTimeFormatted = formatTime(currentDayHours.openTime);
+  const closeTimeFormatted = formatTime(currentDayHours.closeTime);
+
+  return {
+    statusText: `${openTimeFormatted} - ${closeTimeFormatted}`,
+    timeText: `${openTimeFormatted} - ${closeTimeFormatted}`,
+    dayName: todayName,
+    isOpen: true
+  };
+}
+
 export default function StoreLocatorPage() {
   const [retailers, setRetailers] = useState<Retailer[]>([]);
   const [cities, setCities] = useState<string[]>([]);
   const [countries, setCountries] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Filters
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCity, setSelectedCity] = useState('all');
   const [selectedCountry, setSelectedCountry] = useState('all');
@@ -53,10 +125,10 @@ export default function StoreLocatorPage() {
   const [gpsLoading, setGpsLoading] = useState(false);
   const [gpsActive, setGpsActive] = useState(false);
 
-  // Album Carousel States
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [touchStart, setTouchStart] = useState<number | null>(null);
-  const [touchEnd, setTouchEnd] = useState<number | null>(null);
+  // Active / Highlighted Boutique selection
+  const [selectedBoutiqueId, setSelectedBoutiqueId] = useState<string | null>(null);
+  const [sliderIndex, setSliderIndex] = useState(0);
+  const [listLimit, setListLimit] = useState(3);
 
   useEffect(() => {
     fetchLocations();
@@ -66,14 +138,27 @@ export default function StoreLocatorPage() {
     try {
       setLoading(true);
       const res = await fetch('/api/retailers');
-      const data = await res.json();
+      let data: any = { success: false };
+      try {
+        if (res.ok && res.headers.get('content-type')?.includes('application/json')) {
+          data = await res.json();
+        }
+      } catch (e) {
+        console.warn('Failed to parse retailers JSON:', e);
+      }
+
       if (data.success) {
-        setRetailers(data.data || []);
+        const fetchedList = data.data || [];
+        setRetailers(fetchedList);
         setCities(data.cities || []);
         setCountries(data.countries || []);
+
+        if (fetchedList.length > 0) {
+          setSelectedBoutiqueId(fetchedList[0]._id);
+        }
       }
     } catch (error) {
-      console.error('Failed to load store list:', error);
+      console.warn('Failed to load store list:', error);
       toast.error('Could not load store locator list');
     } finally {
       setLoading(false);
@@ -217,1129 +302,1070 @@ export default function StoreLocatorPage() {
     return list;
   })();
 
-  // Reset index when search filters or GPS status changes
+  // Sync selected boutique when list is filtered
   useEffect(() => {
-    setCurrentIndex(0);
-  }, [searchQuery, selectedCity, selectedCountry, gpsActive]);
-
-  const minSwipeDistance = 50;
-
-  const onTouchStart = (e: React.TouchEvent) => {
-    setTouchEnd(null);
-    setTouchStart(e.targetTouches[0].clientX);
-  };
-
-  const onTouchMove = (e: React.TouchEvent) => {
-    setTouchEnd(e.targetTouches[0].clientX);
-  };
-
-  const onTouchEnd = () => {
-    if (!touchStart || !touchEnd) return;
-    const distance = touchStart - touchEnd;
-    const isLeftSwipe = distance > minSwipeDistance;
-    const isRightSwipe = distance < -minSwipeDistance;
-    if (isLeftSwipe) {
-      handleNextSlide();
-    } else if (isRightSwipe) {
-      handlePrevSlide();
+    if (processedRetailers.length > 0) {
+      // Keep selected if still in the list, otherwise select the first item
+      const exists = processedRetailers.some(r => r._id === selectedBoutiqueId);
+      if (!exists) {
+        setSelectedBoutiqueId(processedRetailers[0]._id);
+      }
+    } else {
+      setSelectedBoutiqueId(null);
     }
-  };
+    setSliderIndex(0);
+  }, [searchQuery, selectedCity, selectedCountry, gpsActive, retailers]);
+
+  // Selected boutique details helper
+  const selectedBoutique = retailers.find(r => r._id === selectedBoutiqueId) || null;
+  const todayHours = selectedBoutique ? getTodayHours(selectedBoutique.operatingHours) : null;
+
+  // Build images array for slider using current boutique photo + placeholders
+  const sliderImages = (() => {
+    if (!selectedBoutique) return [];
+    const mainImg = selectedBoutique.image?.url || BOUTIQUE_PLACEHOLDER;
+    return [mainImg, ...SHOP_INTERIORS];
+  })();
 
   const handleNextSlide = () => {
-    if (processedRetailers.length === 0) return;
-    setCurrentIndex((prev) => (prev + 1) % processedRetailers.length);
+    setSliderIndex(prev => (prev + 1) % sliderImages.length);
   };
 
   const handlePrevSlide = () => {
-    if (processedRetailers.length === 0) return;
-    setCurrentIndex((prev) => (prev - 1 + processedRetailers.length) % processedRetailers.length);
-  };
-
-  const resetFilters = () => {
-    setSearchQuery('');
-    setSelectedCity('all');
-    setSelectedCountry('all');
+    setSliderIndex(prev => (prev - 1 + sliderImages.length) % sliderImages.length);
   };
 
   return (
-    <div style={{ backgroundColor: '#faf7f0', minHeight: '100vh', paddingBottom: '80px' }}>
+    <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Jost:wght@300;400;500;600&display=swap');
-        
-        .locator-banner {
-          height: 380px;
+        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Jost:wght@300;400;500;600;700&display=swap');
+
+        /* ── HERO BANNER ── */
+        .locator-hero-banner {
           position: relative;
-          background-image: linear-gradient(rgba(26,18,9,0.5), rgba(26,18,9,0.7)), url('/discover-store.jpg');
+          background: linear-gradient(rgba(26,18,9,0.35), rgba(26,18,9,0.6)), url('/discover-store.jpg');
           background-size: cover;
-          background-position: center;
-          background-attachment: fixed;
+          background-position: center 35%;
           display: flex;
           flex-direction: column;
           align-items: center;
           justify-content: center;
           text-align: center;
           color: #ffffff;
-          padding: 0 24px;
-          border-bottom: 2px solid #8B6914;
+          padding: 140px 24px 80px;
+          border-bottom: 1.5px solid rgba(139,105,20,0.15);
         }
-        .locator-banner h1 {
+        .hero-banner-inner {
+          max-width: 780px;
+          margin: 0 auto;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+        }
+        .locator-tag {
+          font-family: 'Jost', sans-serif;
+          font-size: 10px;
+          font-weight: 700;
+          letter-spacing: 0.35em;
+          text-transform: uppercase;
+          color: #dfb15b;
+          margin-bottom: 16px;
+          display: flex;
+          align-items: center;
+          gap: 6px;
+        }
+        .locator-title {
           font-family: 'Cormorant Garamond', serif;
-          font-size: clamp(34px, 5vw, 50px);
+          font-size: clamp(34px, 5vw, 56px);
           font-weight: 300;
           letter-spacing: 0.12em;
           text-transform: uppercase;
-          margin: 0 0 14px;
-          text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+          margin: 0 0 16px;
+          text-shadow: 0 4px 15px rgba(0,0,0,0.25);
         }
-        .locator-banner p {
-          font-family: 'Jost', sans-serif;
-          font-size: clamp(12px, 3.5vw, 14px);
-          font-weight: 300;
-          letter-spacing: 0.18em;
-          text-transform: uppercase;
-          color: rgba(255,255,255,0.9);
-          max-width: 640px;
-          line-height: 1.6;
+        .locator-subtitle {
+          font-family: 'Cormorant Garamond', serif;
+          font-size: clamp(15px, 2.2vw, 20px);
+          font-style: italic;
+          color: rgba(255,255,255,0.85);
+          line-height: 1.45;
+          margin: 0;
+          max-width: 620px;
         }
+
+        /* ── FLOATING TOOLBAR ── */
         .locator-toolbar {
-          max-width: 1200px;
-          margin: -40px auto 48px;
-          width: calc(100% - 32px);
+          max-width: 1280px;
+          width: calc(100% - 48px);
+          margin: -36px auto 48px;
           background: #ffffff;
-          border: 1px solid rgba(139, 105, 20, 0.16);
+          border: 1px solid rgba(26,18,9,0.08);
           border-radius: 12px;
-          padding: 20px 28px;
-          box-shadow: 0 12px 40px rgba(26,18,9,0.06);
+          padding: 16px 24px;
+          box-shadow: 0 12px 36px rgba(26,18,9,0.06);
           display: flex;
-          flex-wrap: wrap;
-          gap: 18px;
           align-items: center;
-          z-index: 10;
+          gap: 16px;
+          z-index: 99;
           position: relative;
         }
-        .locator-search-wrapper {
+        .locator-search-container {
           position: relative;
-          flex: 1.5;
-          min-width: 280px;
+          flex: 1.6;
+          min-width: 260px;
         }
-        .locator-search-input {
+        .search-icon-svg {
+          position: absolute;
+          left: 16px;
+          top: 50%;
+          transform: translateY(-50%);
+          color: #8b6914;
+          opacity: 0.7;
+        }
+        .search-input-field {
           width: 100%;
           background: #fdfaf6;
-          border: 1px solid rgba(26,18,9,0.12);
+          border: 1px solid rgba(26,18,9,0.1);
           border-radius: 8px;
-          padding: 13px 18px 13px 46px;
+          padding: 12px 16px 12px 46px;
           font-family: 'Jost', sans-serif;
           font-size: 13.5px;
           color: #1a1209;
           outline: none;
           transition: all 0.3s ease;
         }
-        .locator-search-input:focus {
-          border-color: #8B6914;
+        .search-input-field:focus {
+          border-color: #8b6914;
           background: #ffffff;
-          box-shadow: 0 0 0 3px rgba(139,105,20,0.1);
-        }
-        .locator-search-icon {
-          position: absolute;
-          left: 16px;
-          top: 50%;
-          transform: translateY(-50%);
-          color: #8B6914;
-          pointer-events: none;
-          opacity: 0.75;
+          box-shadow: 0 0 0 3px rgba(139,105,20,0.08);
         }
         
-        /* Dropdowns group for responsive side-by-side on mobile */
-        .locator-filters-row {
-          display: flex;
-          gap: 18px;
-          flex: 2;
-          min-width: 280px;
-        }
-        .locator-select {
+        .locator-filter-select {
+          flex: 1;
+          min-width: 150px;
           background: #ffffff;
-          border: 1px solid rgba(26,18,9,0.12);
+          border: 1px solid rgba(26,18,9,0.1);
           border-radius: 8px;
-          padding: 13px 36px 13px 18px;
+          padding: 12px 36px 12px 16px;
           font-family: 'Jost', sans-serif;
           font-size: 13.5px;
           color: #1a1209;
-          cursor: pointer;
           outline: none;
-          flex: 1;
-          min-width: 150px;
+          cursor: pointer;
           transition: all 0.3s ease;
           appearance: none;
           background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%238B6914' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19.5 8.25l-7.5 7.5-7.5-7.5'/%3E%3C/svg%3E");
           background-repeat: no-repeat;
           background-position: right 14px center;
-          background-size: 15px;
+          background-size: 14px;
         }
-        .locator-select:focus {
-          border-color: #8B6914;
-          box-shadow: 0 0 0 3px rgba(139,105,20,0.1);
+        .locator-filter-select:focus {
+          border-color: #8b6914;
         }
-        .locator-reset-btn {
-          background: transparent;
-          border: 1px solid rgba(26,18,9,0.18);
-          color: #1a1209;
-          padding: 13px 26px;
+
+        .location-trigger-btn {
+          background: #5b87a4; /* Blue color styled from attachment */
+          color: #ffffff;
+          border: none;
+          border-radius: 8px;
+          padding: 13px 24px;
           font-family: 'Jost', sans-serif;
-          font-size: 12px;
-          font-weight: 500;
+          font-size: 11.5px;
+          font-weight: 600;
           letter-spacing: 0.08em;
           text-transform: uppercase;
-          border-radius: 8px;
           cursor: pointer;
-          transition: all 0.25s ease;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          transition: all 0.3s ease;
           flex-shrink: 0;
         }
-        .locator-reset-btn:hover {
-          background: #1a1209;
-          color: #ffffff;
-          border-color: #1a1209;
+        .location-trigger-btn:hover {
+          background: #4a7290;
+          box-shadow: 0 4px 15px rgba(91,135,164,0.3);
         }
-        .locator-grid {
-          max-width: 1200px;
-          margin: 0 auto;
-          width: calc(100% - 32px);
+        .location-trigger-btn.gps-active {
+          background: #8b6914;
+        }
+
+        /* ── MAIN WORKSPACE CONTAINER ── */
+        .locator-main-wrapper {
+          background-color: #faf7f0;
+          padding: 0 4% 80px;
+          font-family: 'Jost', sans-serif;
+        }
+        .locator-workspace-grid {
+          max-width: 1280px;
+          margin: 0 auto 72px;
           display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+          grid-template-columns: 460px 1fr;
           gap: 32px;
+          align-items: flex-start;
         }
-        .boutique-card {
-          background: #ffffff;
-          border: 1px solid rgba(139,105,20,0.12);
-          border-radius: 12px;
-          overflow: hidden;
-          box-shadow: 0 4px 20px rgba(26,18,9,0.02);
-          transition: all 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
+        /* ── RETAILERS LIST (LEFT) ── */
+        .list-column-container {
           display: flex;
           flex-direction: column;
+          gap: 20px;
         }
-        .boutique-card:hover {
-          transform: translateY(-6px);
-          box-shadow: 0 20px 40px rgba(26,18,9,0.07);
-          border-color: #8B6914;
+        .list-result-tag {
+          font-size: 11px;
+          font-weight: 700;
+          letter-spacing: 0.1em;
+          color: rgba(26,18,9,0.5);
+          text-transform: uppercase;
+          margin: 0;
         }
-        .boutique-img-container {
-          position: relative;
-          width: 100%;
-          aspect-ratio: 16/10;
-          background: #fbf9f4;
+        .list-result-tag span {
+          color: #8b6914;
+          font-weight: 800;
+          margin-right: 4px;
+        }
+
+        .retailer-card {
+          background: #ffffff;
+          border: 1px solid rgba(26,18,9,0.06);
+          border-radius: 12px;
           overflow: hidden;
+          display: flex;
+          box-shadow: 0 4px 20px rgba(0,0,0,0.015);
+          cursor: pointer;
+          transition: all 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+          position: relative;
+          height: 180px;
         }
-        .boutique-img-container img {
-          transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        .retailer-card:hover {
+          transform: translateY(-3px);
+          box-shadow: 0 10px 25px rgba(26,18,9,0.05);
+          border-color: rgba(139,105,20,0.2);
         }
-        .boutique-card:hover .boutique-img-container img {
-          transform: scale(1.05);
+        .retailer-card.selected {
+          border-color: #8b6914;
+          border-width: 2.5px;
+          box-shadow: 0 10px 25px rgba(139,105,20,0.08);
         }
-        .boutique-card-content {
-          padding: 28px;
+        
+        .retailer-card-img-side {
+          position: relative;
+          width: 150px;
+          height: 100%;
+          flex-shrink: 0;
+        }
+        .retailer-card-details-side {
+          padding: 18px 20px;
           flex: 1;
           display: flex;
           flex-direction: column;
+          justify-content: space-between;
+          min-width: 0;
         }
-        .boutique-badge {
-          display: inline-block;
-          font-family: 'Jost', sans-serif;
-          font-size: 9.5px;
-          font-weight: 600;
-          letter-spacing: 0.14em;
-          text-transform: uppercase;
-          color: #8B6914;
-          background: rgba(139,105,20,0.08);
-          padding: 5px 12px;
+        .retailer-card-badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+          background: rgba(139,105,20,0.06);
+          color: #8b6914;
+          border: 1px solid rgba(139,105,20,0.12);
           border-radius: 4px;
-          margin-bottom: 14px;
-          width: fit-content;
-          border: 0.5px solid rgba(139,105,20,0.15);
-        }
-        .boutique-name {
-          font-family: 'Cormorant Garamond', serif;
-          font-size: 24px;
-          font-weight: 500;
-          color: #1a1209;
-          margin: 0 0 14px;
-          line-height: 1.25;
-          letter-spacing: 0.02em;
-        }
-        .boutique-button {
-          display: block;
-          width: 100%;
-          text-align: center;
-          padding: 13px;
-          background: #ffffff;
-          color: #1a1209;
-          font-family: 'Jost', sans-serif;
-          font-size: 12px;
-          font-weight: 600;
-          letter-spacing: 0.1em;
+          padding: 3px 8px;
+          font-size: 8px;
+          font-weight: 700;
+          letter-spacing: 0.08em;
           text-transform: uppercase;
-          text-decoration: none;
-          border-radius: 6px;
-          transition: all 0.25s ease;
-          border: 1px solid rgba(26,18,9,0.15);
+          width: fit-content;
+          margin-bottom: 6px;
+        }
+        .retailer-card-name {
+          font-family: 'Cormorant Garamond', serif;
+          font-size: 18px;
+          font-weight: 600;
+          color: #1a1209;
+          margin: 0 0 6px;
+          line-height: 1.25;
+          text-overflow: ellipsis;
+          overflow: hidden;
+          white-space: nowrap;
+        }
+        .retailer-card-addr {
+          font-size: 11.5px;
+          color: rgba(26,18,9,0.55);
+          margin: 0 0 8px;
+          line-height: 1.4;
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
+        .retailer-card-distance {
+          font-size: 10.5px;
+          font-weight: 600;
+          color: rgba(26,18,9,0.45);
+          display: flex;
+          align-items: center;
+          gap: 4px;
+        }
+        
+        .retailer-card-actions {
+          display: flex;
+          gap: 12px;
+          border-top: 1.5px solid rgba(26,18,9,0.04);
+          padding-top: 10px;
           margin-top: auto;
         }
-        .boutique-button:hover {
+        .card-action-link {
+          font-family: 'Jost', sans-serif;
+          font-size: 10.5px;
+          font-weight: 600;
+          color: #8b6914;
+          text-transform: uppercase;
+          letter-spacing: 0.1em;
+          text-decoration: none;
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+          transition: color 0.2s;
+        }
+        .card-action-link:hover {
+          color: #1a1209;
+        }
+
+        .load-more-locator-btn {
+          width: 100%;
+          text-align: center;
+          background: #ffffff;
+          border: 1px solid rgba(26,18,9,0.1);
+          border-radius: 8px;
+          padding: 14px;
+          font-size: 11px;
+          font-weight: 600;
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
+          color: #1a1209;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          margin-top: 8px;
+        }
+        .load-more-locator-btn:hover {
           background: #1a1209;
           color: #ffffff;
           border-color: #1a1209;
-          box-shadow: 0 4px 12px rgba(26, 18, 9, 0.15);
         }
-        .gps-float-btn {
-          position: fixed;
-          bottom: 32px;
-          left: 32px;
-          width: 56px;
-          height: 56px;
+
+        /* ── MAP CONTAINER (RIGHT) ── */
+        .map-column-container {
+          position: sticky;
+          top: 100px;
+          height: 580px;
+          border-radius: 16px;
+          overflow: hidden;
+          border: 1px solid rgba(26,18,9,0.08);
+          box-shadow: 0 16px 40px rgba(0,0,0,0.03);
+          z-index: 10;
+        }
+
+        /* ── HIGHLIGHT DETAIL BOX ── */
+        .boutique-highlight-panel {
+          max-width: 1280px;
+          margin: 0 auto;
+          background: #ffffff;
+          border: 1px solid rgba(26,18,9,0.06);
+          border-radius: 16px;
+          overflow: hidden;
+          box-shadow: 0 12px 40px rgba(0,0,0,0.015);
+          display: grid;
+          grid-template-columns: 1.2fr 1fr;
+          margin-bottom: 72px;
+        }
+        .highlight-slider-side {
+          background: #faf7f0;
+          padding: 32px;
+          display: flex;
+          flex-direction: column;
+          gap: 20px;
+          border-right: 1.5px solid rgba(26,18,9,0.04);
+        }
+        .highlight-main-frame {
+          position: relative;
+          aspect-ratio: 16/10;
+          border-radius: 12px;
+          overflow: hidden;
+          background: #eee;
+          box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+        }
+        .slider-nav-arrow {
+          position: absolute;
+          top: 50%;
+          transform: translateY(-50%);
+          width: 36px;
+          height: 36px;
           border-radius: 50%;
-          background: #1a1209;
-          border: 1.5px solid #8B6914;
-          color: #ffffff;
+          background: rgba(255,255,255,0.9);
+          border: none;
+          color: #1a1209;
           display: flex;
           align-items: center;
           justify-content: center;
           cursor: pointer;
-          box-shadow: 0 8px 30px rgba(26, 18, 9, 0.4);
-          transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-          z-index: 99;
+          z-index: 5;
+          box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+          transition: all 0.2s;
         }
-        .gps-float-btn:hover {
-          background: #8B6914;
-          transform: scale(1.06);
-          box-shadow: 0 8px 30px rgba(139, 105, 20, 0.4);
+        .slider-nav-arrow:hover {
+          background: #1a1209;
+          color: #fff;
         }
-        .gps-float-btn.active {
-          background: #8B6914;
-          border-color: #ffffff;
-          box-shadow: 0 0 20px rgba(139, 105, 20, 0.7);
+        .slider-nav-arrow.prev { left: 16px; }
+        .slider-nav-arrow.next { right: 16px; }
+
+        .highlight-thumbnail-row {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 12px;
+        }
+        .thumbnail-card-btn {
+          position: relative;
+          aspect-ratio: 16/10;
+          border-radius: 6px;
+          overflow: hidden;
+          cursor: pointer;
+          border: 2px solid transparent;
+          background: #eee;
+          padding: 0;
+          transition: all 0.2s;
+        }
+        .thumbnail-card-btn.active {
+          border-color: #8b6914;
         }
 
-        /* Album View Styles */
-        .album-view-container {
-          max-width: 900px;
-          margin: 0 auto 60px;
-          width: calc(100% - 32px);
+        .highlight-content-side {
+          padding: 48px;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
         }
-        .album-header {
-          text-align: center;
-          margin-bottom: 32px;
-        }
-        .gps-active-badge {
+        .highlight-badge {
           display: inline-flex;
           align-items: center;
-          gap: 8px;
-          background: rgba(139, 105, 20, 0.1);
-          color: #8B6914;
-          padding: 6px 16px;
-          border-radius: 20px;
-          font-family: 'Jost', sans-serif;
-          font-size: 11px;
-          font-weight: 600;
-          text-transform: uppercase;
-          letter-spacing: 0.12em;
-          margin-bottom: 16px;
-          border: 1px solid rgba(139, 105, 20, 0.15);
-        }
-        .album-title {
-          font-family: 'Cormorant Garamond', serif;
-          font-size: clamp(28px, 5vw, 36px);
-          font-weight: 500;
-          color: #1a1209;
-          margin: 0 0 8px;
-          letter-spacing: 0.05em;
-        }
-        .album-subtitle {
-          font-family: 'Jost', sans-serif;
-          font-size: 14px;
-          color: rgba(26, 18, 9, 0.6);
-          max-width: 500px;
-          margin: 0 auto;
-        }
-        .album-card-wrapper {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 24px;
-          position: relative;
-        }
-        .boutique-album-card {
-          background: #ffffff;
-          border: 1px solid rgba(139, 105, 20, 0.18);
-          border-radius: 16px;
-          overflow: hidden;
-          box-shadow: 0 15px 45px rgba(26, 18, 9, 0.06);
-          width: 100%;
-          max-width: 760px;
-          display: flex;
-          flex-direction: column;
-          position: relative;
-        }
-        .album-card-distance-banner {
-          background: linear-gradient(135deg, #1a1209 0%, #302213 100%);
-          border-bottom: 1.5px solid #8B6914;
-          color: #ffffff;
-          padding: 14px 24px;
-          text-align: center;
-          font-family: 'Jost', sans-serif;
-          font-size: 14px;
-          letter-spacing: 0.05em;
-        }
-        .album-card-distance-banner .distance-bold {
-          color: #dfb15b;
-          font-weight: 600;
-          font-size: 17px;
-        }
-        .album-card-layout {
-          display: grid;
-          grid-template-columns: 1.2fr 1fr;
-        }
-        .album-card-image-sec {
-          position: relative;
-          aspect-ratio: 4/3;
-          background: #fbf9f4;
-          overflow: hidden;
-        }
-        .album-card-image {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-          transition: transform 0.6s ease;
-        }
-        .boutique-album-card:hover .album-card-image {
-          transform: scale(1.03);
-        }
-        .nearest-label-badge {
-          position: absolute;
-          top: 16px;
-          left: 16px;
-          background: #8B6914;
-          color: #ffffff;
-          font-family: 'Jost', sans-serif;
+          gap: 6px;
+          background: rgba(139,105,20,0.08);
+          color: #8b6914;
+          border: 1px solid rgba(139,105,20,0.15);
           font-size: 10px;
-          font-weight: 600;
+          font-weight: 700;
+          letter-spacing: 0.12em;
           text-transform: uppercase;
-          letter-spacing: 0.1em;
-          padding: 6px 12px;
+          padding: 4px 12px;
           border-radius: 4px;
-          box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+          width: fit-content;
+          margin-bottom: 18px;
         }
-        .album-card-info-sec {
-          padding: 36px;
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-        }
-        .album-card-rank {
-          font-family: 'Jost', sans-serif;
-          font-size: 11px;
-          font-weight: 600;
-          color: #8B6914;
-          text-transform: uppercase;
-          letter-spacing: 0.15em;
-          margin-bottom: 12px;
-          display: block;
-        }
-        .album-card-name {
+        .highlight-name {
           font-family: 'Cormorant Garamond', serif;
-          font-size: clamp(24px, 4vw, 30px);
+          font-size: clamp(28px, 4vw, 36px);
           font-weight: 500;
           color: #1a1209;
-          margin: 0 0 16px;
+          margin: 0 0 10px;
           line-height: 1.2;
+          letter-spacing: 0.01em;
         }
-        .album-card-location-details {
-          display: flex;
-          flex-direction: column;
+        .highlight-addr {
+          font-size: 13.5px;
+          color: rgba(26,18,9,0.55);
+          line-height: 1.5;
+          margin: 0 0 28px;
+        }
+
+        .highlight-info-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
           gap: 12px;
           margin-bottom: 28px;
         }
-        .info-row {
+        .info-card-block {
+          background: #faf7f0;
+          border: 1px solid rgba(26,18,9,0.04);
+          border-radius: 8px;
+          padding: 14px;
           display: flex;
-          align-items: flex-start;
-          gap: 10px;
+          flex-direction: column;
+          justify-content: center;
+          text-align: center;
+          min-height: 80px;
         }
-        .info-icon {
-          line-height: 1;
-          margin-top: 2px;
-          flex-shrink: 0;
+        .info-card-block svg {
+          margin: 0 auto 6px;
+          color: #8b6914;
         }
-        .info-text {
-          font-family: 'Jost', sans-serif;
-          font-size: 13.5px;
-          color: rgba(26, 18, 9, 0.65);
-          line-height: 1.4;
+        .info-card-val {
+          font-size: 12px;
+          font-weight: 600;
+          color: #1a1209;
+          margin-bottom: 2px;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          overflow: hidden;
         }
-        .album-card-actions {
-          margin-top: auto;
+        .info-card-label {
+          font-size: 9px;
+          color: rgba(26,18,9,0.45);
+          text-transform: uppercase;
+          font-weight: 600;
+          letter-spacing: 0.05em;
         }
-        .album-card-btn.directions {
-          display: inline-flex;
+
+        .highlight-desc {
+          font-size: 13px;
+          color: rgba(26,18,9,0.65);
+          line-height: 1.6;
+          margin: 0 0 36px;
+        }
+
+        .highlight-actions-row {
+          display: flex;
+          gap: 16px;
+          align-items: center;
+        }
+        .highlight-action-btn {
+          flex: 1;
+          display: flex;
           align-items: center;
           justify-content: center;
-          width: 100%;
-          padding: 13px 20px;
-          background: #1a1209;
-          color: #ffffff;
-          border: 1px solid #1a1209;
+          gap: 8px;
+          background: #ffffff;
+          color: #1a1209;
+          border: 1.5px solid rgba(26,18,9,0.12);
+          border-radius: 8px;
+          padding: 14px 20px;
           font-family: 'Jost', sans-serif;
-          font-size: 12.5px;
-          font-weight: 500;
+          font-size: 11px;
+          font-weight: 600;
           letter-spacing: 0.1em;
           text-transform: uppercase;
           text-decoration: none;
-          border-radius: 6px;
-          transition: all 0.25s ease;
+          cursor: pointer;
+          transition: all 0.3s ease;
         }
-        .album-card-btn.directions:hover {
-          background: #8B6914;
-          border-color: #8B6914;
-          box-shadow: 0 5px 15px rgba(139,105,20,0.2);
+        .highlight-action-btn:hover {
+          background: #1a1209;
+          color: #fff;
+          border-color: #1a1209;
         }
-        .album-nav-btn {
+        .highlight-action-btn.primary {
+          background: #8b6914;
+          color: #fff;
+          border-color: #8b6914;
+        }
+        .highlight-action-btn.primary:hover {
+          background: #a37c17;
+          border-color: #a37c17;
+          box-shadow: 0 4px 15px rgba(139,105,20,0.2);
+        }
+
+        /* ── SERVICE FEATURES BANNER ── */
+        .locator-features-banner {
+          max-width: 1280px;
+          margin: 0 auto;
+          background: #ffffff;
+          border: 1px solid rgba(26,18,9,0.05);
+          border-radius: 16px;
+          padding: 36px 24px;
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 24px;
+          box-shadow: 0 8px 30px rgba(0,0,0,0.01);
+        }
+        .feature-block-item {
+          display: flex;
+          align-items: center;
+          gap: 16px;
+          border-right: 1px solid rgba(26,18,9,0.06);
+          padding-right: 16px;
+        }
+        .feature-block-item:last-child {
+          border-right: none;
+          padding-right: 0;
+        }
+        .feature-item-icon {
           width: 48px;
           height: 48px;
           border-radius: 50%;
-          background: #ffffff;
-          border: 1px solid rgba(26,18,9,0.12);
-          color: #1a1209;
+          background: rgba(139,105,20,0.06);
+          color: #8b6914;
           display: flex;
           align-items: center;
           justify-content: center;
-          cursor: pointer;
-          transition: all 0.25s ease;
-          box-shadow: 0 4px 12px rgba(0,0,0,0.04);
           flex-shrink: 0;
         }
-        .album-nav-btn:hover {
-          background: #1a1209;
-          color: #ffffff;
-          border-color: #1a1209;
-          transform: scale(1.05);
-        }
-        
-        /* Album controls bar with chevrons and dots */
-        .album-controls-bar {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 16px;
-          margin-top: 28px;
-        }
-        .album-dots-container {
-          display: flex;
-          justify-content: center;
-          gap: 8px;
-        }
-        .album-dot-btn {
-          width: 8px;
-          height: 8px;
-          border-radius: 50%;
-          background: rgba(26, 18, 9, 0.15);
-          border: none;
-          cursor: pointer;
-          transition: all 0.25s ease;
-          padding: 0;
-        }
-        .album-dot-btn.active {
-          background: #8B6914;
-          transform: scale(1.35);
-        }
-        .album-touch-nav-btn {
-          display: none;
-          width: 44px;
-          height: 44px;
-          border-radius: 50%;
-          background: #ffffff;
-          border: 1px solid rgba(26,18,9,0.12);
-          color: #1a1209;
-          align-items: center;
-          justify-content: center;
-          cursor: pointer;
-          transition: all 0.2s ease;
-          box-shadow: 0 4px 10px rgba(0,0,0,0.04);
-        }
-        .album-touch-nav-btn:hover {
-          background: #1a1209;
-          color: #ffffff;
-          border-color: #1a1209;
-        }
-        .swipe-helper {
-          display: none;
-          text-align: center;
-          font-family: 'Jost', sans-serif;
+        .feature-item-details h5 {
           font-size: 11px;
-          color: rgba(26, 18, 9, 0.4);
-          letter-spacing: 0.05em;
-          margin-top: 12px;
+          font-weight: 700;
+          letter-spacing: 0.1em;
           text-transform: uppercase;
-        }
-        .view-toggle-container {
-          text-align: center;
-          margin-top: 40px;
-        }
-        .view-toggle-btn.text-link {
-          background: none;
-          border: none;
-          color: #8B6914;
-          font-family: 'Jost', sans-serif;
-          font-size: 13px;
-          font-weight: 500;
-          text-decoration: underline;
-          cursor: pointer;
-          transition: color 0.2s;
-        }
-        .view-toggle-btn.text-link:hover {
           color: #1a1209;
+          margin: 0 0 4px;
+        }
+        .feature-item-details p {
+          font-size: 10.5px;
+          color: rgba(26,18,9,0.5);
+          margin: 0;
+          line-height: 1.4;
         }
 
-        /* Card transition animation */
-        .album-card-animate {
-          animation: cardFadeIn 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
-        }
-        @keyframes cardFadeIn {
-          from { opacity: 0; transform: translateY(12px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-
-        @media (max-width: 768px) {
-          .locator-toolbar {
-            flex-direction: column;
-            align-items: stretch;
-            padding: 16px 20px;
-            gap: 12px;
-            margin: -24px auto 32px;
-            width: calc(100% - 24px);
-          }
-          .locator-search-wrapper {
-            width: 100%;
-            min-width: 0;
-            flex: none;
-          }
-          .locator-filters-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            width: 100%;
-            min-width: 0;
-            flex: none;
-          }
-          .locator-select {
-            width: 100% !important;
-            min-width: 0 !important;
-          }
-          .locator-reset-btn {
-            width: 100%;
-            padding: 12px;
-            text-align: center;
-          }
-          .album-card-layout {
-            grid-template-columns: 1fr;
-          }
-          .album-card-image-sec {
-            aspect-ratio: 16/10;
-          }
-          .album-card-info-sec {
-            padding: 24px;
-          }
-          .album-nav-btn {
-            display: none !important;
-          }
-          .album-touch-nav-btn {
-            display: flex;
-          }
-          .swipe-helper {
-            display: block !important;
-          }
-        }
-        
-        /* Modal Style */
-        .gps-modal {
+        /* ── GPS MODAL DIALOG ── */
+        .gps-modal-overlay {
           position: fixed;
-          inset: 0;
-          background: rgba(26, 18, 9, 0.65);
+          top: 0;
+          left: 0;
+          width: 100vw;
+          height: 100vh;
+          background: rgba(10,8,6,0.6);
           backdrop-filter: blur(8px);
           display: flex;
           align-items: center;
           justify-content: center;
-          z-index: 9999;
-          padding: 20px;
+          z-index: 99999;
+          padding: 24px;
         }
-        .gps-modal-card {
+        .gps-modal-box {
           background: #ffffff;
-          border: 1px solid rgba(139, 105, 20, 0.2);
           border-radius: 16px;
-          max-width: 420px;
+          border: 1px solid rgba(139,105,20,0.12);
+          box-shadow: 0 24px 60px rgba(26,18,9,0.15);
           width: 100%;
+          max-width: 400px;
           padding: 32px;
           text-align: center;
-          box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-          animation: modalIn 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+          animation: modal-zoom 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
-        @keyframes modalIn {
-          from { opacity: 0; transform: scale(0.95); }
-          to { opacity: 1; transform: scale(1); }
+        @keyframes modal-zoom {
+          from { transform: scale(0.9) translateY(10px); opacity: 0; }
+          to { transform: scale(1) translateY(0); opacity: 1; }
+        }
+
+        /* ── RESPONSIVE OVERRIDES ── */
+        @media (max-width: 1024px) {
+          .locator-toolbar {
+            flex-direction: column;
+            align-items: stretch;
+            margin-top: -24px;
+          }
+          .locator-search-container, .locator-filter-select, .location-trigger-btn {
+            width: 100%;
+          }
+          .locator-workspace-grid {
+            grid-template-columns: 1fr;
+            gap: 40px;
+          }
+          .map-column-container {
+            position: relative;
+            top: 0;
+            height: 380px;
+          }
+          .boutique-highlight-panel {
+            grid-template-columns: 1fr;
+          }
+          .highlight-slider-side {
+            border-right: none;
+            border-bottom: 1.5px solid rgba(26,18,9,0.04);
+          }
+          .locator-features-banner {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 28px;
+          }
+          .feature-block-item {
+            border-right: none;
+          }
+        }
+
+        @media (max-width: 640px) {
+          .retailer-card {
+            flex-direction: column;
+            height: auto;
+          }
+          .retailer-card-img-side {
+            width: 100%;
+            height: 160px;
+          }
+          .retailer-card-details-side {
+            padding: 16px;
+          }
+          .highlight-content-side {
+            padding: 24px;
+          }
+          .highlight-info-grid {
+            grid-template-columns: 1fr;
+            gap: 10px;
+          }
+          .highlight-actions-row {
+            flex-direction: column;
+            gap: 12px;
+          }
+          .highlight-action-btn {
+            width: 100%;
+          }
+          .locator-features-banner {
+            grid-template-columns: 1fr;
+            gap: 20px;
+          }
+          .feature-block-item {
+            padding-right: 0;
+          }
         }
       `}</style>
 
-      {/* Banner */}
-      <header className="locator-banner">
-        <p>Authorized Retailers</p>
-        <h1>Find a Boutique</h1>
-        <p>Experience Winsor horology firsthand at our luxury showrooms and authorized dealer boutiques.</p>
-      </header>
+      {/* HERO BANNER SECTION */}
+      <section className="locator-hero-banner">
+        <div className="hero-banner-inner">
+          <span className="locator-tag">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+              <circle cx="12" cy="10" r="3" />
+            </svg>
+            Official Retailers
+          </span>
+          <h1 className="locator-title">Find A Retailer</h1>
+          <p className="locator-subtitle">
+            Discover authorized Winsor boutiques and partners near you for an exceptional experience.
+          </p>
+        </div>
+      </section>
 
-      {/* Toolbar Filters */}
-      <div className="locator-toolbar">
-        {/* Search input */}
-        <div className="locator-search-wrapper">
+      {/* SEARCH TOOLBAR */}
+      <section className="locator-toolbar">
+        <div className="locator-search-container">
+          <svg className="search-icon-svg" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
           <input
             type="text"
-            placeholder="Search boutique name or city..."
+            className="search-input-field"
+            placeholder="Search by boutique name, city..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="locator-search-input"
           />
-          <svg className="locator-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
         </div>
 
-        {/* Dropdowns group for responsive layout on mobile */}
-        <div className="locator-filters-row">
-          {/* City Filter */}
-          {cities.length > 0 && (
-            <select
-              value={selectedCity}
-              onChange={(e) => setSelectedCity(e.target.value)}
-              className="locator-select"
-            >
-              <option value="all">All Cities</option>
-              {cities.map((city) => (
-                <option key={city} value={city}>
-                  {city}
-                </option>
-              ))}
-            </select>
-          )}
+        <select
+          className="locator-filter-select"
+          value={selectedCity}
+          onChange={(e) => setSelectedCity(e.target.value)}
+          aria-label="Filter by City"
+        >
+          <option value="all">All Cities</option>
+          {cities.map(c => (
+            <option key={c} value={c}>{c}</option>
+          ))}
+        </select>
 
-          {/* Country Filter */}
-          {countries.length > 0 && (
-            <select
-              value={selectedCountry}
-              onChange={(e) => setSelectedCountry(e.target.value)}
-              className="locator-select"
-            >
-              <option value="all">All Countries</option>
-              {countries.map((country) => (
-                <option key={country} value={country}>
-                  {country}
-                </option>
-              ))}
-            </select>
-          )}
-        </div>
+        <select
+          className="locator-filter-select"
+          value={selectedCountry}
+          onChange={(e) => setSelectedCountry(e.target.value)}
+          aria-label="Filter by Country"
+        >
+          <option value="all">All Countries</option>
+          {countries.map(c => (
+            <option key={c} value={c}>{c}</option>
+          ))}
+        </select>
 
-        {/* Reset Filter Button */}
-        {(searchQuery || selectedCity !== 'all' || selectedCountry !== 'all') && (
-          <button onClick={resetFilters} className="locator-reset-btn">
-            Clear Filters
-          </button>
+        <button
+          className={`location-trigger-btn ${gpsActive ? 'gps-active' : ''}`}
+          onClick={gpsActive ? handleDeactivateGPS : handleActivateGPS}
+          disabled={gpsLoading}
+        >
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+            <circle cx="12" cy="12" r="7" />
+            <circle cx="12" cy="12" r="2.2" fill="currentColor" />
+            <path d="M12 2v3M12 19v3M2 12h3M19 12h3" />
+          </svg>
+          {gpsLoading ? 'Locating...' : gpsActive ? 'GPS ACTIVE' : 'USE MY LOCATION'}
+        </button>
+      </section>
+
+      {/* MAIN CONTAINER */}
+      <div className="locator-main-wrapper">
+        {loading ? (
+          <div style={{ textAlign: 'center', padding: '100px 20px' }}>
+            <div style={{
+              width: '32px', height: '32px', border: '2px solid rgba(139,105,20,0.15)', borderTopColor: '#8b6914',
+              borderRadius: '50%', animation: 'spin 0.8s linear infinite', margin: '0 auto 16px'
+            }} />
+            <p style={{ color: 'rgba(26,18,9,0.45)', fontSize: '13px' }}>Loading authorized showrooms…</p>
+          </div>
+        ) : (
+          <>
+            <div className="locator-workspace-grid">
+              
+              {/* LEFT: BOUTIQUE LIST */}
+              <div className="list-column-container">
+                <h3 className="list-result-tag">
+                  <span>{processedRetailers.length}</span> Retailers Found
+                </h3>
+
+                {processedRetailers.length === 0 ? (
+                  <div style={{ padding: '40px 20px', textAlign: 'center', background: '#fff', borderRadius: '12px', border: '1px dashed rgba(26,18,9,0.1)' }}>
+                    <p style={{ color: 'rgba(26,18,9,0.45)', fontSize: '13px', margin: 0 }}>No showrooms match your filter criteria.</p>
+                  </div>
+                ) : (
+                  <>
+                    {processedRetailers.slice(0, listLimit).map(r => {
+                      const isSelected = r._id === selectedBoutiqueId;
+                      return (
+                        <div 
+                          key={r._id}
+                          className={`retailer-card ${isSelected ? 'selected' : ''}`}
+                          onClick={() => {
+                            setSelectedBoutiqueId(r._id);
+                            setSliderIndex(0);
+                          }}
+                        >
+                          <div className="retailer-card-img-side">
+                            <img
+                              src={r.image?.url || BOUTIQUE_PLACEHOLDER}
+                              alt={r.name}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+
+                          <div className="retailer-card-details-side">
+                            <div>
+                              <span className="retailer-card-badge">
+                                <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                                </svg>
+                                Authorized Retailer
+                              </span>
+                              <h4 className="retailer-card-name">{r.name}</h4>
+                              <p className="retailer-card-addr">{r.address}</p>
+                            </div>
+
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                              <span className="retailer-card-distance">
+                                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                                  <circle cx="12" cy="10" r="3" />
+                                </svg>
+                                {r.distance !== undefined ? `${r.distance.toFixed(1)} km away` : `${r.city}, ${r.country}`}
+                              </span>
+
+                              <div className="retailer-card-actions" onClick={(e) => e.stopPropagation()}>
+                                {r.phone && (
+                                  <a href={`tel:${r.phone}`} className="card-action-link">
+                                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                                    Call
+                                  </a>
+                                )}
+                                <a href={r.googleMapsLink} target="_blank" rel="noopener noreferrer" className="card-action-link">
+                                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+                                  Directions
+                                </a>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+
+                    {processedRetailers.length > listLimit && (
+                      <button
+                        className="load-more-locator-btn"
+                        onClick={() => setListLimit(prev => prev + 3)}
+                      >
+                        Load More Retailers
+                      </button>
+                    )}
+                  </>
+                )}
+              </div>
+
+              {/* RIGHT: LEAFLET MAP */}
+              <div className="map-column-container">
+                <RetailersMap
+                  retailers={processedRetailers}
+                  selectedId={selectedBoutiqueId}
+                  onSelectRetailer={setSelectedBoutiqueId}
+                  userCoords={userCoords}
+                />
+              </div>
+
+            </div>
+
+            {/* DETAIL HIGHLIGHT PANEL */}
+            {selectedBoutique && (
+              <section className="boutique-highlight-panel">
+                
+                {/* Image Slider Column */}
+                <div className="highlight-slider-side">
+                  <div className="highlight-main-frame">
+                    <img
+                      src={sliderImages[sliderIndex]}
+                      alt="Boutique Showroom Interior"
+                      className="w-full h-full object-cover"
+                    />
+                    
+                    {sliderImages.length > 1 && (
+                      <>
+                        <button className="slider-nav-arrow prev" onClick={handlePrevSlide} aria-label="Previous Slide">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M15 18l-6-6 6-6"/></svg>
+                        </button>
+                        <button className="slider-nav-arrow next" onClick={handleNextSlide} aria-label="Next Slide">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M9 18l6-6-6-6"/></svg>
+                        </button>
+                      </>
+                    )}
+                  </div>
+
+                  {sliderImages.length > 1 && (
+                    <div className="highlight-thumbnail-row">
+                      {sliderImages.map((img, idx) => (
+                        <button
+                          key={idx}
+                          onClick={() => setSliderIndex(idx)}
+                          className={`thumbnail-card-btn ${idx === sliderIndex ? 'active' : ''}`}
+                          aria-label={`Show boutique photo ${idx + 1}`}
+                        >
+                          <img
+                            src={img}
+                            alt="Thumbnail"
+                            className="w-full h-full object-cover"
+                          />
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Info Details Column */}
+                <div className="highlight-content-side font-['Jost']">
+                  <span className="highlight-badge">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ marginRight: '4px' }}>
+                      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                    </svg>
+                    Authorized Retailer
+                  </span>
+                  <h2 className="highlight-name">{selectedBoutique.name}</h2>
+                  <p className="highlight-addr">{selectedBoutique.address}</p>
+
+                  <div className="highlight-info-grid">
+                    <div className="info-card-block">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/><path d="M2 12h20"/></svg>
+                      <span className="info-card-val">{selectedBoutique.country}</span>
+                      <span className="info-card-label">Region</span>
+                    </div>
+                    <div className="info-card-block">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                      <span className="info-card-val">{todayHours ? todayHours.statusText : '9:30 AM - 7:00 PM'}</span>
+                      <span className="info-card-label">
+                        {todayHours ? `${todayHours.isOpen ? 'Open' : 'Closed'} (${todayHours.dayName})` : 'Open Today'}
+                      </span>
+                    </div>
+                    <div className="info-card-block">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                      <span className="info-card-val">{selectedBoutique.phone || '011 234 4567'}</span>
+                      <span className="info-card-label">Phone</span>
+                    </div>
+                  </div>
+
+                  <p className="highlight-desc">
+                    {selectedBoutique.name} has been a trusted partner in luxury timepieces since 2002.
+                    Explore the complete Winsor collection with expert horology guidance and exceptional,
+                    bespoke after-sales service at this authorized boutique partner showroom.
+                  </p>
+
+                  <div className="highlight-actions-row">
+                    {selectedBoutique.phone && (
+                      <a href={`tel:${selectedBoutique.phone}`} className="highlight-action-btn primary">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                        Call Showroom
+                      </a>
+                    )}
+                    <a href={selectedBoutique.googleMapsLink} target="_blank" rel="noopener noreferrer" className="highlight-action-btn">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+                      Directions
+                    </a>
+                    {selectedBoutique.websiteUrl && (
+                      <a href={selectedBoutique.websiteUrl} target="_blank" rel="noopener noreferrer" className="highlight-action-btn">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                        Website
+                      </a>
+                    )}
+                  </div>
+                </div>
+
+              </section>
+            )}
+
+            {/* SERVICES BANNER */}
+            <section className="locator-features-banner">
+              <div className="feature-block-item">
+                <div className="feature-item-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                </div>
+                <div className="feature-item-details">
+                  <h5>Authorized Retailers</h5>
+                  <p>100% genuine products with official warranty.</p>
+                </div>
+              </div>
+              <div className="feature-block-item">
+                <div className="feature-item-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                </div>
+                <div className="feature-item-details">
+                  <h5>Expert Service</h5>
+                  <p>Professional guidance and after-sales support.</p>
+                </div>
+              </div>
+              <div className="feature-block-item">
+                <div className="feature-item-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="12 8 8 12 12 16 16 12 12 8"/></svg>
+                </div>
+                <div className="feature-item-details">
+                  <h5>Premium Experience</h5>
+                  <p>Discover the complete Winsor collection.</p>
+                </div>
+              </div>
+              <div className="feature-block-item">
+                <div className="feature-item-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                </div>
+                <div className="feature-item-details">
+                  <h5>Global Standard</h5>
+                  <p>International service and support network.</p>
+                </div>
+              </div>
+            </section>
+          </>
         )}
       </div>
 
-      {/* Stores List Grid / Swipeable Album */}
-      <main>
-        {loading ? (
-          <div className="locator-grid">
-            {Array.from({ length: 3 }).map((_, i) => (
-              <div
-                key={i}
-                style={{
-                  height: '380px',
-                  background: '#ffffff',
-                  border: '1px solid rgba(26,18,9,0.06)',
-                  borderRadius: '8px',
-                  animation: 'pulse 1.5s infinite',
-                }}
-              />
-            ))}
-          </div>
-        ) : processedRetailers.length === 0 ? (
-          <div
-            style={{
-              maxWidth: '1200px',
-              margin: '0 auto',
-              width: 'calc(100% - 32px)',
-              textAlign: 'center',
-              padding: '80px 20px',
-              background: '#ffffff',
-              border: '1px solid rgba(26,18,9,0.06)',
-              borderRadius: '8px',
-            }}
-          >
-            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '20px', color: 'rgba(139,105,20,0.5)' }}>
-              <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
-                <rect x="2" y="2" width="20" height="20" rx="2" ry="2" />
-                <path d="M5 17h14M5 12h14M5 7h14" />
-              </svg>
-            </div>
-            <h3 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '24px', color: '#1a1209', margin: '0 0 8px' }}>
-              No Boutiques Found
-            </h3>
-            <p style={{ fontFamily: "'Jost', sans-serif", fontSize: '13px', color: 'rgba(26,18,9,0.5)', margin: '0 0 20px' }}>
-              We could not find any authorized retailers matching your filters.
-            </p>
-            <button onClick={resetFilters} className="locator-reset-btn">
-              Reset Filters
-            </button>
-          </div>
-        ) : gpsActive && userCoords ? (
-          /* Swipable Album View */
-          <div className="album-view-container">
-            <div className="album-header">
-              <div className="gps-active-badge">
-                <svg
-                  className="w-4 h-4 text-[#8B6914] animate-pulse"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  viewBox="0 0 24 24"
-                  style={{ width: '16px', height: '16px' }}
-                >
-                  <circle cx="12" cy="12" r="7" />
-                  <circle cx="12" cy="12" r="2.2" fill="currentColor" />
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 2v3M12 19v3M2 12h3M19 12h3" />
-                </svg>
-                <span>GPS Proximity Sorting Active</span>
-              </div>
-              <h2 className="album-title">Nearest Showrooms</h2>
-              <p className="album-subtitle">
-                Showing boutique {currentIndex + 1} of {processedRetailers.length}, sorted by proximity.
-              </p>
-            </div>
-
-            <div className="album-card-wrapper">
-              {/* Prev Button */}
-              <button
-                onClick={handlePrevSlide}
-                className="album-nav-btn prev"
-                aria-label="Previous boutique"
-                title="Previous nearest boutique"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" style={{ width: '20px', height: '20px' }}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
-                </svg>
-              </button>
-
-              {/* Boutique Card */}
-              <div
-                key={currentIndex}
-                className="boutique-album-card album-card-animate"
-                onTouchStart={onTouchStart}
-                onTouchMove={onTouchMove}
-                onTouchEnd={onTouchEnd}
-              >
-                {/* Distance Banner */}
-                <div className="album-card-distance-banner">
-                  <span>Approximately </span>
-                  <span className="distance-bold">
-                    {processedRetailers[currentIndex]?.distance !== undefined
-                      ? `${processedRetailers[currentIndex].distance!.toFixed(1)} km`
-                      : 'N/A'}
-                  </span>
-                  <span> away from you</span>
-                </div>
-
-                <div className="album-card-layout">
-                  <div className="album-card-image-sec">
-                    <img
-                      src={processedRetailers[currentIndex]?.image?.url || BOUTIQUE_PLACEHOLDER}
-                      alt={processedRetailers[currentIndex]?.name}
-                      className="album-card-image"
-                    />
-                    {currentIndex === 0 && (
-                      <span className="nearest-label-badge">Nearest Showroom</span>
-                    )}
-                  </div>
-                  <div className="album-card-info-sec">
-                    <span className="album-card-rank">
-                      Boutique Partner #{currentIndex + 1}
-                    </span>
-                    <h3 className="album-card-name">{processedRetailers[currentIndex]?.name}</h3>
-
-                    <div className="album-card-location-details">
-                      <div className="info-row">
-                        <span className="info-icon" style={{ color: '#8B6914' }}>
-                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline-block', verticalAlign: 'middle' }}>
-                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-                            <circle cx="12" cy="10" r="3" />
-                          </svg>
-                        </span>
-                        <span className="info-text">{processedRetailers[currentIndex]?.address}</span>
-                      </div>
-                      <div className="info-row">
-                        <span className="info-icon" style={{ color: '#8B6914' }}>
-                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline-block', verticalAlign: 'middle' }}>
-                            <rect x="4" y="2" width="16" height="20" rx="2" ry="2" />
-                            <line x1="9" y1="22" x2="9" y2="16" />
-                            <line x1="15" y1="22" x2="15" y2="16" />
-                            <path d="M8 6h.01M16 6h.01M8 10h.01" />
-                          </svg>
-                        </span>
-                        <span className="info-text">
-                          <strong style={{ color: '#1a1209' }}>
-                            {processedRetailers[currentIndex]?.city}, {processedRetailers[currentIndex]?.country}
-                          </strong>
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="album-card-actions">
-                      <a
-                        href={processedRetailers[currentIndex]?.googleMapsLink}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="album-card-btn directions"
-                      >
-                        <span>Get Directions</span>
-                        <svg className="w-4 h-4 ml-1.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" style={{ width: '16px', height: '16px', marginLeft: '6px' }}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
-                        </svg>
-                      </a>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Next Button */}
-              <button
-                onClick={handleNextSlide}
-                className="album-nav-btn next"
-                aria-label="Next boutique"
-                title="Next nearest boutique"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" style={{ width: '20px', height: '20px' }}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-                </svg>
-              </button>
-            </div>
-
-            {/* Mobile Touch-Friendly Controls Bar */}
-            <div className="album-controls-bar">
-              <button
-                onClick={handlePrevSlide}
-                className="album-touch-nav-btn"
-                aria-label="Previous boutique"
-              >
-                <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
-                </svg>
-              </button>
-
-              {processedRetailers.length > 1 && (
-                <div className="album-dots-container">
-                  {processedRetailers.map((_, idx) => (
-                    <button
-                      key={idx}
-                      onClick={() => setCurrentIndex(idx)}
-                      className={`album-dot-btn ${idx === currentIndex ? 'active' : ''}`}
-                      aria-label={`Go to slide ${idx + 1}`}
-                    />
-                  ))}
-                </div>
-              )}
-
-              <button
-                onClick={handleNextSlide}
-                className="album-touch-nav-btn"
-                aria-label="Next boutique"
-              >
-                <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-                </svg>
-              </button>
-            </div>
-
-            <div className="swipe-helper">
-              <span>← Swipe card to browse nearest options →</span>
-            </div>
-
-            <div className="view-toggle-container">
-              <button
-                onClick={() => setGpsActive(false)}
-                className="view-toggle-btn text-link"
-              >
-                Turn off GPS and view all showrooms in standard grid
-              </button>
-            </div>
-          </div>
-        ) : (
-          /* Standard Grid View */
-          <div className="locator-grid">
-            {processedRetailers.map((r) => (
-              <div key={r._id} className="boutique-card">
-                <div className="boutique-img-container">
-                  <img
-                    src={r.image?.url || BOUTIQUE_PLACEHOLDER}
-                    alt={r.name}
-                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                  />
-                </div>
-
-                <div className="boutique-card-content">
-                  <span className="boutique-badge">
-                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-                        <polyline points="9 22 9 12 15 12 15 22" />
-                      </svg>
-                      Winsor Boutique Partner
-                    </span>
-                  </span>
-
-                  <h3 className="boutique-name">{r.name}</h3>
-
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', flex: 1, marginBottom: '24px' }}>
-                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: '3px' }}>
-                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-                        <circle cx="12" cy="10" r="3" />
-                      </svg>
-                      <span style={{ fontSize: '13.5px', color: 'rgba(26,18,9,0.65)', fontFamily: "'Jost', sans-serif", lineHeight: 1.45 }}>
-                        {r.address}
-                      </span>
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
-                        <rect x="4" y="2" width="16" height="20" rx="2" ry="2" />
-                        <line x1="9" y1="22" x2="9" y2="16" />
-                        <line x1="15" y1="22" x2="15" y2="16" />
-                        <path d="M8 6h.01M16 6h.01M8 10h.01" />
-                      </svg>
-                      <span style={{ fontSize: '13.5px', fontWeight: 600, color: '#1a1209', fontFamily: "'Jost', sans-serif" }}>
-                        {r.city}, {r.country}
-                      </span>
-                    </div>
-                  </div>
-
-                  <a
-                    href={r.googleMapsLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="boutique-button"
-                  >
-                    Get Directions
-                  </a>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </main>
-
-      {/* Floating GPS Icon Button */}
-      {!loading && (
-        <button
-          onClick={gpsActive ? handleDeactivateGPS : handleActivateGPS}
-          className={`gps-float-btn ${gpsActive ? 'active' : ''}`}
-          title={gpsActive ? 'Turn off GPS sorting' : 'Find nearest Winsor shop'}
-          disabled={gpsLoading}
-        >
-          {gpsLoading ? (
-            <div
-              style={{
-                width: '24px',
-                height: '24px',
-                border: '2px solid rgba(255,255,255,0.3)',
-                borderTopColor: '#ffffff',
-                borderRadius: '50%',
-                animation: 'spin 1.2s linear infinite',
-              }}
-            />
-          ) : (
-            <svg 
-              className={`w-6 h-6 ${gpsActive ? 'animate-pulse' : ''}`} 
-              fill="none" 
-              stroke="currentColor" 
-              strokeWidth="2.2" 
-              viewBox="0 0 24 24" 
-              xmlns="http://www.w3.org/2000/svg"
-              style={{ width: '24px', height: '24px' }}
-            >
-              <circle cx="12" cy="12" r="7" />
-              <circle cx="12" cy="12" r="2.2" fill="currentColor" />
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 2v3M12 19v3M2 12h3M19 12h3" />
-            </svg>
-          )}
-        </button>
-      )}
-
       {/* GPS Confirmation Popup Modal */}
       {showGPSModal && (
-        <div className="gps-modal">
-          <div className="gps-modal-card">
-            <div style={{ 
-              display: 'flex', 
-              justifyContent: 'center', 
-              marginBottom: '20px', 
-              color: '#8B6914' 
-            }}>
-              <div style={{
-                background: 'rgba(139,105,20,0.1)',
-                padding: '16px',
-                borderRadius: '50%',
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}>
-                <svg 
-                  className="w-10 h-10 animate-pulse" 
-                  fill="none" 
-                  stroke="currentColor" 
-                  strokeWidth="2" 
-                  viewBox="0 0 24 24" 
-                  xmlns="http://www.w3.org/2000/svg"
-                  style={{ width: '40px', height: '40px' }}
-                >
+        <div className="gps-modal-overlay">
+          <div className="gps-modal-box">
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '20px', color: '#8b6914' }}>
+              <div style={{ background: 'rgba(139,105,20,0.08)', padding: '16px', borderRadius: '50%', display: 'inline-flex' }}>
+                <svg className="animate-pulse" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <circle cx="12" cy="12" r="7" />
                   <circle cx="12" cy="12" r="2.5" fill="currentColor" />
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 2v3M12 19v3M2 12h3M19 12h3" />
+                  <path d="M12 2v3M12 19v3M2 12h3M19 12h3" />
                 </svg>
               </div>
             </div>
-            <h3 style={{
-              fontFamily: "'Cormorant Garamond', serif",
-              fontSize: '22px',
-              fontWeight: 600,
-              color: '#1a1209',
-              margin: '0 0 10px',
-            }}>
+            <h3 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '22px', fontWeight: 600, color: '#1a1209', margin: '0 0 10px' }}>
               Find Nearest Boutique
             </h3>
-            <p style={{
-              fontFamily: "'Jost', sans-serif",
-              fontSize: '13.5px',
-              color: 'rgba(26,18,9,0.7)',
-              lineHeight: '1.5',
-              margin: '0 0 24px',
-            }}>
-              Are you looking for the nearest Winsor shop? Allow us to access your location to show showrooms sorted by proximity.
+            <p style={{ fontSize: '13.5px', color: 'rgba(26,18,9,0.7)', lineHeight: '1.5', margin: '0 0 24px' }}>
+              Allow us to access your browser location to display authorized showrooms sorted by proximity.
             </p>
             <div style={{ display: 'flex', gap: '12px' }}>
               <button
                 onClick={() => setShowGPSModal(false)}
                 style={{
-                  flex: 1,
-                  padding: '12px',
-                  background: 'transparent',
-                  border: '1px solid rgba(26,18,9,0.15)',
-                  borderRadius: '6px',
-                  fontFamily: "'Jost', sans-serif",
-                  fontSize: '12px',
-                  color: '#1a1209',
-                  cursor: 'pointer',
+                  flex: 1, padding: '12px', background: 'transparent', border: '1px solid rgba(26,18,9,0.15)',
+                  borderRadius: '8px', fontFamily: "'Jost', sans-serif", fontSize: '12px', color: '#1a1209', cursor: 'pointer'
                 }}
               >
                 No, Show All
@@ -1347,17 +1373,9 @@ export default function StoreLocatorPage() {
               <button
                 onClick={handleConfirmGPS}
                 style={{
-                  flex: 1,
-                  padding: '12px',
-                  background: '#8B6914',
-                  border: 'none',
-                  borderRadius: '6px',
-                  fontFamily: "'Jost', sans-serif",
-                  fontSize: '12px',
-                  color: '#ffffff',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  boxShadow: '0 4px 12px rgba(139, 105, 20, 0.25)',
+                  flex: 1, padding: '12px', background: '#8b6914', border: 'none', borderRadius: '8px',
+                  fontFamily: "'Jost', sans-serif", fontSize: '12px', color: '#ffffff', fontWeight: 600,
+                  cursor: 'pointer', boxShadow: '0 4px 12px rgba(139, 105, 20, 0.25)'
                 }}
               >
                 Yes, Locate Me
@@ -1366,16 +1384,6 @@ export default function StoreLocatorPage() {
           </div>
         </div>
       )}
-
-      <style>{`
-        @keyframes spin {
-          to { transform: rotate(360deg); }
-        }
-        @keyframes pulse {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0.5; }
-        }
-      `}</style>
-    </div>
+    </>
   );
 }

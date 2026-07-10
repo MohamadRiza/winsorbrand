@@ -71,14 +71,22 @@ export default function CustomerOrdersPage() {
       try {
         setLoading(true);
         const res = await fetch('/api/customer/orders');
-        const data = await res.json();
+        let data: any = { success: false };
+        try {
+          if (res.ok && res.headers.get('content-type')?.includes('application/json')) {
+            data = await res.json();
+          }
+        } catch (e) {
+          console.warn('Failed to parse orders JSON:', e);
+        }
+        
         if (data.success) {
           setOrders(data.data || []);
         } else {
           throw new Error(data.error || 'Failed to retrieve orders');
         }
       } catch (err: any) {
-        console.error(err);
+        console.warn(err);
         setError(err.message);
       } finally {
         setLoading(false);

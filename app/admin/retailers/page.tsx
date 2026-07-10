@@ -11,6 +11,13 @@ interface Retailer {
   city: string;
   country: string;
   googleMapsLink: string;
+  phone?: string;
+  websiteUrl?: string;
+  operatingHours?: {
+    weekdays: { isOpen: boolean; openTime: string; closeTime: string };
+    saturday: { isOpen: boolean; openTime: string; closeTime: string };
+    sunday: { isOpen: boolean; openTime: string; closeTime: string };
+  };
   image?: {
     url: string;
     publicId: string;
@@ -35,6 +42,13 @@ export default function AdminRetailersPage() {
     city: '',
     country: '',
     googleMapsLink: '',
+    phone: '',
+    websiteUrl: '',
+    operatingHours: {
+      weekdays: { isOpen: true, openTime: '09:30', closeTime: '19:00' },
+      saturday: { isOpen: true, openTime: '09:30', closeTime: '19:00' },
+      sunday: { isOpen: false, openTime: '10:00', closeTime: '18:00' },
+    },
     image: { url: '', publicId: '' },
     latitude: '' as string | number,
     longitude: '' as string | number,
@@ -247,6 +261,13 @@ export default function AdminRetailersPage() {
       city: r.city,
       country: r.country,
       googleMapsLink: r.googleMapsLink,
+      phone: r.phone || '',
+      websiteUrl: r.websiteUrl || '',
+      operatingHours: r.operatingHours || {
+        weekdays: { isOpen: true, openTime: '09:30', closeTime: '19:00' },
+        saturday: { isOpen: true, openTime: '09:30', closeTime: '19:00' },
+        sunday: { isOpen: false, openTime: '10:00', closeTime: '18:00' },
+      },
       image: r.image || { url: '', publicId: '' },
       latitude: r.latitude !== undefined ? r.latitude : '',
       longitude: r.longitude !== undefined ? r.longitude : '',
@@ -299,6 +320,13 @@ export default function AdminRetailersPage() {
       city: '',
       country: '',
       googleMapsLink: '',
+      phone: '',
+      websiteUrl: '',
+      operatingHours: {
+        weekdays: { isOpen: true, openTime: '09:30', closeTime: '19:00' },
+        saturday: { isOpen: true, openTime: '09:30', closeTime: '19:00' },
+        sunday: { isOpen: false, openTime: '10:00', closeTime: '18:00' },
+      },
       image: { url: '', publicId: '' },
       latitude: '',
       longitude: '',
@@ -481,6 +509,241 @@ export default function AdminRetailersPage() {
                   required
                   className="w-full px-4 py-2.5 bg-[#fbf9f4] border border-[#1a1209]/15 rounded-lg text-sm text-[#1a1209] focus:outline-none focus:border-[#8B6914] focus:ring-2 focus:ring-[#8B6914]/20 transition font-['Jost']"
                 />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-[11px] font-semibold tracking-[0.2em] uppercase text-[#1a1209]/70 mb-2">
+                    Phone Number (Optional)
+                  </label>
+                  <input
+                    type="tel"
+                    value={formData.phone}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    placeholder="e.g. +94 11 234 4567"
+                    className="w-full px-4 py-2.5 bg-[#fbf9f4] border border-[#1a1209]/15 rounded-lg text-sm text-[#1a1209] focus:outline-none focus:border-[#8B6914] focus:ring-2 focus:ring-[#8B6914]/20 transition font-['Jost']"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-semibold tracking-[0.2em] uppercase text-[#1a1209]/70 mb-2">
+                    Website URL (Optional)
+                  </label>
+                  <input
+                    type="url"
+                    value={formData.websiteUrl}
+                    onChange={(e) => setFormData({ ...formData, websiteUrl: e.target.value })}
+                    placeholder="https://www.happytime.lk"
+                    className="w-full px-4 py-2.5 bg-[#fbf9f4] border border-[#1a1209]/15 rounded-lg text-sm text-[#1a1209] focus:outline-none focus:border-[#8B6914] focus:ring-2 focus:ring-[#8B6914]/20 transition font-['Jost']"
+                  />
+                </div>
+              </div>
+
+              {/* Operating Hours Section */}
+              <div className="p-3.5 bg-[#faf7f0] rounded-lg border border-[#1a1209]/5 space-y-3">
+                <p className="text-[10px] font-bold tracking-wider text-[#8B6914] uppercase mb-1">
+                  Operating Hours Scheduler
+                </p>
+                
+                {/* Weekdays (Mon-Fri) */}
+                <div className="flex flex-col gap-2 p-2 bg-white rounded-md border border-[#1a1209]/5">
+                  <div className="flex items-center justify-between">
+                    <label className="flex items-center gap-2 text-xs font-semibold text-[#1a1209] cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={formData.operatingHours.weekdays.isOpen}
+                        onChange={(e) => setFormData({
+                          ...formData,
+                          operatingHours: {
+                            ...formData.operatingHours,
+                            weekdays: {
+                              ...formData.operatingHours.weekdays,
+                              isOpen: e.target.checked
+                            }
+                          }
+                        })}
+                        className="rounded border-[#1a1209]/15 text-[#8B6914] focus:ring-[#8B6914]/20"
+                      />
+                      Weekdays (Monday - Friday)
+                    </label>
+                    <span className="text-[9px] uppercase font-bold text-gray-400">
+                      {formData.operatingHours.weekdays.isOpen ? 'Open' : 'Closed'}
+                    </span>
+                  </div>
+                  {formData.operatingHours.weekdays.isOpen && (
+                    <div className="grid grid-cols-2 gap-3 mt-1">
+                      <div>
+                        <label className="block text-[8px] font-bold text-gray-500 uppercase mb-1">Open Time</label>
+                        <input
+                          type="time"
+                          value={formData.operatingHours.weekdays.openTime}
+                          onChange={(e) => setFormData({
+                            ...formData,
+                            operatingHours: {
+                              ...formData.operatingHours,
+                              weekdays: {
+                                ...formData.operatingHours.weekdays,
+                                openTime: e.target.value
+                              }
+                            }
+                          })}
+                          className="w-full px-2 py-1 bg-[#fbf9f4] border border-[#1a1209]/10 rounded text-xs text-[#1a1209] outline-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[8px] font-bold text-gray-500 uppercase mb-1">Close Time</label>
+                        <input
+                          type="time"
+                          value={formData.operatingHours.weekdays.closeTime}
+                          onChange={(e) => setFormData({
+                            ...formData,
+                            operatingHours: {
+                              ...formData.operatingHours,
+                              weekdays: {
+                                ...formData.operatingHours.weekdays,
+                                closeTime: e.target.value
+                              }
+                            }
+                          })}
+                          className="w-full px-2 py-1 bg-[#fbf9f4] border border-[#1a1209]/10 rounded text-xs text-[#1a1209] outline-none"
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Saturday */}
+                <div className="flex flex-col gap-2 p-2 bg-white rounded-md border border-[#1a1209]/5">
+                  <div className="flex items-center justify-between">
+                    <label className="flex items-center gap-2 text-xs font-semibold text-[#1a1209] cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={formData.operatingHours.saturday.isOpen}
+                        onChange={(e) => setFormData({
+                          ...formData,
+                          operatingHours: {
+                            ...formData.operatingHours,
+                            saturday: {
+                              ...formData.operatingHours.saturday,
+                              isOpen: e.target.checked
+                            }
+                          }
+                        })}
+                        className="rounded border-[#1a1209]/15 text-[#8B6914] focus:ring-[#8B6914]/20"
+                      />
+                      Saturday
+                    </label>
+                    <span className="text-[9px] uppercase font-bold text-gray-400">
+                      {formData.operatingHours.saturday.isOpen ? 'Open' : 'Closed'}
+                    </span>
+                  </div>
+                  {formData.operatingHours.saturday.isOpen && (
+                    <div className="grid grid-cols-2 gap-3 mt-1">
+                      <div>
+                        <label className="block text-[8px] font-bold text-gray-500 uppercase mb-1">Open Time</label>
+                        <input
+                          type="time"
+                          value={formData.operatingHours.saturday.openTime}
+                          onChange={(e) => setFormData({
+                            ...formData,
+                            operatingHours: {
+                              ...formData.operatingHours,
+                              saturday: {
+                                ...formData.operatingHours.saturday,
+                                openTime: e.target.value
+                              }
+                            }
+                          })}
+                          className="w-full px-2 py-1 bg-[#fbf9f4] border border-[#1a1209]/10 rounded text-xs text-[#1a1209] outline-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[8px] font-bold text-gray-500 uppercase mb-1">Close Time</label>
+                        <input
+                          type="time"
+                          value={formData.operatingHours.saturday.closeTime}
+                          onChange={(e) => setFormData({
+                            ...formData,
+                            operatingHours: {
+                              ...formData.operatingHours,
+                              saturday: {
+                                ...formData.operatingHours.saturday,
+                                closeTime: e.target.value
+                              }
+                            }
+                          })}
+                          className="w-full px-2 py-1 bg-[#fbf9f4] border border-[#1a1209]/10 rounded text-xs text-[#1a1209] outline-none"
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Sunday */}
+                <div className="flex flex-col gap-2 p-2 bg-white rounded-md border border-[#1a1209]/5">
+                  <div className="flex items-center justify-between">
+                    <label className="flex items-center gap-2 text-xs font-semibold text-[#1a1209] cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={formData.operatingHours.sunday.isOpen}
+                        onChange={(e) => setFormData({
+                          ...formData,
+                          operatingHours: {
+                            ...formData.operatingHours,
+                            sunday: {
+                              ...formData.operatingHours.sunday,
+                              isOpen: e.target.checked
+                            }
+                          }
+                        })}
+                        className="rounded border-[#1a1209]/15 text-[#8B6914] focus:ring-[#8B6914]/20"
+                      />
+                      Sunday
+                    </label>
+                    <span className="text-[9px] uppercase font-bold text-gray-400">
+                      {formData.operatingHours.sunday.isOpen ? 'Open' : 'Closed'}
+                    </span>
+                  </div>
+                  {formData.operatingHours.sunday.isOpen && (
+                    <div className="grid grid-cols-2 gap-3 mt-1">
+                      <div>
+                        <label className="block text-[8px] font-bold text-gray-500 uppercase mb-1">Open Time</label>
+                        <input
+                          type="time"
+                          value={formData.operatingHours.sunday.openTime}
+                          onChange={(e) => setFormData({
+                            ...formData,
+                            operatingHours: {
+                              ...formData.operatingHours,
+                              sunday: {
+                                ...formData.operatingHours.sunday,
+                                openTime: e.target.value
+                              }
+                            }
+                          })}
+                          className="w-full px-2 py-1 bg-[#fbf9f4] border border-[#1a1209]/10 rounded text-xs text-[#1a1209] outline-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[8px] font-bold text-gray-500 uppercase mb-1">Close Time</label>
+                        <input
+                          type="time"
+                          value={formData.operatingHours.sunday.closeTime}
+                          onChange={(e) => setFormData({
+                            ...formData,
+                            operatingHours: {
+                              ...formData.operatingHours,
+                              sunday: {
+                                ...formData.operatingHours.sunday,
+                                closeTime: e.target.value
+                              }
+                            }
+                          })}
+                          className="w-full px-2 py-1 bg-[#fbf9f4] border border-[#1a1209]/10 rounded text-xs text-[#1a1209] outline-none"
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* GPS Coordinates Section */}

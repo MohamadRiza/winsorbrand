@@ -75,15 +75,30 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         try {
           // 1. Fetch server cart
           const res = await fetch('/api/customer/cart');
-          const data = await res.json();
+          let data: any = { success: false };
+          try {
+            if (res.ok && res.headers.get('content-type')?.includes('application/json')) {
+              data = await res.json();
+            }
+          } catch (e) {
+            console.warn('Failed to parse server cart JSON:', e);
+          }
+
           let serverItems: CartItem[] = [];
           if (data.success && data.data?.items) {
             serverItems = mapDbItems(data.data.items);
           }
 
-          // 2. Read local guest cart
+          // 2. Read local guest cart safely
           const localStr = localStorage.getItem('winsor_cart');
-          const localItems: CartItem[] = localStr ? JSON.parse(localStr) : [];
+          let localItems: CartItem[] = [];
+          if (localStr) {
+            try {
+              localItems = JSON.parse(localStr);
+            } catch (e) {
+              console.warn('Failed to parse local guest cart JSON:', e);
+            }
+          }
 
           if (localItems.length > 0) {
             // Merge local guest cart and server cart
@@ -95,7 +110,14 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ items: mapToDbPayload(merged) }),
             });
-            const saveData = await saveRes.json();
+            let saveData: any = { success: false };
+            try {
+              if (saveRes.ok && saveRes.headers.get('content-type')?.includes('application/json')) {
+                saveData = await saveRes.json();
+              }
+            } catch (e) {
+              console.warn('Failed to parse saved cart JSON:', e);
+            }
             
             if (saveData.success && saveData.data?.items) {
               setCartItems(mapDbItems(saveData.data.items));
@@ -110,18 +132,33 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
             setCartItems(serverItems);
           }
         } catch (err) {
-          console.error('Failed to sync/fetch cart:', err);
+          console.warn('Failed to sync/fetch cart:', err);
         }
       } else {
-        // Signed out: Read local storage
+        // Signed out: Read local storage safely
         try {
           const localStr = localStorage.getItem('winsor_cart');
-          const localItems: CartItem[] = localStr ? JSON.parse(localStr) : [];
+          let localItems: CartItem[] = [];
+          if (localStr) {
+            try {
+              localItems = JSON.parse(localStr);
+            } catch (e) {
+              console.warn('Failed to parse local guest cart JSON:', e);
+            }
+          }
           
           if (localItems.length > 0) {
             // Populate products info for display
             const res = await fetch('/api/products');
-            const data = await res.json();
+            let data: any = { success: false };
+            try {
+              if (res.ok && res.headers.get('content-type')?.includes('application/json')) {
+                data = await res.json();
+              }
+            } catch (e) {
+              console.warn('Failed to parse products JSON:', e);
+            }
+
             if (data.success && data.data) {
               const allProducts: IProduct[] = data.data;
               const populated = localItems.map(item => {
@@ -136,7 +173,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
             setCartItems([]);
           }
         } catch (err) {
-          console.error('Failed to load local cart:', err);
+          console.warn('Failed to load local cart:', err);
         }
       }
       setLoading(false);
@@ -156,7 +193,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
           body: JSON.stringify({ items: mapToDbPayload(newItems) }),
         });
       } catch (err) {
-        console.error('Failed to save cart to server:', err);
+        console.warn('Failed to save cart to server:', err);
       }
     } else {
       localStorage.setItem('winsor_cart', JSON.stringify(newItems.map(item => ({

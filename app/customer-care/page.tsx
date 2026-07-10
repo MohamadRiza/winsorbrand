@@ -339,6 +339,8 @@ export default function CustomerCarePage() {
         }
 
         .input-field {
+          width: 100%;
+          box-sizing: border-box;
           height: 44px;
           border: 1px solid rgba(26, 18, 9, 0.14);
           border-radius: 4px;
@@ -363,6 +365,8 @@ export default function CustomerCarePage() {
         }
 
         .textarea-field {
+          width: 100%;
+          box-sizing: border-box;
           border: 1px solid rgba(26, 18, 9, 0.14);
           border-radius: 4px;
           padding: 12px 14px;
@@ -712,7 +716,7 @@ export default function CustomerCarePage() {
                             value={formData.mobile}
                             onChange={handleInputChange}
                             className="input-field"
-                            style={{ flex: 1 }}
+                            style={{ flex: 1, minWidth: 0 }}
                             required
                             placeholder="77 123 4567"
                             disabled={loading}

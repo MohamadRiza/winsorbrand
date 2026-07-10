@@ -77,7 +77,14 @@ export default function ProfilePage() {
       setLoading(true);
       try {
         const res = await fetch('/api/customer/profile');
-        const data = await res.json();
+        let data: any = { success: false };
+        try {
+          if (res.ok && res.headers.get('content-type')?.includes('application/json')) {
+            data = await res.json();
+          }
+        } catch (e) {
+          console.warn('Failed to parse profile details JSON:', e);
+        }
         
         if (data.success && data.data) {
           setFormData({
@@ -90,7 +97,7 @@ export default function ProfilePage() {
           });
         }
       } catch (err) {
-        console.error('Failed to fetch profile details', err);
+        console.warn('Failed to fetch profile details', err);
         toast.error('Could not load profile details.');
       } finally {
         setLoading(false);
