@@ -32,13 +32,7 @@ interface Retailer {
 
 const BOUTIQUE_PLACEHOLDER = 'https://images.unsplash.com/photo-1582037936109-1a06705d2334?q=80&w=800&auto=format&fit=crop';
 
-// Fallback luxury watch boutique interior pictures to populate thumbnail slider
-const SHOP_INTERIORS = [
-  'https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=800&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?q=80&w=800&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=800&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1582037936109-1a06705d2334?q=80&w=800&auto=format&fit=crop'
-];
+
 
 // Haversine distance formula in kilometers
 function calculateHaversineDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
@@ -320,11 +314,11 @@ export default function StoreLocatorPage() {
   const selectedBoutique = retailers.find(r => r._id === selectedBoutiqueId) || null;
   const todayHours = selectedBoutique ? getTodayHours(selectedBoutique.operatingHours) : null;
 
-  // Build images array for slider using current boutique photo + placeholders
+  // Build images array for slider using exact boutique photo uploaded by owner
   const sliderImages = (() => {
     if (!selectedBoutique) return [];
     const mainImg = selectedBoutique.image?.url || BOUTIQUE_PLACEHOLDER;
-    return [mainImg, ...SHOP_INTERIORS];
+    return [mainImg];
   })();
 
   const handleNextSlide = () => {
@@ -336,7 +330,7 @@ export default function StoreLocatorPage() {
   };
 
   return (
-    <>
+    <div style={{ backgroundColor: '#faf7f0', minHeight: '100vh', width: '100%', position: 'relative' }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Jost:wght@300;400;500;600;700&display=swap');
 
@@ -352,7 +346,7 @@ export default function StoreLocatorPage() {
           justify-content: center;
           text-align: center;
           color: #ffffff;
-          padding: 140px 24px 80px;
+          padding: 220px 24px 100px;
           border-bottom: 1.5px solid rgba(139,105,20,0.15);
         }
         .hero-banner-inner {
@@ -464,9 +458,9 @@ export default function StoreLocatorPage() {
         }
 
         .location-trigger-btn {
-          background: #5b87a4; /* Blue color styled from attachment */
+          background: #1a1209;
           color: #ffffff;
-          border: none;
+          border: 1px solid rgba(139, 105, 20, 0.4);
           border-radius: 8px;
           padding: 13px 24px;
           font-family: 'Jost', sans-serif;
@@ -482,8 +476,9 @@ export default function StoreLocatorPage() {
           flex-shrink: 0;
         }
         .location-trigger-btn:hover {
-          background: #4a7290;
-          box-shadow: 0 4px 15px rgba(91,135,164,0.3);
+          background: #8b6914;
+          border-color: #8b6914;
+          box-shadow: 0 4px 15px rgba(139, 105, 20, 0.2);
         }
         .location-trigger-btn.gps-active {
           background: #8b6914;
@@ -1384,6 +1379,6 @@ export default function StoreLocatorPage() {
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 }
