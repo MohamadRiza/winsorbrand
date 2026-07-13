@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { orderRef, items, shippingAddress, subtotal } = body;
+    const { orderRef, items, shippingAddress, subtotal, isGift } = body;
 
     if (!orderRef || !items || !shippingAddress || !subtotal) {
       return NextResponse.json(
@@ -119,6 +119,7 @@ export async function POST(req: NextRequest) {
       shippingAddress,
       subtotal,
       status: 'pending',
+      isGift: !!isGift || (Array.isArray(items) && items.some((i: any) => i.isGift)),
     });
 
     return NextResponse.json({ success: true, data: newOrder });

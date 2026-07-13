@@ -94,6 +94,11 @@ export interface IOrderItem {
   colorVariant?: string;
   quantity: number;
   price: number;
+  isGift?: boolean;
+  giftNote?: string;
+  canvaLink?: string;
+  giftAttachmentUrl?: string;
+  giftAttachmentName?: string;
 }
 
 export interface IOrderShippingAddress {
@@ -114,6 +119,7 @@ export interface IOrder {
   subtotal: number;
   status: OrderStatus;
   cancelReason?: string;
+  isGift?: boolean;
   createdAt?: Date;
   updatedAt?: Date;
 }

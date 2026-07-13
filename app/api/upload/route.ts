@@ -12,11 +12,12 @@ export async function POST(req: NextRequest) {
       gallery:    'winsor/gallery',
       colorImage: 'winsor/colors',
       video:      'winsor/videos',
+      document:   'winsor/documents',
     };
 
     const asset = await uploadToCloudinary(file, {
       folder:       folderMap[type] ?? 'winsor/misc',
-      resourceType: type === 'video' ? 'video' : 'image',
+      resourceType: type === 'video' ? 'video' : (type === 'document' ? 'auto' : 'image'),
     });
 
     return NextResponse.json({ success: true, data: asset });

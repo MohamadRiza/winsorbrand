@@ -11,6 +11,11 @@ const OrderItemSchema = new Schema({
   colorVariant: { type: String, trim: true },
   quantity: { type: Number, required: true, min: 1 },
   price: { type: Number, required: true, min: 0 },
+  isGift: { type: Boolean, default: false },
+  giftNote: { type: String, trim: true, default: '' },
+  canvaLink: { type: String, trim: true, default: '' },
+  giftAttachmentUrl: { type: String, trim: true, default: '' },
+  giftAttachmentName: { type: String, trim: true, default: '' },
 }, { _id: false });
 
 const OrderShippingAddressSchema = new Schema({
@@ -61,6 +66,10 @@ const OrderSchema = new Schema<IOrderDocument>({
   cancelReason: {
     type: String,
     trim: true,
+  },
+  isGift: {
+    type: Boolean,
+    default: false,
   },
 }, { timestamps: true });
 

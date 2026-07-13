@@ -25,6 +25,135 @@ export default function CartPage() {
   const [orderSuccess, setOrderSuccess] = useState(false);
   const [orderRef, setOrderRef] = useState('');
 
+  // Gifting Options States
+  interface GiftConfig {
+    isGift: boolean;
+    giftNote: string;
+    canvaLink: string;
+    giftAttachmentUrl: string;
+    giftAttachmentName: string;
+  }
+  const [giftDetails, setGiftDetails] = useState<{ [key: string]: GiftConfig }>({});
+  const [activeGiftKey, setActiveGiftKey] = useState<string | null>(null);
+
+  // Modal Editing States
+  const [modalIsGift, setModalIsGift] = useState(false);
+  const [modalGiftNote, setModalGiftNote] = useState('');
+  const [modalCanvaLink, setModalCanvaLink] = useState('');
+  const [modalAttachmentUrl, setModalAttachmentUrl] = useState('');
+  const [modalAttachmentName, setModalAttachmentName] = useState('');
+  const [modalUploadingFile, setModalUploadingFile] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+
+  // Open Gifting Modal
+  const openGiftingModal = (key: string) => {
+    const existing = giftDetails[key] || {
+      isGift: false,
+      giftNote: '',
+      canvaLink: '',
+      giftAttachmentUrl: '',
+      giftAttachmentName: ''
+    };
+    setModalIsGift(existing.isGift);
+    setModalGiftNote(existing.giftNote);
+    setModalCanvaLink(existing.canvaLink);
+    setModalAttachmentUrl(existing.giftAttachmentUrl);
+    setModalAttachmentName(existing.giftAttachmentName);
+    setActiveGiftKey(key);
+  };
+
+  // Save Gifting Details
+  const saveGiftingDetails = () => {
+    if (!activeGiftKey) return;
+    setGiftDetails(prev => ({
+      ...prev,
+      [activeGiftKey]: {
+        isGift: modalIsGift,
+        giftNote: modalGiftNote,
+        canvaLink: modalCanvaLink,
+        giftAttachmentUrl: modalAttachmentUrl,
+        giftAttachmentName: modalAttachmentName
+      }
+    }));
+    setActiveGiftKey(null);
+    toast.success('Gifting options saved successfully.');
+  };
+
+  // Clear Gifting Details
+  const clearGiftingDetails = (key: string) => {
+    setGiftDetails(prev => {
+      const next = { ...prev };
+      delete next[key];
+      return next;
+    });
+    toast.success('Gifting options removed.');
+  };
+
+  // File Upload Handler (for Gifting Modal) with XHR progress calculation
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('File size must not exceed 5MB.');
+      return;
+    }
+
+    setModalUploadingFile(true);
+    setUploadProgress(0);
+
+    try {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const base64 = reader.result as string;
+
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', '/api/upload', true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+
+        // Track upload progress
+        xhr.upload.onprogress = (event) => {
+          if (event.lengthComputable) {
+            const percent = Math.round((event.loaded / event.total) * 100);
+            setUploadProgress(percent);
+          }
+        };
+
+        xhr.onload = () => {
+          setModalUploadingFile(false);
+          if (xhr.status >= 200 && xhr.status < 300) {
+            try {
+              const data = JSON.parse(xhr.responseText);
+              if (data.success && data.data) {
+                setModalAttachmentUrl(data.data.url);
+                setModalAttachmentName(file.name);
+                toast.success('Wishing card uploaded successfully.');
+              } else {
+                toast.error(data.error || 'Failed to upload document.');
+              }
+            } catch (err) {
+              toast.error('Failed to parse upload response.');
+            }
+          } else {
+            toast.error(`Upload failed with status ${xhr.status}`);
+          }
+        };
+
+        xhr.onerror = () => {
+          setModalUploadingFile(false);
+          toast.error('Upload failed due to connection error.');
+        };
+
+        xhr.send(JSON.stringify({ file: base64, type: 'document', name: file.name }));
+      };
+      reader.readAsDataURL(file);
+    } catch (err: any) {
+      console.error(err);
+      toast.error(err?.message || 'Failed to upload wishing card.');
+      setModalUploadingFile(false);
+    }
+  };
+
   // Fetch customer profile details if signed in
   useEffect(() => {
     if (!isSignedIn) {
@@ -125,6 +254,10 @@ export default function CartPage() {
 
   const selectedCount = selectedItemsList.reduce((acc, item) => acc + item.quantity, 0);
 
+  const hasGiftItem = selectedItemsList.some(item => 
+    item.product?.giftCategories && item.product.giftCategories.length > 0
+  );
+
   // Handle Checkout Click
   const handleCheckoutClick = () => {
     if (selectedItemsList.length === 0) {
@@ -150,15 +283,26 @@ export default function CartPage() {
     try {
       const ref = `WNS-2026-${Math.floor(100000 + Math.random() * 900000)}`;
       
-      const orderItems = selectedItemsList.map(item => ({
-        productId: item.productId,
-        productTitle: item.product?.title || 'Unknown Timepiece',
-        productModelNo: item.product?.modelNo || 'N/A',
-        productThumbnail: item.product?.thumbnail?.url || '',
-        colorVariant: item.colorVariant,
-        quantity: item.quantity,
-        price: item.product?.price || 0,
-      }));
+      const orderItems = selectedItemsList.map(item => {
+        const key = `${item.productId}-${item.colorVariant || ''}`;
+        const gift = giftDetails[key];
+        return {
+          productId: item.productId,
+          productTitle: item.product?.title || 'Unknown Timepiece',
+          productModelNo: item.product?.modelNo || 'N/A',
+          productThumbnail: item.product?.thumbnail?.url || '',
+          colorVariant: item.colorVariant,
+          quantity: item.quantity,
+          price: item.product?.price || 0,
+          isGift: !!gift?.isGift,
+          giftNote: gift?.giftNote || '',
+          canvaLink: gift?.canvaLink || '',
+          giftAttachmentUrl: gift?.giftAttachmentUrl || '',
+          giftAttachmentName: gift?.giftAttachmentName || '',
+        };
+      });
+
+      const orderHasGifts = orderItems.some(i => i.isGift);
 
       const res = await fetch('/api/customer/orders', {
         method: 'POST',
@@ -175,6 +319,7 @@ export default function CartPage() {
             mobileCode: profile.mobileCode,
           },
           subtotal: selectedSubtotal,
+          isGift: orderHasGifts,
         }),
       });
 
@@ -712,6 +857,9 @@ export default function CartPage() {
           position: relative;
           border: 1px solid rgba(139, 105, 20, 0.15);
           animation: modal-enter 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+          max-height: 95vh;
+          display: flex;
+          flex-direction: column;
         }
         
         @keyframes modal-enter {
@@ -878,7 +1026,186 @@ export default function CartPage() {
           }
         }
 
+        /* GIFTING PANEL CARD */
+        .gifting-panel-card {
+          background: #ffffff;
+          border-radius: 16px;
+          border: 1px solid rgba(139, 105, 20, 0.12);
+          box-shadow: 0 10px 30px rgba(26, 18, 9, 0.02);
+          padding: 28px;
+          display: flex;
+          flex-direction: column;
+          gap: 20px;
+        }
+
+        .gifting-checkbox-row {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          cursor: pointer;
+          user-select: none;
+        }
+
+        .gifting-inputs-section {
+          border-top: 1px dashed rgba(139, 105, 20, 0.15);
+          padding-top: 20px;
+          display: flex;
+          flex-direction: column;
+          gap: 16px;
+          animation: slide-down 0.25s ease-out;
+        }
+
+        @keyframes slide-down {
+          from { opacity: 0; transform: translateY(-10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+
+        .gifting-input-group {
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+        }
+
+        .gifting-label {
+          font-size: 11px;
+          font-weight: 700;
+          color: #8b6914;
+          text-transform: uppercase;
+          letter-spacing: 0.08em;
+        }
+
+        .gifting-textarea {
+          width: 100%;
+          min-height: 100px;
+          padding: 12px;
+          border-radius: 8px;
+          border: 1px solid rgba(26, 18, 9, 0.15);
+          background: #fbf9f4;
+          font-family: 'Jost', sans-serif;
+          font-size: 13.5px;
+          color: #1a1209;
+          outline: none;
+          resize: vertical;
+          transition: border-color 0.2s;
+        }
+
+        .gifting-textarea:focus {
+          border-color: #8b6914;
+        }
+
+        .gifting-text-input {
+          width: 100%;
+          padding: 10px 12px;
+          border-radius: 8px;
+          border: 1px solid rgba(26, 18, 9, 0.15);
+          background: #fbf9f4;
+          font-family: 'Jost', sans-serif;
+          font-size: 13px;
+          color: #1a1209;
+          outline: none;
+          transition: border-color 0.2s;
+        }
+
+        .gifting-text-input:focus {
+          border-color: #8b6914;
+        }
+
+        .file-upload-zone {
+          border: 2px dashed rgba(139, 105, 20, 0.25);
+          border-radius: 8px;
+          padding: 20px;
+          text-align: center;
+          cursor: pointer;
+          background: rgba(139, 105, 20, 0.02);
+          transition: all 0.2s;
+          position: relative;
+        }
+
+        .file-upload-zone:hover {
+          border-color: #8b6914;
+          background: rgba(139, 105, 20, 0.04);
+        }
+
+        .file-upload-zone input {
+          position: absolute;
+          inset: 0;
+          opacity: 0;
+          cursor: pointer;
+        }
+
+        .file-preview-box {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 10px 14px;
+          background: rgba(139, 105, 20, 0.05);
+          border: 1px solid rgba(139, 105, 20, 0.15);
+          border-radius: 6px;
+          font-size: 12px;
+        }
+
+        .gifting-trigger-btn {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          border: 1.2px solid #8b6914;
+          background: #ffffff;
+          color: #8b6914;
+          font-family: 'Jost', sans-serif;
+          font-size: 11px;
+          font-weight: 650;
+          padding: 8px 16px;
+          border-radius: 4px;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+        }
+
+        .gifting-trigger-btn:hover {
+          background: #8b6914;
+          color: #ffffff;
+          box-shadow: 0 4px 12px rgba(139, 105, 20, 0.12);
+        }
+
+        .gifting-trigger-btn.added {
+          background: rgba(139, 105, 20, 0.08);
+          border-color: #8b6914;
+          color: #8b6914;
+        }
+
+        .gifting-trigger-btn.added:hover {
+          background: #8b6914;
+          color: #ffffff;
+        }
+
+        .modal-custom-checkbox {
+          width: 20px;
+          height: 20px;
+          border: 1.5px solid rgba(139, 105, 20, 0.4);
+          border-radius: 4px;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          background: #ffffff;
+          transition: all 0.2s ease;
+          cursor: pointer;
+          flex-shrink: 0;
+        }
+
+        .modal-custom-checkbox:hover {
+          border-color: #8b6914;
+        }
+
+        .modal-custom-checkbox.checked {
+          background-color: #8b6914;
+          border-color: #8b6914;
+        }
+
         @media (max-width: 768px) {
+          .modal-box {
+            padding: 24px 20px;
+          }
           .cart-item-card {
             grid-template-columns: auto 1fr;
             gap: 16px;
@@ -936,6 +1263,148 @@ export default function CartPage() {
         }
       `}</style>
 
+      {/* GIFTING OPTIONS POP-UP MODAL */}
+      {activeGiftKey !== null && (() => {
+        const item = cartItems.find(i => `${i.productId}-${i.colorVariant || ''}` === activeGiftKey);
+        return (
+          <div className="modal-overlay" onClick={() => setActiveGiftKey(null)}>
+            <div className="modal-box" onClick={e => e.stopPropagation()} style={{ maxWidth: '540px', padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', borderBottom: '1px solid rgba(139,105,20,0.12)', paddingBottom: '14px' }}>
+                <div style={{ color: '#8b6914', marginBottom: '6px' }}>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M20 12v10H4V12" />
+                    <path d="M2 7h20v5H2z" />
+                    <path d="M12 22V7" />
+                    <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z" />
+                    <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z" />
+                  </svg>
+                </div>
+                <h3 className="modal-title" style={{ margin: 0, fontSize: '24px' }}>Gifting Options</h3>
+                <p style={{ margin: '4px 0 0', fontSize: '12px', color: 'rgba(26,18,9,0.5)', fontFamily: "'Jost', sans-serif" }}>
+                  For timepiece: <strong style={{ color: '#1a1209' }}>{item?.product?.title}</strong> {item?.colorVariant ? `(${item.colorVariant})` : ''}
+                </p>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', userSelect: 'none' }} onClick={() => setModalIsGift(!modalIsGift)}>
+                <button 
+                  className={`modal-custom-checkbox ${modalIsGift ? 'checked' : ''}`}
+                  type="button"
+                >
+                  {modalIsGift && (
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="20 6 9 17 4 12"/>
+                    </svg>
+                  )}
+                </button>
+                <span style={{ fontSize: '13px', fontWeight: 600, color: '#1a1209', fontFamily: "'Jost', sans-serif" }}>
+                  Enable Complimentary Gift Wrapping & Card
+                </span>
+              </div>
+
+              {modalIsGift && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', borderTop: '1px dashed rgba(139,105,20,0.15)', paddingTop: '16px' }}>
+                  <div className="gifting-input-group">
+                    <label className="gifting-label">Personal Greeting Note (Free)</label>
+                    <textarea 
+                      value={modalGiftNote}
+                      onChange={e => setModalGiftNote(e.target.value)}
+                      placeholder="Write a greeting note wishing your recipient the best..."
+                      className="gifting-textarea"
+                      maxLength={300}
+                      style={{ minHeight: '75px' }}
+                    />
+                    <span style={{ fontSize: '10.5px', color: 'rgba(26,18,9,0.4)', textAlign: 'right', marginTop: '2px' }}>
+                      {modalGiftNote.length} / 300 characters
+                    </span>
+                  </div>
+
+                  <div className="gifting-input-group">
+                    <label className="gifting-label">Canva Card Design Link (Optional)</label>
+                    <input 
+                      type="text"
+                      value={modalCanvaLink}
+                      onChange={e => setModalCanvaLink(e.target.value)}
+                      placeholder="Paste your Canva card view link (https://canva.com/...)"
+                      className="gifting-text-input"
+                    />
+                  </div>
+
+                  <div className="gifting-input-group">
+                    <label className="gifting-label">Upload Wishes Card / Image (PDF, JPG, PNG, Max 5MB, Optional)</label>
+                    {modalUploadingFile ? (
+                      <div className="file-upload-zone" style={{ padding: '18px 14px' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
+                          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8b6914" strokeWidth="2.5" style={{ animation: 'spin 1.2s linear infinite' }}>
+                            <circle cx="12" cy="12" r="10" stroke="rgba(139,105,20,0.15)" strokeWidth="2.5" />
+                            <path d="M12 2a10 10 0 0 1 10 10" stroke="#8b6914" strokeWidth="2.5" strokeLinecap="round" />
+                          </svg>
+                          <span style={{ fontSize: '12px', color: '#1a1209', fontWeight: 650 }}>
+                            Uploading Wishes Card: {uploadProgress}%
+                          </span>
+                          <div style={{ width: '80%', height: '4px', background: 'rgba(139,105,20,0.12)', borderRadius: '2px', overflow: 'hidden', marginTop: '4px' }}>
+                            <div style={{ width: `${uploadProgress}%`, height: '100%', background: '#8b6914', transition: 'width 0.15s ease-out' }} />
+                          </div>
+                        </div>
+                      </div>
+                    ) : modalAttachmentUrl ? (
+                      <div className="file-preview-box" style={{ background: 'rgba(139, 105, 20, 0.04)', border: '1px solid rgba(139, 105, 20, 0.15)', borderRadius: '8px', padding: '10px 14px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#8B6914', fontWeight: 500, fontSize: '12px' }}>
+                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                            <polyline points="14 2 14 8 20 8"/>
+                          </svg>
+                          <span style={{ textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap', maxWidth: '280px' }}>
+                            {modalAttachmentName}
+                          </span>
+                        </div>
+                        <button 
+                          type="button"
+                          onClick={() => { setModalAttachmentUrl(''); setModalAttachmentName(''); }}
+                          style={{ background: 'none', border: 'none', color: '#c62828', fontSize: '11px', fontWeight: 600, cursor: 'pointer', fontFamily: "'Jost', sans-serif" }}
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="file-upload-zone" style={{ padding: '14px' }}>
+                        <input 
+                          type="file" 
+                          accept="image/*,application/pdf" 
+                          onChange={handleFileUpload}
+                          disabled={modalUploadingFile}
+                        />
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
+                          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(139,105,20,0.5)" strokeWidth="2" style={{ marginBottom: '2px' }}>
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="17 8 12 3 7 8"/>
+                            <line x1="12" y1="3" x2="12" y2="15"/>
+                          </svg>
+                          <span style={{ fontSize: '12px', color: '#1a1209', fontStyle: 'normal', fontWeight: 500 }}>
+                            Choose file to upload wishes card
+                          </span>
+                          <span style={{ fontSize: '10px', color: 'rgba(26,18,9,0.38)' }}>
+                            PDF, PNG, JPG (Max 5MB)
+                          </span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              <div className="modal-actions" style={{ marginTop: '12px' }}>
+                <button className="modal-btn cancel" onClick={() => setActiveGiftKey(null)} type="button">
+                  Cancel
+                </button>
+                <button className="modal-btn confirm" onClick={saveGiftingDetails} type="button">
+                  Save Gifting Wishes
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
+
       {/* CONFIRMATION PURCHASE MODAL */}
       {showConfirmModal && (
         <div className="modal-overlay" onClick={() => setShowConfirmModal(false)}>
@@ -945,41 +1414,59 @@ export default function CartPage() {
               Verify your dispatch address and the selected timepieces before completing checkout.
             </p>
 
-            <div className="modal-block">
-              <div className="modal-block-header">Contact Patron</div>
-              <p style={{ margin: 0, color: '#1a1209' }}>
-                <strong>Email:</strong> {profile?.email}<br />
-                <strong>Mobile:</strong> {profile?.mobileCode} {profile?.mobile}
-              </p>
-            </div>
-
-            <div className="modal-block">
-              <div className="modal-block-header">Delivery Destination</div>
-              <p style={{ margin: 0, color: '#1a1209' }}>
-                {profile?.address}<br />
-                {profile?.city}, {profile?.postalCode}<br />
-                {profile?.country}
-              </p>
-              <div style={{ marginTop: '8px' }}>
-                <Link href="/profile" onClick={() => setShowConfirmModal(false)} style={{ color: '#8B6914', fontSize: '11.5px', textDecoration: 'underline', fontWeight: 500 }}>
-                  Edit Shipping Profile
-                </Link>
+            {/* Scrollable Content Wrapper */}
+            <div style={{ maxHeight: 'calc(95vh - 260px)', overflowY: 'auto', paddingRight: '6px', margin: '0 -6px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div className="modal-block" style={{ margin: 0 }}>
+                <div className="modal-block-header">Contact Patron</div>
+                <p style={{ margin: 0, color: '#1a1209' }}>
+                  <strong>Email:</strong> {profile?.email}<br />
+                  <strong>Mobile:</strong> {profile?.mobileCode} {profile?.mobile}
+                </p>
               </div>
-            </div>
 
-            <div className="modal-block">
-              <div className="modal-block-header">Purchase Timepieces ({selectedCount})</div>
-              <div style={{ maxHeight: '110px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                {selectedItemsList.map((item, idx) => (
-                  <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px' }}>
-                    <span style={{ color: 'rgba(26, 18, 9, 0.7)' }}>
-                      {item.product?.title} {item.colorVariant ? `(${item.colorVariant})` : ''} × {item.quantity}
-                    </span>
-                    <span style={{ fontWeight: 600, color: '#8B6914' }}>
-                      {convertPrice((item.product?.price || 0) * item.quantity)}
-                    </span>
-                  </div>
-                ))}
+              <div className="modal-block" style={{ margin: 0 }}>
+                <div className="modal-block-header">Delivery Destination</div>
+                <p style={{ margin: 0, color: '#1a1209' }}>
+                  {profile?.address}<br />
+                  {profile?.city}, {profile?.postalCode}<br />
+                  {profile?.country}
+                </p>
+                <div style={{ marginTop: '8px' }}>
+                  <Link href="/profile" onClick={() => setShowConfirmModal(false)} style={{ color: '#8B6914', fontSize: '11.5px', textDecoration: 'underline', fontWeight: 500 }}>
+                    Edit Shipping Profile
+                  </Link>
+                </div>
+              </div>
+
+              <div className="modal-block" style={{ margin: 0, wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                <div className="modal-block-header">Purchase Timepieces ({selectedCount})</div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  {selectedItemsList.map((item, idx) => {
+                    const key = `${item.productId}-${item.colorVariant || ''}`;
+                    const gift = giftDetails[key];
+                    return (
+                      <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '4px', borderBottom: idx < selectedItemsList.length - 1 ? '1px dashed rgba(139,105,20,0.1)' : 'none', paddingBottom: idx < selectedItemsList.length - 1 ? '8px' : '0' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', gap: '8px' }}>
+                          <span style={{ color: 'rgba(26, 18, 9, 0.7)', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                            {item.product?.title} {item.colorVariant ? `(${item.colorVariant})` : ''} × {item.quantity}
+                          </span>
+                          <span style={{ fontWeight: 600, color: '#8B6914', flexShrink: 0 }}>
+                            {convertPrice((item.product?.price || 0) * item.quantity)}
+                          </span>
+                        </div>
+                        {gift?.isGift && (
+                          <div style={{ fontSize: '11px', color: '#8b6914', background: 'rgba(139,105,20,0.03)', padding: '6px 10px', borderRadius: '4px', marginTop: '2px', lineHeight: 1.45, wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                            <strong>Gifting Options:</strong><br />
+                            {gift.giftNote && <span style={{ fontStyle: 'italic', display: 'block', margin: '2px 0', wordBreak: 'break-word', overflowWrap: 'break-word' }}>"{gift.giftNote}"</span>}
+                            {gift.canvaLink && <span style={{ display: 'block', wordBreak: 'break-all' }}>Canva Link: {gift.canvaLink}</span>}
+                            {gift.giftAttachmentName && <span style={{ display: 'block', wordBreak: 'break-all' }}>Wishing Card: {gift.giftAttachmentName}</span>}
+                            {!gift.giftNote && !gift.canvaLink && !gift.giftAttachmentName && <span>Gift Wrap & Empty Card</span>}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             </div>
 
@@ -1066,8 +1553,9 @@ export default function CartPage() {
                 /* CART LAYOUT GRID */
                 <div className="cart-grid">
                   
-                  {/* Left Column: Items Panel */}
-                  <div className="cart-items-panel">
+                  {/* Left Column: Items Panel & Gifting Options */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                    <div className="cart-items-panel">
                     
                     {/* Store / Boutique Grouping Header */}
                     <div className="store-header">
@@ -1162,6 +1650,52 @@ export default function CartPage() {
                               </span>
                             </div>
 
+                            {/* Gifting Options Trigger (if gifts category product) */}
+                            {item.product?.giftCategories && item.product.giftCategories.length > 0 && (
+                              <div style={{ marginTop: '10px', display: 'flex' }}>
+                                {giftDetails[itemKey]?.isGift ? (
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                    <button
+                                      onClick={() => openGiftingModal(itemKey)}
+                                      className="gifting-trigger-btn added"
+                                      type="button"
+                                    >
+                                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '6px' }}>
+                                        <path d="M20 12v10H4V12" />
+                                        <path d="M2 7h20v5H2z" />
+                                        <path d="M12 22V7" />
+                                        <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z" />
+                                        <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z" />
+                                      </svg>
+                                      Gift Options Added (Edit)
+                                    </button>
+                                    <button
+                                      onClick={() => clearGiftingDetails(itemKey)}
+                                      style={{ background: 'none', border: 'none', color: '#c62828', fontSize: '11px', fontWeight: 600, cursor: 'pointer', fontFamily: "'Jost', sans-serif", textTransform: 'uppercase', letterSpacing: '0.04em' }}
+                                      type="button"
+                                    >
+                                      Remove
+                                    </button>
+                                  </div>
+                                ) : (
+                                  <button
+                                    onClick={() => openGiftingModal(itemKey)}
+                                    className="gifting-trigger-btn"
+                                    type="button"
+                                  >
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '6px' }}>
+                                      <path d="M20 12v10H4V12" />
+                                      <path d="M2 7h20v5H2z" />
+                                      <path d="M12 22V7" />
+                                      <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z" />
+                                      <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z" />
+                                    </svg>
+                                    Add Gift Options (Free)
+                                  </button>
+                                )}
+                              </div>
+                            )}
+
                             {/* Row Action Controls */}
                             <div className="item-actions-panel">
                               {/* Quantity Control Pill */}
@@ -1212,6 +1746,7 @@ export default function CartPage() {
                       );
                     })}
 
+                    </div>
                   </div>
 
                   {/* Right Column: Checkout Summary & Sticky Actions */}
