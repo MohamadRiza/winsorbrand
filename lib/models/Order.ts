@@ -71,7 +71,31 @@ const OrderSchema = new Schema<IOrderDocument>({
     type: Boolean,
     default: false,
   },
+  // ── Coupon / Discount Fields ───────────────────────────────
+  couponCode: {
+    type: String,
+    trim: true,
+    uppercase: true,
+    default: null,
+  },
+  couponDiscountPercent: {
+    type: Number,
+    default: 0,
+    min: 0,
+    max: 100,
+  },
+  couponDiscountAmount: {
+    type: Number,
+    default: 0,
+    min: 0,
+  },
+  finalTotal: {
+    type: Number,
+    default: null,  // null means no coupon applied, equals subtotal
+    min: 0,
+  },
 }, { timestamps: true });
+
 
 // Clear cached model in dev
 delete (mongoose.models as any).Order;

@@ -45,6 +45,17 @@ export default function CartPage() {
   const [modalUploadingFile, setModalUploadingFile] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
 
+  // ── Coupon / Discount States ────────────────────────────────
+  const [couponInput, setCouponInput] = useState('');
+  const [couponValidating, setCouponValidating] = useState(false);
+  interface CouponResult {
+    code: string;
+    discountPercent: number;
+    expiresAt: string;
+    validationToken: string;
+  }
+  const [appliedCoupon, setAppliedCoupon] = useState<CouponResult | null>(null);
+
   // Open Gifting Modal
   const openGiftingModal = (key: string) => {
     const existing = giftDetails[key] || {
@@ -258,6 +269,40 @@ export default function CartPage() {
     item.product?.giftCategories && item.product.giftCategories.length > 0
   );
 
+  // ── Apply Coupon Code ──────────────────────────────────────
+  const handleApplyCoupon = async () => {
+    const code = couponInput.trim().toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 8);
+    if (!code) { toast.error('Please enter a coupon code'); return; }
+    if (!isSignedIn) { toast.error('Please sign in to apply a coupon'); return; }
+
+    setCouponValidating(true);
+    try {
+      const res = await fetch('/api/customer/validate-coupon', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setAppliedCoupon(data.data);
+        toast.success(`Coupon "${data.data.code}" applied — ${data.data.discountPercent}% off!`);
+      } else {
+        toast.error(data.error || 'Invalid coupon code');
+        setAppliedCoupon(null);
+      }
+    } catch {
+      toast.error('Failed to validate coupon. Please try again.');
+    } finally {
+      setCouponValidating(false);
+    }
+  };
+
+  const handleRemoveCoupon = () => {
+    setAppliedCoupon(null);
+    setCouponInput('');
+    toast.success('Coupon removed');
+  };
+
   // Handle Checkout Click
   const handleCheckoutClick = () => {
     if (selectedItemsList.length === 0) {
@@ -320,6 +365,9 @@ export default function CartPage() {
           },
           subtotal: selectedSubtotal,
           isGift: orderHasGifts,
+          // Coupon — server will verify and compute discount
+          couponCode: appliedCoupon?.code || null,
+          validationToken: appliedCoupon?.validationToken || null,
         }),
       });
 
@@ -332,6 +380,10 @@ export default function CartPage() {
       
       // Clear the items from cart context (mutates DB if signed in)
       await clearCart();
+      
+      // Clear coupon state
+      setAppliedCoupon(null);
+      setCouponInput('');
       
       setOrderSuccess(true);
       setShowConfirmModal(false);
@@ -1012,19 +1064,193 @@ export default function CartPage() {
           font-weight: 500;
         }
 
-        /* RESPONSIVE */
+        /* ════════════════════════════════════════════════════
+           RESPONSIVE — comprehensive mobile-first breakpoints
+           ════════════════════════════════════════════════════ */
+
+        /* Kill horizontal overflow at all costs */
+        html, body {
+          overflow-x: hidden;
+          max-width: 100%;
+        }
+
+        /* ── Tablet / Small Laptop ≤ 1024px ── */
         @media (max-width: 1024px) {
           .cart-container {
-            padding: 120px 24px 80px;
+            padding: 120px 20px 80px;
           }
           .cart-grid {
             grid-template-columns: 1fr;
-            gap: 32px;
+            gap: 24px;
           }
           .cart-summary-panel {
             position: static;
           }
         }
+
+        /* ── Large Mobile ≤ 768px ── */
+        @media (max-width: 768px) {
+          .cart-container {
+            padding: 100px 14px 80px;
+            overflow-x: hidden;
+          }
+
+          /* Store header: stack on small screens */
+          .store-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 8px;
+            padding: 14px 16px;
+          }
+
+          .store-name {
+            font-size: 12.5px;
+          }
+
+          .store-shipping-notice {
+            font-size: 11px;
+          }
+
+          .select-all-row {
+            padding: 12px 16px;
+            font-size: 12px;
+          }
+
+          /* Summary panel padding */
+          .cart-summary-panel {
+            padding: 22px 18px;
+          }
+
+          .summary-title {
+            font-size: 20px;
+          }
+        }
+
+        /* ── Phone ≤ 640px — Main card restructure ── */
+        @media (max-width: 640px) {
+          .cart-container {
+            padding: 92px 12px 80px;
+          }
+
+          .cart-title {
+            font-size: 28px;
+          }
+
+          /* ─────────────────────────────────────────────────
+             CART ITEM CARD: 3-column named-area grid
+             [check] [img / price]  [info (title→actions)]
+             ───────────────────────────────────────────────── */
+          .cart-item-card {
+            display: grid;
+            grid-template-columns: 26px 82px 1fr;
+            grid-template-rows: auto auto;
+            grid-template-areas:
+              "check img   info"
+              "check price info";
+            gap: 10px 12px;
+            padding: 14px;
+            align-items: start;
+          }
+
+          /* Checkbox: col 1, span both rows */
+          .cart-item-card > button:first-child {
+            grid-area: check;
+            grid-row: 1 / 3;
+            margin-top: 3px;
+            align-self: start;
+          }
+
+          /* Image: col 2, row 1 only */
+          .cart-item-img-container {
+            grid-area: img;
+            width: 82px !important;
+            height: 82px !important;
+          }
+
+          /* Price: col 2, row 2 — sits below the image */
+          .item-price-column {
+            grid-area: price;
+            min-width: unset !important;
+            text-align: left;
+            flex-direction: column;
+            gap: 1px;
+            align-self: start;
+          }
+
+          .item-price-total {
+            font-size: 14px;
+          }
+
+          .item-price-unit {
+            font-size: 10px;
+          }
+
+          /* Info: col 3, span both rows */
+          .cart-item-info {
+            grid-area: info;
+            grid-row: 1 / 3;
+            min-width: 0; /* prevent overflow inside grid cell */
+          }
+
+          /* Title wraps cleanly */
+          .item-title {
+            font-size: 16px;
+            line-height: 1.3;
+            word-break: break-word;
+            overflow-wrap: break-word;
+          }
+
+          /* Meta row wraps */
+          .item-meta-row {
+            flex-wrap: wrap;
+            gap: 6px;
+            font-size: 11px;
+          }
+
+          /* Actions panel: qty + delete */
+          .item-actions-panel {
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+          }
+
+          /* Qty buttons slightly smaller */
+          .qty-btn {
+            width: 28px;
+            height: 28px;
+          }
+
+          .qty-val {
+            width: 28px;
+          }
+
+          /* Delete button smaller text */
+          .text-action-btn {
+            font-size: 11px;
+          }
+        }
+
+        /* ── Very small phones ≤ 380px ── */
+        @media (max-width: 380px) {
+          .cart-container {
+            padding: 88px 10px 80px;
+          }
+
+          .cart-item-card {
+            grid-template-columns: 24px 74px 1fr;
+            padding: 12px;
+          }
+
+          .cart-item-img-container {
+            width: 74px !important;
+            height: 74px !important;
+          }
+
+          .item-title {
+            font-size: 14px;
+          }
+        }
+
 
         /* GIFTING PANEL CARD */
         .gifting-panel-card {
@@ -1202,66 +1428,44 @@ export default function CartPage() {
           border-color: #8b6914;
         }
 
-        @media (max-width: 768px) {
+        /* Modal on mobile */
+        @media (max-width: 640px) {
+          .modal-overlay {
+            padding: 12px;
+            align-items: flex-end;
+          }
           .modal-box {
-            padding: 24px 20px;
+            padding: 22px 16px 28px;
+            border-radius: 16px 16px 0 0;
+            max-height: 92vh;
           }
-          .cart-item-card {
-            grid-template-columns: auto 1fr;
-            gap: 16px;
-            padding: 20px;
-            position: relative;
+          .modal-title {
+            font-size: 22px;
           }
-          
-          .custom-checkbox {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            z-index: 10;
-          }
-
-          .cart-item-img-container {
-            width: 90px;
-            height: 90px;
-            margin-left: 28px;
-          }
-
-          .item-price-column {
-            grid-column: 2;
-            text-align: left;
-            min-width: 0;
-            margin-top: 12px;
-            border-top: 1px dashed rgba(139, 105, 20, 0.15);
-            padding-top: 12px;
-            flex-direction: row;
-            align-items: center;
-            justify-content: space-between;
-          }
-
-          .item-actions-panel {
-            grid-column: 1 / span 2;
-            justify-content: space-between;
-            margin-top: 14px;
-            flex-wrap: wrap;
-            gap: 12px;
-          }
-          
-          .store-header {
+          .modal-actions {
             flex-direction: column;
-            align-items: flex-start;
-            gap: 8px;
-            padding: 16px 20px;
+            gap: 10px;
+          }
+          .modal-btn {
+            width: 100%;
           }
           .empty-cart-view {
-            padding: 60px 20px;
-            margin: 20px 16px 0;
-            border-radius: 12px;
+            padding: 60px 16px;
+            margin: 20px 0 0;
           }
           .empty-cart-title {
             font-size: 22px;
           }
+          /* Gifting trigger btn: full width on mobile */
+          .gifting-trigger-btn {
+            width: 100%;
+            justify-content: center;
+            font-size: 10.5px;
+            padding: 8px 12px;
+          }
         }
       `}</style>
+
 
       {/* GIFTING OPTIONS POP-UP MODAL */}
       {activeGiftKey !== null && (() => {
@@ -1470,9 +1674,34 @@ export default function CartPage() {
               </div>
             </div>
 
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 4px', margin: '20px 0 28px' }}>
-              <span style={{ fontSize: '13.5px', fontWeight: 500, color: 'rgba(26,18,9,0.5)' }}>Total Amount:</span>
-              <span style={{ fontSize: '22px', fontWeight: 600, color: '#8B6914' }}>{convertPrice(selectedSubtotal)}</span>
+            <div style={{ padding: '0 4px', margin: '20px 0 28px' }}>
+              {appliedCoupon ? (
+                <>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                    <span style={{ fontSize: '13px', color: 'rgba(26,18,9,0.5)' }}>Subtotal:</span>
+                    <span style={{ fontSize: '14px', fontWeight: 500, color: 'rgba(26,18,9,0.7)', textDecoration: 'line-through' }}>{convertPrice(selectedSubtotal)}</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+                    <span style={{ fontSize: '13px', color: '#15803d', fontWeight: 600 }}>
+                      Coupon {appliedCoupon.code} ({appliedCoupon.discountPercent}% off):
+                    </span>
+                    <span style={{ fontSize: '14px', fontWeight: 600, color: '#15803d' }}>
+                      - {convertPrice(Math.round((selectedSubtotal * appliedCoupon.discountPercent) / 100))}
+                    </span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1.5px solid rgba(26,18,9,0.07)', paddingTop: 10 }}>
+                    <span style={{ fontSize: '13.5px', fontWeight: 500, color: 'rgba(26,18,9,0.5)' }}>Total Amount:</span>
+                    <span style={{ fontSize: '22px', fontWeight: 600, color: '#8B6914' }}>
+                      {convertPrice(Math.max(0, selectedSubtotal - Math.round((selectedSubtotal * appliedCoupon.discountPercent) / 100)))}
+                    </span>
+                  </div>
+                </>
+              ) : (
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontSize: '13.5px', fontWeight: 500, color: 'rgba(26,18,9,0.5)' }}>Total Amount:</span>
+                  <span style={{ fontSize: '22px', fontWeight: 600, color: '#8B6914' }}>{convertPrice(selectedSubtotal)}</span>
+                </div>
+              )}
             </div>
 
             <div className="modal-actions">
@@ -1768,11 +1997,87 @@ export default function CartPage() {
                       <span style={{ color: 'rgba(26,18,9,0.5)', fontWeight: 500 }}>Included</span>
                     </div>
 
+                    {appliedCoupon && (
+                      <div className="summary-row" style={{ color: '#15803d' }}>
+                        <span>Discount ({appliedCoupon.discountPercent}% off — {appliedCoupon.code}):</span>
+                        <span>- {convertPrice(Math.round((selectedSubtotal * appliedCoupon.discountPercent) / 100))}</span>
+                      </div>
+                    )}
+
                     <div className="summary-row total-row">
                       <span>Order Total:</span>
-                      <span>{convertPrice(selectedSubtotal)}</span>
+                      <span>{appliedCoupon
+                        ? convertPrice(Math.max(0, selectedSubtotal - Math.round((selectedSubtotal * appliedCoupon.discountPercent) / 100)))
+                        : convertPrice(selectedSubtotal)}
+                      </span>
                     </div>
 
+                    {/* ── COUPON CODE SECTION ── */}
+                    {isSignedIn && (
+                      <div style={{ marginTop: 16, padding: '14px', background: 'rgba(139,105,20,0.03)', border: '1.5px dashed rgba(139,105,20,0.2)', borderRadius: 10 }}>
+                        {!appliedCoupon ? (
+                          <>
+                            <p style={{ margin: '0 0 10px', fontSize: 12, fontWeight: 600, color: 'rgba(26,18,9,0.65)', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+                              Have a Coupon Code?
+                            </p>
+                            <div style={{ display: 'flex', gap: 8 }}>
+                              <input
+                                type="text"
+                                placeholder="Enter code..."
+                                value={couponInput}
+                                maxLength={8}
+                                onChange={e => setCouponInput(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ''))}
+                                onKeyDown={e => e.key === 'Enter' && handleApplyCoupon()}
+                                style={{
+                                  flex: 1, padding: '9px 12px',
+                                  border: '1.5px solid rgba(26,18,9,0.12)', borderRadius: 8,
+                                  fontFamily: "'Jost', sans-serif", fontSize: 13,
+                                  fontWeight: 700, letterSpacing: '0.12em', color: '#1a1209',
+                                  background: '#ffffff', outline: 'none',
+                                }}
+                              />
+                              <button
+                                onClick={handleApplyCoupon}
+                                disabled={couponValidating || !couponInput.trim()}
+                                style={{
+                                  padding: '9px 14px',
+                                  background: couponValidating ? 'rgba(139,105,20,0.4)' : '#8B6914',
+                                  color: '#ffffff', border: 'none', borderRadius: 8,
+                                  fontFamily: "'Jost', sans-serif", fontSize: 11.5,
+                                  fontWeight: 700, cursor: couponValidating ? 'not-allowed' : 'pointer',
+                                  letterSpacing: '0.06em', whiteSpace: 'nowrap',
+                                  transition: 'all 0.2s ease',
+                                }}
+                              >
+                                {couponValidating ? '...' : 'Apply'}
+                              </button>
+                            </div>
+                          </>
+                        ) : (
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <div>
+                              <p style={{ margin: 0, fontSize: 12, fontWeight: 700, color: '#15803d', letterSpacing: '0.08em' }}>
+                                ✓ {appliedCoupon.code} Applied
+                              </p>
+                              <p style={{ margin: '2px 0 0', fontSize: 11, color: 'rgba(26,18,9,0.5)' }}>
+                                {appliedCoupon.discountPercent}% discount active
+                              </p>
+                            </div>
+                            <button
+                              onClick={handleRemoveCoupon}
+                              style={{
+                                background: 'transparent', border: '1px solid rgba(220,38,38,0.3)',
+                                borderRadius: 6, padding: '4px 10px', color: '#dc2626',
+                                fontFamily: "'Jost', sans-serif", fontSize: 11, fontWeight: 600,
+                                cursor: 'pointer',
+                              }}
+                            >
+                              Remove
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    )}
                     {/* GATE 1: GUEST BANNER */}
                     {!isSignedIn && (
                       <div className="guard-banner banner-warning">

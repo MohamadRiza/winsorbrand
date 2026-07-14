@@ -120,6 +120,11 @@ export interface IOrder {
   status: OrderStatus;
   cancelReason?: string;
   isGift?: boolean;
+  // Coupon / Discount fields
+  couponCode?: string | null;
+  couponDiscountPercent?: number;
+  couponDiscountAmount?: number;
+  finalTotal?: number | null;
   createdAt?: Date;
   updatedAt?: Date;
-}
+}
