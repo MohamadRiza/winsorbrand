@@ -1,4 +1,4 @@
-const watchHero = "/watch-hero.jpg";
+const watchHero = "/Home1.webp";
 const watchCard = "/watch-card.jpg";
 const watchConquest = "/watch-conquest.jpg";
 const watchGmt = "/watch-gmt.jpg";
