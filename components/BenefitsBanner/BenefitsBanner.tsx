@@ -7,7 +7,7 @@ export default function BenefitsBanner() {
       subtext: 'On all orders over $150',
       icon: (
         <svg 
-          className="w-6 h-6 text-[#dfb15b] transition-transform duration-300 group-hover:scale-110" 
+          className="w-5 h-5 text-[#dfb15b]" 
           fill="none" 
           stroke="currentColor" 
           strokeWidth="1.2" 
@@ -23,7 +23,7 @@ export default function BenefitsBanner() {
       subtext: 'International warranty',
       icon: (
         <svg 
-          className="w-6 h-6 text-[#dfb15b] transition-transform duration-300 group-hover:scale-110" 
+          className="w-5 h-5 text-[#dfb15b]" 
           fill="none" 
           stroke="currentColor" 
           strokeWidth="1.2" 
@@ -38,7 +38,7 @@ export default function BenefitsBanner() {
       subtext: '30-day return policy',
       icon: (
         <svg 
-          className="w-6 h-6 text-[#dfb15b] transition-transform duration-300 group-hover:scale-110" 
+          className="w-5 h-5 text-[#dfb15b]" 
           fill="none" 
           stroke="currentColor" 
           strokeWidth="1.2" 
@@ -55,7 +55,7 @@ export default function BenefitsBanner() {
       subtext: '100% secure checkout',
       icon: (
         <svg 
-          className="w-6 h-6 text-[#dfb15b] transition-transform duration-300 group-hover:scale-110" 
+          className="w-5 h-5 text-[#dfb15b]" 
           fill="none" 
           stroke="currentColor" 
           strokeWidth="1.2" 
@@ -67,10 +67,33 @@ export default function BenefitsBanner() {
     },
   ];
 
+  // Repeat benefits list to achieve seamless infinite loop scrolling
+  const duplicatedBenefits = [...benefits, ...benefits];
+
   return (
-    <section className="bg-[#FAF4E8] border-y border-[#8B6914]/20 py-4 md:py-5 select-none">
+    <section className="bg-[#FAF4E8] border-y border-[#8B6914]/20 py-4 select-none overflow-hidden">
+      <style>{`
+        @keyframes marquee {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
+        }
+        .marquee-wrapper {
+          display: none;
+        }
+        @media (max-width: 639px) {
+          .marquee-wrapper {
+            display: flex;
+            width: max-content;
+            gap: 48px;
+            animation: marquee 24s linear infinite;
+          }
+        }
+      `}</style>
+
       <div className="max-w-7xl mx-auto px-6">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-0">
+        
+        {/* Desktop View (Grid Layout) */}
+        <div className="hidden sm:grid grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-0">
           {benefits.map((benefit, idx) => (
             <div 
               key={idx} 
@@ -103,7 +126,46 @@ export default function BenefitsBanner() {
             </div>
           ))}
         </div>
+
+        {/* Mobile View (Slow Continuous Marquee) */}
+        <div className="block sm:hidden overflow-hidden w-full relative">
+          {/* Faders for premium overlay look at edges */}
+          <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-[#FAF4E8] to-transparent z-10 pointer-events-none" />
+          <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-[#FAF4E8] to-transparent z-10 pointer-events-none" />
+
+          <div className="marquee-wrapper">
+            {duplicatedBenefits.map((benefit, idx) => (
+              <div 
+                key={idx} 
+                className="flex items-center gap-3.5 shrink-0"
+              >
+                {/* Icon Container */}
+                <div className="flex-shrink-0 flex items-center justify-center p-1.5 rounded-lg bg-white border border-[#8B6914]/20">
+                  {benefit.icon}
+                </div>
+
+                {/* Text Content */}
+                <div className="flex flex-col">
+                  <h3 
+                    className="text-[#1a1209] text-[11px] font-medium tracking-[0.12em] uppercase whitespace-nowrap"
+                    style={{ fontFamily: "'Jost', sans-serif" }}
+                  >
+                    {benefit.title}
+                  </h3>
+                  <p 
+                    className="text-[#666666] text-[9.5px] font-light tracking-[0.05em] mt-0.5 whitespace-nowrap"
+                    style={{ fontFamily: "'Jost', sans-serif" }}
+                  >
+                    {benefit.subtext}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
       </div>
     </section>
   );
 }
+
