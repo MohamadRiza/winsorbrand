@@ -212,13 +212,13 @@ export default function AIAssistant() {
         .ai-chat-window {
           position: fixed;
           right: 28px;
-          bottom: 96px;
+          bottom: 28px;
           width: 380px;
-          height: 560px;
-          background: rgba(250, 247, 240, 0.96);
-          border: 1px solid rgba(26, 18, 9, 0.08);
+          height: 580px;
+          background: rgba(250, 247, 240, 0.98);
+          border: 1px solid rgba(139, 105, 20, 0.15);
           border-radius: 16px;
-          box-shadow: 0 16px 48px rgba(26, 18, 9, 0.12);
+          box-shadow: 0 16px 48px rgba(26, 18, 9, 0.16);
           backdrop-filter: blur(20px);
           -webkit-backdrop-filter: blur(20px);
           display: flex;
@@ -234,6 +234,12 @@ export default function AIAssistant() {
           opacity: 1;
           transform: scale(1) translateY(0);
           pointer-events: all;
+        }
+
+        .ai-widget-trigger.open {
+          opacity: 0;
+          pointer-events: none;
+          transform: scale(0.8) translateY(15px);
         }
 
         /* ── HEADER ── */
@@ -291,6 +297,23 @@ export default function AIAssistant() {
           background: rgba(139,105,20,0.15);
           border-color: #8b6914;
           color: #8b6914;
+        }
+
+        .ai-chat-close-btn {
+          background: transparent;
+          border: none;
+          color: rgba(255, 255, 255, 0.6);
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 6px;
+          border-radius: 50%;
+          transition: all 0.2s;
+        }
+        .ai-chat-close-btn:hover {
+          background: rgba(255, 255, 255, 0.15);
+          color: #fff;
         }
 
         /* ── MESSAGE CONTAINER ── */
@@ -455,17 +478,25 @@ export default function AIAssistant() {
         @media (max-width: 580px) {
           .ai-chat-window {
             right: 0;
+            left: 0;
             bottom: 0;
             width: 100vw;
-            height: 100vh;
-            border-radius: 0;
-            border: none;
+            height: 70vh;
+            border-radius: 20px 20px 0 0;
+            border: 1px solid rgba(139, 105, 20, 0.15);
+            border-bottom: none;
+            box-shadow: 0 -10px 32px rgba(26, 18, 9, 0.12);
+            transform: translateY(100%);
+            transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+          }
+          .ai-chat-window.open {
+            transform: translateY(0);
           }
           .ai-widget-trigger {
-            right: 16px;
-            bottom: 16px;
-            width: 48px;
-            height: 48px;
+            right: 20px;
+            bottom: 96px;
+            width: 50px;
+            height: 50px;
           }
         }
       `}</style>
@@ -503,15 +534,36 @@ export default function AIAssistant() {
               <span>AI Horology Assistant</span>
             </div>
           </div>
-          <button 
-            className={`ai-voice-toggle-btn ${voiceEnabled ? 'active' : ''}`}
-            onClick={() => {
-              setVoiceEnabled(!voiceEnabled);
-              toast.success(`Voice response mode ${!voiceEnabled ? 'Enabled' : 'Disabled'}`);
-            }}
-          >
-            🔊 Voice Auto
-          </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <button 
+              type="button"
+              className={`ai-voice-toggle-btn ${voiceEnabled ? 'active' : ''}`}
+              onClick={() => {
+                setVoiceEnabled(!voiceEnabled);
+                toast.success(`Voice response mode ${!voiceEnabled ? 'Enabled' : 'Disabled'}`);
+              }}
+            >
+              🔊 Voice Auto
+            </button>
+            <button
+              type="button"
+              className="ai-chat-close-btn"
+              onClick={() => {
+                if (currentUtterance) {
+                  window.speechSynthesis.cancel();
+                  setCurrentUtterance(null);
+                  setMessages(prev => prev.map(m => ({ ...m, isAudioPlaying: false })));
+                }
+                setIsOpen(false);
+              }}
+              aria-label="Close Chat"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"/>
+                <line x1="6" y1="6" x2="18" y2="18"/>
+              </svg>
+            </button>
+          </div>
         </div>
 
         {/* MESSAGES LIST */}
