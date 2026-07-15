@@ -11,12 +11,23 @@ export default function Watch3DAssembly() {
 
   const [loadedCount, setLoadedCount] = useState(0);
   const [imagesLoaded, setImagesLoaded] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const [activeCallout, setActiveCallout] = useState<string | null>(null);
   const [progress, setProgress] = useState(0);
   const [assemblyPercent, setAssemblyPercent] = useState(0);
 
   const targetFrameRef = useRef(1);
   const currentFrameRef = useRef(1);
+
+  // Detect mobile view on mount
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // Opacities for smooth transitions during scroll
   const heroOpacity = Math.max(0, 1 - progress / 0.12);
@@ -25,6 +36,10 @@ export default function Watch3DAssembly() {
 
   // Preload all WebP frames
   useEffect(() => {
+    if (isMobile) {
+      setImagesLoaded(true);
+      return;
+    }
     let loaded = 0;
     const imagesArray: HTMLImageElement[] = [];
 
@@ -53,11 +68,11 @@ export default function Watch3DAssembly() {
     }
 
     imagesRef.current = imagesArray;
-  }, []);
+  }, [isMobile]);
 
   // Listen to scroll events to update target frame index
   useEffect(() => {
-    if (!imagesLoaded) return;
+    if (isMobile || !imagesLoaded) return;
 
     const handleScroll = () => {
       if (!containerRef.current) return;
@@ -88,7 +103,7 @@ export default function Watch3DAssembly() {
 
   // Canvas drawing loop with frame LERP easing
   useEffect(() => {
-    if (!imagesLoaded) return;
+    if (isMobile || !imagesLoaded) return;
 
     let animationFrameId: number;
     let localFrame = 1;
@@ -158,7 +173,104 @@ export default function Watch3DAssembly() {
 
     animationFrameId = requestAnimationFrame(updateFrame);
     return () => cancelAnimationFrame(animationFrameId);
-  }, [imagesLoaded]);
+  }, [isMobile, imagesLoaded]);
+
+  // Mobile Hero View (using watch_smoke_vid.webm without loading frames)
+  if (isMobile) {
+    return (
+      <div 
+        id="hero" 
+        className="w-full bg-[#050302] border-b border-[#8B6914]/20 overflow-hidden"
+        style={{ 
+          height: '50vh', 
+          position: 'sticky', 
+          top: '76px', // Position right below sticky mobile navbar
+          zIndex: 10 
+        }}
+      >
+        {/* Background Video */}
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="absolute inset-0 w-full h-full object-cover"
+          src="/watch_smoke_vid.webm"
+        />
+
+        {/* Ambient Overlay Gradient */}
+        <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_center,rgba(0,0,0,0.15)_20%,rgba(5,3,2,0.95)_90%)]" />
+
+        {/* Content Overlay */}
+        <div className="absolute inset-0 z-30 flex flex-col items-center justify-center text-center px-6">
+          <p
+            className="text-white/70 tracking-[0.35em] text-[10px] mb-2 uppercase"
+            style={{ fontFamily: "'Jost', sans-serif", fontWeight: 400 }}
+          >
+            THE MASTER COLLECTION
+          </p>
+
+          <h1
+            className="text-white text-4xl mb-2"
+            style={{
+              fontFamily: "'Cormorant Garamond', serif",
+              fontWeight: 300,
+              letterSpacing: '0.12em',
+              lineHeight: 1.1,
+            }}
+          >
+            WINSOR
+          </h1>
+
+          <p
+            className="text-white/80 tracking-[0.2em] text-[10px] mb-6 max-w-[260px] mx-auto leading-relaxed"
+            style={{ fontFamily: "'Jost', sans-serif", fontWeight: 300 }}
+          >
+            WHERE PRECISION MEETS ELEGANCE
+          </p>
+
+          <div className="flex flex-row items-center gap-6">
+            <a
+              href="#collections"
+              className="group relative inline-block"
+            >
+              <span
+                className="text-white/90 tracking-[0.2em] text-[9px] uppercase font-medium"
+                style={{ fontFamily: "'Jost', sans-serif" }}
+              >
+                DISCOVER MORE
+              </span>
+              <span className="absolute -bottom-1 left-0 w-full h-px bg-white/40" />
+            </a>
+
+            <a
+              href="#shop"
+              className="group relative inline-block"
+            >
+              <span
+                className="text-white/90 tracking-[0.2em] text-[9px] uppercase font-medium"
+                style={{ fontFamily: "'Jost', sans-serif" }}
+              >
+                SHOP NOW
+              </span>
+              <span className="absolute -bottom-1 left-0 w-full h-px bg-white/40" />
+            </a>
+          </div>
+        </div>
+
+        <style>{`
+          @media (max-width: 767px) {
+            /* Ensure subsequent home page elements scroll over the sticky hero */
+            main > *:not(#hero) {
+              position: relative;
+              z-index: 20;
+              background-color: #faf7f0; /* Match Winsor boutique cream background */
+            }
+          }
+        `}</style>
+      </div>
+    );
+  }
 
   // Luxury Loading Screen
   if (!imagesLoaded) {
