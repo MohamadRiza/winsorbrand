@@ -494,7 +494,7 @@ export default function AIAssistant() {
           }
           .ai-widget-trigger {
             right: 20px;
-            bottom: 96px;
+            bottom: 24px;
             width: 50px;
             height: 50px;
           }
