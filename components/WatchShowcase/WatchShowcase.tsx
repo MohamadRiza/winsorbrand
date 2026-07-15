@@ -24,13 +24,13 @@ const WatchShowcase = () => {
             <span className="absolute left-6 top-6 z-10 bg-[#1a1209] text-white px-3 py-1 text-[10px] tracking-widest uppercase font-medium">
               Exclusive
             </span>
-            <img
-              src={watchCard}
-              alt="Hydroconquest Exclusive Edition watch"
-              loading="lazy"
-              width={768}
-              height={896}
+            <video
+              autoPlay
+              loop
+              muted
+              playsInline
               className="aspect-[4/5] w-full object-cover rounded-xl transition-transform duration-700 hover:scale-[1.03]"
+              src="/watch360rotate.webm"
             />
             <div className="mt-5 space-y-1">
               <h3 className="text-sm font-medium tracking-[0.08em] uppercase transition-colors duration-300 group-hover:text-[#8B6914]" style={{ color: '#1a1209' }}>

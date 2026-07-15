@@ -308,19 +308,19 @@ export default function GenderCollectionSection() {
 
   const menData = {
     image: '/winsor_man.png',
-    video: '/longines.webm',
+    video: '/Winsor_men_vid.webm',
     title: "Engineered for those who never settle.",
-  };
+  }; ``
 
   const womenData = {
     image: '/winsor_girl_G.png',
-    video: '/longines.webm',
+    video: '/Winsor_gir_vid.webm',
     title: "Timeless beauty that complements every you.",
   };
 
   const giftData = {
     image: '/graduation_gift.png',
-    video: '/longines.webm',
+    video: '/winsor_gift_vid.webm',
     title: "The Perfect Gift",
   };
 
