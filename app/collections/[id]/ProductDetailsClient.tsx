@@ -657,6 +657,10 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
           border: 1px solid rgba(26,18,9,0.06);
           box-shadow: 0 8px 30px rgba(0,0,0,0.02);
         }
+        .brand-banner-bg {
+          object-fit: cover;
+          object-position: center 20%;
+        }
         .brand-banner-overlay {
           position: absolute;
           inset: 0;
@@ -668,9 +672,6 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
           z-index: 2;
           max-width: 480px;
           color: #fff;
-        }
-        .brand-banner-logo {
-          margin-bottom: 24px;
         }
         .brand-banner-title {
           font-family: 'Cormorant Garamond', serif;
@@ -964,18 +965,34 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
             font-size: 32px;
           }
           .brand-banner-container {
-            padding-left: 24px;
-            padding-right: 24px;
-            height: 380px;
-            align-items: center;
+            padding-left: 20px;
+            padding-right: 20px;
+            height: 300px;
+            align-items: flex-end;
             justify-content: center;
             text-align: center;
+            padding-bottom: 24px;
+          }
+          .brand-banner-bg {
+            object-position: 53% center !important;
           }
           .brand-banner-overlay {
-            background: rgba(26,18,9,0.8);
+            background: rgba(26,18,9,0.85);
           }
           .brand-banner-title {
-            font-size: 32px;
+            font-size: 26px;
+            margin-bottom: 8px;
+          }
+          .brand-banner-p {
+            font-size: 11px;
+            max-width: 280px;
+            margin-left: auto;
+            margin-right: auto;
+            margin-bottom: 16px;
+          }
+          .brand-banner-btn {
+            padding: 8px 18px;
+            font-size: 9.5px;
           }
         }
       `}</style>
@@ -1102,9 +1119,27 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
 
             {/* Three inline trust badges */}
             <div className="features-badge-bar">
-              <span>🛡️ 100% Genuine</span>
-              <span>⏰ {product.warranty && product.warranty !== 'no_warranty' ? WARRANTY_LABELS[product.warranty] : '1 Year Warranty'}</span>
-              <span>🔒 Secure Payment</span>
+              <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                  <path d="M9 11l2 2 4-4" />
+                </svg>
+                100% Genuine
+              </span>
+              <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10" />
+                  <polyline points="12 6 12 12 16 14" />
+                </svg>
+                {product.warranty && product.warranty !== 'no_warranty' ? WARRANTY_LABELS[product.warranty] : '1 Year Warranty'}
+              </span>
+              <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                </svg>
+                Secure Payment
+              </span>
             </div>
 
             {/* Description */}
@@ -1255,17 +1290,14 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
         <div className="brand-banner-wrapper">
           <div className="brand-banner-container">
             <Image
-              src="/winsor_man.png"
+              src="/actor_actress_winsor.webp"
               alt="Winsor Crafted for Moments"
               fill
               sizes="100vw"
-              style={{ objectFit: 'cover', objectPosition: 'center 20%' }}
+              className="brand-banner-bg"
             />
             <div className="brand-banner-overlay" />
             <div className="brand-banner-content">
-              <div className="brand-banner-logo">
-                <Image src="/Winsor.png" alt="Winsor Logo" width={140} height={44} style={{ filter: 'brightness(0) invert(1)' }} />
-              </div>
               <h2 className="brand-banner-title">Crafted for Moments</h2>
               <p className="brand-banner-p">
                 Winsor represents more than time – it represents you. Every second is a step towards your next adventure.
