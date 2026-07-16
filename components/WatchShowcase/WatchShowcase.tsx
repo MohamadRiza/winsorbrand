@@ -57,9 +57,9 @@ const WatchShowcase = () => {
       </div>
 
       {/* Three collection tiles */}
-      <div className="mx-auto mt-8 grid max-w-7xl grid-cols-1 gap-6 px-4 sm:mt-12 sm:px-6 md:grid-cols-3 md:gap-8">
+      <div className="mx-auto mt-8 grid max-w-7xl grid-cols-1 gap-6 px-4 sm:mt-12 sm:px-6 md:grid-cols-3 md:gap-8 mobile-stack-container">
         {/* Conquest */}
-        <a href="#" className="group relative block aspect-[16/10] sm:aspect-[4/5] overflow-hidden rounded-2xl border border-[rgba(26,18,9,0.06)] shadow-[0_4px_20px_rgba(0,0,0,0.02)]">
+        <a href="#" className="group relative block aspect-[16/10] sm:aspect-[4/5] overflow-hidden rounded-2xl border border-[rgba(26,18,9,0.06)] shadow-[0_4px_20px_rgba(0,0,0,0.02)] mobile-stack-card mobile-stack-card-1">
           <img
             src={watchConquest}
             alt="Conquest collection"
@@ -79,7 +79,7 @@ const WatchShowcase = () => {
         </a>
 
         {/* Hydroconquest GMT */}
-        <a href="#" className="group relative block aspect-[16/10] sm:aspect-[4/5] overflow-hidden rounded-2xl border border-[rgba(26,18,9,0.06)] shadow-[0_4px_20px_rgba(0,0,0,0.02)] bg-black">
+        <a href="#" className="group relative block aspect-[16/10] sm:aspect-[4/5] overflow-hidden rounded-2xl border border-[rgba(26,18,9,0.06)] shadow-[0_4px_20px_rgba(0,0,0,0.02)] bg-black mobile-stack-card mobile-stack-card-2">
           <img
             src={watchGmt}
             alt="Hydroconquest GMT collection"
@@ -99,7 +99,7 @@ const WatchShowcase = () => {
         </a>
 
         {/* Limited Edition */}
-        <a href="#" className="group relative block aspect-[16/10] sm:aspect-[4/5] overflow-hidden rounded-2xl border border-[rgba(26,18,9,0.06)] shadow-[0_4px_20px_rgba(0,0,0,0.02)] bg-black">
+        <a href="#" className="group relative block aspect-[16/10] sm:aspect-[4/5] overflow-hidden rounded-2xl border border-[rgba(26,18,9,0.06)] shadow-[0_4px_20px_rgba(0,0,0,0.02)] bg-black mobile-stack-card mobile-stack-card-3">
           <img
             src={watchHero}
             alt="Limited Edition collection"
@@ -118,6 +118,31 @@ const WatchShowcase = () => {
           </div>
         </a>
       </div>
+
+      <style>{`
+        @media (max-width: 767px) {
+          .mobile-stack-container {
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 24px !important;
+            padding-bottom: 40px;
+          }
+          .mobile-stack-card {
+            position: sticky !important;
+            top: 90px; /* Aligns neatly below mobile sticky header */
+            box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.15);
+          }
+          .mobile-stack-card-1 {
+            z-index: 1;
+          }
+          .mobile-stack-card-2 {
+            z-index: 2;
+          }
+          .mobile-stack-card-3 {
+            z-index: 3;
+          }
+        }
+      `}</style>
     </section>
   );
 };
