@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useCurrency } from '@/app/context/CurrencyContext';
@@ -26,10 +26,15 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
   const [selectedImage, setSelectedImage] = useState<string>('');
   const [selectedVariant, setSelectedVariant] = useState<ColorVariant | null>(null);
 
-  // Cart Mock Interaction States
+  // Cart Interaction States
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [showToast, setShowToast] = useState(false);
   const [suggestions, setSuggestions] = useState<IProduct[]>([]);
+
+  // Accordion States
+  const [detailsOpen, setDetailsOpen] = useState(true);
+  const [warrantyOpen, setWarrantyOpen] = useState(false);
+  const [deliveryOpen, setDeliveryOpen] = useState(false);
 
   // Fetch product data on mount/id change
   useEffect(() => {
@@ -97,7 +102,7 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
     }
   };
 
-  // Helper to determine product gender (Gents / Ladies / Unisex)
+  // Helper to determine product gender
   const getProductGender = (prod: IProduct): 'Gents' | 'Ladies' | 'Unisex' => {
     const specs = prod.specifications || {};
     for (const key of Object.keys(specs)) {
@@ -154,7 +159,7 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
     loadSuggestions();
   }, [product]);
 
-  // Real Add to Cart trigger
+  // Add to Cart
   const handleAddToCart = () => {
     if (!product) return;
     const colorVariantName = selectedVariant?.colorName || '';
@@ -165,12 +170,11 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
     setShowToast(true);
   };
 
-  // Real Buy Now trigger
+  // Buy Now
   const handleBuyNow = () => {
     if (!product) return;
     const colorVariantName = selectedVariant?.colorName || '';
     addToCart(product._id!, 1, colorVariantName, product);
-    
     router.push('/cart');
   };
 
@@ -250,16 +254,20 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
           gap: 12px;
           max-height: 560px;
           overflow-y: auto;
+          scrollbar-width: none;
+        }
+        .thumbnails-column::-webkit-scrollbar {
+          display: none;
         }
         .thumbnail-item {
           aspect-ratio: 1;
-          border-radius: 4px;
-          border: 1px solid rgba(26, 18, 9, 0.06);
-          background-color: rgba(26, 18, 9, 0.01);
+          border-radius: 8px;
+          border: 1px solid rgba(26, 18, 9, 0.08);
+          background-color: #fff;
           cursor: pointer;
           position: relative;
           overflow: hidden;
-          transition: border-color 0.2s;
+          transition: all 0.3s;
         }
         .thumbnail-item.active {
           border-color: #8B6914;
@@ -273,9 +281,9 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
           aspect-ratio: 1;
           max-height: 560px;
           position: relative;
-          border-radius: 6px;
-          border: 1px solid rgba(26, 18, 9, 0.04);
-          background-color: rgba(26, 18, 9, 0.02);
+          border-radius: 12px;
+          border: 1px solid rgba(26, 18, 9, 0.06);
+          background-color: #fff;
           overflow: hidden;
         }
         
@@ -295,7 +303,7 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
         }
         .detail-sticker {
           display: inline-block;
-          background: #8B6914;
+          background: #1a1209;
           color: #fff;
           font-size: 8px;
           font-weight: 600;
@@ -308,23 +316,30 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
         }
         .detail-title {
           font-family: 'Cormorant Garamond', serif;
-          font-size: 40px;
+          font-size: 38px;
           font-weight: 400;
           line-height: 1.15;
           margin-bottom: 4px;
           color: #1a1209;
         }
+        .detail-subtitle {
+          font-size: 13.5px;
+          color: rgba(26, 18, 9, 0.55);
+          letter-spacing: 0.02em;
+          margin-bottom: 18px;
+          font-weight: 300;
+        }
         .model-no {
-          font-size: 12px;
-          color: rgba(26, 18, 9, 0.45);
+          font-size: 11px;
+          color: rgba(26, 18, 9, 0.4);
           letter-spacing: 0.05em;
-          margin-bottom: 24px;
+          margin-bottom: 20px;
         }
         .detail-price {
           font-size: 26px;
           font-weight: 500;
           color: #8B6914;
-          margin-bottom: 28px;
+          margin-bottom: 24px;
         }
         
         /* COLOR VARIANTS Swatches */
@@ -339,7 +354,7 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
         .swatches-row {
           display: flex;
           gap: 12px;
-          margin-bottom: 30px;
+          margin-bottom: 24px;
         }
         .swatch-btn {
           width: 32px;
@@ -387,7 +402,7 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
         .actions-buttons-container {
           display: flex;
           gap: 16px;
-          margin-bottom: 32px;
+          margin-bottom: 24px;
           width: 100%;
         }
         .cart-action-btn {
@@ -404,6 +419,10 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
           text-transform: uppercase;
           cursor: pointer;
           transition: all 0.3s;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
         }
         .cart-action-btn:hover:not(:disabled) {
           background: #8B6914;
@@ -439,56 +458,62 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
           cursor: not-allowed;
         }
 
+        /* THREE ACCENTED BADGES */
+        .features-badge-bar {
+          display: flex;
+          justify-content: space-between;
+          padding: 14px 4px;
+          border-top: 1px solid rgba(26,18,9,0.06);
+          border-bottom: 1px solid rgba(26,18,9,0.06);
+          margin-bottom: 24px;
+          font-size: 11px;
+          color: rgba(26,18,9,0.65);
+          font-weight: 500;
+          letter-spacing: 0.02em;
+        }
+
+        /* ACCORDIONS */
+        .accordion-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          width: 100%;
+          background: none;
+          border: none;
+          padding: 15px 0;
+          font-family: 'Jost', sans-serif;
+          font-size: 13px;
+          font-weight: 500;
+          letter-spacing: 0.05em;
+          text-transform: uppercase;
+          color: #1a1209;
+          cursor: pointer;
+          transition: color 0.2s;
+        }
+        .accordion-header:hover {
+          color: #8B6914;
+        }
+        .accordion-content {
+          padding: 0 0 16px 0;
+          font-size: 13px;
+          line-height: 1.5;
+          color: rgba(26,18,9,0.7);
+        }
+
         .back-link {
           display: inline-flex;
           align-items: center;
           gap: 8px;
-          color: rgba(26, 18, 9, 0.5);
-          font-size: 12px;
+          color: rgba(26, 18, 9, 0.4);
+          font-size: 11.5px;
           font-weight: 500;
           letter-spacing: 0.08em;
           text-decoration: none;
-          margin-top: auto;
+          margin-top: 24px;
           transition: color 0.2s;
         }
         .back-link:hover {
           color: #8b6914;
-        }
-
-        /* SPECS TABLE & TABS */
-        .specs-section {
-          margin-top: 48px;
-          border-top: 1px solid rgba(26,18,9,0.08);
-          padding-top: 40px;
-        }
-        .specs-section h3 {
-          font-family: 'Cormorant Garamond', serif;
-          font-size: 26px;
-          font-weight: 500;
-          margin-bottom: 20px;
-        }
-        .specs-grid {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 16px;
-        }
-        .spec-item {
-          display: flex;
-          flex-direction: column;
-          padding: 12px 0;
-          border-bottom: 1px solid rgba(26, 18, 9, 0.05);
-        }
-        .spec-label {
-          font-size: 10px;
-          font-weight: 600;
-          letter-spacing: 0.1em;
-          text-transform: uppercase;
-          color: rgba(26, 18, 9, 0.4);
-          margin-bottom: 4px;
-        }
-        .spec-value {
-          font-size: 13.5px;
-          color: #1a1209;
         }
 
         /* LARGE IMAGES DETAILS GRID */
@@ -506,35 +531,246 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
           letter-spacing: 0.05em;
         }
         .large-gallery-container {
-          max-width: 1000px;
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 24px;
+          max-width: 1300px;
           margin: 0 auto;
-          display: flex;
-          flex-direction: column;
-          gap: 40px;
         }
         .large-gallery-item {
           width: 100%;
           position: relative;
-          aspect-ratio: 1.5;
-          border-radius: 8px;
+          aspect-ratio: 1;
+          border-radius: 12px;
           overflow: hidden;
-          box-shadow: 0 8px 24px rgba(26,18,9,0.04);
-          border: 1px solid rgba(26,18,9,0.03);
-          background-color: rgba(26,18,9,0.01);
+          box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+          border: 1px solid rgba(26,18,9,0.05);
+          background-color: #fff;
         }
         .large-gallery-video-item {
           width: 100%;
           aspect-ratio: 1.777;
-          border-radius: 8px;
+          border-radius: 12px;
           overflow: hidden;
-          box-shadow: 0 8px 24px rgba(26,18,9,0.04);
+          box-shadow: 0 4px 20px rgba(0,0,0,0.02);
           background: #000;
-          margin-bottom: 20px;
+          margin-bottom: 30px;
+          max-width: 1300px;
+          margin-left: auto;
+          margin-right: auto;
         }
         .large-video-element {
           width: 100%;
           height: 100%;
           object-fit: cover;
+        }
+
+        /* STORE BANNER */
+        .store-banner-wrapper {
+          max-width: 1300px;
+          margin: 80px auto 0;
+          padding: 0;
+        }
+        .store-banner-container {
+          display: grid;
+          grid-template-columns: 1fr 2.2fr;
+          background: #FAF7F0;
+          border-radius: 16px;
+          overflow: hidden;
+          border: 1px solid rgba(26,18,9,0.06);
+          box-shadow: 0 8px 30px rgba(0,0,0,0.02);
+        }
+        .store-banner-text {
+          padding: 60px 40px;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          background: #FAF4E8;
+          border-right: 1px solid rgba(26,18,9,0.06);
+        }
+        .store-banner-tag {
+          font-size: 10px;
+          letter-spacing: 0.25em;
+          text-transform: uppercase;
+          color: rgba(26,18,9,0.5);
+          margin-bottom: 8px;
+          font-weight: 500;
+        }
+        .store-banner-title {
+          font-family: 'Cormorant Garamond', serif;
+          font-size: 36px;
+          font-weight: 400;
+          line-height: 1.15;
+          margin-bottom: 16px;
+          color: #1a1209;
+        }
+        .store-banner-p {
+          font-size: 13px;
+          line-height: 1.6;
+          color: rgba(26,18,9,0.7);
+          margin-bottom: 28px;
+        }
+        .store-banner-btn {
+          align-self: flex-start;
+          background: #8B6914;
+          color: #fff;
+          border: none;
+          text-decoration: none;
+          padding: 12px 24px;
+          font-size: 11px;
+          letter-spacing: 0.15em;
+          font-weight: 500;
+          text-transform: uppercase;
+          border-radius: 4px;
+          transition: all 0.3s;
+        }
+        .store-banner-btn:hover {
+          background: #1a1209;
+          box-shadow: 0 4px 12px rgba(26,18,9,0.25);
+        }
+        .store-banner-image {
+          position: relative;
+          width: 100%;
+          min-height: 380px;
+        }
+
+        /* BRAND LIFESTYLE BANNER */
+        .brand-banner-wrapper {
+          max-width: 1300px;
+          margin: 60px auto 0;
+          padding: 0;
+        }
+        .brand-banner-container {
+          position: relative;
+          width: 100%;
+          height: 400px;
+          border-radius: 16px;
+          overflow: hidden;
+          display: flex;
+          align-items: center;
+          padding-left: 80px;
+          border: 1px solid rgba(26,18,9,0.06);
+          box-shadow: 0 8px 30px rgba(0,0,0,0.02);
+        }
+        .brand-banner-overlay {
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(90deg, rgba(26,18,9,0.85) 0%, rgba(26,18,9,0.45) 50%, rgba(26,18,9,0.15) 100%);
+          z-index: 1;
+        }
+        .brand-banner-content {
+          position: relative;
+          z-index: 2;
+          max-width: 480px;
+          color: #fff;
+        }
+        .brand-banner-logo {
+          margin-bottom: 24px;
+        }
+        .brand-banner-title {
+          font-family: 'Cormorant Garamond', serif;
+          font-size: 40px;
+          font-weight: 300;
+          letter-spacing: 0.05em;
+          line-height: 1.2;
+          margin-bottom: 16px;
+        }
+        .brand-banner-p {
+          font-size: 13.5px;
+          line-height: 1.6;
+          color: rgba(255,255,255,0.75);
+          margin-bottom: 28px;
+          font-family: 'Jost', sans-serif;
+        }
+        .brand-banner-btn {
+          display: inline-block;
+          background: transparent;
+          color: #fff;
+          border: 1px solid rgba(255,255,255,0.4);
+          text-decoration: none;
+          padding: 12px 28px;
+          font-size: 11px;
+          letter-spacing: 0.15em;
+          font-weight: 500;
+          text-transform: uppercase;
+          border-radius: 4px;
+          transition: all 0.3s;
+        }
+        .brand-banner-btn:hover {
+          background: #fff;
+          color: #1a1209;
+          border-color: #fff;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        /* TIMELESS PAIRINGS CATEGORY GRID */
+        .pairings-grid {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 24px;
+        }
+        .pairing-card {
+          display: flex;
+          flex-direction: column;
+          background: #FAF7F0;
+          border-radius: 12px;
+          overflow: hidden;
+          border: 1px solid rgba(26,18,9,0.05);
+          text-decoration: none;
+          color: inherit;
+          transition: all 0.4s;
+        }
+        .pairing-card:hover {
+          transform: translateY(-5px);
+          box-shadow: 0 12px 30px rgba(139,105,20,0.06);
+          border-color: rgba(139,105,20,0.25);
+        }
+        .pairing-img-container {
+          position: relative;
+          width: 100%;
+          aspect-ratio: 1.35;
+          overflow: hidden;
+        }
+        .pairing-img {
+          transition: transform 0.6s ease;
+        }
+        .pairing-card:hover .pairing-img {
+          transform: scale(1.05);
+        }
+        .pairing-info {
+          padding: 16px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          text-align: center;
+          flex-grow: 1;
+          justify-content: space-between;
+        }
+        .pairing-card-title {
+          font-family: 'Jost', sans-serif;
+          font-size: 13px;
+          font-weight: 600;
+          letter-spacing: 0.05em;
+          color: #1a1209;
+          margin: 0 0 4px 0;
+        }
+        .pairing-card-desc {
+          font-size: 11px;
+          color: rgba(26,18,9,0.5);
+          margin: 0 0 12px 0;
+        }
+        .pairing-card-link {
+          font-size: 10px;
+          font-weight: 600;
+          letter-spacing: 0.1em;
+          color: #8B6914;
+          border-bottom: 1.5px solid transparent;
+          padding-bottom: 2px;
+          transition: all 0.3s;
+        }
+        .pairing-card:hover .pairing-card-link {
+          color: #1a1209;
+          border-color: #1a1209;
         }
 
         /* SUGGESTIONS SECTION */
@@ -565,16 +801,48 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
         .suggested-img-container {
           position: relative;
           aspect-ratio: 1;
-          border-radius: 4px;
+          border-radius: 8px;
           overflow: hidden;
           background: rgba(26,18,9,0.02);
-          border: 1px solid rgba(26, 18, 9, 0.03);
+          border: 1px solid rgba(26, 18, 9, 0.04);
         }
         .suggested-card:hover .suggested-img {
           transform: scale(1.05);
         }
         .suggested-card:hover {
           transform: translateY(-4px);
+        }
+
+        /* FOOTER FEATURES BANNER */
+        .features-footer-banner {
+          max-width: 1300px;
+          margin: 80px auto 0;
+          padding: 0;
+        }
+        .features-footer-grid {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 30px;
+          border-top: 1px solid rgba(26,18,9,0.06);
+          padding-top: 40px;
+        }
+        .feature-footer-item {
+          display: flex;
+          align-items: center;
+          gap: 16px;
+        }
+        .feature-footer-item h4 {
+          font-size: 13px;
+          font-weight: 600;
+          color: #1a1209;
+          margin: 0;
+          letter-spacing: 0.05em;
+          text-transform: uppercase;
+        }
+        .feature-footer-item p {
+          font-size: 11px;
+          color: rgba(26,18,9,0.5);
+          margin: 2px 0 0 0;
         }
 
         /* TOAST SUCCESS BOX */
@@ -603,7 +871,7 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
           pointer-events: auto;
         }
 
-        /* Responsive */
+        /* Responsive styling */
         @media (max-width: 1024px) {
           .detail-container {
             padding: 100px 24px 60px;
@@ -618,9 +886,21 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
           .info-container {
             width: 100%;
           }
+          .large-gallery-container {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+          }
           .suggestions-grid {
             grid-template-columns: repeat(2, 1fr);
             gap: 20px;
+          }
+          .pairings-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+          }
+          .features-footer-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
           }
         }
         
@@ -649,9 +929,45 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
             flex-direction: column;
             gap: 12px;
           }
+          .large-gallery-container {
+            grid-template-columns: 1fr;
+          }
           .suggestions-grid {
             grid-template-columns: repeat(2, 1fr);
             gap: 12px;
+          }
+          .pairings-grid {
+            grid-template-columns: 1fr;
+            gap: 16px;
+          }
+          .features-footer-grid {
+            grid-template-columns: 1fr;
+            gap: 20px;
+          }
+          .store-banner-container {
+            grid-template-columns: 1fr;
+          }
+          .store-banner-text {
+            padding: 40px 24px;
+            border-right: none;
+            border-bottom: 1px solid rgba(26,18,9,0.06);
+          }
+          .store-banner-image {
+            min-height: 260px;
+          }
+          .brand-banner-container {
+            padding-left: 24px;
+            padding-right: 24px;
+            height: 380px;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+          }
+          .brand-banner-overlay {
+            background: rgba(26,18,9,0.8);
+          }
+          .brand-banner-title {
+            font-size: 32px;
           }
         }
       `}</style>
@@ -705,14 +1021,21 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
 
           {/* RIGHT: INFO DETAILS */}
           <div className="info-container">
-            {/* Brand and Sticker */}
+            {/* Brand */}
             <span className="brand-label">{product.brand}</span>
+
+            {/* Sticker */}
             {product.stickerEnabled && product.stickerText && (
               <span className="detail-sticker">{product.stickerText}</span>
             )}
 
             {/* Title */}
             <h1 className="detail-title">{product.title}</h1>
+            
+            {/* Tagline */}
+            <p className="detail-subtitle">Timeless Elegance for Every Space</p>
+            
+            {/* Model Number */}
             <div className="model-no">Model Number: {product.modelNo}</div>
 
             {/* Price */}
@@ -722,7 +1045,7 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
             {product.colorVariants && product.colorVariants.length > 0 && (
               <div>
                 <h3 className="swatch-label">
-                  Variant: <span style={{ color: '#1a1209', fontWeight: 500 }}>{selectedVariant?.colorName || ''}</span>
+                  Variants : {product.colorVariants.length} Size / Color
                 </h3>
                 <div className="swatches-row">
                   {product.colorVariants.map((variant) => (
@@ -743,10 +1066,10 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
             <div className="stock-badge">
               <div
                 className="stock-dot"
-                style={{ backgroundColor: isSoldOut ? 'rgba(26,18,9,0.3)' : '#2e7d32' }}
+                style={{ backgroundColor: isSoldOut ? '#d32f2f' : '#2e7d32' }}
               />
-              <span style={{ color: isSoldOut ? 'rgba(26,18,9,0.6)' : '#2e7d32' }}>
-                {isSoldOut ? 'Sold Out' : `In Stock ${selectedVariant && selectedVariant.qty < 5 ? `(Only ${selectedVariant.qty} left)` : ''}`}
+              <span style={{ color: isSoldOut ? '#d32f2f' : '#2e7d32', fontSize: '13px', fontWeight: 500 }}>
+                {isSoldOut ? '● Out of Stock' : `● In Stock – Delivery in 2-3 days`}
               </span>
             </div>
 
@@ -757,7 +1080,8 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
                 disabled={isSoldOut}
                 className="cart-action-btn"
               >
-                {isSoldOut ? 'Out of Stock' : 'Add to Cart'}
+                <span>Add to Cart</span>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
               </button>
               <button
                 onClick={handleBuyNow}
@@ -768,18 +1092,80 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
               </button>
             </div>
 
+            {/* Three inline trust badges */}
+            <div className="features-badge-bar">
+              <span>🛡️ 100% Genuine</span>
+              <span>⏰ {product.warranty && product.warranty !== 'no_warranty' ? WARRANTY_LABELS[product.warranty] : '1 Year Warranty'}</span>
+              <span>🔒 Secure Payment</span>
+            </div>
+
             {/* Description */}
-            <p style={{ fontSize: '14px', lineHeight: 1.6, color: 'rgba(26,18,9,0.7)', margin: '0 0 24px' }}>
+            <p style={{ fontSize: '13.5px', lineHeight: 1.6, color: 'rgba(26,18,9,0.7)', margin: '0 0 20px' }}>
               {product.description}
             </p>
 
-            {/* Warranty Details */}
-            {product.warranty && product.warranty !== 'no_warranty' && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12.5px', color: '#8B6914', marginBottom: '24px' }}>
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                <span>Winsor Warranty: {WARRANTY_LABELS[product.warranty]}</span>
+            {/* Accordion Panel */}
+            <div className="accordion-section" style={{ marginTop: '10px', borderTop: '1px solid rgba(26,18,9,0.08)' }}>
+              {/* Product Details */}
+              <div style={{ borderBottom: '1px solid rgba(26,18,9,0.08)' }}>
+                <button
+                  type="button"
+                  onClick={() => setDetailsOpen(!detailsOpen)}
+                  className="accordion-header"
+                >
+                  <span>Product Details</span>
+                  <span>{detailsOpen ? '−' : '+'}</span>
+                </button>
+                {detailsOpen && (
+                  <div className="accordion-content">
+                    <p>Experience precision craftsmanship built to stand the test of time. Handcrafted using selected premium materials with attention to every minute detail.</p>
+                    {specs.length > 0 && (
+                      <ul style={{ margin: '8px 0 0', paddingLeft: '20px', listStyleType: 'disc' }}>
+                        {specs.map(([label, value]) => (
+                          <li key={label} style={{ fontSize: '12.5px', color: 'rgba(26,18,9,0.7)', marginBottom: '4px' }}>
+                            <strong>{label}:</strong> {value}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                )}
               </div>
-            )}
+
+              {/* Warranty Information */}
+              <div style={{ borderBottom: '1px solid rgba(26,18,9,0.08)' }}>
+                <button
+                  type="button"
+                  onClick={() => setWarrantyOpen(!warrantyOpen)}
+                  className="accordion-header"
+                >
+                  <span>Warranty Information</span>
+                  <span>{warrantyOpen ? '−' : '+'}</span>
+                </button>
+                {warrantyOpen && (
+                  <div className="accordion-content">
+                    <p>Every Winsor timepiece is accompanied by a 1-Year or 2-Year international warranty, securing your investment against any manufacturing anomalies. Service and repair are provided directly by our master horologists.</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Delivery & Returns */}
+              <div style={{ borderBottom: '1px solid rgba(26,18,9,0.08)' }}>
+                <button
+                  type="button"
+                  onClick={() => setDeliveryOpen(!deliveryOpen)}
+                  className="accordion-header"
+                >
+                  <span>Delivery & Returns</span>
+                  <span>{deliveryOpen ? '−' : '+'}</span>
+                </button>
+                {deliveryOpen && (
+                  <div className="accordion-content">
+                    <p>Enjoy free secured worldwide express shipping on all orders. Returns are accepted within 14 days of delivery, provided the item is in pristine, unworn condition with its original packaging intact.</p>
+                  </div>
+                )}
+              </div>
+            </div>
 
             {/* Back to Catalog */}
             <Link href="/collections" className="back-link">
@@ -789,24 +1175,7 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
           </div>
         </div>
 
-        {/* BOTTOM: SPECIFICATIONS TABLE */}
-        {specs.length > 0 && (
-          <div className="detail-wrapper specs-section">
-            <div style={{ width: '100%' }}>
-              <h3>Timepiece Specifications</h3>
-              <div className="specs-grid">
-                {specs.map(([label, value]) => (
-                  <div key={label} className="spec-item">
-                    <span className="spec-label">{label}</span>
-                    <span className="spec-value">{value}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* LARGE IMAGES DETAILS GRID */}
+        {/* BOTTOM: THE TIMEPIECE IN FOCUS */}
         {galleryImages.length > 0 && (
           <div className="detail-wrapper large-gallery-section">
             <div style={{ width: '100%' }}>
@@ -828,13 +1197,17 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
               )}
 
               <div className="large-gallery-container">
-                {galleryImages.map((imgUrl, i) => (
+                {/* Take up to 3 gallery images or supplement with fallback */}
+                {(galleryImages.slice(0, 3).length >= 3 
+                  ? galleryImages.slice(0, 3) 
+                  : [...galleryImages, "/watch-conquest.jpg", "/watch-gmt.jpg"].slice(0, 3)
+                ).map((imgUrl, i) => (
                   <div key={i} className="large-gallery-item">
                     <Image
                       src={imgUrl}
                       alt={`${product.title} detailed zoom ${i}`}
                       fill
-                      sizes="(max-width: 1024px) 100vw, 1000px"
+                      sizes="(max-width: 1024px) 100vw, 400px"
                       style={{ objectFit: 'cover' }}
                     />
                   </div>
@@ -844,11 +1217,127 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
           </div>
         )}
 
-        {/* SUGGESTED WATCHES / Timeless Pairings */}
+        {/* OUR STORES EXPERIENCE */}
+        <div className="store-banner-wrapper">
+          <div className="store-banner-container">
+            <div className="store-banner-text">
+              <span className="store-banner-tag">OUR STORES</span>
+              <h2 className="store-banner-title">Experience Winsor</h2>
+              <p className="store-banner-p">
+                Visit our exclusive stores and explore premium timepieces crafted for every moment.
+              </p>
+              <Link href="/customer-care" className="store-banner-btn">
+                FIND A STORE
+              </Link>
+            </div>
+            <div className="store-banner-image">
+              <Image 
+                src="/discover-store.jpg" 
+                alt="Winsor store interior" 
+                fill 
+                sizes="(max-width: 1024px) 100vw, 800px"
+                style={{ objectFit: 'cover' }}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* BRAND BANNER - Crafted for Moments */}
+        <div className="brand-banner-wrapper">
+          <div className="brand-banner-container">
+            <Image 
+              src="/winsor_man.png" 
+              alt="Winsor Crafted for Moments" 
+              fill
+              sizes="100vw"
+              style={{ objectFit: 'cover', objectPosition: 'center 20%' }}
+            />
+            <div className="brand-banner-overlay" />
+            <div className="brand-banner-content">
+              <div className="brand-banner-logo">
+                <Image src="/Winsor.png" alt="Winsor Logo" width={140} height={44} style={{ filter: 'brightness(0) invert(1)' }} />
+              </div>
+              <h2 className="brand-banner-title">Crafted for Moments</h2>
+              <p className="brand-banner-p">
+                Winsor represents more than time – it represents you. Every second is a step towards your next adventure.
+              </p>
+              <Link href="/customer-care" className="brand-banner-btn">
+                DISCOVER OUR STORY
+              </Link>
+            </div>
+          </div>
+        </div>
+
+        {/* TIMELESS PAIRINGS */}
+        <div className="detail-wrapper pairings-section" style={{ marginTop: '80px', borderTop: '1px solid rgba(26,18,9,0.08)', paddingTop: '60px' }}>
+          <div style={{ width: '100%' }}>
+            <span className="pairings-tag" style={{ display: 'block', textAlign: 'center', fontSize: '9px', letterSpacing: '0.3em', color: '#8B6914', textTransform: 'uppercase', marginBottom: '8px' }}>
+              Style Match
+            </span>
+            <h3 className="pairings-title" style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '28px', fontWeight: 500, textAlign: 'center', marginBottom: '6px', letterSpacing: '0.05em' }}>
+              Timeless Pairings
+            </h3>
+            <p className="pairings-desc" style={{ fontSize: '13px', color: 'rgba(26,18,9,0.5)', textAlign: 'center', marginBottom: '40px' }}>
+              Discover watches that complement your style
+            </p>
+
+            <div className="pairings-grid">
+              {/* Card 1: Collections */}
+              <Link href="/collections" className="pairing-card">
+                <div className="pairing-img-container">
+                  <Image src="/Home1.webp" alt="Collections" fill sizes="(max-width: 768px) 50vw, 25vw" style={{ objectFit: 'cover' }} className="pairing-img" />
+                </div>
+                <div className="pairing-info">
+                  <h4 className="pairing-card-title">Collections</h4>
+                  <p className="pairing-card-desc">Explore Our Premium Collection</p>
+                  <span className="pairing-card-link">VIEW ALL</span>
+                </div>
+              </Link>
+
+              {/* Card 2: Classic */}
+              <Link href="/collections?type=classic" className="pairing-card">
+                <div className="pairing-img-container">
+                  <Image src="/mens-watch-highlight.png" alt="Classic" fill sizes="(max-width: 768px) 50vw, 25vw" style={{ objectFit: 'cover' }} className="pairing-img" />
+                </div>
+                <div className="pairing-info">
+                  <h4 className="pairing-card-title">Classic</h4>
+                  <p className="pairing-card-desc">Elegance Beyond Time</p>
+                  <span className="pairing-card-link">VIEW ALL</span>
+                </div>
+              </Link>
+
+              {/* Card 3: Sport */}
+              <Link href="/collections?type=sports" className="pairing-card">
+                <div className="pairing-img-container">
+                  <Image src="/watch-gmt.jpg" alt="Sport" fill sizes="(max-width: 768px) 50vw, 25vw" style={{ objectFit: 'cover' }} className="pairing-img" />
+                </div>
+                <div className="pairing-info">
+                  <h4 className="pairing-card-title">Sport</h4>
+                  <p className="pairing-card-desc">Built for Performance</p>
+                  <span className="pairing-card-link">VIEW ALL</span>
+                </div>
+              </Link>
+
+              {/* Card 4: Limited Edition */}
+              <Link href="/collections?type=limited" className="pairing-card">
+                <div className="pairing-img-container">
+                  <Image src="/gifts-highlight.png" alt="Limited Edition" fill sizes="(max-width: 768px) 50vw, 25vw" style={{ objectFit: 'cover' }} className="pairing-img" />
+                </div>
+                <div className="pairing-info">
+                  <h4 className="pairing-card-title">Limited Edition</h4>
+                  <p className="pairing-card-desc">Exclusivity at Its Finest</p>
+                  <span className="pairing-card-link">VIEW ALL</span>
+                </div>
+              </Link>
+            </div>
+          </div>
+        </div>
+
+        {/* DYNAMIC SUGGESTIONS LIST (If any) */}
         {suggestions.length > 0 && (
           <div className="detail-wrapper suggestions-section">
             <div style={{ width: '100%' }}>
-              <h3>Timeless Pairings</h3>
+              <h3>Suggested Timepieces</h3>
               <div className="suggestions-grid">
                 {suggestions.map((p) => {
                   const gender = getProductGender(p);
@@ -889,6 +1378,43 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
             </div>
           </div>
         )}
+
+        {/* FEATURES FOOTER BANNER */}
+        <div className="features-footer-banner">
+          <div className="features-footer-grid">
+            <div className="feature-footer-item">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+              <div>
+                <h4>Free Shipping</h4>
+                <p>On All Orders</p>
+              </div>
+            </div>
+
+            <div className="feature-footer-item">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+              <div>
+                <h4>Easy Returns</h4>
+                <p>14-Day Return Policy</p>
+              </div>
+            </div>
+
+            <div className="feature-footer-item">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              <div>
+                <h4>Genuine Products</h4>
+                <p>100% Authentic</p>
+              </div>
+            </div>
+
+            <div className="feature-footer-item">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              <div>
+                <h4>Secure Payments</h4>
+                <p>Protected Checkout</p>
+              </div>
+            </div>
+          </div>
+        </div>
 
       </div>
     </>
