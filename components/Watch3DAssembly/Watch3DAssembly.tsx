@@ -85,6 +85,12 @@ export default function Watch3DAssembly() {
       scrollPercent = Math.max(0, Math.min(1, scrollPercent));
       setProgress(scrollPercent);
 
+      let assembly = 0;
+      if (scrollPercent > 0.08) {
+        assembly = Math.min(100, Math.round(((scrollPercent - 0.08) / (0.92 - 0.08)) * 100));
+      }
+      setAssemblyPercent(assembly);
+
       // Determine the target frame (1 to 300)
       let targetFrame = 1;
       if (scrollPercent > 0.08) {
@@ -340,6 +346,7 @@ export default function Watch3DAssembly() {
   }
 
   // Interactive 3D Scroll Assembly Container
+  // Interactive 3D Scroll Assembly Container
   return (
     <div
       id="hero"
@@ -432,6 +439,254 @@ export default function Watch3DAssembly() {
           </div>
         </div>
 
+        {/* Futuristic Target Reticle */}
+        <div
+          className="absolute inset-0 pointer-events-none z-20 flex items-center justify-center"
+          style={{
+            opacity: progress > 0.08 && progress < 0.85 ? 1 : 0,
+            transition: 'opacity 0.4s ease',
+          }}
+        >
+          {/* Concentric rotating circles */}
+          <div className="relative w-[300px] h-[300px] md:w-[450px] md:h-[450px] flex items-center justify-center">
+            {/* Outer dotted ring */}
+            <div
+              className="absolute inset-0 rounded-full border border-dashed border-[#8B6914]/25"
+              style={{ animation: 'spinClockwise 40s linear infinite' }}
+            />
+            {/* Inner quadrant markers ring */}
+            <div
+              className="absolute w-[85%] h-[85%] rounded-full border border-[#8B6914]/15"
+              style={{ animation: 'spinCounterClockwise 60s linear infinite' }}
+            />
+            {/* Center crosshair */}
+            <div className="w-6 h-[1px] bg-[#8B6914]/40 absolute" />
+            <div className="h-6 w-[1px] bg-[#8B6914]/40 absolute" />
+            
+            {/* Diagnostic corner brackets */}
+            <div className="absolute top-0 left-0 w-4 h-4 border-t border-l border-[#8B6914]/50" />
+            <div className="absolute top-0 right-0 w-4 h-4 border-t border-r border-[#8B6914]/50" />
+            <div className="absolute bottom-0 left-0 w-4 h-4 border-b border-l border-[#8B6914]/50" />
+            <div className="absolute bottom-0 right-0 w-4 h-4 border-b border-r border-[#8B6914]/50" />
+          </div>
+        </div>
+
+        {/* Left Side System Diagnostics Panel */}
+        <div
+          className="absolute left-8 top-1/2 -translate-y-1/2 z-20 pointer-events-none hidden lg:flex flex-col gap-6"
+          style={{
+            opacity: progress > 0.08 && progress < 0.95 ? 1 : 0,
+            transform: `translateY(-50%) translateX(${progress > 0.08 && progress < 0.95 ? '0' : '-30px'})`,
+            transition: 'opacity 0.5s ease, transform 0.5s ease',
+            fontFamily: "'Jost', sans-serif",
+            width: '280px',
+          }}
+        >
+          {/* Header */}
+          <div className="border-b border-[#8B6914]/30 pb-2">
+            <p className="text-[10px] tracking-[0.25em] text-[#8B6914] font-semibold uppercase">SYSTEM STAGE: ACTIVE</p>
+            <h4 className="text-white text-xs tracking-[0.1em] uppercase font-light mt-1">Movement Diagnostics</h4>
+          </div>
+
+          {/* Stats list */}
+          <div className="flex flex-col gap-4 text-[10px] text-white/60 tracking-wider">
+            <div>
+              <p className="text-[#8B6914]/70 mb-1 uppercase text-[9px] tracking-widest">Calibre Calibration</p>
+              <p className="text-white font-medium">CAL. W-800 CHRONO / AUTOMATIC</p>
+            </div>
+            
+            <div>
+              <p className="text-[#8B6914]/70 mb-1 uppercase text-[9px] tracking-widest">Beat Rate frequency</p>
+              <p className="text-white font-medium">28,800 A/h (4 HZ) • STABLE</p>
+            </div>
+
+            <div>
+              <p className="text-[#8B6914]/70 mb-1 uppercase text-[9px] tracking-widest">Escapement Deviation</p>
+              <p className="text-[#8B6914] font-medium">+1.8 SEC/DAY (CHRONOMETER SPEC)</p>
+            </div>
+
+            <div>
+              <p className="text-[#8B6914]/70 mb-1 uppercase text-[9px] tracking-widest">Jewels Allocation</p>
+              <p className="text-white font-medium">25 SYNTHETIC RUBIES REGISTERED</p>
+            </div>
+
+            <div>
+              <p className="text-[#8B6914]/70 mb-1 uppercase text-[9px] tracking-widest">Power Reserve Capacity</p>
+              <div className="flex items-center gap-2 mt-1">
+                <div className="flex-grow h-[3px] bg-white/10 rounded-full overflow-hidden">
+                  <div className="w-[85%] h-full bg-[#8B6914]" />
+                </div>
+                <span className="text-white font-mono text-[9px]">42 HRS</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Right Side Technical Specs Panel */}
+        <div
+          className="absolute right-8 top-1/2 -translate-y-1/2 z-20 pointer-events-none hidden lg:flex flex-col gap-6"
+          style={{
+            opacity: progress > 0.08 && progress < 0.95 ? 1 : 0,
+            transform: `translateY(-50%) translateX(${progress > 0.08 && progress < 0.95 ? '0' : '30px'})`,
+            transition: 'opacity 0.5s ease, transform 0.5s ease',
+            fontFamily: "'Jost', sans-serif",
+            width: '280px',
+            textAlign: 'right',
+          }}
+        >
+          {/* Header */}
+          <div className="border-b border-[#8B6914]/30 pb-2">
+            <p className="text-[10px] tracking-[0.25em] text-[#8B6914] font-semibold uppercase">SPECIFICATION MATRIX</p>
+            <h4 className="text-white text-xs tracking-[0.1em] uppercase font-light mt-1">Architectural Dimensions</h4>
+          </div>
+
+          {/* Stats list */}
+          <div className="flex flex-col gap-4 text-[10px] text-white/60 tracking-wider">
+            <div>
+              <p className="text-[#8B6914]/70 mb-1 uppercase text-[9px] tracking-widest">Case Diameter</p>
+              <p className="text-white font-medium">41.5 MM LUGLESS BEVEL</p>
+            </div>
+
+            <div>
+              <p className="text-[#8B6914]/70 mb-1 uppercase text-[9px] tracking-widest">Profile Thickness</p>
+              <p className="text-white font-medium">11.2 MM ULTRA SLIM PROFILE</p>
+            </div>
+
+            <div>
+              <p className="text-[#8B6914]/70 mb-1 uppercase text-[9px] tracking-widest">Glass Specification</p>
+              <p className="text-white font-medium">SAPPHIRE DOUBLE-DOMED AR COATED</p>
+            </div>
+
+            <div>
+              <p className="text-[#8B6914]/70 mb-1 uppercase text-[9px] tracking-widest">Water Protection</p>
+              <p className="text-white font-medium">10 ATM / 100 METERS PRESSURE RATIO</p>
+            </div>
+
+            <div>
+              <p className="text-[#8B6914]/70 mb-1 uppercase text-[9px] tracking-widest">Assembly Completion</p>
+              <div className="flex items-center justify-end gap-2 mt-1">
+                <span className="text-white font-mono text-[9px]">{assemblyPercent}%</span>
+                <div className="w-[120px] h-[3px] bg-white/10 rounded-full overflow-hidden">
+                  <div className="h-full bg-[#8B6914] transition-all duration-300" style={{ width: `${assemblyPercent}%` }} />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Dynamic Leader Line Callouts */}
+        <div className="absolute inset-0 pointer-events-none z-20 hidden md:block">
+          {/* Callout 1: Gear Train / Escapement (0.15 < progress < 0.35) */}
+          <div
+            className="absolute transition-all duration-500"
+            style={{
+              left: '15%',
+              top: '25%',
+              opacity: progress > 0.15 && progress < 0.35 ? 1 : 0,
+              transform: `translateY(${progress > 0.15 && progress < 0.35 ? '0' : '20px'})`,
+              width: '280px',
+              fontFamily: "'Jost', sans-serif",
+            }}
+          >
+            <div className="relative border-l border-t border-[#8B6914]/40 p-4 bg-[#050302]/85 backdrop-blur-sm rounded-br-md">
+              <div className="absolute -left-1 -top-1 w-2 h-2 bg-[#8B6914] rounded-full" />
+              <span className="text-[9px] tracking-widest text-[#8B6914] font-semibold block uppercase">COMPONENT GROUP 01</span>
+              <h5 className="text-white text-xs font-semibold tracking-wider uppercase mt-1">Escapement Mechanism</h5>
+              <p className="text-white/60 text-[10px] mt-2 leading-relaxed">
+                Silicon escapement wheel and balance spring engineered for high-precision beat consistency.
+              </p>
+            </div>
+            {/* SVG Connecting diagonal line */}
+            <svg className="absolute top-full left-[80px] w-[180px] h-[80px] overflow-visible" style={{ pointerEvents: 'none' }}>
+              <path d="M 0 0 L 60 40 L 160 40" fill="none" stroke="#8B6914" strokeWidth="1" strokeDasharray="3,3" />
+              <circle cx="160" cy="40" r="3" fill="#8B6914" />
+            </svg>
+          </div>
+
+          {/* Callout 2: Automatic Calibre Rotor (0.35 < progress < 0.55) */}
+          <div
+            className="absolute transition-all duration-500"
+            style={{
+              right: '15%',
+              top: '20%',
+              opacity: progress > 0.35 && progress < 0.55 ? 1 : 0,
+              transform: `translateY(${progress > 0.35 && progress < 0.55 ? '0' : '20px'})`,
+              width: '280px',
+              fontFamily: "'Jost', sans-serif",
+              textAlign: 'right',
+            }}
+          >
+            <div className="relative border-r border-t border-[#8B6914]/40 p-4 bg-[#050302]/85 backdrop-blur-sm rounded-bl-md">
+              <div className="absolute -right-1 -top-1 w-2 h-2 bg-[#8B6914] rounded-full" />
+              <span className="text-[9px] tracking-widest text-[#8B6914] font-semibold block uppercase">COMPONENT GROUP 02</span>
+              <h5 className="text-white text-xs font-semibold tracking-wider uppercase mt-1">Automatic Calibre Rotor</h5>
+              <p className="text-white/60 text-[10px] mt-2 leading-relaxed">
+                Winding weight decorated with Cotes de Geneve stripes, storing power with micro ball-bearings.
+              </p>
+            </div>
+            {/* SVG Connecting diagonal line */}
+            <svg className="absolute top-full right-[80px] w-[180px] h-[80px] overflow-visible" style={{ pointerEvents: 'none' }}>
+              <path d="M 180 0 L 120 40 L 20 40" fill="none" stroke="#8B6914" strokeWidth="1" strokeDasharray="3,3" />
+              <circle cx="20" cy="40" r="3" fill="#8B6914" />
+            </svg>
+          </div>
+
+          {/* Callout 3: Sapphire Dome (0.55 < progress < 0.75) */}
+          <div
+            className="absolute transition-all duration-500"
+            style={{
+              left: '18%',
+              bottom: '22%',
+              opacity: progress > 0.55 && progress < 0.75 ? 1 : 0,
+              transform: `translateY(${progress > 0.55 && progress < 0.75 ? '0' : '-20px'})`,
+              width: '280px',
+              fontFamily: "'Jost', sans-serif",
+            }}
+          >
+            <div className="relative border-l border-b border-[#8B6914]/40 p-4 bg-[#050302]/85 backdrop-blur-sm rounded-tr-md">
+              <div className="absolute -left-1 -bottom-1 w-2 h-2 bg-[#8B6914] rounded-full" />
+              <span className="text-[9px] tracking-widest text-[#8B6914] font-semibold block uppercase">COMPONENT GROUP 03</span>
+              <h5 className="text-white text-xs font-semibold tracking-wider uppercase mt-1">Sapphire Crystal Dome</h5>
+              <p className="text-white/60 text-[10px] mt-2 leading-relaxed">
+                High hardness index sapphire glass providing scratch immunity and distortion-free readability.
+              </p>
+            </div>
+            {/* SVG Connecting diagonal line */}
+            <svg className="absolute bottom-full left-[80px] w-[180px] h-[80px] overflow-visible" style={{ pointerEvents: 'none' }}>
+              <path d="M 0 80 L 60 40 L 160 40" fill="none" stroke="#8B6914" strokeWidth="1" strokeDasharray="3,3" />
+              <circle cx="160" cy="40" r="3" fill="#8B6914" />
+            </svg>
+          </div>
+
+          {/* Callout 4: Finished Case Build (0.75 < progress < 0.9) */}
+          <div
+            className="absolute transition-all duration-500"
+            style={{
+              right: '18%',
+              bottom: '25%',
+              opacity: progress > 0.75 && progress < 0.90 ? 1 : 0,
+              transform: `translateY(${progress > 0.75 && progress < 0.90 ? '0' : '-20px'})`,
+              width: '280px',
+              fontFamily: "'Jost', sans-serif",
+              textAlign: 'right',
+            }}
+          >
+            <div className="relative border-r border-b border-[#8B6914]/40 p-4 bg-[#050302]/85 backdrop-blur-sm rounded-tl-md">
+              <div className="absolute -right-1 -bottom-1 w-2 h-2 bg-[#8B6914] rounded-full" />
+              <span className="text-[9px] tracking-widest text-[#8B6914] font-semibold block uppercase">COMPONENT GROUP 04</span>
+              <h5 className="text-white text-xs font-semibold tracking-wider uppercase mt-1">Case Build & Bezel</h5>
+              <p className="text-white/60 text-[10px] mt-2 leading-relaxed">
+                Fluted mirror-polished bezel paired with heavy-duty 316L stainless steel monobloc watchcase.
+              </p>
+            </div>
+            {/* SVG Connecting diagonal line */}
+            <svg className="absolute bottom-full right-[80px] w-[180px] h-[80px] overflow-visible" style={{ pointerEvents: 'none' }}>
+              <path d="M 180 80 L 120 40 L 20 40" fill="none" stroke="#8B6914" strokeWidth="1" strokeDasharray="3,3" />
+              <circle cx="20" cy="40" r="3" fill="#8B6914" />
+            </svg>
+          </div>
+        </div>
+
         {/* Scroll Indicator */}
         <div
           className="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3 z-30"
@@ -465,6 +720,14 @@ export default function Watch3DAssembly() {
           0%   { transform: translateY(-150%); opacity: 0; }
           20%  { opacity: 1; }
           100% { transform: translateY(350%); opacity: 0; }
+        }
+        @keyframes spinClockwise {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+        @keyframes spinCounterClockwise {
+          from { transform: rotate(360deg); }
+          to { transform: rotate(0deg); }
         }
       `}</style>
     </div>
