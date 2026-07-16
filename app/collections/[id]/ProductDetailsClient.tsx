@@ -71,12 +71,12 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
   const galleryImages = useMemo(() => {
     if (!product) return [];
     const imagesList: string[] = [];
-    
+
     // Add primary thumbnail
     if (product.thumbnail?.url) {
       imagesList.push(product.thumbnail.url);
     }
-    
+
     // Add variant images
     product.colorVariants?.forEach(v => {
       if (v.image?.url && !imagesList.includes(v.image.url)) {
@@ -121,10 +121,10 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
     const titleLower = prod.title.toLowerCase();
     const descLower = prod.description.toLowerCase();
     if (
-      titleLower.includes('ladies') || 
-      titleLower.includes('women') || 
-      titleLower.includes('diamond') || 
-      descLower.includes('ladies') || 
+      titleLower.includes('ladies') ||
+      titleLower.includes('women') ||
+      titleLower.includes('diamond') ||
+      descLower.includes('ladies') ||
       descLower.includes('women')
     ) {
       return 'Ladies';
@@ -144,11 +144,11 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
         if (data.success && data.data) {
           const allProd: IProduct[] = data.data;
           const filtered = allProd.filter(p => p._id !== currentProduct._id);
-          
+
           const currentGender = getProductGender(currentProduct);
           const matchingGender = filtered.filter(p => getProductGender(p) === currentGender);
           const otherGender = filtered.filter(p => getProductGender(p) !== currentGender);
-          
+
           const combined = [...matchingGender, ...otherGender].slice(0, 4);
           setSuggestions(combined);
         }
@@ -572,51 +572,60 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
           padding: 0;
         }
         .store-banner-container {
-          display: grid;
-          grid-template-columns: 1fr 2.2fr;
-          background: #FAF7F0;
+          position: relative;
+          width: 100%;
+          height: 420px;
           border-radius: 16px;
           overflow: hidden;
+          display: flex;
+          align-items: center;
+          padding-left: 80px;
           border: 1px solid rgba(26,18,9,0.06);
           box-shadow: 0 8px 30px rgba(0,0,0,0.02);
         }
-        .store-banner-text {
-          padding: 60px 40px;
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          background: #FAF4E8;
-          border-right: 1px solid rgba(26,18,9,0.06);
+        .store-banner-overlay {
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(90deg, rgba(15, 12, 10, 0.98) 0%, rgba(15, 12, 10, 0.75) 35%, rgba(15, 12, 10, 0.15) 100%);
+          z-index: 1;
+        }
+        .store-banner-content {
+          position: relative;
+          z-index: 2;
+          max-width: 480px;
+          color: #fff;
         }
         .store-banner-tag {
           font-size: 10px;
           letter-spacing: 0.25em;
           text-transform: uppercase;
-          color: rgba(26,18,9,0.5);
-          margin-bottom: 8px;
+          color: rgba(255, 255, 255, 0.55);
+          margin-bottom: 12px;
           font-weight: 500;
+          display: block;
         }
         .store-banner-title {
           font-family: 'Cormorant Garamond', serif;
-          font-size: 36px;
-          font-weight: 400;
-          line-height: 1.15;
+          font-size: 40px;
+          font-weight: 300;
+          line-height: 1.2;
           margin-bottom: 16px;
-          color: #1a1209;
+          color: #fff;
         }
         .store-banner-p {
-          font-size: 13px;
+          font-size: 13.5px;
           line-height: 1.6;
-          color: rgba(26,18,9,0.7);
+          color: rgba(255, 255, 255, 0.75);
           margin-bottom: 28px;
+          font-family: 'Jost', sans-serif;
         }
         .store-banner-btn {
-          align-self: flex-start;
+          display: inline-block;
           background: #8B6914;
           color: #fff;
           border: none;
           text-decoration: none;
-          padding: 12px 24px;
+          padding: 12px 28px;
           font-size: 11px;
           letter-spacing: 0.15em;
           font-weight: 500;
@@ -625,13 +634,9 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
           transition: all 0.3s;
         }
         .store-banner-btn:hover {
-          background: #1a1209;
-          box-shadow: 0 4px 12px rgba(26,18,9,0.25);
-        }
-        .store-banner-image {
-          position: relative;
-          width: 100%;
-          min-height: 380px;
+          background: #fff;
+          color: #1a1209;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
 
         /* BRAND LIFESTYLE BANNER */
@@ -945,15 +950,18 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
             gap: 20px;
           }
           .store-banner-container {
-            grid-template-columns: 1fr;
+            padding-left: 24px;
+            padding-right: 24px;
+            height: 380px;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
           }
-          .store-banner-text {
-            padding: 40px 24px;
-            border-right: none;
-            border-bottom: 1px solid rgba(26,18,9,0.06);
+          .store-banner-overlay {
+            background: rgba(15, 12, 10, 0.85);
           }
-          .store-banner-image {
-            min-height: 260px;
+          .store-banner-title {
+            font-size: 32px;
           }
           .brand-banner-container {
             padding-left: 24px;
@@ -974,7 +982,7 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
 
       {/* TOAST NOTIFICATION */}
       <div className={`toast-box ${showToast ? 'active' : ''}`}>
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
         <div>
           <h4 style={{ margin: 0, fontSize: '13px', fontWeight: 600, color: '#8B6914', letterSpacing: '0.05em', textTransform: 'uppercase', marginBottom: '2px' }}>Shopping Bag</h4>
           <p style={{ margin: 0, fontSize: '12px', color: 'rgba(26,18,9,0.7)', lineHeight: 1.3 }}>{toastMessage}</p>
@@ -984,7 +992,7 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
 
       <div className="detail-container">
         <div className="detail-wrapper">
-          
+
           {/* LEFT: GALLERY */}
           <div className="gallery-container">
             <div className="thumbnails-column">
@@ -1004,7 +1012,7 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
                 </div>
               ))}
             </div>
-            
+
             <div className="main-image-view">
               {selectedImage && (
                 <Image
@@ -1031,10 +1039,10 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
 
             {/* Title */}
             <h1 className="detail-title">{product.title}</h1>
-            
+
             {/* Tagline */}
             <p className="detail-subtitle">Timeless Elegance for Every Space</p>
-            
+
             {/* Model Number */}
             <div className="model-no">Model Number: {product.modelNo}</div>
 
@@ -1081,7 +1089,7 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
                 className="cart-action-btn"
               >
                 <span>Add to Cart</span>
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="9" cy="21" r="1" /><circle cx="20" cy="21" r="1" /><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" /></svg>
               </button>
               <button
                 onClick={handleBuyNow}
@@ -1169,7 +1177,7 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
 
             {/* Back to Catalog */}
             <Link href="/collections" className="back-link">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12" /><polyline points="12 19 5 12 12 5" /></svg>
               Back to Collections
             </Link>
           </div>
@@ -1180,26 +1188,26 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
           <div className="detail-wrapper large-gallery-section">
             <div style={{ width: '100%' }}>
               <h3>The Timepiece in Focus</h3>
-              
+
               {/* Product video if uploaded */}
               {product.video?.url && (
                 <div className="large-gallery-video-item">
-                  <video 
-                    src={product.video.url} 
-                    controls 
-                    muted 
-                    loop 
-                    autoPlay 
-                    playsInline 
-                    className="large-video-element" 
+                  <video
+                    src={product.video.url}
+                    controls
+                    muted
+                    loop
+                    autoPlay
+                    playsInline
+                    className="large-video-element"
                   />
                 </div>
               )}
 
               <div className="large-gallery-container">
                 {/* Take up to 3 gallery images or supplement with fallback */}
-                {(galleryImages.slice(0, 3).length >= 3 
-                  ? galleryImages.slice(0, 3) 
+                {(galleryImages.slice(0, 3).length >= 3
+                  ? galleryImages.slice(0, 3)
                   : [...galleryImages, "/watch-conquest.jpg", "/watch-gmt.jpg"].slice(0, 3)
                 ).map((imgUrl, i) => (
                   <div key={i} className="large-gallery-item">
@@ -1220,9 +1228,19 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
         {/* OUR STORES EXPERIENCE */}
         <div className="store-banner-wrapper">
           <div className="store-banner-container">
-            <div className="store-banner-text">
+            <Image
+              src="/KCC.webp"
+              alt="Winsor store interior"
+              fill
+              sizes="100vw"
+              style={{ objectFit: 'cover', objectPosition: 'center 45%' }}
+            />
+            <div className="store-banner-overlay" />
+            <div className="store-banner-content">
               <span className="store-banner-tag">OUR STORES</span>
-              <h2 className="store-banner-title">Experience Winsor</h2>
+              <h2 className="store-banner-title">
+                Experience <span style={{ color: '#dfb15b', fontWeight: 'inherit' }}>Winsor</span>
+              </h2>
               <p className="store-banner-p">
                 Visit our exclusive stores and explore premium timepieces crafted for every moment.
               </p>
@@ -1230,24 +1248,15 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
                 FIND A STORE
               </Link>
             </div>
-            <div className="store-banner-image">
-              <Image 
-                src="/discover-store.jpg" 
-                alt="Winsor store interior" 
-                fill 
-                sizes="(max-width: 1024px) 100vw, 800px"
-                style={{ objectFit: 'cover' }}
-              />
-            </div>
           </div>
         </div>
 
         {/* BRAND BANNER - Crafted for Moments */}
         <div className="brand-banner-wrapper">
           <div className="brand-banner-container">
-            <Image 
-              src="/winsor_man.png" 
-              alt="Winsor Crafted for Moments" 
+            <Image
+              src="/winsor_man.png"
+              alt="Winsor Crafted for Moments"
               fill
               sizes="100vw"
               style={{ objectFit: 'cover', objectPosition: 'center 20%' }}
@@ -1383,7 +1392,7 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
         <div className="features-footer-banner">
           <div className="features-footer-grid">
             <div className="feature-footer-item">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="3" width="15" height="13" /><polygon points="16 8 20 8 23 11 23 16 16 16 16 8" /><circle cx="5.5" cy="18.5" r="2.5" /><circle cx="18.5" cy="18.5" r="2.5" /></svg>
               <div>
                 <h4>Free Shipping</h4>
                 <p>On All Orders</p>
@@ -1391,7 +1400,7 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
             </div>
 
             <div className="feature-footer-item">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67" /></svg>
               <div>
                 <h4>Easy Returns</h4>
                 <p>14-Day Return Policy</p>
@@ -1399,7 +1408,7 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
             </div>
 
             <div className="feature-footer-item">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>
               <div>
                 <h4>Genuine Products</h4>
                 <p>100% Authentic</p>
@@ -1407,7 +1416,7 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
             </div>
 
             <div className="feature-footer-item">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
               <div>
                 <h4>Secure Payments</h4>
                 <p>Protected Checkout</p>
