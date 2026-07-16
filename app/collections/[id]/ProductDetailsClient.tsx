@@ -36,6 +36,10 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
   const [warrantyOpen, setWarrantyOpen] = useState(false);
   const [deliveryOpen, setDeliveryOpen] = useState(false);
 
+  // Reviews States
+  const [reviews, setReviews] = useState<any[]>([]);
+  const [loadingReviews, setLoadingReviews] = useState(false);
+
   // Fetch product data on mount/id change
   useEffect(() => {
     async function loadProduct() {
@@ -67,6 +71,24 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
     loadProduct();
   }, [id]);
 
+  useEffect(() => {
+    async function loadReviews() {
+      try {
+        setLoadingReviews(true);
+        const res = await fetch(`/api/reviews?productId=${id}`);
+        const data = await res.json();
+        if (data.success) {
+          setReviews(data.data || []);
+        }
+      } catch (err) {
+        console.error('Failed to load reviews:', err);
+      } finally {
+        setLoadingReviews(false);
+      }
+    }
+    loadReviews();
+  }, [id]);
+
   // Create list of all gallery images for thumbnails
   const galleryImages = useMemo(() => {
     if (!product) return [];
@@ -93,6 +115,38 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
 
     return imagesList;
   }, [product]);
+
+  const reviewsStats = useMemo(() => {
+    if (!reviews || reviews.length === 0) {
+      return { count: 0, average: 0 };
+    }
+    const sum = reviews.reduce((acc, rev) => acc + rev.rating, 0);
+    return {
+      count: reviews.length,
+      average: parseFloat((sum / reviews.length).toFixed(1)),
+    };
+  }, [reviews]);
+
+  const starDistribution = useMemo(() => {
+    const dist = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
+    if (!reviews || reviews.length === 0) return dist;
+    reviews.forEach(r => {
+      const ratingKey = Math.round(r.rating) as 5 | 4 | 3 | 2 | 1;
+      if (dist[ratingKey] !== undefined) {
+        dist[ratingKey]++;
+      }
+    });
+    return dist;
+  }, [reviews]);
+
+  const maskReviewerName = (name: string) => {
+    if (!name) return 'Customer';
+    const trimmed = name.trim();
+    if (trimmed.length <= 2) {
+      return trimmed[0] + '*';
+    }
+    return trimmed[0] + '*'.repeat(trimmed.length - 2) + trimmed[trimmed.length - 1];
+  };
 
   // Handle color variant selection
   const handleVariantSelect = (variant: ColorVariant) => {
@@ -994,6 +1048,10 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
             padding: 8px 18px;
             font-size: 9.5px;
           }
+          .reviews-layout-grid {
+            grid-template-columns: 1fr !important;
+            gap: 30px !important;
+          }
         }
       `}</style>
 
@@ -1059,6 +1117,18 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
 
             {/* Tagline */}
             <p className="detail-subtitle">Timeless Elegance for Every Space</p>
+
+            {reviewsStats.count > 0 && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', margin: '10px 0 14px 0', fontSize: '12.5px' }}>
+                <div style={{ display: 'flex', gap: '2px' }}>
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <span key={i} style={{ color: i < Math.round(reviewsStats.average) ? '#FFC107' : '#E0E0E0', fontSize: '14px' }}>★</span>
+                  ))}
+                </div>
+                <span style={{ fontWeight: 600, color: '#1a1209' }}>{reviewsStats.average}</span>
+                <span style={{ color: 'rgba(26,18,9,0.4)', fontSize: '12px' }}>({reviewsStats.count} {reviewsStats.count === 1 ? 'Review' : 'Reviews'})</span>
+              </div>
+            )}
 
             {/* Model Number */}
             <div className="model-no">Model Number: {product.modelNo}</div>
@@ -1419,6 +1489,127 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
             </div>
           </div>
         )}
+
+        {/* CUSTOMER REVIEWS SECTION */}
+        <div className="detail-wrapper reviews-section" style={{ marginTop: '80px', borderTop: '1px solid rgba(26,18,9,0.08)', paddingTop: '60px' }}>
+          <div style={{ width: '100%' }}>
+            <span style={{ display: 'block', textAlign: 'center', fontSize: '9px', letterSpacing: '0.3em', color: '#8B6914', textTransform: 'uppercase', marginBottom: '8px' }}>
+              Verified Feedback
+            </span>
+            <h3 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '28px', fontWeight: 500, textAlign: 'center', marginBottom: '6px', letterSpacing: '0.05em' }}>
+              Customer Reviews
+            </h3>
+            <p style={{ fontSize: '13px', color: 'rgba(26,18,9,0.5)', textAlign: 'center', marginBottom: '40px' }}>
+              What our patrons have to say about this timepiece
+            </p>
+
+            {reviews.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '40px 20px', border: '1px dashed rgba(26,18,9,0.12)', borderRadius: '8px' }}>
+                <p style={{ fontSize: '14.5px', color: 'rgba(26,18,9,0.5)', margin: 0 }}>
+                  No reviews submitted yet for this timepiece.
+                </p>
+              </div>
+            ) : (
+              <div className="reviews-layout-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 2.2fr', gap: '50px', alignItems: 'flex-start' }}>
+                {/* Left Card: Summary Stats */}
+                <div style={{ background: '#FAF7F0', border: '1px solid rgba(26,18,9,0.06)', borderRadius: '8px', padding: '30px', position: 'sticky', top: '100px' }}>
+                  <h4 style={{ margin: '0 0 16px 0', fontSize: '15px', fontWeight: 600, borderBottom: '1px solid rgba(26,18,9,0.06)', paddingBottom: '10px' }}>Rating Summary</h4>
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginBottom: '8px' }}>
+                    <span style={{ fontSize: '48px', fontWeight: 500, fontFamily: "'Cormorant Garamond', serif", lineHeight: 1 }}>{reviewsStats.average}</span>
+                    <span style={{ fontSize: '14px', color: 'rgba(26,18,9,0.4)' }}>out of 5</span>
+                  </div>
+                  
+                  {/* Rating Stars */}
+                  <div style={{ display: 'flex', gap: '3px', marginBottom: '16px' }}>
+                    {Array.from({ length: 5 }).map((_, i) => (
+                      <span key={i} style={{ color: i < Math.round(reviewsStats.average) ? '#FFC107' : '#E0E0E0', fontSize: '20px' }}>★</span>
+                    ))}
+                  </div>
+                  
+                  <span style={{ fontSize: '12px', color: 'rgba(26,18,9,0.5)', display: 'block', marginBottom: '24px' }}>
+                    Based on {reviewsStats.count} verified patron {reviewsStats.count === 1 ? 'review' : 'reviews'}
+                  </span>
+
+                  {/* Distribution bars */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    {([5, 4, 3, 2, 1] as const).map(stars => {
+                      const count = starDistribution[stars] || 0;
+                      const percentage = reviews.length > 0 ? (count / reviews.length) * 100 : 0;
+                      return (
+                        <div key={stars} style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '12px' }}>
+                          <span style={{ width: '42px', color: 'rgba(26,18,9,0.6)', fontWeight: 500 }}>{stars} Star</span>
+                          <div style={{ flex: 1, height: '6px', background: 'rgba(26,18,9,0.06)', borderRadius: '3px', overflow: 'hidden' }}>
+                            <div style={{ width: `${percentage}%`, height: '100%', background: '#8B6914', borderRadius: '3px' }} />
+                          </div>
+                          <span style={{ width: '28px', textAlign: 'right', color: 'rgba(26,18,9,0.4)' }}>{count}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Right Card: Reviews List */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                  {reviews.map((rev, idx) => {
+                    const dispName = rev.isAnonymous ? maskReviewerName(rev.username) : rev.username;
+                    return (
+                      <div key={idx} style={{ borderBottom: '1px solid rgba(26,18,9,0.06)', paddingBottom: '24px', display: 'flex', gap: '16px' }}>
+                        {/* Avatar */}
+                        <div style={{ flexShrink: 0 }}>
+                          {rev.isAnonymous || !rev.userAvatar ? (
+                            <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: '#8B6914', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600, fontSize: '16.5px', textTransform: 'uppercase', fontFamily: "'Jost', sans-serif" }}>
+                              {dispName ? dispName[0] : 'C'}
+                            </div>
+                          ) : (
+                            <div style={{ width: '40px', height: '40px', borderRadius: '50%', overflow: 'hidden', position: 'relative', border: '1px solid rgba(26,18,9,0.05)' }}>
+                              <img src={rev.userAvatar} alt={dispName} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Details */}
+                        <div style={{ flex: 1 }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '6px' }}>
+                            <div>
+                              <h5 style={{ margin: '0 0 2px 0', fontSize: '14.5px', fontWeight: 600, color: '#1a1209' }}>{dispName}</h5>
+                              <span style={{ fontSize: '10.5px', color: '#8B6914', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 550 }}>
+                                ✓ Verified Purchase
+                              </span>
+                            </div>
+                            <span style={{ fontSize: '11.5px', color: 'rgba(26,18,9,0.4)' }}>
+                              {new Date(rev.createdAt).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })}
+                            </span>
+                          </div>
+
+                          {/* Stars */}
+                          <div style={{ display: 'flex', gap: '2px', marginBottom: '10px' }}>
+                            {Array.from({ length: 5 }).map((_, i) => (
+                              <span key={i} style={{ color: i < rev.rating ? '#FFC107' : '#E0E0E0', fontSize: '13px' }}>★</span>
+                            ))}
+                          </div>
+
+                          {/* Comment */}
+                          <p style={{ margin: '0 0 12px 0', fontSize: '13.5px', lineHeight: 1.5, color: 'rgba(26,18,9,0.75)' }}>{rev.comment}</p>
+
+                          {/* Images */}
+                          {rev.images && rev.images.length > 0 && (
+                            <div style={{ display: 'flex', gap: '8px' }}>
+                              {rev.images.map((url: string, i: number) => (
+                                <a href={url} target="_blank" rel="noopener noreferrer" key={i} style={{ position: 'relative', width: '70px', height: '70px', borderRadius: '4px', overflow: 'hidden', border: '1px solid rgba(26,18,9,0.05)', display: 'block' }}>
+                                  <img src={url} alt="patron upload" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                </a>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
 
         {/* FEATURES FOOTER BANNER */}
         <div className="features-footer-banner">

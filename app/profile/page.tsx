@@ -59,7 +59,22 @@ export default function ProfilePage() {
   const { openUserProfile, signOut } = useClerk();
 
   // Tab State
-  const [activeTab, setActiveTab] = useState<'profile-details' | 'dashboard' | 'orders' | 'wishlist' | 'addresses' | 'security' | 'notifications' | 'payment-methods'>('profile-details');
+  const [activeTab, setActiveTab] = useState<'profile-details' | 'dashboard' | 'orders' | 'wishlist' | 'addresses' | 'security' | 'notifications' | 'payment-methods' | 'reviews'>('profile-details');
+
+  // Reviews States
+  const [pendingReviews, setPendingReviews] = useState<any[]>([]);
+  const [myReviews, setMyReviews] = useState<any[]>([]);
+  const [loadingReviews, setLoadingReviews] = useState(false);
+
+  // Form states for Review Modal
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [reviewItem, setReviewItem] = useState<any | null>(null);
+  const [reviewRating, setReviewRating] = useState<number>(5);
+  const [reviewComment, setReviewComment] = useState('');
+  const [reviewAnonymous, setReviewAnonymous] = useState(false);
+  const [reviewImages, setReviewImages] = useState<string[]>([]);
+  const [uploadingReviewImg, setUploadingReviewImg] = useState(false);
+  const [submittingReview, setSubmittingReview] = useState(false);
 
   // Loading States
   const [loading, setLoading] = useState(false);
@@ -91,6 +106,124 @@ export default function ProfilePage() {
   };
 
   const membershipTier = getMembershipTier(orders.length);
+
+  // Fetch Reviews Data
+  useEffect(() => {
+    if (activeTab === 'reviews') {
+      fetchReviewsData();
+    }
+  }, [activeTab]);
+
+  const fetchReviewsData = async () => {
+    setLoadingReviews(true);
+    try {
+      const [pendingRes, myRes] = await Promise.all([
+        fetch('/api/reviews/pending'),
+        fetch('/api/reviews/my'),
+      ]);
+      const pendingData = await pendingRes.json();
+      const myData = await myRes.json();
+      if (pendingData.success) setPendingReviews(pendingData.data || []);
+      if (myData.success) setMyReviews(myData.data || []);
+    } catch (err) {
+      console.error('Failed to load reviews data:', err);
+    } finally {
+      setLoadingReviews(false);
+    }
+  };
+
+  const handleReviewImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    if (reviewImages.length + files.length > 2) {
+      toast.error('You can upload a maximum of 2 images.');
+      return;
+    }
+
+    setUploadingReviewImg(true);
+    try {
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const reader = new FileReader();
+
+        const url = await new Promise<string>((resolve, reject) => {
+          reader.readAsDataURL(file);
+          reader.onloadend = async () => {
+            try {
+              const base64 = reader.result as string;
+              const res = await fetch('/api/upload', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  file: base64,
+                  type: 'gallery',
+                  name: file.name,
+                }),
+              });
+              const uploadRes = await res.json();
+              if (uploadRes.success && uploadRes.data?.url) {
+                resolve(uploadRes.data.url);
+              } else {
+                reject(new Error(uploadRes.error || 'Upload failed'));
+              }
+            } catch (err) {
+              reject(err);
+            }
+          };
+          reader.onerror = () => reject(new Error('File reading failed'));
+        });
+
+        setReviewImages(prev => [...prev, url]);
+      }
+      toast.success('Images uploaded successfully');
+    } catch (err: any) {
+      toast.error(err?.message || 'Failed to upload images');
+    } finally {
+      setUploadingReviewImg(false);
+    }
+  };
+
+  const handleSubmitReview = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!reviewItem || !reviewComment) return;
+
+    setSubmittingReview(true);
+    try {
+      const res = await fetch('/api/reviews', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          productId: reviewItem.productId,
+          orderId: reviewItem.orderId,
+          rating: reviewRating,
+          comment: reviewComment,
+          images: reviewImages,
+          isAnonymous: reviewAnonymous,
+          username: user?.fullName || 'Verified Customer',
+          userAvatar: user?.imageUrl || null,
+        }),
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        toast.success('Your review has been submitted for moderation.');
+        setIsReviewModalOpen(false);
+        setReviewItem(null);
+        setReviewRating(5);
+        setReviewComment('');
+        setReviewAnonymous(false);
+        setReviewImages([]);
+        fetchReviewsData();
+      } else {
+        toast.error(data.error || 'Failed to submit review');
+      }
+    } catch (err) {
+      toast.error('Network error submitting review');
+    } finally {
+      setSubmittingReview(false);
+    }
+  };
 
   // Fetch Mongo Profile & Orders
   useEffect(() => {
@@ -890,6 +1023,7 @@ export default function ProfilePage() {
             { id: 'profile-details', label: 'Profile', icon: <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg> },
             { id: 'orders', label: 'Orders', icon: <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12" /><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z" /></svg> },
             { id: 'wishlist', label: 'Wishlist', icon: <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" /></svg> },
+            { id: 'reviews', label: 'Reviews', icon: <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" /></svg> },
             { id: 'addresses', label: 'Addresses', icon: <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" /></svg> },
             { id: 'security', label: 'Security', icon: <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg> },
             { id: 'notifications', label: 'Alerts', icon: <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" /><path d="M13.73 21a2 2 0 0 1-3.46 0" /></svg> },
@@ -966,6 +1100,12 @@ export default function ProfilePage() {
                   <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
                 </svg>
                 Wishlist
+              </button>
+              <button className={`sidebar-menu-btn ${activeTab === 'reviews' ? 'active' : ''}`} onClick={() => setActiveTab('reviews')}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                </svg>
+                My Reviews
               </button>
               <button className={`sidebar-menu-btn ${activeTab === 'addresses' ? 'active' : ''}`} onClick={() => setActiveTab('addresses')}>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
@@ -1462,6 +1602,125 @@ export default function ProfilePage() {
               </div>
             )}
 
+            {/* REVIEWS TAB */}
+            {activeTab === 'reviews' && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '30px' }}>
+                {/* Pending Reviews */}
+                <div className="content-card">
+                  <div className="card-header-block">
+                    <h3 className="card-title">Pending Reviews</h3>
+                    <p className="card-subtitle">Products eligible for review (Delivered within the last 30 days).</p>
+                  </div>
+                  {loadingReviews ? (
+                    <p style={{ fontSize: '13px', color: 'rgba(26,18,9,0.5)', textAlign: 'center', padding: '20px 0' }}>Loading items...</p>
+                  ) : pendingReviews.length === 0 ? (
+                    <p style={{ fontSize: '13.5px', color: 'rgba(26,18,9,0.5)', textAlign: 'center', padding: '30px 0', margin: 0 }}>
+                      No pending reviews. Only purchased timepieces from delivered orders within the last 30 days can be reviewed.
+                    </p>
+                  ) : (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                      {pendingReviews.map((item, idx) => (
+                        <div key={idx} style={{ display: 'flex', gap: '16px', border: '1px solid rgba(26,18,9,0.08)', borderRadius: '8px', padding: '16px', alignItems: 'center' }}>
+                          <div style={{ position: 'relative', width: '64px', height: '64px', borderRadius: '4px', overflow: 'hidden', flexShrink: 0, border: '1px solid rgba(26,18,9,0.05)' }}>
+                            <img src={item.productThumbnail} alt={item.productTitle} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                          </div>
+                          <div style={{ flexGrow: 1, minWidth: 0 }}>
+                            <h4 style={{ margin: '0 0 2px 0', fontSize: '14px', fontWeight: 600, color: '#1a1209' }}>{item.productTitle}</h4>
+                            <span style={{ fontSize: '11px', color: 'rgba(26,18,9,0.4)', textTransform: 'uppercase' }}>Model: {item.productModelNo}</span>
+                            <div style={{ marginTop: '6px', fontSize: '11.5px', color: '#8B6914', fontWeight: 550 }}>
+                              ⏳ {item.daysLeft} days remaining to review
+                            </div>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setReviewItem(item);
+                              setIsReviewModalOpen(true);
+                            }}
+                            className="store-banner-btn"
+                            style={{ padding: '8px 16px', fontSize: '10.5px', borderRadius: '4px', cursor: 'pointer' }}
+                          >
+                            WRITE REVIEW
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* My Past Reviews */}
+                <div className="content-card">
+                  <div className="card-header-block">
+                    <h3 className="card-title">My Submitted Reviews</h3>
+                    <p className="card-subtitle">Track status and details of your previous product reviews.</p>
+                  </div>
+                  {loadingReviews ? (
+                    <p style={{ fontSize: '13px', color: 'rgba(26,18,9,0.5)', textAlign: 'center', padding: '20px 0' }}>Loading reviews...</p>
+                  ) : myReviews.length === 0 ? (
+                    <p style={{ fontSize: '13.5px', color: 'rgba(26,18,9,0.5)', textAlign: 'center', padding: '30px 0', margin: 0 }}>
+                      You have not submitted any reviews yet.
+                    </p>
+                  ) : (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                      {myReviews.map((rev, idx) => (
+                        <div key={idx} style={{ border: '1px solid rgba(26,18,9,0.08)', borderRadius: '8px', padding: '20px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(26,18,9,0.05)', paddingBottom: '10px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                              <div style={{ width: '40px', height: '40px', position: 'relative', borderRadius: '4px', overflow: 'hidden', border: '1px solid rgba(26,18,9,0.05)' }}>
+                                <img src={rev.productId?.thumbnail?.url || '/white.webp'} alt={rev.productId?.title || 'Timepiece'} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                              </div>
+                              <div>
+                                <h4 style={{ margin: '0 0 2px 0', fontSize: '13.5px', fontWeight: 600 }}>{rev.productId?.title || 'Timepiece'}</h4>
+                                <span style={{ fontSize: '11px', color: 'rgba(26,18,9,0.4)', textTransform: 'uppercase' }}>Model: {rev.productId?.modelNo || 'N/A'}</span>
+                              </div>
+                            </div>
+                            
+                            {/* Status badge */}
+                            <span style={{
+                              fontSize: '9px',
+                              fontWeight: 650,
+                              padding: '4px 10px',
+                              borderRadius: '4px',
+                              textTransform: 'uppercase',
+                              background: rev.status === 'approved' ? 'rgba(46,125,50,0.1)' : rev.status === 'rejected' ? 'rgba(198,40,40,0.1)' : 'rgba(239,108,0,0.1)',
+                              color: rev.status === 'approved' ? '#2e7d32' : rev.status === 'rejected' ? '#c62828' : '#ef6c00',
+                            }}>
+                              {rev.status === 'pending' ? 'Pending Approval' : rev.status}
+                            </span>
+                          </div>
+
+                          {/* Review Details */}
+                          <div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px' }}>
+                              {Array.from({ length: 5 }).map((_, i) => (
+                                <span key={i} style={{ color: i < rev.rating ? '#FFC107' : '#E0E0E0', fontSize: '14px' }}>★</span>
+                              ))}
+                              <span style={{ fontSize: '11px', color: 'rgba(26,18,9,0.4)', marginLeft: '6px' }}>
+                                Reviewed on {new Date(rev.createdAt).toLocaleDateString()}
+                              </span>
+                            </div>
+                            <p style={{ margin: '0 0 10px 0', fontSize: '13px', lineHeight: 1.5, color: 'rgba(26,18,9,0.7)' }}>{rev.comment}</p>
+                            
+                            {/* Attached Images */}
+                            {rev.images && rev.images.length > 0 && (
+                              <div style={{ display: 'flex', gap: '8px' }}>
+                                {rev.images.map((url: string, i: number) => (
+                                  <a href={url} target="_blank" rel="noopener noreferrer" key={i} style={{ position: 'relative', width: '50px', height: '50px', borderRadius: '4px', overflow: 'hidden', border: '1px solid rgba(26,18,9,0.05)' }}>
+                                    <img src={url} alt="Review attachment" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                  </a>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+
             {/* BOTTOM CARD TILES ROW */}
             {activeTab === 'profile-details' && (
               <div className="portal-bottom-split">
@@ -1536,6 +1795,119 @@ export default function ProfilePage() {
           </div>
         </div>
       </div>
+
+      {/* WRITE REVIEW MODAL */}
+      {isReviewModalOpen && reviewItem && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 1000, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', fontFamily: "'Jost', sans-serif" }}>
+          <div style={{ background: '#fff', borderRadius: '8px', padding: '30px', maxWidth: '480px', width: '100%', boxShadow: '0 10px 40px rgba(0,0,0,0.15)', maxHeight: '90vh', overflowY: 'auto' }}>
+            <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '24px', fontWeight: 500, margin: '0 0 8px 0', color: '#1a1209' }}>Write a Review</h2>
+            <p style={{ margin: '0 0 20px 0', fontSize: '12.5px', color: 'rgba(26,18,9,0.5)' }}>For: {reviewItem.productTitle} (Model: {reviewItem.productModelNo})</p>
+
+            <form onSubmit={handleSubmitReview}>
+              {/* Star Selection */}
+              <div style={{ marginBottom: '20px' }}>
+                <label style={{ display: 'block', fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', marginBottom: '8px', color: 'rgba(26,18,9,0.6)' }}>Select Rating *</label>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  {[1, 2, 3, 4, 5].map((num) => (
+                    <button
+                      key={num}
+                      type="button"
+                      onClick={() => setReviewRating(num)}
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        cursor: 'pointer',
+                        fontSize: '28px',
+                        color: reviewRating >= num ? '#FFC107' : '#E0E0E0',
+                        padding: 0,
+                      }}
+                    >
+                      ★
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Comment text */}
+              <div style={{ marginBottom: '20px' }}>
+                <label style={{ display: 'block', fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', marginBottom: '8px', color: 'rgba(26,18,9,0.6)' }}>Your Feedback *</label>
+                <textarea
+                  required
+                  rows={4}
+                  placeholder="Describe your experience with the timepiece's craftsmanship, packaging, and quality details..."
+                  value={reviewComment}
+                  onChange={(e) => setReviewComment(e.target.value)}
+                  style={{ width: '100%', padding: '12px', borderRadius: '4px', border: '1px solid rgba(26,18,9,0.15)', outline: 'none', resize: 'vertical', fontSize: '13px', color: '#1a1209' }}
+                />
+              </div>
+
+              {/* Image Attachments */}
+              <div style={{ marginBottom: '20px' }}>
+                <label style={{ display: 'block', fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', marginBottom: '8px', color: 'rgba(26,18,9,0.6)' }}>Attach Photos (Max 2)</label>
+                <input
+                  type="file"
+                  multiple
+                  accept="image/*"
+                  onChange={handleReviewImageUpload}
+                  disabled={uploadingReviewImg || reviewImages.length >= 2}
+                  style={{ fontSize: '12px' }}
+                />
+                
+                {uploadingReviewImg && <p style={{ fontSize: '11px', color: '#8B6914', margin: '6px 0 0 0' }}>Uploading image attachments...</p>}
+
+                {reviewImages.length > 0 && (
+                  <div style={{ display: 'flex', gap: '8px', marginTop: '10px' }}>
+                    {reviewImages.map((url, i) => (
+                      <div key={i} style={{ position: 'relative', width: '50px', height: '50px', borderRadius: '4px', overflow: 'hidden' }}>
+                        <img src={url} alt="Attached review item" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        <button
+                          type="button"
+                          onClick={() => setReviewImages(prev => prev.filter((_, idx) => idx !== i))}
+                          style={{ position: 'absolute', top: 2, right: 2, background: 'rgba(0,0,0,0.6)', border: 'none', color: '#fff', width: '14px', height: '14px', borderRadius: '50%', fontSize: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Anonymous Checkbox */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '24px' }}>
+                <input
+                  id="review-anonymous"
+                  type="checkbox"
+                  checked={reviewAnonymous}
+                  onChange={(e) => setReviewAnonymous(e.target.checked)}
+                />
+                <label htmlFor="review-anonymous" style={{ fontSize: '13px', color: 'rgba(26,18,9,0.8)', cursor: 'pointer' }}>Review anonymously (masks your profile name)</label>
+              </div>
+
+              {/* Actions */}
+              <div style={{ display: 'flex', gap: '12px' }}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsReviewModalOpen(false);
+                    setReviewItem(null);
+                  }}
+                  style={{ flex: 1, padding: '12px', borderRadius: '4px', border: '1px solid rgba(26,18,9,0.15)', background: 'transparent', cursor: 'pointer', fontSize: '12px', fontWeight: 500 }}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={submittingReview || uploadingReviewImg}
+                  style={{ flex: 1, padding: '12px', borderRadius: '4px', background: '#1a1209', color: '#fff', border: 'none', cursor: 'pointer', fontSize: '12px', fontWeight: 500 }}
+                >
+                  {submittingReview ? 'Submitting...' : 'Submit Review'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

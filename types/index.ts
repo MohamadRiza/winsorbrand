@@ -128,3 +128,20 @@ export interface IOrder {
   createdAt?: Date;
   updatedAt?: Date;
 }
+
+export interface IReview {
+  _id?: string;
+  productId: string;
+  orderId?: string;
+  userId: string;
+  username: string;
+  userAvatar?: string;
+  rating: number;
+  comment: string;
+  images?: string[];
+  isAnonymous: boolean;
+  isFake: boolean;
+  status: 'pending' | 'approved' | 'rejected';
+  createdAt?: Date;
+  updatedAt?: Date;
+}
