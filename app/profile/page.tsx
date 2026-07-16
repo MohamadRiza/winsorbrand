@@ -1674,7 +1674,7 @@ export default function ProfilePage() {
                                 <span style={{ fontSize: '11px', color: 'rgba(26,18,9,0.4)', textTransform: 'uppercase' }}>Model: {rev.productId?.modelNo || 'N/A'}</span>
                               </div>
                             </div>
-                            
+
                             {/* Status badge */}
                             <span style={{
                               fontSize: '9px',
@@ -1700,7 +1700,7 @@ export default function ProfilePage() {
                               </span>
                             </div>
                             <p style={{ margin: '0 0 10px 0', fontSize: '13px', lineHeight: 1.5, color: 'rgba(26,18,9,0.7)' }}>{rev.comment}</p>
-                            
+
                             {/* Attached Images */}
                             {rev.images && rev.images.length > 0 && (
                               <div style={{ display: 'flex', gap: '8px' }}>
@@ -1852,7 +1852,7 @@ export default function ProfilePage() {
                   disabled={uploadingReviewImg || reviewImages.length >= 2}
                   style={{ fontSize: '12px' }}
                 />
-                
+
                 {uploadingReviewImg && <p style={{ fontSize: '11px', color: '#8B6914', margin: '6px 0 0 0' }}>Uploading image attachments...</p>}
 
                 {reviewImages.length > 0 && (

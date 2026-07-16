@@ -43,15 +43,15 @@ const WatchShowcase = () => {
           </div>
         </article>
 
-        {/* Large lifestyle image */}
+        {/* Large lifestyle video */}
         <div className="overflow-hidden rounded-2xl border border-[rgba(26,18,9,0.06)] shadow-[0_4px_20px_rgba(0,0,0,0.02)]">
-          <img
-            src={watchHero}
-            alt="Hydroconquest watch on a rocky landscape"
-            loading="lazy"
-            width={1280}
-            height={1024}
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
             className="aspect-[4/3] h-full max-h-[720px] w-full object-cover transition-transform duration-700 hover:scale-[1.02] sm:aspect-auto"
+            src="/watch_space_vid.webm"
           />
         </div>
       </div>

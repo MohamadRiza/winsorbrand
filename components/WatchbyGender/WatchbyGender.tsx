@@ -112,6 +112,7 @@ function GenderSection({
         height: '100%',
         overflow: 'hidden',
         cursor: 'pointer',
+        borderRadius: '16px',
       }}
     >
       {/* Zoomable Media Container Wrapper */}
@@ -350,6 +351,9 @@ export default function GenderCollectionSection() {
             width: '100%',
             height: isMobile ? '28vh' : '62vh',
             minHeight: isMobile ? '180px' : '460px',
+            position: 'sticky',
+            top: isMobile ? '76px' : '90px',
+            zIndex: 1,
           }}
         >
           {/* Men's Card */}
@@ -399,6 +403,11 @@ export default function GenderCollectionSection() {
             width: '100%',
             height: isMobile ? '22vh' : '38vh',
             minHeight: isMobile ? '140px' : '280px',
+            position: 'relative',
+            zIndex: 2,
+            background: '#faf7f0',
+            borderRadius: '16px',
+            boxShadow: '0 -20px 40px rgba(26,18,9,0.05), 0 10px 30px rgba(0,0,0,0.02)',
           }}
         >
           <GenderSection
