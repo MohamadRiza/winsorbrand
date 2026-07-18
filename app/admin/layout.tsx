@@ -22,21 +22,6 @@ export default async function AdminLayout({ children }: { children: ReactNode })
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh', background: '#faf7f0' }}>
-      <Toaster
-        position="top-right"
-        toastOptions={{
-          style: {
-            background: '#1a1209',
-            color: '#f3e3b8',
-            border: '1px solid rgba(201,161,74,0.3)',
-            fontSize: '13px',
-            fontFamily: "'Jost', sans-serif",
-          },
-          success: { iconTheme: { primary: '#8B6914', secondary: '#1a1209' } },
-          error: { iconTheme: { primary: '#dc3232', secondary: '#1a1209' } },
-        }}
-      />
-      
       <SidebarClientWrapper />
       
       <main style={{ 

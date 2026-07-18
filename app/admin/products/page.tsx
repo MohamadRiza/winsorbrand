@@ -29,6 +29,11 @@ export default function ProductsPage() {
     status: 'all',
     stockStatus: 'all',
   });
+  
+  // Pagination State
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+
   const [giftCategories, setGiftCategories] = useState<Array<{ _id: string; slug: string; label: string; emoji: string }>>([]);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
@@ -174,6 +179,19 @@ export default function ProductsPage() {
     });
   }, [products, filters]);
 
+  // Reset pagination on filter change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filters]);
+
+  // Slice list for pagination
+  const paginatedProducts = useMemo(() => {
+    const startIndex = (currentPage - 1) * pageSize;
+    return filteredProducts.slice(startIndex, startIndex + pageSize);
+  }, [filteredProducts, currentPage, pageSize]);
+
+  const totalPages = Math.ceil(filteredProducts.length / pageSize) || 1;
+
   const resetFilters = () => {
     setFilters({
       search: '',
@@ -195,61 +213,141 @@ export default function ProductsPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#8B6914]"></div>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '400px' }}>
+        <div style={{
+          width: '48px',
+          height: '48px',
+          border: '3px solid rgba(139,105,20,0.2)',
+          borderTopColor: '#8B6914',
+          borderRadius: '50%',
+          animation: 'spin 1s linear infinite',
+        }} />
+        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between flex-wrap gap-4">
+    <div style={{ fontFamily: "'Jost', sans-serif", display: 'flex', flexDirection: 'column', gap: '24px', color: '#1a1209' }}>
+      
+      {/* Top Header */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px' }}>
         <div>
-          <h1 className="font-['Cormorant_Garamond'] text-3xl font-semibold text-[#1a1209]">
+          <h1 style={{
+            fontFamily: "'Cormorant Garamond', serif",
+            fontSize: '32px',
+            fontWeight: 500,
+            margin: 0,
+            lineHeight: 1.1,
+          }}>
             Products
           </h1>
-          <p className="font-['Jost'] text-[#1a1209]/60 mt-1">
+          <p style={{
+            fontSize: '13.5px',
+            color: 'rgba(26,18,9,0.5)',
+            margin: '4px 0 0',
+          }}>
             Manage your product inventory ({filteredProducts.length} products)
           </p>
         </div>
+        
         <Link
           href="/admin/products/new"
-          className="px-6 py-3 bg-gradient-to-r from-[#1a1209] to-[#2a1d10] text-[#faf7f0] font-['Jost'] font-medium rounded-lg hover:from-[#2a1d10] hover:to-[#3a2815] transition-all flex items-center gap-2 shadow-lg"
+          style={{
+            background: '#1a1209',
+            color: '#faf7f0',
+            border: '1px solid #8B6914',
+            padding: '10px 20px',
+            borderRadius: '8px',
+            fontFamily: "'Jost', sans-serif",
+            fontSize: '13px',
+            fontWeight: 500,
+            textDecoration: 'none',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            boxShadow: '0 4px 15px rgba(26,18,9,0.15)',
+            transition: 'background 0.2s',
+          }}
+          onMouseEnter={(e) => e.currentTarget.style.background = '#2c1d0e'}
+          onMouseLeave={(e) => e.currentTarget.style.background = '#1a1209'}
         >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-          </svg>
-          Add Product
+          <span style={{ color: '#c9a14a', fontWeight: 'bold', fontSize: '15px' }}>+</span> Add Product
         </Link>
       </div>
 
-      <div className="bg-white rounded-xl border border-[#1a1209]/10 p-6 space-y-4">
-        <div className="flex items-center justify-between">
-          <h3 className="font-['Jost'] font-semibold text-[#1a1209]">Filters</h3>
+      {/* Filters Container */}
+      <div style={{
+        background: '#fff',
+        border: '1px solid rgba(26,18,9,0.08)',
+        borderRadius: '12px',
+        padding: '20px',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '16px',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.01)',
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <h3 style={{ fontSize: '14px', fontWeight: 600, margin: 0, letterSpacing: '0.04em' }}>Filters</h3>
           <button
             onClick={resetFilters}
-            className="text-sm text-[#8B6914] hover:text-[#1a1209] font-['Jost']"
+            style={{
+              background: 'transparent',
+              border: 'none',
+              color: '#8B6914',
+              cursor: 'pointer',
+              fontSize: '12px',
+              fontWeight: 500,
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px',
+              transition: 'color 0.2s',
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.color = '#1a1209'}
+            onMouseLeave={(e) => e.currentTarget.style.color = '#8B6914'}
           >
-            Reset Filters
+            Reset Filters ↻
           </button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        {/* Filters Form Row 1 */}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+          gap: '16px',
+        }}>
           <div>
-            <label className="block text-[11px] font-semibold tracking-[0.2em] uppercase text-[#1a1209]/70 mb-2">
+            <label style={{ display: 'block', fontSize: '10px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(26,18,9,0.5)', marginBottom: '6px' }}>
               Search
             </label>
-            <input
-              type="text"
-              value={filters.search}
-              onChange={(e) => setFilters({ ...filters, search: e.target.value })}
-              placeholder="Search products..."
-              className="w-full px-4 py-2.5 bg-[#fbf9f4] border border-[#1a1209]/15 rounded-lg text-[#1a1209] placeholder-[#1a1209]/30 focus:outline-none focus:border-[#8B6914] focus:ring-2 focus:ring-[#8B6914]/20 transition font-['Jost'] text-sm"
-            />
+            <div style={{ position: 'relative' }}>
+              <input
+                type="text"
+                value={filters.search}
+                onChange={(e) => setFilters({ ...filters, search: e.target.value })}
+                placeholder="Search products..."
+                style={{
+                  width: '100%',
+                  padding: '9px 12px 9px 36px',
+                  backgroundColor: '#fbf9f4',
+                  border: '1px solid rgba(26,18,9,0.12)',
+                  borderRadius: '8px',
+                  fontSize: '13px',
+                  outline: 'none',
+                  fontFamily: "'Jost', sans-serif",
+                }}
+              />
+              <svg 
+                style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'rgba(26,18,9,0.3)' }} 
+                width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"
+              >
+                <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
+              </svg>
+            </div>
           </div>
 
           <div>
-            <label className="block text-[11px] font-semibold tracking-[0.2em] uppercase text-[#1a1209]/70 mb-2">
+            <label style={{ display: 'block', fontSize: '10px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(26,18,9,0.5)', marginBottom: '6px' }}>
               Model Number
             </label>
             <input
@@ -257,12 +355,21 @@ export default function ProductsPage() {
               value={filters.modelNo}
               onChange={(e) => setFilters({ ...filters, modelNo: e.target.value })}
               placeholder="e.g., WS:2019"
-              className="w-full px-4 py-2.5 bg-[#fbf9f4] border border-[#1a1209]/15 rounded-lg text-[#1a1209] placeholder-[#1a1209]/30 focus:outline-none focus:border-[#8B6914] focus:ring-2 focus:ring-[#8B6914]/20 transition font-['Jost'] text-sm"
+              style={{
+                width: '100%',
+                padding: '9px 12px',
+                backgroundColor: '#fbf9f4',
+                border: '1px solid rgba(26,18,9,0.12)',
+                borderRadius: '8px',
+                fontSize: '13px',
+                outline: 'none',
+                fontFamily: "'Jost', sans-serif",
+              }}
             />
           </div>
 
           <div>
-            <label className="block text-[11px] font-semibold tracking-[0.2em] uppercase text-[#1a1209]/70 mb-2">
+            <label style={{ display: 'block', fontSize: '10px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(26,18,9,0.5)', marginBottom: '6px' }}>
               Min Price (LKR)
             </label>
             <input
@@ -270,12 +377,21 @@ export default function ProductsPage() {
               value={filters.minPrice}
               onChange={(e) => setFilters({ ...filters, minPrice: e.target.value })}
               placeholder="0"
-              className="w-full px-4 py-2.5 bg-[#fbf9f4] border border-[#1a1209]/15 rounded-lg text-[#1a1209] placeholder-[#1a1209]/30 focus:outline-none focus:border-[#8B6914] focus:ring-2 focus:ring-[#8B6914]/20 transition font-['Jost'] text-sm"
+              style={{
+                width: '100%',
+                padding: '9px 12px',
+                backgroundColor: '#fbf9f4',
+                border: '1px solid rgba(26,18,9,0.12)',
+                borderRadius: '8px',
+                fontSize: '13px',
+                outline: 'none',
+                fontFamily: "'Jost', sans-serif",
+              }}
             />
           </div>
 
           <div>
-            <label className="block text-[11px] font-semibold tracking-[0.2em] uppercase text-[#1a1209]/70 mb-2">
+            <label style={{ display: 'block', fontSize: '10px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(26,18,9,0.5)', marginBottom: '6px' }}>
               Max Price (LKR)
             </label>
             <input
@@ -283,18 +399,43 @@ export default function ProductsPage() {
               value={filters.maxPrice}
               onChange={(e) => setFilters({ ...filters, maxPrice: e.target.value })}
               placeholder="1000000"
-              className="w-full px-4 py-2.5 bg-[#fbf9f4] border border-[#1a1209]/15 rounded-lg text-[#1a1209] placeholder-[#1a1209]/30 focus:outline-none focus:border-[#8B6914] focus:ring-2 focus:ring-[#8B6914]/20 transition font-['Jost'] text-sm"
+              style={{
+                width: '100%',
+                padding: '9px 12px',
+                backgroundColor: '#fbf9f4',
+                border: '1px solid rgba(26,18,9,0.12)',
+                borderRadius: '8px',
+                fontSize: '13px',
+                outline: 'none',
+                fontFamily: "'Jost', sans-serif",
+              }}
             />
           </div>
+        </div>
 
+        {/* Filters Form Row 2 */}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+          gap: '16px',
+        }}>
           <div>
-            <label className="block text-[11px] font-semibold tracking-[0.2em] uppercase text-[#1a1209]/70 mb-2">
+            <label style={{ display: 'block', fontSize: '10px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(26,18,9,0.5)', marginBottom: '6px' }}>
               Gift Category
             </label>
             <select
               value={filters.giftCategory}
               onChange={(e) => setFilters({ ...filters, giftCategory: e.target.value })}
-              className="w-full px-4 py-2.5 bg-[#fbf9f4] border border-[#1a1209]/15 rounded-lg text-[#1a1209] focus:outline-none focus:border-[#8B6914] focus:ring-2 focus:ring-[#8B6914]/20 transition font-['Jost'] text-sm"
+              style={{
+                width: '100%',
+                padding: '9px 12px',
+                backgroundColor: '#fbf9f4',
+                border: '1px solid rgba(26,18,9,0.12)',
+                borderRadius: '8px',
+                fontSize: '13px',
+                outline: 'none',
+                fontFamily: "'Jost', sans-serif",
+              }}
             >
               <option value="">All Categories</option>
               {giftCategories.map(cat => (
@@ -306,13 +447,22 @@ export default function ProductsPage() {
           </div>
 
           <div>
-            <label className="block text-[11px] font-semibold tracking-[0.2em] uppercase text-[#1a1209]/70 mb-2">
+            <label style={{ display: 'block', fontSize: '10px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(26,18,9,0.5)', marginBottom: '6px' }}>
               Collection
             </label>
             <select
               value={filters.collectionSection}
               onChange={(e) => setFilters({ ...filters, collectionSection: e.target.value })}
-              className="w-full px-4 py-2.5 bg-[#fbf9f4] border border-[#1a1209]/15 rounded-lg text-[#1a1209] focus:outline-none focus:border-[#8B6914] focus:ring-2 focus:ring-[#8B6914]/20 transition font-['Jost'] text-sm"
+              style={{
+                width: '100%',
+                padding: '9px 12px',
+                backgroundColor: '#fbf9f4',
+                border: '1px solid rgba(26,18,9,0.12)',
+                borderRadius: '8px',
+                fontSize: '13px',
+                outline: 'none',
+                fontFamily: "'Jost', sans-serif",
+              }}
             >
               <option value="">All Collections</option>
               {collectionSections.map(section => (
@@ -324,13 +474,22 @@ export default function ProductsPage() {
           </div>
 
           <div>
-            <label className="block text-[11px] font-semibold tracking-[0.2em] uppercase text-[#1a1209]/70 mb-2">
+            <label style={{ display: 'block', fontSize: '10px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(26,18,9,0.5)', marginBottom: '6px' }}>
               Status
             </label>
             <select
               value={filters.status}
               onChange={(e) => setFilters({ ...filters, status: e.target.value })}
-              className="w-full px-4 py-2.5 bg-[#fbf9f4] border border-[#1a1209]/15 rounded-lg text-[#1a1209] focus:outline-none focus:border-[#8B6914] focus:ring-2 focus:ring-[#8B6914]/20 transition font-['Jost'] text-sm"
+              style={{
+                width: '100%',
+                padding: '9px 12px',
+                backgroundColor: '#fbf9f4',
+                border: '1px solid rgba(26,18,9,0.12)',
+                borderRadius: '8px',
+                fontSize: '13px',
+                outline: 'none',
+                fontFamily: "'Jost', sans-serif",
+              }}
             >
               <option value="all">All Products</option>
               <option value="active">Active</option>
@@ -339,13 +498,22 @@ export default function ProductsPage() {
           </div>
 
           <div>
-            <label className="block text-[11px] font-semibold tracking-[0.2em] uppercase text-[#1a1209]/70 mb-2">
+            <label style={{ display: 'block', fontSize: '10px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(26,18,9,0.5)', marginBottom: '6px' }}>
               Stock Status
             </label>
             <select
               value={filters.stockStatus}
               onChange={(e) => setFilters({ ...filters, stockStatus: e.target.value })}
-              className="w-full px-4 py-2.5 bg-[#fbf9f4] border border-[#1a1209]/15 rounded-lg text-[#1a1209] focus:outline-none focus:border-[#8B6914] focus:ring-2 focus:ring-[#8B6914]/20 transition font-['Jost'] text-sm"
+              style={{
+                width: '100%',
+                padding: '9px 12px',
+                backgroundColor: '#fbf9f4',
+                border: '1px solid rgba(26,18,9,0.12)',
+                borderRadius: '8px',
+                fontSize: '13px',
+                outline: 'none',
+                fontFamily: "'Jost', sans-serif",
+              }}
             >
               <option value="all">All Stock</option>
               <option value="in-stock">In Stock</option>
@@ -355,147 +523,232 @@ export default function ProductsPage() {
         </div>
       </div>
 
-      <div className="bg-white rounded-xl border border-[#1a1209]/10 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-[#faf7f0] border-b border-[#1a1209]/10">
-              <tr>
-                <th className="px-6 py-4 text-left font-['Jost'] text-xs font-semibold text-[#1a1209] uppercase tracking-wider">
+      {/* Table Card Container */}
+      <div style={{
+        background: '#fff',
+        border: '1px solid rgba(26,18,9,0.08)',
+        borderRadius: '12px',
+        overflow: 'hidden',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.01)',
+      }}>
+        <div style={{ overflowX: 'auto' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+            <thead>
+              <tr style={{ backgroundColor: '#faf7f0', borderBottom: '1px solid rgba(26,18,9,0.08)' }}>
+                <th style={{ padding: '14px 20px', fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'rgba(26,18,9,0.7)' }}>
                   Product
                 </th>
-                <th className="px-6 py-4 text-left font-['Jost'] text-xs font-semibold text-[#1a1209] uppercase tracking-wider">
+                <th style={{ padding: '14px 20px', fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'rgba(26,18,9,0.7)' }}>
                   Model
                 </th>
-                <th className="px-6 py-4 text-left font-['Jost'] text-xs font-semibold text-[#1a1209] uppercase tracking-wider">
+                <th style={{ padding: '14px 20px', fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'rgba(26,18,9,0.7)' }}>
                   Price
                 </th>
-                <th className="px-6 py-4 text-left font-['Jost'] text-xs font-semibold text-[#1a1209] uppercase tracking-wider">
+                <th style={{ padding: '14px 20px', fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'rgba(26,18,9,0.7)' }}>
                   Stock
                 </th>
-                <th className="px-6 py-4 text-left font-['Jost'] text-xs font-semibold text-[#1a1209] uppercase tracking-wider">
+                <th style={{ padding: '14px 20px', fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'rgba(26,18,9,0.7)' }}>
                   Status
                 </th>
-                <th className="px-6 py-4 text-right font-['Jost'] text-xs font-semibold text-[#1a1209] uppercase tracking-wider">
+                <th style={{ padding: '14px 20px', fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'rgba(26,18,9,0.7)', textAlign: 'right' }}>
                   Actions
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#1a1209]/5">
-              {filteredProducts.map((product) => {
+            <tbody style={{ fontSize: '13px' }}>
+              {paginatedProducts.map((product) => {
                 const totalStock = getTotalStock(product);
                 const isSoldOut = product.isSoldOut || totalStock === 0;
 
                 return (
-                  <tr key={product._id} className="hover:bg-[#faf7f0]/50 transition-colors">
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-lg bg-[#faf7f0] overflow-hidden flex-shrink-0 border border-[#1a1209]/10">
+                  <tr key={product._id} className="table-row" style={{ borderBottom: '1px solid rgba(26,18,9,0.04)', transition: 'background 0.2s' }}>
+                    <td style={{ padding: '16px 20px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <div style={{
+                          width: '42px',
+                          height: '42px',
+                          borderRadius: '8px',
+                          overflow: 'hidden',
+                          backgroundColor: '#faf7f0',
+                          border: '1px solid rgba(26,18,9,0.06)',
+                          flexShrink: 0,
+                        }}>
                           <img
                             src={product.thumbnail.url}
                             alt={product.title}
-                            className="w-full h-full object-cover"
+                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                           />
                         </div>
-                        <div className="min-w-0">
-                          <p className="font-['Jost'] font-medium text-[#1a1209] truncate max-w-[200px]">
+                        <div style={{ minWidth: 0 }}>
+                          <p style={{ margin: 0, fontWeight: 600, color: '#1a1209', fontSize: '13.5px' }}>
                             {product.title}
                           </p>
-                          <p className="font-['Jost'] text-xs text-[#1a1209]/60">
+                          <p style={{ margin: '2px 0 0', fontSize: '11px', color: 'rgba(26,18,9,0.45)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                             {product.brand}
                           </p>
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4">
-                      <span className="font-['Jost'] text-sm text-[#1a1209] font-medium">
-                        {product.modelNo}
-                      </span>
+                    <td style={{ padding: '16px 20px', fontWeight: 500, color: '#1a1209' }}>
+                      {product.modelNo}
                     </td>
-                    <td className="px-6 py-4">
-                      <span className="font-['Jost'] text-sm font-semibold text-[#8B6914]">
-                        LKR {product.price.toLocaleString()}
-                      </span>
+                    <td style={{ padding: '16px 20px', fontWeight: 600, color: '#8B6914', fontFamily: "'Jost', sans-serif" }}>
+                      LKR {product.price.toLocaleString()}
                     </td>
-                    <td className="px-6 py-4">
+                    <td style={{ padding: '16px 20px' }}>
                       {isSoldOut ? (
-                        <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-['Jost'] font-semibold bg-red-100 text-red-700 border border-red-200">
-                          <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                          </svg>
-                          SOLD OUT
+                        <span style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '4px',
+                          padding: '3px 8px',
+                          borderRadius: '20px',
+                          backgroundColor: 'rgba(231,76,60,0.08)',
+                          color: '#e74c3c',
+                          fontSize: '11px',
+                          fontWeight: 600,
+                          border: '1px solid rgba(231,76,60,0.15)',
+                        }}>
+                          ✕ SOLD OUT
                         </span>
                       ) : (
-                        <span className="font-['Jost'] text-sm text-green-600 font-medium">
+                        <span style={{ color: '#2ecc71', fontWeight: 500 }}>
                           {totalStock} units
                         </span>
                       )}
                     </td>
-                    <td className="px-6 py-4">
-                      <div className="flex flex-col gap-2">
+                    <td style={{ padding: '16px 20px' }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', alignItems: 'flex-start' }}>
                         <button
                           onClick={() => toggleStatus(product)}
-                          className={`inline-flex px-3 py-1 rounded-full text-xs font-['Jost'] font-medium transition-colors ${
-                            product.isActive
-                              ? 'bg-green-100 text-green-700 hover:bg-green-200'
-                              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                          }`}
+                          style={{
+                            padding: '3px 8px',
+                            borderRadius: '4px',
+                            fontSize: '11px',
+                            fontWeight: 500,
+                            backgroundColor: product.isActive ? 'rgba(46,204,113,0.08)' : 'rgba(127,140,141,0.08)',
+                            color: product.isActive ? '#27ae60' : '#7f8c8d',
+                            border: product.isActive ? '1px solid rgba(46,204,113,0.15)' : '1px solid rgba(127,140,141,0.15)',
+                            cursor: 'pointer',
+                          }}
                         >
                           {product.isActive ? 'Active' : 'Inactive'}
                         </button>
                         <button
                           onClick={() => toggleSoldOut(product)}
                           disabled={totalStock === 0}
-                          className={`inline-flex px-3 py-1 rounded-full text-xs font-['Jost'] font-medium transition-colors disabled:opacity-50 ${
-                            isSoldOut
-                              ? 'bg-red-100 text-red-700 hover:bg-red-200'
-                              : 'bg-blue-100 text-blue-700 hover:bg-blue-200'
-                          }`}
+                          style={{
+                            padding: '3px 8px',
+                            borderRadius: '4px',
+                            fontSize: '11px',
+                            fontWeight: 500,
+                            backgroundColor: isSoldOut ? 'rgba(231,76,60,0.08)' : 'rgba(52,152,219,0.08)',
+                            color: isSoldOut ? '#e74c3c' : '#3498db',
+                            border: isSoldOut ? '1px solid rgba(231,76,60,0.15)' : '1px solid rgba(52,152,219,0.15)',
+                            cursor: totalStock === 0 ? 'not-allowed' : 'pointer',
+                            opacity: totalStock === 0 ? 0.5 : 1,
+                          }}
                         >
                           {isSoldOut ? 'Sold Out' : 'Mark Sold Out'}
                         </button>
                       </div>
                     </td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center justify-end gap-2">
+                    <td style={{ padding: '16px 20px', textAlign: 'right' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '8px' }}>
                         {product._id && (
                           <>
                             <Link
                               href={`/products/${product._id}`}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="p-2 text-[#8B6914] hover:bg-[#8B6914]/10 rounded transition-colors"
+                              style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                width: '28px',
+                                height: '28px',
+                                borderRadius: '4px',
+                                color: '#8B6914',
+                                border: '1px solid rgba(139,105,20,0.15)',
+                                backgroundColor: 'transparent',
+                                cursor: 'pointer',
+                                transition: 'all 0.2s',
+                              }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.backgroundColor = 'rgba(139,105,20,0.08)';
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.backgroundColor = 'transparent';
+                              }}
                               title="View Product"
                             >
-                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                              <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                               </svg>
                             </Link>
                             
                             <Link
                               href={`/admin/products/edit/${product._id}`}
-                              className="p-2 text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                              style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                width: '28px',
+                                height: '28px',
+                                borderRadius: '4px',
+                                color: '#3498db',
+                                border: '1px solid rgba(52,152,219,0.15)',
+                                backgroundColor: 'transparent',
+                                cursor: 'pointer',
+                                transition: 'all 0.2s',
+                              }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.backgroundColor = 'rgba(52,152,219,0.08)';
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.backgroundColor = 'transparent';
+                              }}
                               title="Edit Product"
                             >
-                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                              <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                               </svg>
                             </Link>
                             
                             <button
                               onClick={() => product._id && handleDelete(product._id, product.title)}
                               disabled={deletingId === product._id || !product._id}
-                              className="p-2 text-red-600 hover:bg-red-50 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                              style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                width: '28px',
+                                height: '28px',
+                                borderRadius: '4px',
+                                color: '#e74c3c',
+                                border: '1px solid rgba(231,76,60,0.15)',
+                                backgroundColor: 'transparent',
+                                cursor: 'pointer',
+                                transition: 'all 0.2s',
+                                opacity: deletingId === product._id ? 0.5 : 1,
+                              }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.backgroundColor = 'rgba(231,76,60,0.08)';
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.backgroundColor = 'transparent';
+                              }}
                               title="Delete Product"
                             >
                               {deletingId === product._id ? (
-                                <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                                <svg style={{ animation: 'spin 1s linear infinite' }} width="14" height="14" fill="none" viewBox="0 0 24 24">
                                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                                 </svg>
                               ) : (
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                 </svg>
                               )}
                             </button>
@@ -511,17 +764,139 @@ export default function ProductsPage() {
         </div>
 
         {filteredProducts.length === 0 && (
-          <div className="text-center py-16">
-            <div className="text-[#1a1209]/30 mb-4">
-              <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+          <div style={{ textAlign: 'center', padding: '64px 0' }}>
+            <div style={{ color: 'rgba(26,18,9,0.2)', marginBottom: '16px' }}>
+              <svg style={{ margin: '0 auto' }} width="64" height="64" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
               </svg>
             </div>
-            <p className="text-[#1a1209]/60 font-['Jost'] text-lg">No products found</p>
-            <p className="text-[#1a1209]/40 font-['Jost'] text-sm mt-1">Try adjusting your filters</p>
+            <p style={{ color: 'rgba(26,18,9,0.6)', fontSize: '18px', margin: 0 }}>No products found</p>
+            <p style={{ color: 'rgba(26,18,9,0.4)', fontSize: '14px', margin: '4px 0 0' }}>Try adjusting your filters</p>
+          </div>
+        )}
+
+        {/* Pagination Footer */}
+        {filteredProducts.length > 0 && (
+          <div style={{
+            padding: '16px 20px',
+            borderTop: '1px solid rgba(26,18,9,0.06)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            gap: '12px',
+            backgroundColor: '#faf7f0',
+          }}>
+            <span style={{ fontSize: '13px', color: 'rgba(26,18,9,0.5)' }}>
+              Showing {Math.min((currentPage - 1) * pageSize + 1, filteredProducts.length)} to {Math.min(currentPage * pageSize, filteredProducts.length)} of {filteredProducts.length} products
+            </span>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+              {/* Page Size Selector */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <select
+                  value={pageSize}
+                  onChange={(e) => {
+                    setPageSize(Number(e.target.value));
+                    setCurrentPage(1);
+                  }}
+                  style={{
+                    padding: '6px 24px 6px 12px',
+                    backgroundColor: '#fff',
+                    border: '1px solid rgba(26,18,9,0.12)',
+                    borderRadius: '6px',
+                    fontSize: '13px',
+                    cursor: 'pointer',
+                    outline: 'none',
+                    fontFamily: "'Jost', sans-serif",
+                  }}
+                >
+                  <option value={5}>5 per page</option>
+                  <option value={10}>10 per page</option>
+                  <option value={20}>20 per page</option>
+                  <option value={50}>50 per page</option>
+                </select>
+              </div>
+
+              {/* Navigation Arrows & Numbers */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <button
+                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                  disabled={currentPage === 1}
+                  style={{
+                    width: '32px',
+                    height: '32px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    borderRadius: '6px',
+                    border: '1px solid rgba(26,18,9,0.1)',
+                    backgroundColor: '#fff',
+                    cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
+                    opacity: currentPage === 1 ? 0.5 : 1,
+                    fontSize: '13px',
+                  }}
+                >
+                  ‹
+                </button>
+
+                {Array.from({ length: totalPages }).map((_, idx) => {
+                  const pageNum = idx + 1;
+                  const isActive = currentPage === pageNum;
+                  return (
+                    <button
+                      key={pageNum}
+                      onClick={() => setCurrentPage(pageNum)}
+                      style={{
+                        width: '32px',
+                        height: '32px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        borderRadius: '6px',
+                        border: '1px solid ' + (isActive ? '#8B6914' : 'rgba(26,18,9,0.1)'),
+                        backgroundColor: isActive ? '#8B6914' : '#fff',
+                        color: isActive ? '#fff' : '#1a1209',
+                        fontWeight: isActive ? 600 : 400,
+                        cursor: 'pointer',
+                        fontSize: '13px',
+                      }}
+                    >
+                      {pageNum}
+                    </button>
+                  );
+                })}
+
+                <button
+                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                  disabled={currentPage === totalPages}
+                  style={{
+                    width: '32px',
+                    height: '32px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    borderRadius: '6px',
+                    border: '1px solid rgba(26,18,9,0.1)',
+                    backgroundColor: '#fff',
+                    cursor: currentPage === totalPages ? 'not-allowed' : 'pointer',
+                    opacity: currentPage === totalPages ? 0.5 : 1,
+                    fontSize: '13px',
+                  }}
+                >
+                  ›
+                </button>
+              </div>
+            </div>
           </div>
         )}
       </div>
+
+      <style>{`
+        .table-row:hover {
+          background-color: rgba(26,18,9,0.015) !important;
+        }
+      `}</style>
     </div>
   );
 }

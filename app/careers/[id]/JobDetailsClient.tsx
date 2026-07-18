@@ -259,7 +259,6 @@ export default function JobDetailsClient({ id }: { id: string }) {
   return (
     <div className="min-h-screen bg-[#faf7f0] text-[#1a1209] font-['Jost'] flex flex-col mt-[72px] lg:mt-[86px]">
       <Navbar />
-      <Toaster position="top-right" />
 
       {/* Success Modal */}
       {successData && (

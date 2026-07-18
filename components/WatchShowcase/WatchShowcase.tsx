@@ -1,7 +1,7 @@
 const watchHero = "/Home1.webp";
 const watchCard = "/watch-card.jpg";
-const watchConquest = "/watch-conquest.jpg";
-const watchGmt = "/watch-gmt.jpg";
+const watchConquest = "/Winsor_Premium.webp";
+const watchGmt = "/Sport_Watch.webp";
 
 const WatchShowcase = () => {
   return (
@@ -68,11 +68,19 @@ const WatchShowcase = () => {
             height={1280}
             className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
           />
-          <div className="absolute inset-x-0 bottom-0 flex flex-col items-center pb-8 text-center sm:pb-12">
-            <h3 className="font-serif text-2xl tracking-wide sm:text-3xl lg:text-4xl transition-colors duration-300 group-hover:text-[#8B6914]" style={{ color: '#1a1209' }}>
+          {/* Black gradient overlay from below to up */}
+          <div 
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background: 'linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 40%, transparent 100%)',
+              zIndex: 1,
+            }}
+          />
+          <div className="absolute inset-x-0 bottom-0 flex flex-col items-center pb-8 text-center sm:pb-12" style={{ zIndex: 2 }}>
+            <h3 className="font-serif text-2xl tracking-wide text-white sm:text-3xl lg:text-4xl transition-colors duration-300 group-hover:text-[#dfb15b]">
               PREMIUM
             </h3>
-            <span className="mt-3 border-b border-[#1a1209]/40 pb-1 text-xs text-[#1a1209] transition-all duration-300 group-hover:text-[#8B6914] group-hover:border-[#8B6914] sm:mt-4 sm:text-sm">
+            <span className="mt-3 border-b border-white/50 pb-1 text-xs text-white transition-all duration-300 group-hover:text-[#dfb15b] group-hover:border-[#dfb15b] sm:mt-4 sm:text-sm">
               Discover
             </span>
           </div>
@@ -88,7 +96,15 @@ const WatchShowcase = () => {
             height={1280}
             className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
           />
-          <div className="absolute inset-x-0 bottom-0 flex flex-col items-center pb-8 text-center sm:pb-12">
+          {/* Black gradient overlay from below to up */}
+          <div 
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background: 'linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 40%, transparent 100%)',
+              zIndex: 1,
+            }}
+          />
+          <div className="absolute inset-x-0 bottom-0 flex flex-col items-center pb-8 text-center sm:pb-12" style={{ zIndex: 2 }}>
             <h3 className="font-serif text-2xl tracking-wide text-white sm:text-3xl lg:text-4xl transition-colors duration-300 group-hover:text-[#dfb15b]">
               SPORTS
             </h3>
@@ -108,7 +124,15 @@ const WatchShowcase = () => {
             height={1280}
             className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
           />
-          <div className="absolute inset-x-0 bottom-0 flex flex-col items-center pb-8 text-center sm:pb-12">
+          {/* Black gradient overlay from below to up */}
+          <div 
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background: 'linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 40%, transparent 100%)',
+              zIndex: 1,
+            }}
+          />
+          <div className="absolute inset-x-0 bottom-0 flex flex-col items-center pb-8 text-center sm:pb-12" style={{ zIndex: 2 }}>
             <h3 className="font-serif text-2xl tracking-wide text-white sm:text-3xl lg:text-4xl transition-colors duration-300 group-hover:text-[#dfb15b]">
               LIMITED EDITION
             </h3>

@@ -35,6 +35,8 @@ export default function CartPage() {
   }
   const [giftDetails, setGiftDetails] = useState<{ [key: string]: GiftConfig }>({});
   const [activeGiftKey, setActiveGiftKey] = useState<string | null>(null);
+  const [activeGiftInfoKey, setActiveGiftInfoKey] = useState<string | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
 
   // Modal Editing States
   const [modalIsGift, setModalIsGift] = useState(false);
@@ -164,6 +166,16 @@ export default function CartPage() {
       setModalUploadingFile(false);
     }
   };
+
+  // Handle window resizing to detect mobile viewports
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Fetch customer profile details if signed in
   useEffect(() => {
@@ -465,7 +477,7 @@ export default function CartPage() {
           border-radius: 16px;
           border: 1px solid rgba(139, 105, 20, 0.12);
           box-shadow: 0 10px 30px rgba(26, 18, 9, 0.02);
-          overflow: hidden;
+          overflow: visible;
         }
 
         .store-header {
@@ -475,6 +487,8 @@ export default function CartPage() {
           padding: 20px 28px;
           border-bottom: 1.5px solid rgba(139, 105, 20, 0.1);
           background-color: rgba(139, 105, 20, 0.03);
+          border-top-left-radius: 15px;
+          border-top-right-radius: 15px;
         }
 
         .store-info {
@@ -1907,20 +1921,208 @@ export default function CartPage() {
                                     </button>
                                   </div>
                                 ) : (
-                                  <button
-                                    onClick={() => openGiftingModal(itemKey)}
-                                    className="gifting-trigger-btn"
-                                    type="button"
-                                  >
-                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '6px' }}>
-                                      <path d="M20 12v10H4V12" />
-                                      <path d="M2 7h20v5H2z" />
-                                      <path d="M12 22V7" />
-                                      <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z" />
-                                      <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z" />
-                                    </svg>
-                                    Add Gift Options (Free)
-                                  </button>
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', position: 'relative' }}>
+                                    <button
+                                      onClick={() => openGiftingModal(itemKey)}
+                                      className="gifting-trigger-btn"
+                                      type="button"
+                                    >
+                                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '6px' }}>
+                                        <path d="M20 12v10H4V12" />
+                                        <path d="M2 7h20v5H2z" />
+                                        <path d="M12 22V7" />
+                                        <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z" />
+                                        <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z" />
+                                      </svg>
+                                      Add Gift Options (Free)
+                                    </button>
+
+                                    {/* Gift Info Trigger */}
+                                    <div style={{ position: 'relative' }}>
+                                      <button
+                                        type="button"
+                                        onClick={() => setActiveGiftInfoKey(activeGiftInfoKey === itemKey ? null : itemKey)}
+                                        onMouseEnter={() => !isMobile && setActiveGiftInfoKey(itemKey)}
+                                        onMouseLeave={() => !isMobile && setActiveGiftInfoKey(null)}
+                                        style={{
+                                          display: 'flex',
+                                          alignItems: 'center',
+                                          justifyContent: 'center',
+                                          width: '24px',
+                                          height: '24px',
+                                          borderRadius: '50%',
+                                          border: '1.2px solid #8B6914',
+                                          background: 'none',
+                                          color: '#8B6914',
+                                          cursor: 'pointer',
+                                          fontSize: '12px',
+                                          fontWeight: 600,
+                                          fontFamily: 'serif',
+                                          transition: 'all 0.2s',
+                                        }}
+                                      >
+                                        i
+                                      </button>
+
+                                      {/* Gift Info Tooltip Pop-up */}
+                                      {activeGiftInfoKey === itemKey && (
+                                        isMobile ? (
+                                          /* Mobile Modal Overlay Wrapper */
+                                          <div 
+                                            onClick={() => setActiveGiftInfoKey(null)}
+                                            style={{
+                                              position: 'fixed',
+                                              top: 0,
+                                              left: 0,
+                                              right: 0,
+                                              bottom: 0,
+                                              backgroundColor: 'rgba(26, 18, 9, 0.45)',
+                                              backdropFilter: 'blur(3px)',
+                                              display: 'flex',
+                                              alignItems: 'center',
+                                              justifyContent: 'center',
+                                              padding: '20px',
+                                              zIndex: 2000,
+                                              pointerEvents: 'auto',
+                                            }}
+                                          >
+                                            {/* Centered Modal Card */}
+                                            <div 
+                                              onClick={(e) => e.stopPropagation()} /* Prevent close when clicking inside card */
+                                              style={{
+                                                width: '100%',
+                                                maxWidth: '320px',
+                                                background: '#ffffff',
+                                                border: '1.5px solid #8B6914',
+                                                borderRadius: '12px',
+                                                padding: '16px',
+                                                boxShadow: '0 15px 35px rgba(26,18,9,0.3)',
+                                                position: 'relative',
+                                                display: 'flex',
+                                                flexDirection: 'column',
+                                              }}
+                                            >
+                                              {/* Mobile Close Button */}
+                                              <button
+                                                type="button"
+                                                onClick={() => setActiveGiftInfoKey(null)}
+                                                style={{
+                                                  position: 'absolute',
+                                                  top: '12px',
+                                                  right: '12px',
+                                                  background: 'none',
+                                                  border: 'none',
+                                                  fontSize: '16px',
+                                                  fontWeight: 600,
+                                                  color: '#1a1209',
+                                                  cursor: 'pointer',
+                                                  padding: '4px',
+                                                }}
+                                              >
+                                                ✕
+                                              </button>
+
+                                              <img 
+                                                src="/graduation_gift.png" 
+                                                alt="Winsor Premium Gift Presentation" 
+                                                style={{
+                                                  width: '100%',
+                                                  height: '180px',
+                                                  objectFit: 'cover',
+                                                  borderRadius: '8px',
+                                                  border: '1px solid rgba(139,105,20,0.12)',
+                                                  marginBottom: '10px'
+                                                }}
+                                              />
+                                              <p style={{
+                                                margin: '0 0 4px',
+                                                fontFamily: "'Cormorant Garamond', serif",
+                                                fontSize: '16px',
+                                                fontWeight: 600,
+                                                color: '#8B6914'
+                                              }}>
+                                                Signature Gift Presentation
+                                              </p>
+                                              <p style={{
+                                                margin: 0,
+                                                fontFamily: "'Jost', sans-serif",
+                                                fontSize: '12px',
+                                                lineHeight: '1.45',
+                                                color: 'rgba(26,18,9,0.75)'
+                                              }}>
+                                                Every gift timepiece is shipped in our multi-slot leatherette watch case with velvet-cushions, wrapped in brand-textured protective paper, and accompanied by your wishes.
+                                              </p>
+                                            </div>
+                                          </div>
+                                        ) : (
+                                          /* Desktop Tooltip Popover */
+                                          <div 
+                                            style={{
+                                              position: 'absolute',
+                                              bottom: '34px',
+                                              left: '50%',
+                                              transform: 'translateX(-50%)',
+                                              width: '280px',
+                                              background: '#ffffff',
+                                              border: '1.5px solid #8B6914',
+                                              borderRadius: '10px',
+                                              padding: '12px',
+                                              boxShadow: '0 10px 25px rgba(26,18,9,0.18)',
+                                              zIndex: 100,
+                                              textAlign: 'left',
+                                              pointerEvents: 'auto',
+                                            }}
+                                            onMouseEnter={() => setActiveGiftInfoKey(itemKey)}
+                                            onMouseLeave={() => setActiveGiftInfoKey(null)}
+                                          >
+                                            {/* Tooltip Arrow */}
+                                            <div style={{
+                                              position: 'absolute',
+                                              bottom: '-8px',
+                                              left: '50%',
+                                              transform: 'translateX(-50%) rotate(45deg)',
+                                              width: '14px',
+                                              height: '14px',
+                                              background: '#ffffff',
+                                              borderRight: '1.5px solid #8B6914',
+                                              borderBottom: '1.5px solid #8B6914',
+                                            }} />
+
+                                            <img 
+                                              src="/graduation_gift.png" 
+                                              alt="Winsor Premium Gift Presentation" 
+                                              style={{
+                                                width: '100%',
+                                                height: '150px',
+                                                objectFit: 'cover',
+                                                borderRadius: '6px',
+                                                border: '1px solid rgba(139,105,20,0.12)',
+                                                marginBottom: '8px'
+                                              }}
+                                            />
+                                            <p style={{
+                                              margin: '0 0 4px',
+                                              fontFamily: "'Cormorant Garamond', serif",
+                                              fontSize: '14px',
+                                              fontWeight: 600,
+                                              color: '#8B6914'
+                                            }}>
+                                              Signature Gift Presentation
+                                            </p>
+                                            <p style={{
+                                              margin: 0,
+                                              fontFamily: "'Jost', sans-serif",
+                                              fontSize: '11px',
+                                              lineHeight: '1.45',
+                                              color: 'rgba(26,18,9,0.75)'
+                                            }}>
+                                              Every gift timepiece is shipped in our multi-slot leatherette watch case with velvet-cushions, wrapped in brand-textured protective paper, and accompanied by your custom wishes.
+                                            </p>
+                                          </div>
+                                        )
+                                      )}
+                                    </div>
+                                  </div>
                                 )}
                               </div>
                             )}

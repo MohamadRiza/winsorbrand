@@ -11,7 +11,7 @@ type IconComponent = (props: { active: boolean }) => React.JSX.Element;
 
 // ── Icon Components (SVG - no external deps) ───────────────────────────────
 const DashboardIcon: IconComponent = ({ active }) => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={active ? '#8B6914' : 'currentColor'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={active ? '#f3e3b8' : '#c9a14a'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
     <rect x="3" y="3" width="7" height="7" rx="1" />
     <rect x="14" y="3" width="7" height="7" rx="1" />
     <rect x="3" y="14" width="7" height="7" rx="1" />
@@ -20,13 +20,13 @@ const DashboardIcon: IconComponent = ({ active }) => (
 );
 
 const ProductsIcon: IconComponent = ({ active }) => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={active ? '#8B6914' : 'currentColor'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={active ? '#f3e3b8' : '#c9a14a'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
     <path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
   </svg>
 );
 
 const OrdersIcon: IconComponent = ({ active }) => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={active ? '#8B6914' : 'currentColor'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={active ? '#f3e3b8' : '#c9a14a'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
     <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
     <line x1="3" y1="6" x2="21" y2="6" />
     <path d="M16 10a4 4 0 0 1-8 0" />
@@ -34,7 +34,7 @@ const OrdersIcon: IconComponent = ({ active }) => (
 );
 
 const CustomersIcon: IconComponent = ({ active }) => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={active ? '#8B6914' : 'currentColor'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={active ? '#f3e3b8' : '#c9a14a'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
     <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
     <circle cx="9" cy="7" r="4" />
     <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
@@ -43,20 +43,20 @@ const CustomersIcon: IconComponent = ({ active }) => (
 );
 
 const MessagesIcon: IconComponent = ({ active }) => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={active ? '#8B6914' : 'currentColor'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={active ? '#f3e3b8' : '#c9a14a'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
     <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
   </svg>
 );
 
 const JobsIcon: IconComponent = ({ active }) => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={active ? '#8B6914' : 'currentColor'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={active ? '#f3e3b8' : '#c9a14a'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
     <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
     <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
   </svg>
 );
 
 const StockIcon: IconComponent = ({ active }) => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={active ? '#8B6914' : 'currentColor'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={active ? '#f3e3b8' : '#c9a14a'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
     <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
     <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
     <line x1="12" y1="22.08" x2="12" y2="12" />
@@ -64,16 +64,38 @@ const StockIcon: IconComponent = ({ active }) => (
 );
 
 const SettingsIcon: IconComponent = ({ active }) => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={active ? '#8B6914' : 'currentColor'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={active ? '#f3e3b8' : '#c9a14a'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
     <circle cx="12" cy="12" r="3" />
     <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
   </svg>
 );
 
 const RetailerIcon: IconComponent = ({ active }) => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={active ? '#8B6914' : 'currentColor'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={active ? '#f3e3b8' : '#c9a14a'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
     <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
     <circle cx="12" cy="10" r="3" />
+  </svg>
+);
+
+const StaffIcon: IconComponent = ({ active }) => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={active ? '#f3e3b8' : '#c9a14a'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+    <circle cx="9" cy="7" r="4" />
+    <path d="M19 8v4c0 1.5 1.5 2.5 1.5 2.5s1.5-1 1.5-2.5V8l-1.5-.75L19 8z" stroke="#c9a14a" strokeWidth="1.2" />
+  </svg>
+);
+
+const CouponsIcon: IconComponent = ({ active }) => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={active ? '#f3e3b8' : '#c9a14a'} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" />
+    <line x1="7" y1="7" x2="7.01" y2="7" />
+  </svg>
+);
+
+const ReviewsIcon: IconComponent = ({ active }) => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={active ? '#f3e3b8' : '#c9a14a'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+    <path d="M9 10l2 2 4-4" />
   </svg>
 );
 
@@ -156,22 +178,12 @@ const NAV_ITEMS: NavItem[] = [
   { 
     label: 'Coupons', 
     href: '/admin/coupons', 
-    icon: () => (
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/>
-        <line x1="7" y1="7" x2="7.01" y2="7"/>
-      </svg>
-    )
+    icon: CouponsIcon
   },
   { 
     label: 'Reviews', 
     href: '/admin/reviews', 
-    icon: () => (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-        <path d="M9 10l2 2 4-4" />
-      </svg>
-    )
+    icon: ReviewsIcon
   },
   { 
     label: 'Retailers', 
@@ -181,7 +193,7 @@ const NAV_ITEMS: NavItem[] = [
   { 
     label: 'Staff Management', 
     href: '/admin/staff', 
-    icon: CustomersIcon 
+    icon: StaffIcon 
   },
   { label: 'Settings', href: '/admin/settings', icon: SettingsIcon },
 ];
@@ -217,6 +229,7 @@ export default function Sidebar({
   const pathname = usePathname();
   const router = useRouter();
   const [openSubmenu, setOpenSubmenu] = useState<string | null>(null);
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   
   // Local state fallback if not managed by parent
   const [localCollapsed, setLocalCollapsed] = useState(false);
@@ -298,9 +311,14 @@ export default function Sidebar({
     <>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Jost:wght@300;400;500;600&display=swap');
-        .sb-link { transition: all 0.2s ease; }
-        .sb-link:hover { background: rgba(139,105,20,0.08); }
-        .sb-link-active { background: rgba(139,105,20,0.12); border-left: 3px solid #8B6914; }
+        .sb-link { transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1); border: 1px solid transparent; margin: 0 8px; border-radius: 8px; }
+        .sb-link:hover { background: rgba(201, 161, 74, 0.08); border-color: rgba(201, 161, 74, 0.15); color: #ffffff !important; }
+        .sb-link-active { 
+          background: linear-gradient(90deg, rgba(201, 161, 74, 0.18) 0%, rgba(139, 105, 20, 0.06) 100%) !important; 
+          border: 1px solid rgba(201, 161, 74, 0.35) !important;
+          border-radius: 8px !important;
+          box-shadow: 0 4px 15px rgba(201, 161, 74, 0.05);
+        }
         .sb-scrollbar::-webkit-scrollbar { width: 4px; }
         .sb-scrollbar::-webkit-scrollbar-track { background: transparent; }
         .sb-scrollbar::-webkit-scrollbar-thumb { background: rgba(139,105,20,0.3); border-radius: 2px; }
@@ -332,8 +350,8 @@ export default function Sidebar({
           position: 'fixed',
           left: 0,
           top: 0,
-          background: '#1a1209',
-          borderRight: '1px solid rgba(139,105,20,0.2)',
+          background: '#070605',
+          borderRight: '1px solid rgba(255, 255, 255, 0.05)',
           display: 'flex',
           flexDirection: 'column',
           transition: 'width 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -344,23 +362,27 @@ export default function Sidebar({
       >
         {/* Header */}
         <div style={{ 
-          padding: collapsed ? '16px 12px' : '20px 24px', 
+          padding: collapsed ? '12px 6px' : '20px 24px', 
           borderBottom: '1px solid rgba(139,105,20,0.15)',
           display: 'flex',
+          flexDirection: collapsed ? 'column' : 'row',
           alignItems: 'center',
           justifyContent: collapsed ? 'center' : 'space-between',
+          gap: collapsed ? '8px' : '0',
           minHeight: '72px'
         }}>
-          {!collapsed && (
-            <Link href="/admin/dashboard" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <Image src="/yellow.webp" alt="Winsor" width={32} height={32} style={{ objectFit: 'contain' }} priority />
-              <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '18px', fontWeight: 600, color: '#f3e3b8', letterSpacing: '0.05em' }}>
-                WINSOR
-              </span>
-            </Link>
-          )}
+          <Link href="/admin/dashboard" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Image 
+              src="/yellow.webp" 
+              alt="Winsor Logo" 
+              width={collapsed ? 40 : 80} 
+              height={collapsed ? 40 : 40} 
+              style={{ objectFit: 'contain' }} 
+              priority 
+            />
+          </Link>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div style={{ display: 'flex', flexDirection: collapsed ? 'column' : 'row', alignItems: 'center', gap: '12px' }}>
             {/* Mobile close button */}
             <button
               onClick={() => {
@@ -408,54 +430,7 @@ export default function Sidebar({
           </div>
         </div>
 
-        {/* Admin Profile */}
-        {!collapsed && (
-          <div style={{ 
-            padding: '16px 24px', 
-            borderBottom: '1px solid rgba(139,105,20,0.1)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '12px'
-          }}>
-            <div style={{
-              width: '40px',
-              height: '40px',
-              borderRadius: '50%',
-              background: 'linear-gradient(135deg, #8B6914, #c9a14a)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: '#1a1209',
-              fontWeight: 600,
-              fontSize: '14px',
-              fontFamily: "'Jost', sans-serif"
-            }}>
-              {adminName?.charAt(0).toUpperCase()}
-            </div>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <p style={{ 
-                color: '#f3e3b8', 
-                fontSize: '13px', 
-                fontWeight: 500, 
-                margin: 0,
-                whiteSpace: 'nowrap',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis'
-              }}>
-                {adminName}
-              </p>
-              <p style={{ 
-                color: 'rgba(243,227,184,0.6)', 
-                fontSize: '11px', 
-                margin: 0,
-                textTransform: 'uppercase',
-                letterSpacing: '0.08em'
-              }}>
-                {adminRole}
-              </p>
-            </div>
-          </div>
-        )}
+
 
         {/* Navigation */}
         <nav style={{ 
@@ -493,24 +468,27 @@ export default function Sidebar({
                     display: 'flex',
                     alignItems: 'center',
                     gap: '12px',
-                    padding: collapsed ? '12px' : '12px 16px',
-                    color: active ? '#8B6914' : 'rgba(243,227,184,0.85)',
+                    padding: collapsed ? '10px' : '10px 14px',
+                    color: active ? '#f3e3b8' : 'rgba(255, 255, 255, 0.75)',
                     textDecoration: 'none',
-                    fontSize: '12px',
-                    fontWeight: active ? 600 : 400,
-                    letterSpacing: '0.08em',
-                    textTransform: 'uppercase',
-                    borderRadius: '0 4px 4px 0',
-                    borderLeft: active && !hasChildren ? '3px solid #8B6914' : '3px solid transparent',
+                    fontSize: '13px',
+                    fontWeight: active ? 500 : 400,
+                    letterSpacing: '0.03em',
                     position: 'relative',
                     whiteSpace: collapsed ? 'nowrap' : 'normal',
                     overflow: 'hidden'
                   }}
                   onMouseEnter={(e) => {
-                    if (!active) e.currentTarget.style.background = 'rgba(139,105,20,0.08)';
+                    if (!active) {
+                      e.currentTarget.style.background = 'rgba(201, 161, 74, 0.08)';
+                      e.currentTarget.style.borderColor = 'rgba(201, 161, 74, 0.15)';
+                    }
                   }}
                   onMouseLeave={(e) => {
-                    if (!active) e.currentTarget.style.background = '';
+                    if (!active) {
+                      e.currentTarget.style.background = '';
+                      e.currentTarget.style.borderColor = 'transparent';
+                    }
                   }}
                 >
                   <item.icon active={active} />
@@ -580,58 +558,158 @@ export default function Sidebar({
           })}
         </nav>
  
-        {/* Footer / Logout */}
+        {/* Footer / Profile Card */}
         <div style={{ 
-          padding: collapsed ? '12px' : '16px 24px', 
-          borderTop: '1px solid rgba(139,105,20,0.15)',
-          background: 'rgba(26,18,9,0.5)'
+          padding: '16px 20px', 
+          borderTop: '1px solid rgba(255,255,255,0.05)',
+          background: 'rgba(0, 0, 0, 0.2)',
+          position: 'relative'
         }}>
-          <button
-            onClick={handleLogout}
-            style={{
+          {/* Popover Menu */}
+          {profileMenuOpen && (
+            <div style={{
+              position: 'absolute',
+              bottom: '80px',
+              left: collapsed ? '12px' : '20px',
+              right: collapsed ? 'auto' : '20px',
+              width: collapsed ? '180px' : 'auto',
+              background: '#0c0a09',
+              border: '1px solid rgba(201, 161, 74, 0.3)',
+              borderRadius: '8px',
+              boxShadow: '0 10px 25px rgba(0,0,0,0.5)',
+              padding: '6px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '4px',
+              zIndex: 50,
+            }}>
+              <Link
+                href="/admin/settings"
+                onClick={() => setProfileMenuOpen(false)}
+                style={{
+                  padding: '8px 12px',
+                  borderRadius: '6px',
+                  color: 'rgba(255, 255, 255, 0.8)',
+                  fontSize: '12px',
+                  textDecoration: 'none',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  transition: 'background 0.2s'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'}
+                onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+              >
+                <SettingsIcon active={false} />
+                <span>Account Settings</span>
+              </Link>
+              <button
+                onClick={() => {
+                  setProfileMenuOpen(false);
+                  handleLogout();
+                }}
+                style={{
+                  padding: '8px 12px',
+                  borderRadius: '6px',
+                  color: '#dc3232',
+                  background: 'transparent',
+                  border: 'none',
+                  fontSize: '12px',
+                  textAlign: 'left',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  width: '100%',
+                  transition: 'background 0.2s'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(220,50,50,0.08)'}
+                onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+              >
+                <LogoutIcon />
+                <span>Logout</span>
+              </button>
+            </div>
+          )}
+
+          {/* Clickable Profile Card */}
+          <div 
+            onClick={() => setProfileMenuOpen(!profileMenuOpen)}
+            style={{ 
               display: 'flex',
               alignItems: 'center',
-              gap: collapsed ? 0 : '12px',
-              width: '100%',
-              padding: collapsed ? '12px' : '12px 16px',
-              background: 'transparent',
-              border: '1px solid rgba(139,105,20,0.3)',
-              borderRadius: '6px',
-              color: 'rgba(243,227,184,0.7)',
-              fontSize: '11px',
-              fontWeight: 500,
-              letterSpacing: '0.1em',
-              textTransform: 'uppercase',
+              justifyContent: collapsed ? 'center' : 'space-between',
+              gap: '12px',
               cursor: 'pointer',
-              transition: 'all 0.2s ease',
-              justifyContent: collapsed ? 'center' : 'flex-start'
+              padding: '6px',
+              borderRadius: '8px',
+              transition: 'background 0.2s',
             }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = 'rgba(220,50,50,0.15)';
-              e.currentTarget.style.borderColor = '#dc3232';
-              e.currentTarget.style.color = '#dc3232';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = 'transparent';
-              e.currentTarget.style.borderColor = 'rgba(139,105,20,0.3)';
-              e.currentTarget.style.color = 'rgba(243,227,184,0.7)';
-            }}
+            onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.03)'}
+            onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
           >
-            <LogoutIcon />
-            {!collapsed && <span>Logout</span>}
-          </button>
-          
-          {!collapsed && (
-            <p style={{ 
-              textAlign: 'center', 
-              fontSize: '10px', 
-              color: 'rgba(243,227,184,0.3)', 
-              marginTop: '12px',
-              letterSpacing: '0.05em'
+            <div style={{
+              width: '36px',
+              height: '36px',
+              borderRadius: '50%',
+              background: 'linear-gradient(135deg, #8B6914, #c9a14a)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#1a1209',
+              fontWeight: 600,
+              fontSize: '13px',
+              fontFamily: "'Jost', sans-serif",
+              border: '1px solid rgba(201, 161, 74, 0.4)',
+              flexShrink: 0
             }}>
-              © 2026 Winsor Admin
-            </p>
-          )}
+              {adminName?.charAt(0).toUpperCase()}
+            </div>
+            
+            {!collapsed && (
+              <>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p style={{ 
+                    color: '#ffffff', 
+                    fontSize: '13px', 
+                    fontWeight: 500, 
+                    margin: 0,
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis'
+                  }}>
+                    {adminName}
+                  </p>
+                  <p style={{ 
+                    color: '#c9a14a', 
+                    fontSize: '11px', 
+                    margin: 0,
+                    textTransform: 'capitalize',
+                    letterSpacing: '0.02em',
+                    fontWeight: 400
+                  }}>
+                    {adminRole === 'admin' ? 'Super Admin' : 'Staff'}
+                  </p>
+                </div>
+
+                <div style={{ color: '#c9a14a', display: 'flex', alignItems: 'center' }}>
+                  <svg 
+                    width="12" 
+                    height="12" 
+                    viewBox="0 0 24 24" 
+                    fill="none" 
+                    stroke="currentColor" 
+                    strokeWidth="2.5" 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round"
+                    style={{ transition: 'transform 0.2s', transform: profileMenuOpen ? 'rotate(180deg)' : 'rotate(0)' }}
+                  >
+                    <polyline points="6 9 12 15 18 9" />
+                  </svg>
+                </div>
+              </>
+            )}
+          </div>
         </div>
       </aside>
     </>

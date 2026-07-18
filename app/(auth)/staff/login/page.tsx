@@ -116,18 +116,6 @@ function StaffLoginContent() {
       className="min-h-screen w-full flex bg-[#f7f4ee] overflow-hidden select-none animate-fadeIn"
       style={{ fontFamily: "'Jost', sans-serif" }}
     >
-      <Toaster
-        position="top-center"
-        toastOptions={{
-          style: {
-            background: '#1a1209',
-            color: '#f3e3b8',
-            border: '1px solid rgba(201,161,74,0.3)',
-            fontSize: '13px',
-            letterSpacing: '0.02em',
-          },
-        }}
-      />
 
       {/* LEFT — Brand image panel with 3D Parallax */}
       <div className="hidden lg:flex relative w-1/2 overflow-hidden">

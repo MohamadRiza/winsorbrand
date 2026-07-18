@@ -286,12 +286,12 @@ export default function Watch3DAssembly() {
         style={{
           width: '100%',
           height: '100vh',
-          background: '#050302',
+          background: '#faf7f0',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
-          color: '#dfb15b',
+          color: '#8B6914',
           position: 'relative',
           overflow: 'hidden',
           userSelect: 'none',
@@ -303,8 +303,8 @@ export default function Watch3DAssembly() {
             style={{
               width: '40px',
               height: '40px',
-              border: '2px solid rgba(223, 177, 91, 0.1)',
-              borderTopColor: '#dfb15b',
+              border: '2px solid rgba(139, 105, 20, 0.1)',
+              borderTopColor: '#8B6914',
               borderRadius: '50%',
               animation: 'spin 1.2s linear infinite',
             }}
@@ -321,7 +321,7 @@ export default function Watch3DAssembly() {
               fontSize: '24px',
               fontWeight: 300,
               letterSpacing: '0.25em',
-              color: '#ffffff',
+              color: '#1a1209',
               margin: '10px 0 2px 0',
               textTransform: 'uppercase',
             }}
@@ -333,7 +333,7 @@ export default function Watch3DAssembly() {
               fontFamily: "'Jost', sans-serif",
               fontSize: '10px',
               letterSpacing: '0.15em',
-              color: 'rgba(255, 255, 255, 0.5)',
+              color: 'rgba(26, 18, 9, 0.5)',
               textTransform: 'uppercase',
               margin: 0,
             }}

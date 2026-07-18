@@ -8,6 +8,11 @@ import { useCart } from '@/app/context/CartContext';
 import toast from 'react-hot-toast';
 import { IGiftCategory, IProduct } from '@/types';
 
+const stripEmojis = (text: string) => {
+  if (!text) return '';
+  return text.replace(/[\u00a9\u00ae\u2000-\u3300\ud83c-\udbff\udc00-\udfff]/g, '').trim();
+};
+
 // Slug to image mapping for active gift categories inside public/gift_categories
 function getGiftCategoryImage(slug: string): string {
   const mapping: Record<string, string> = {
@@ -703,7 +708,7 @@ export default function GiftsPage() {
                     </div>
                     <div className="gender-header-overlay" />
                     <div className="gender-header-content">
-                      <h2>{cat.label} {cat.emoji}</h2>
+                      <h2>{stripEmojis(cat.label)}</h2>
                       <span>Explore this curated collection</span>
                     </div>
                     <div className="gender-header-arrow">
@@ -718,7 +723,7 @@ export default function GiftsPage() {
             <h2 className="section-header-title">
               {selectedCategorySlug === 'all' 
                 ? 'All Curated Gifts' 
-                : `${giftCategories.find(c => c.slug === selectedCategorySlug)?.label || 'Curated'} Selection`}
+                : `${stripEmojis(giftCategories.find(c => c.slug === selectedCategorySlug)?.label || 'Curated')} Selection`}
             </h2>
 
             {filteredProducts.length === 0 ? (
