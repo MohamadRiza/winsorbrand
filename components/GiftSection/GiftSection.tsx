@@ -52,6 +52,195 @@ const OCCASION_BACKGROUNDS: Record<string, string> = {
   'esala-perahera': '/gift_categories/esala_perahara.png',
 };
 
+// ── Occasion Vibe SVG Icons ───────────────────────────────────────────────
+const SnowflakeIcon = ({ size = 20, color = '#ffffff' }: { size?: number; color?: string }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="12" y1="2" x2="12" y2="22" />
+    <line x1="2" y1="12" x2="22" y2="12" />
+    <line x1="4.93" y1="4.93" x2="19.07" y2="19.07" />
+    <line x1="4.93" y1="19.07" x2="19.07" y2="4.93" />
+    <polyline points="10 4 12 6 14 4" />
+    <polyline points="10 20 12 18 14 20" />
+    <polyline points="20 10 18 12 20 14" />
+    <polyline points="4 10 6 12 4 14" />
+  </svg>
+);
+
+const GraduationCapIcon = ({ size = 20, color = '#dfb15b' }: { size?: number; color?: string }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+    <path d="M6 12v5c0 2 2 3 6 3s6-1 6-3v-5" />
+  </svg>
+);
+
+const HeartIcon = ({ size = 20, color = '#ff4d6d' }: { size?: number; color?: string }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" style={{ color }}>
+    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+  </svg>
+);
+
+const SparkleIcon = ({ size = 20, color = '#ffd700' }: { size?: number; color?: string }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" style={{ color }}>
+    <path d="M12 2l2.4 6.6 6.6 2.4-6.6 2.4-2.4 6.6-2.4-6.6-6.6-2.4 6.6-2.4z" />
+  </svg>
+);
+
+const BlossomIcon = ({ size = 20, color = '#fbcfe8' }: { size?: number; color?: string }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="12" r="3" />
+    <path d="M12 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3z" />
+    <path d="M12 16a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3z" />
+    <path d="M5 12a3 3 0 0 0 3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0-3-3z" />
+    <path d="M19 12a3 3 0 0 0-3-3 3 3 0 0 0 3 3 3 3 0 0 0-3 3 3 3 0 0 0 3-3z" />
+  </svg>
+);
+
+const LuxuryDotIcon = ({ size = 8, color = '#c9a14a' }: { size?: number; color?: string }) => (
+  <svg width={size} height={size} viewBox="0 0 8 8" fill="currentColor" style={{ color }}>
+    <circle cx="4" cy="4" r="3" />
+  </svg>
+);
+
+// ── Occasion Vibe Particles Overlay ───────────────────────────────────────
+function OccasionVibe({ slug }: { slug: string }) {
+  const normalizedSlug = slug.toLowerCase();
+
+  const config = useMemo(() => {
+    switch (normalizedSlug) {
+      case 'christmas':
+        return {
+          type: 'snow',
+          count: 24,
+          IconComponent: SnowflakeIcon,
+          color: '#ffffff',
+          glow: '0 0 8px rgba(255,255,255,0.6)',
+          animationName: 'vibe-snow',
+        };
+      case 'valentines-day':
+      case 'womens-day':
+        return {
+          type: 'hearts',
+          count: 18,
+          IconComponent: HeartIcon,
+          color: '#ff4d6d',
+          glow: '0 0 12px rgba(255,77,109,0.7)',
+          animationName: 'vibe-swirl',
+        };
+      case 'graduation':
+        return {
+          type: 'confetti',
+          count: 22,
+          IconComponent: GraduationCapIcon,
+          color: '#dfb15b',
+          glow: '0 0 8px rgba(223,177,91,0.6)',
+          animationName: 'vibe-swirl',
+        };
+      case 'new-year':
+      case 'sinhala-tamil-new-year':
+      case 'eid':
+      case 'esala-perahera':
+        return {
+          type: 'sparkles',
+          count: 20,
+          IconComponent: SparkleIcon,
+          color: '#ffd700',
+          glow: '0 0 10px rgba(255,215,0,0.8)',
+          animationName: 'vibe-snow',
+        };
+      case 'mothers-day':
+      case 'fathers-day':
+      case 'easter-sunday':
+      case 'thai-pongal':
+        return {
+          type: 'blossom',
+          count: 16,
+          IconComponent: BlossomIcon,
+          color: '#fbcfe8',
+          glow: '0 0 6px rgba(251,207,232,0.4)',
+          animationName: 'vibe-swirl',
+        };
+      default:
+        // Default luxury vibe: elegant gold sparkles
+        return {
+          type: 'luxury',
+          count: 14,
+          IconComponent: LuxuryDotIcon,
+          color: '#c9a14a',
+          glow: '0 0 6px rgba(201,161,74,0.5)',
+          animationName: 'vibe-snow',
+        };
+    }
+  }, [normalizedSlug]);
+
+  const particles = useMemo(() => {
+    return Array.from({ length: config.count }).map((_, i) => {
+      const left = `${Math.random() * 100}%`;
+      const delay = `${Math.random() * 8}s`;
+      const duration = `${12 + Math.random() * 14}s`;
+      const size = `${12 + Math.random() * 14}px`;
+      const opacity = 0.15 + Math.random() * 0.45;
+      return { id: i, left, delay, duration, size, opacity };
+    });
+  }, [config]);
+
+  const IconComponent = config.IconComponent;
+
+  return (
+    <div style={{
+      position: 'absolute',
+      inset: 0,
+      pointerEvents: 'none',
+      zIndex: 2,
+      overflow: 'hidden',
+    }}>
+      <style>{`
+        @keyframes vibe-snow {
+          0% { transform: translateY(-25px) rotate(0deg) translateX(0); opacity: 0; }
+          15% { opacity: var(--op, 0.7); }
+          85% { opacity: var(--op, 0.7); }
+          100% { transform: translateY(105vh) rotate(360deg) translateX(-15px); opacity: 0; }
+        }
+        @keyframes vibe-float-up {
+          0% { transform: translateY(105vh) rotate(0deg) scale(0.8); opacity: 0; }
+          15% { opacity: var(--op, 0.7); }
+          85% { opacity: var(--op, 0.7); }
+          100% { transform: translateY(-25px) rotate(180deg) scale(1.2); opacity: 0; }
+        }
+        @keyframes vibe-swirl {
+          0% { transform: translateY(-25px) rotate(0deg) translateX(0); opacity: 0; }
+          15% { opacity: var(--op, 0.7); }
+          85% { opacity: var(--op, 0.7); }
+          100% { transform: translateY(105vh) rotate(360deg) translateX(15px); opacity: 0; }
+        }
+      `}</style>
+
+      {particles.map(p => (
+        <span
+          key={p.id}
+          style={{
+            position: 'absolute',
+            top: '-25px',
+            bottom: 'auto',
+            left: p.left,
+            animationName: config.animationName,
+            animationDuration: p.duration,
+            animationDelay: p.delay,
+            animationIterationCount: 'infinite',
+            animationTimingFunction: 'linear',
+            opacity: 0,
+            display: 'inline-block',
+            transformOrigin: 'center',
+            filter: config.glow ? `drop-shadow(${config.glow})` : 'none',
+            ['--op' as any]: p.opacity,
+          }}
+        >
+          <IconComponent size={parseInt(p.size)} color={config.color} />
+        </span>
+      ))}
+    </div>
+  );
+}
+
 // ── Hero stage: one big background + swipeable watch (book-page feel) ─────
 function HeroStage({
   background,
@@ -60,6 +249,7 @@ function HeroStage({
   setActiveIndex,
   categoryLabel,
   categoryTagline,
+  categorySlug,
 }: {
   background: string;
   products: GiftProduct[];
@@ -67,6 +257,7 @@ function HeroStage({
   setActiveIndex: (i: number) => void;
   categoryLabel: string;
   categoryTagline?: string;
+  categorySlug: string;
 }) {
   const dragStartX = useRef<number | null>(null);
   const [direction, setDirection] = useState<1 | -1>(1);
@@ -75,6 +266,20 @@ function HeroStage({
   const [bg1, setBg1] = useState(background);
   const [bg2, setBg2] = useState('');
   const [showBg2, setShowBg2] = useState(false);
+
+  const ambientGlow = useMemo(() => {
+    const slug = categorySlug.toLowerCase();
+    switch (slug) {
+      case 'christmas':
+        return 'radial-gradient(circle at 10% 10%, rgba(220, 38, 38, 0.15) 0%, transparent 50%), radial-gradient(circle at 90% 90%, rgba(22, 101, 52, 0.15) 0%, transparent 50%)';
+      case 'valentines-day':
+        return 'radial-gradient(circle at 50% 50%, rgba(219, 39, 119, 0.18) 0%, transparent 80%)';
+      case 'graduation':
+        return 'radial-gradient(circle at 10% 90%, rgba(201, 161, 74, 0.15) 0%, transparent 60%)';
+      default:
+        return 'none';
+    }
+  }, [categorySlug]);
 
   useEffect(() => {
     if (background === bg1 && !showBg2) return;
@@ -179,6 +384,21 @@ function HeroStage({
           zIndex: 1,
         }}
       />
+
+      {/* Ambient Vibe light leak leak overlay */}
+      <div 
+        style={{
+          position: 'absolute',
+          inset: 0,
+          backgroundImage: ambientGlow,
+          pointerEvents: 'none',
+          zIndex: 1,
+          mixBlendMode: 'screen',
+        }}
+      />
+
+      {/* Occasion Particle Effects Vibe overlay */}
+      <OccasionVibe slug={categorySlug} />
 
       {/* Giant ghost word — Rolex Oyster vibe */}
       <div
@@ -608,11 +828,54 @@ export default function GiftSection() {
               ))
             : categories.map((cat) => {
                 const isActive = cat.slug === activeSlug;
+                const getActiveTabStyle = (slug: string) => {
+                  const norm = slug.toLowerCase();
+                  switch (norm) {
+                    case 'christmas':
+                      return {
+                        background: '#a81c1c',
+                        borderColor: '#a81c1c',
+                        color: '#ffffff',
+                        boxShadow: '0 4px 15px rgba(168, 28, 28, 0.35)',
+                      };
+                    case 'valentines-day':
+                      return {
+                        background: '#db2777',
+                        borderColor: '#db2777',
+                        color: '#ffffff',
+                        boxShadow: '0 4px 15px rgba(219, 39, 119, 0.35)',
+                      };
+                    case 'graduation':
+                      return {
+                        background: '#8b6914',
+                        borderColor: '#8b6914',
+                        color: '#ffffff',
+                        boxShadow: '0 4px 15px rgba(139, 105, 20, 0.35)',
+                      };
+                    case 'new-year':
+                    case 'sinhala-tamil-new-year':
+                      return {
+                        background: '#c9a14a',
+                        borderColor: '#c9a14a',
+                        color: '#ffffff',
+                        boxShadow: '0 4px 15px rgba(201, 161, 74, 0.35)',
+                      };
+                    default:
+                      return {
+                        background: '#1a1209',
+                        borderColor: '#1a1209',
+                        color: '#ffffff',
+                        boxShadow: '0 4px 15px rgba(26, 18, 9, 0.25)',
+                      };
+                  }
+                };
+
                 return (
                   <button
                     key={cat._id}
                     onClick={() => setActiveSlug(cat.slug)}
                     className={`gift-tab-btn ${isActive ? 'active' : ''}`}
+                    style={isActive ? getActiveTabStyle(cat.slug) : {}}
                   >
                     <span>{cat.label}</span>
                   </button>
@@ -630,6 +893,7 @@ export default function GiftSection() {
           setActiveIndex={setActiveIndex}
           categoryLabel={activeCat.label}
           categoryTagline={`Gift Ideas for ${activeCat.label}`}
+          categorySlug={activeCat.slug}
         />
       )}
 
