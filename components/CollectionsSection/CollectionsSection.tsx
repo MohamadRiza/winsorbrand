@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { useCurrency } from '@/app/context/CurrencyContext';
 
 // ── Types ──────────────────────────────────────────────────────────────────
-type SectionKey = 'sports' | 'new' | 'luxury' | 'limited' | 'bestsellers';
+type SectionKey = 'sports' | 'luxury' | 'limited' | 'new' | 'ladies';
 
 interface CloudinaryAsset { url: string; publicId: string; }
 interface ColorVariant    { colorName: string; colorHex: string; qty: number; image?: CloudinaryAsset; }
@@ -35,11 +35,11 @@ interface Section {
 
 // ── Section config ─────────────────────────────────────────────────────────
 const SECTIONS: Section[] = [
-  { key:'sports',      label:'Sports',       heading:'Built for Motion',       sub:'Precision engineering for the active lifestyle' },
-  { key:'new',         label:'New Arrivals',  heading:'Just Arrived',           sub:'The latest additions to the Winsor family'     },
-  { key:'luxury',      label:'Luxury',       heading:'Masterful Craftsmanship', sub:'Where haute horlogerie meets timeless design'  },
-  { key:'limited',     label:'Limited Edition', heading:'Rare by Design',         sub:'Exclusive editions crafted in finite numbers'  },
-  { key:'bestsellers', label:'Best Sellers', heading:'Beloved Timepieces',     sub:'The watches our clients return to again and again' },
+  { key:'sports',      label:'Sports',       heading:'Sports Collection',       sub:'Precision engineering for the active lifestyle' },
+  { key:'luxury',      label:'Classic',      heading:'Classic Collection',      sub:'Where style meets timeless design' },
+  { key:'limited',     label:'Limited Edition', heading:'Limited Edition',       sub:'Exclusive editions crafted in finite numbers' },
+  { key:'new',         label:'New Arrivals', heading:'New Arrivals Collection',  sub:'The latest masterpieces added to our collection' },
+  { key:'ladies',      label:'Ladies',       heading:'Ladies Collection',       sub:'Timeless luxury for her' },
 ];
 
 // ── Watch Specs Formatter ──────────────────────────────────────────────────
@@ -171,6 +171,52 @@ function WatchCard({ product, index }: { product: WatchProduct; index: number })
   const [cardHovered, setCardHovered] = useState(false);
   const [imgIndex, setImgIndex] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
+  const [isFav, setIsFav] = useState(false);
+
+  // Sync wishlist state
+  useEffect(() => {
+    const checkWishlist = () => {
+      const saved = localStorage.getItem('winsor_wishlist');
+      if (saved) {
+        try {
+          const arr = JSON.parse(saved);
+          setIsFav(arr.includes(product._id));
+        } catch (e) {
+          console.warn(e);
+        }
+      }
+    };
+    checkWishlist();
+    window.addEventListener('storage', checkWishlist);
+    return () => window.removeEventListener('storage', checkWishlist);
+  }, [product._id]);
+
+  const toggleWishlist = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    const saved = localStorage.getItem('winsor_wishlist');
+    let updated: string[] = [];
+    if (saved) {
+      try {
+        updated = JSON.parse(saved);
+      } catch (e) {
+        console.warn(e);
+      }
+    }
+    
+    if (isFav) {
+      updated = updated.filter(id => id !== product._id);
+      import('react-hot-toast').then(({ default: toast }) => toast.success('Removed from Wishlist'));
+    } else {
+      updated = [...updated, product._id];
+      import('react-hot-toast').then(({ default: toast }) => toast.success('Added to Wishlist'));
+    }
+    
+    localStorage.setItem('winsor_wishlist', JSON.stringify(updated));
+    setIsFav(!isFav);
+    window.dispatchEvent(new Event('storage'));
+  };
 
   // Mobile check
   useEffect(() => {
@@ -286,6 +332,35 @@ function WatchCard({ product, index }: { product: WatchProduct; index: number })
             isMobile={isMobile}
           />
         </Link>
+
+        {/* Wishlist Heart Button */}
+        <button
+          onClick={toggleWishlist}
+          style={{
+            position: 'absolute',
+            top: '16px',
+            right: '16px',
+            width: '32px',
+            height: '32px',
+            borderRadius: '50%',
+            background: isFav ? '#8B6914' : 'rgba(255,255,255,0.9)',
+            border: '1px solid rgba(26,18,9,0.06)',
+            boxShadow: '0 4px 12px rgba(26,18,9,0.06)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            zIndex: 4,
+            color: isFav ? '#ffffff' : '#1a1209',
+            transition: 'all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+          }}
+          className="wn-wishlist-btn"
+          aria-label="Toggle Wishlist"
+        >
+          <svg width="13" height="13" viewBox="0 0 24 24" fill={isFav ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.8">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+          </svg>
+        </button>
 
         {/* Sticker badge */}
         {product.stickerEnabled && product.stickerText && (
@@ -492,13 +567,28 @@ const miniArrowStyle: React.CSSProperties = {
 };
 
 // ── Main Section Component ─────────────────────────────────────────────────
+interface CategoryCard {
+  key: SectionKey;
+  label: string;
+  image: string;
+  bgImage: string;
+  exploreText: string;
+}
+
+const CATEGORIES: CategoryCard[] = [
+  { key: 'sports', label: 'Sports', image: '/category_HomeS/sport.webp', bgImage: '/category_HomeS/sport_bg.png', exploreText: 'EXPLORE →' },
+  { key: 'luxury', label: 'Classic', image: '/category_HomeS/classic.webp', bgImage: '/category_HomeS/classic_bg.png', exploreText: 'EXPLORE →' },
+  { key: 'limited', label: 'Limited Edition', image: '/category_HomeS/limitted.webp', bgImage: '/category_HomeS/limitted_bg.png', exploreText: 'EXPLORE →' },
+  { key: 'new', label: 'New Arrivals', image: '/category_HomeS/new_arrivals.webp', bgImage: '/category_HomeS/new_arrivals_bg.png', exploreText: 'EXPLORE →' },
+  { key: 'ladies', label: 'Ladies', image: '/category_HomeS/ladies.webp', bgImage: '/category_HomeS/ladies_bg.png', exploreText: 'EXPLORE →' },
+];
+
 export default function CollectionsSection() {
   const [activeSection, setActiveSection] = useState<SectionKey>('sports');
   const [products, setProducts] = useState<WatchProduct[]>([]);
   const [loading, setLoading] = useState(true);
   const [allProducts, setAllProducts] = useState<Record<SectionKey, WatchProduct[]>>({} as Record<SectionKey, WatchProduct[]>);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const tabsContainerRef = useRef<HTMLDivElement>(null);
 
   const [scrollProgress, setScrollProgress] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
@@ -519,10 +609,63 @@ export default function CollectionsSection() {
         const productsData: Record<SectionKey, WatchProduct[]> = {} as Record<SectionKey, WatchProduct[]>;
         
         for (const section of SECTIONS) {
-          const res = await fetch(`/api/products/collections?section=${section.key}&limit=10`);
-          const data = await res.json();
-          if (data.success) {
-            productsData[section.key] = data.data;
+          if (section.key === 'ladies') {
+            const res = await fetch(`/api/products`);
+            if (!res.ok) {
+              console.warn(`Failed to fetch ladies collection: status ${res.status}`);
+              productsData[section.key] = [];
+              continue;
+            }
+            const contentType = res.headers.get('content-type') || '';
+            if (!contentType.includes('application/json')) {
+              console.warn(`Non-JSON response received for ladies collection`);
+              productsData[section.key] = [];
+              continue;
+            }
+            const data = await res.json();
+            if (data.success) {
+              const ladiesWatches = data.data.filter((p: any) => {
+                const specs = p.specifications instanceof Map 
+                  ? Object.fromEntries(p.specifications)
+                  : (p.specifications || {});
+                
+                const genderKey = Object.keys(specs).find(k => k.toLowerCase() === 'gender');
+                if (genderKey) {
+                  const val = String(specs[genderKey]).toLowerCase();
+                  if (val.includes('lady') || val.includes('women') || val.includes('female') || val.includes('ladies')) {
+                    return true;
+                  }
+                }
+                
+                const titleLower = (p.title || '').toLowerCase();
+                const descLower = (p.description || '').toLowerCase();
+                
+                return titleLower.includes('women') || 
+                       titleLower.includes('ladies') || 
+                       titleLower.includes('lady') || 
+                       descLower.includes('women') ||
+                       descLower.includes('ladies') ||
+                       descLower.includes('lady');
+              });
+              productsData[section.key] = ladiesWatches.slice(0, 10);
+            }
+          } else {
+            const res = await fetch(`/api/products/collections?section=${section.key}&limit=10`);
+            if (!res.ok) {
+              console.warn(`Failed to fetch collection ${section.key}: status ${res.status}`);
+              productsData[section.key] = [];
+              continue;
+            }
+            const contentType = res.headers.get('content-type') || '';
+            if (!contentType.includes('application/json')) {
+              console.warn(`Non-JSON response received for collection ${section.key}`);
+              productsData[section.key] = [];
+              continue;
+            }
+            const data = await res.json();
+            if (data.success) {
+              productsData[section.key] = data.data;
+            }
           }
         }
         
@@ -544,14 +687,6 @@ export default function CollectionsSection() {
       setProducts(allProducts[activeSection]);
     }
   }, [activeSection, allProducts]);
-
-  // Reset scroll progress and offset when section tab changes
-  useEffect(() => {
-    if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollLeft = 0;
-    }
-    setScrollProgress(0);
-  }, [activeSection]);
 
   // Track scrolling to update progress indicator bar
   const handleScroll = useCallback(() => {
@@ -582,25 +717,18 @@ export default function CollectionsSection() {
     }
   };
 
-  // Scroll tabs on mobile if needed
-  const scrollTabs = (direction: 'left' | 'right') => {
-    if (tabsContainerRef.current) {
-      const scrollAmount = 150;
-      tabsContainerRef.current.scrollBy({
-        left: direction === 'left' ? -scrollAmount : scrollAmount,
-        behavior: 'smooth'
-      });
-    }
-  };
-
-  const activeSectionData = SECTIONS.find(s => s.key === activeSection);
+  const activeSectionLabel = activeSection === 'sports' ? 'SPORTS'
+                           : activeSection === 'luxury' ? 'CLASSIC'
+                           : activeSection === 'limited' ? 'LIMITED EDITION'
+                           : activeSection === 'new' ? 'NEW ARRIVALS'
+                           : 'LADIES';
 
   const wrapperPadding = isMobile ? '0 16px' : '0 80px';
   const cardGap = isMobile ? '12px' : '16px';
 
   return (
     <section id="collections" style={{ 
-      background:'#faf7f0', 
+      background:'#ffffff', 
       padding:'0 0 54px',
       fontFamily: "'Jost', sans-serif",
       borderBottom: '1px solid rgba(26,18,9,0.06)',
@@ -632,148 +760,212 @@ export default function CollectionsSection() {
             transform: none !important;
           }
         }
+        .wn-cat-card:hover {
+          border-color: #8B6914 !important;
+          box-shadow: 0 8px 24px rgba(139,105,20,0.08) !important;
+        }
+        .wn-cat-card:hover .wn-cat-img {
+          transform: scale(1.05) !important;
+        }
+        .wn-wishlist-btn:hover {
+          transform: scale(1.08) !important;
+          background: #8B6914 !important;
+          color: #ffffff !important;
+          border-color: #8B6914 !important;
+        }
       `}</style>
 
       <div style={{ maxWidth:'1400px', margin:'0 auto' }}>
 
-        {/* Centered Navigation Tabs */}
+        {/* Category Cards Selector Grid */}
         <div style={{
-          display:'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          borderBottom: '1px solid rgba(26,18,9,0.08)',
-          padding: '0 16px',
-          background: '#faf7f0',
+          padding: isMobile ? '24px 12px 12px' : '60px 80px 30px',
+          background: '#ffffff',
         }}>
-          
-          {/* Mobile scroll arrows */}
-          <button
-            onClick={() => scrollTabs('left')}
-            style={{
-              display: 'none',
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-              padding: '8px',
-              fontSize: '18px',
-              color: '#8B6914',
-              zIndex: 5,
-            }}
-            className="mobile-tab-arrow"
-            aria-label="Scroll tabs left"
-          >
-            ‹
-          </button>
+          {/* Section title 'SHOP BY COLLECTION' on mobile only */}
+          {isMobile && (
+            <div style={{
+              textAlign: 'center',
+              marginBottom: '20px',
+            }}>
+              <span style={{
+                fontFamily: "'Jost', sans-serif",
+                fontSize: '11.5px',
+                fontWeight: 600,
+                textTransform: 'uppercase',
+                letterSpacing: '0.12em',
+                color: '#8b6914',
+              }}>
+                Shop by Collection
+              </span>
+            </div>
+          )}
 
           <div 
-            ref={tabsContainerRef}
-            id="tabs-container"
             style={{
-              display:'flex',
-              justifyContent: 'center',
-              gap: '8px',
-              maxWidth: '100%',
-              overflowX: 'auto',
+              display: 'flex',
+              gap: isMobile ? '12px' : '24px',
+              overflowX: isMobile ? 'auto' : 'visible',
               scrollBehavior: 'smooth',
-              padding: '0 40px',
-              scrollPaddingLeft: '16px',
-              scrollPaddingRight: '16px',
-            }} 
+              paddingBottom: isMobile ? '8px' : '16px',
+              justifyContent: 'center',
+              alignItems: 'flex-start',
+            }}
             className="hide-scrollbar"
           >
-            {SECTIONS.map((section) => {
-              const isActive = activeSection === section.key;
+            {CATEGORIES.map((cat) => {
+              const isActive = activeSection === cat.key;
               return (
                 <button
-                  key={section.key}
-                  onClick={() => setActiveSection(section.key)}
+                  key={cat.key}
+                  onClick={() => setActiveSection(cat.key)}
                   style={{
-                    fontFamily:"'Jost',sans-serif",
-                    fontSize: '13px',
-                    fontWeight: isActive ? 600 : 400,
-                    letterSpacing:'0.12em',
-                    textTransform:'uppercase',
-                    padding: '20px 24px',
-                    border:'none',
-                    background:'none',
-                    cursor:'pointer',
-                    color: isActive ? '#1a1209' : 'rgba(26, 18, 9, 0.55)',
-                    borderBottom: isActive ? '2px solid #1a1209' : '2px solid transparent',
-                    transition:'all 0.3s ease',
-                    whiteSpace:'nowrap',
-                    flexShrink:0,
-                    marginBottom:'-1px',
-                  }}
-                  onMouseEnter={(e) => {
-                    if (!isActive) e.currentTarget.style.color = 'rgba(26, 18, 9, 0.85)';
-                  }}
-                  onMouseLeave={(e) => {
-                    if (!isActive) e.currentTarget.style.color = 'rgba(26, 18, 9, 0.55)';
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    background: 'none',
+                    border: 'none',
+                    padding: 0,
+                    cursor: 'pointer',
+                    outline: 'none',
+                    flexShrink: 0,
+                    width: isMobile ? '64px' : '200px',
                   }}
                 >
-                  {section.label}
+                  {/* Card Image Area (Circle on Mobile, Square on Desktop) */}
+                  <div style={{
+                    width: '100%',
+                    aspectRatio: '1/1',
+                    borderRadius: isMobile ? '50%' : '16px',
+                    background: isMobile ? 'rgba(26,18,9,0.03)' : '#ffffff',
+                    border: isActive ? '2px solid #8B6914' : '1px solid rgba(26,18,9,0.06)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    position: 'relative',
+                    overflow: 'hidden',
+                    transition: 'all 0.35s ease',
+                    boxShadow: isActive ? '0 8px 24px rgba(139,105,20,0.12)' : 'none',
+                  }}
+                  className="wn-cat-card"
+                  >
+                    {/* Desktop View: Show background image with watch included */}
+                    {!isMobile && (
+                      <img
+                        src={cat.bgImage}
+                        alt={cat.label}
+                        style={{
+                          position: 'absolute',
+                          inset: 0,
+                          width: '100%',
+                          height: '100%',
+                          objectFit: 'cover',
+                          transform: isActive ? 'scale(1.05)' : 'scale(1)',
+                          transition: 'transform 0.4s ease',
+                        }}
+                        className="wn-cat-img"
+                      />
+                    )}
+
+                    {/* Mobile View: Show circular watch image */}
+                    {isMobile && (
+                      <img
+                        src={cat.image}
+                        alt={cat.label}
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          objectFit: 'contain',
+                          padding: '8px',
+                          transform: isActive ? 'scale(1.05)' : 'scale(1)',
+                          transition: 'transform 0.4s ease',
+                        }}
+                        className="wn-cat-img"
+                      />
+                    )}
+                  </div>
+
+                  {/* Card Titles Below */}
+                  <div style={{ marginTop: isMobile ? '8px' : '12px', textAlign: 'center', width: '100%' }}>
+                    <span style={{
+                      display: 'block',
+                      fontFamily: "'Jost', sans-serif",
+                      fontSize: isMobile ? '8.5px' : '13px',
+                      fontWeight: 600,
+                      textTransform: 'uppercase',
+                      letterSpacing: isMobile ? '0.04em' : '0.1em',
+                      color: isActive ? '#8B6914' : '#1a1209',
+                      transition: 'color 0.3s ease',
+                      lineHeight: 1.25,
+                    }}>
+                      {cat.label}
+                    </span>
+                    {!isMobile && (
+                      <span style={{
+                        display: 'block',
+                        fontFamily: "'Jost', sans-serif",
+                        fontSize: '9px',
+                        fontWeight: 500,
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.08em',
+                        color: '#8B6914',
+                        marginTop: '4px',
+                        opacity: isActive ? 1 : 0.65,
+                        transition: 'opacity 0.3s ease',
+                      }}>
+                        {cat.exploreText}
+                      </span>
+                    )}
+                  </div>
                 </button>
               );
             })}
           </div>
-
-          <button
-            onClick={() => scrollTabs('right')}
-            style={{
-              display: 'none',
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-              padding: '8px',
-              fontSize: '18px',
-              color: '#8B6914',
-              zIndex: 5,
-            }}
-            className="mobile-tab-arrow"
-            aria-label="Scroll tabs right"
-          >
-            ›
-          </button>
         </div>
 
         {/* Section Header */}
-        {activeSectionData && (
-          <div style={{
-            padding: '44px 20px 28px',
-            textAlign: 'center',
-            background: '#faf7f0',
-          }}>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: isMobile ? '0 16px' : '0 80px',
+          marginBottom: '24px',
+          marginTop: '20px',
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
             <h2 style={{
               fontFamily: "'Cormorant Garamond', serif",
-              fontSize: 'clamp(28px, 4.5vw, 36px)',
-              fontWeight: 300,
-              fontStyle: 'italic',
-              color: '#1a1209',
-              letterSpacing: '0.04em',
-              margin: '0 0 10px 0',
-              lineHeight: 1.2,
-            }}>
-              {activeSectionData.heading}
-            </h2>
-            <p style={{
-              fontFamily: "'Jost', sans-serif",
-              fontSize: '11px',
+              fontSize: isMobile ? '18px' : '24px',
               fontWeight: 500,
-              color: 'rgba(26, 18, 9, 0.45)',
-              letterSpacing: '0.12em',
-              margin: 0,
-              lineHeight: 1.5,
               textTransform: 'uppercase',
+              letterSpacing: '0.08em',
+              color: '#1a1209',
+              margin: 0
             }}>
-              {activeSectionData.sub}
-            </p>
+              {activeSectionLabel}
+            </h2>
+            <div style={{ width: '40px', height: '1.5px', background: '#c9a14a' }} />
           </div>
-        )}
+          <Link href="/collections" style={{
+            fontFamily: "'Jost', sans-serif",
+            fontSize: '11px',
+            fontWeight: 600,
+            textTransform: 'uppercase',
+            letterSpacing: '0.08em',
+            color: '#8B6914',
+            textDecoration: 'none',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '4px',
+          }}>
+            View All <span style={{ fontSize: '12px' }}>→</span>
+          </Link>
+        </div>
 
         {/* Horizontal Carousel */}
         <div style={{
           position: 'relative',
-          background: '#faf7f0', 
+          background: '#ffffff', 
           padding: '10px 0 24px',
         }}>
           {/* Scroll Container */}
@@ -793,8 +985,21 @@ export default function CollectionsSection() {
           >
             {loading
               ? Array.from({ length: 4 }).map((_, i) => <SkeletonCard key={i} />)
-              : products.map((p, i) => (
-                  <WatchCard key={p._id} product={p} index={i} />
+              : (products && products.length > 0 ? (
+                  products.map((p, i) => (
+                    <WatchCard key={p._id} product={p} index={i} />
+                  ))
+                ) : (
+                  <div style={{
+                    padding: '40px 16px',
+                    width: '100%',
+                    textAlign: 'center',
+                    fontFamily: "'Jost', sans-serif",
+                    fontSize: '13px',
+                    color: 'rgba(26,18,9,0.5)'
+                  }}>
+                    No timepieces found in this collection.
+                  </div>
                 ))
             }
           </div>
@@ -874,16 +1079,6 @@ export default function CollectionsSection() {
           .desktop-only {
             display: none !important;
           }
-          .mobile-tab-arrow {
-            display: flex !important;
-          }
-          #tabs-container {
-            justify-content: flex-start !important;
-            padding-left: 16px !important;
-            padding-right: 16px !important;
-          }
-        }
-        @media (min-width: 769px) {
           .mobile-tab-arrow {
             display: none !important;
           }

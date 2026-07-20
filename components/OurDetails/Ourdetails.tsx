@@ -84,7 +84,7 @@ const Ourdetaills = () => {
   };
 
   return (
-    <section className="py-16 sm:py-20 lg:py-28 select-none" style={{ background: '#faf7f0', color: '#1a1209' }}>
+    <section className="py-16 sm:py-20 lg:py-28 select-none" style={{ background: '#ffffff', color: '#1a1209' }}>
       <div className="mx-auto max-w-3xl px-4 text-center sm:px-6">
         <span className="text-[9px] tracking-[0.35em] text-[#8B6914] uppercase font-semibold mb-3 block">
           THE WINSOR EXPERIENCE

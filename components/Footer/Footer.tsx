@@ -143,7 +143,7 @@ function CurrencySelectorCompact() {
           bottom: '100%',
           left: 0,
           marginBottom: '8px',
-          background: '#faf7f0',
+          background: '#ffffff',
           border: '1px solid rgba(26,18,9,0.1)',
           borderRadius: '6px',
           padding: '8px',
@@ -313,7 +313,7 @@ export default function Footer() {
       `}</style>
 
       <footer style={{
-        background: '#faf7f0',
+        background: '#ffffff',
         borderTop: '1px solid rgba(26,18,9,0.07)',
         fontFamily: "'Jost',sans-serif",
         color: '#1a1209'

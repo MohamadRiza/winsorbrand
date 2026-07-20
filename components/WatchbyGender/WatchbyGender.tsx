@@ -329,7 +329,7 @@ export default function GenderCollectionSection() {
     <section
       style={{
         width: '100%',
-        background: '#faf7f0',
+        background: '#ffffff',
       }}
     >
       <div
@@ -405,7 +405,7 @@ export default function GenderCollectionSection() {
             minHeight: isMobile ? '140px' : '280px',
             position: 'relative',
             zIndex: 2,
-            background: '#faf7f0',
+            background: '#ffffff',
             borderRadius: '16px',
             boxShadow: '0 -20px 40px rgba(26,18,9,0.05), 0 10px 30px rgba(0,0,0,0.02)',
           }}

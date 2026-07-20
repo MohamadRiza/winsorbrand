@@ -5,7 +5,7 @@ const watchGmt = "/Sport_Watch.webp";
 
 const WatchShowcase = () => {
   return (
-    <section className="py-12 sm:py-16 lg:py-28" style={{ background: '#faf7f0', color: '#1a1209' }}>
+    <section className="py-12 sm:py-16 lg:py-28" style={{ background: '#ffffff', color: '#1a1209' }}>
       {/* Heading */}
       <div className="mx-auto max-w-3xl px-4 text-center sm:px-6">
         <h2 className="font-serif text-[28px] font-normal leading-tight tracking-tight sm:text-3xl md:text-[40px] md:leading-tight" style={{ color: '#1a1209' }}>
