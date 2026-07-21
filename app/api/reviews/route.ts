@@ -61,14 +61,17 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 2. Check if purchase is within 30 days
-    const orderDate = new Date(order.createdAt!);
+    // 2. Check if purchase is within 90 days of delivery (not placement)
+    // Use deliveredAt if stamped, otherwise fall back to updatedAt for legacy orders
+    const deliveryDate = (order as any).deliveredAt
+      ? new Date((order as any).deliveredAt)
+      : new Date((order as any).updatedAt || order.createdAt!);
     const now = new Date();
-    const diffTime = Math.abs(now.getTime() - orderDate.getTime());
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    if (diffDays > 30) {
+    const diffMs = now.getTime() - deliveryDate.getTime();
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    if (diffDays > 90) {
       return NextResponse.json(
-        { success: false, error: 'Review period has expired (30 days from purchase).' },
+        { success: false, error: 'Review period has expired (90 days from delivery).' },
         { status: 400 }
       );
     }

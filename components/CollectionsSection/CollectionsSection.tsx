@@ -77,7 +77,7 @@ function SkeletonCard() {
       display:'flex', 
       flexDirection:'column', 
       gap:'16px',
-      background: '#ffffff',
+      background: '#faf7f0',
       padding: '24px 16px',
       border: '1px solid rgba(26, 18, 9, 0.06)',
       boxSizing: 'border-box',
@@ -325,7 +325,7 @@ function WatchCard({ product, index }: { product: WatchProduct; index: number })
         borderRadius: '16px',
         overflow: 'hidden',
         animationDelay: `${index * 80}ms`,
-        background: '#ffffff',
+        background: '#faf7f0',
         transition: 'transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.4s ease, border-color 0.4s ease',
         transform: (!isMobile && cardHovered) ? 'translateY(-6px)' : 'none',
         boxShadow: (!isMobile && cardHovered) ? '0 16px 32px rgba(26, 18, 9, 0.06)' : '0 4px 12px rgba(0,0,0,0.02)',
@@ -343,7 +343,7 @@ function WatchCard({ product, index }: { product: WatchProduct; index: number })
           position: 'relative', 
           width: '100%',
           height: isMobile ? '200px' : '270px',
-          background: '#ffffff', 
+          background: '#faf7f0', 
           overflow: 'hidden', 
           display: 'flex',
           alignItems: 'center',
@@ -465,7 +465,7 @@ function WatchCard({ product, index }: { product: WatchProduct; index: number })
           maxHeight: cardHovered ? '48px' : '0px',
           transition: 'all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
           overflowY: 'hidden',
-          background: '#ffffff',
+          background: '#faf7f0',
         }}>
           {allImages.slice(0, 5).map((imgUrl, i) => {
             const isActive = i === imgIndex;
@@ -514,7 +514,7 @@ function WatchCard({ product, index }: { product: WatchProduct; index: number })
           flexDirection: 'column',
           textAlign: 'left',
           boxSizing: 'border-box',
-          background: '#ffffff',
+          background: '#faf7f0',
         }}>
           {/* Watch Title */}
           <h3 style={{
@@ -768,7 +768,7 @@ export default function CollectionsSection() {
 
   return (
     <section id="collections" style={{ 
-      background:'#ffffff', 
+      background:'#faf7f0', 
       padding:'0 0 54px',
       fontFamily: "'Jost', sans-serif",
       borderBottom: '1px solid rgba(26,18,9,0.06)',
@@ -820,7 +820,7 @@ export default function CollectionsSection() {
         {/* Category Cards Selector Grid */}
         <div style={{
           padding: isMobile ? '24px 12px 12px' : '60px 80px 30px',
-          background: '#ffffff',
+          background: '#faf7f0',
         }}>
           {/* Section title 'SHOP BY COLLECTION' on mobile only */}
           {isMobile && (
@@ -877,7 +877,7 @@ export default function CollectionsSection() {
                     width: '100%',
                     aspectRatio: '1/1',
                     borderRadius: isMobile ? '50%' : '16px',
-                    background: isMobile ? 'rgba(26,18,9,0.03)' : '#ffffff',
+                    background: isMobile ? 'rgba(26,18,9,0.03)' : '#faf7f0',
                     border: isActive ? '2px solid #8B6914' : '1px solid rgba(26,18,9,0.06)',
                     display: 'flex',
                     alignItems: 'center',
@@ -1005,7 +1005,7 @@ export default function CollectionsSection() {
         {/* Horizontal Carousel */}
         <div style={{
           position: 'relative',
-          background: '#ffffff', 
+          background: '#faf7f0', 
           padding: '10px 0 24px',
         }}>
           {/* Scroll Container */}
@@ -1133,7 +1133,7 @@ const bottomArrowStyle: React.CSSProperties = {
   height: '40px',
   borderRadius: '50%',
   border: '1px solid rgba(26, 18, 9, 0.12)',
-  background: '#ffffff',
+  background: '#faf7f0',
   color: '#1a1209',
   fontSize: '18px',
   cursor: 'pointer',

@@ -66,6 +66,10 @@ export async function PATCH(
     // If we are reverting/rejecting a cancellation request and status is not cancelled,
     // (no stock change is needed since stock was already decremented at checkout)
     order.status = status;
+    // Record delivery timestamp for the 30-day review eligibility window
+    if (status === 'delivered' && !(order as any).deliveredAt) {
+      (order as any).deliveredAt = new Date();
+    }
     await order.save();
 
     return NextResponse.json({ success: true, data: order });

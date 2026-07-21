@@ -16,20 +16,27 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // 1. Fetch delivered orders for this user
+    // 1. Fetch ALL delivered orders for this user (no date restriction here — we check per-order below)
     const orders = await Order.find({ clerkId: userId, status: 'delivered' }).sort({ createdAt: -1 });
 
     const now = new Date();
+    const REVIEW_WINDOW_DAYS = 90; // Generous 90-day window from delivery date
     const pendingReviews: any[] = [];
 
-    // 2. Iterate orders and check which items can be reviewed (within 30 days and not reviewed yet)
+    // 2. Iterate orders and check which items can still be reviewed
     for (const order of orders) {
-      const orderDate = new Date(order.createdAt!);
-      const diffTime = Math.abs(now.getTime() - orderDate.getTime());
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      // Use deliveredAt if set, otherwise fall back to updatedAt (for legacy orders already marked delivered)
+      // This ensures orders marked delivered before this fix still appear for review
+      const deliveryDate = (order as any).deliveredAt
+        ? new Date((order as any).deliveredAt)
+        : new Date((order as any).updatedAt || order.createdAt!);
 
-      // Exclude orders older than 30 days
-      if (diffDays > 30) continue;
+      const diffMs = now.getTime() - deliveryDate.getTime();
+      const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+      const daysLeft = Math.max(0, REVIEW_WINDOW_DAYS - diffDays);
+
+      // Skip orders past the review window
+      if (diffDays > REVIEW_WINDOW_DAYS) continue;
 
       for (const item of order.items) {
         // Check if user already reviewed this item in this order
@@ -40,10 +47,10 @@ export async function GET(req: NextRequest) {
         });
 
         if (!alreadyReviewed) {
-          const daysLeft = Math.max(0, 30 - Math.floor(diffTime / (1000 * 60 * 60 * 24)));
           pendingReviews.push({
             orderId: order.orderRef,
             orderDate: order.createdAt,
+            deliveredAt: (order as any).deliveredAt || (order as any).updatedAt || order.createdAt,
             productId: item.productId,
             productTitle: item.productTitle,
             productModelNo: item.productModelNo,
@@ -65,3 +72,4 @@ export async function GET(req: NextRequest) {
     );
   }
 }
+

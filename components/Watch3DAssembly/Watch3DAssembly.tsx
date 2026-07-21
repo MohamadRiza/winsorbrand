@@ -86,7 +86,7 @@ export default function Watch3DAssembly() {
       className="relative w-full overflow-hidden"
       style={{
         height: isMobile ? '380px' : '100vh',
-        backgroundColor: isDarkSlide ? '#050302' : '#ffffff',
+        backgroundColor: isDarkSlide ? '#050302' : '#faf7f0',
         transition: 'background-color 0.8s cubic-bezier(0.25, 1, 0.5, 1)',
         borderBottom: `1px solid ${isDarkSlide ? 'rgba(201, 161, 74, 0.2)' : 'rgba(139, 105, 20, 0.12)'}`
       }}

@@ -94,6 +94,11 @@ const OrderSchema = new Schema<IOrderDocument>({
     default: null,  // null means no coupon applied, equals subtotal
     min: 0,
   },
+  // ── Delivery Tracking ─────────────────────────────────────
+  deliveredAt: {
+    type: Date,
+    default: null,
+  },
 }, { timestamps: true });
 
 

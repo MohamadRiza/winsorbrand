@@ -59,7 +59,7 @@ const CloseIcon  = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="n
 function CurrencyPanel({ onClose }: { onClose: () => void }) {
   const { selected, detectedCode, setCurrency, lastUpdated, loading } = useCurrency();
   return (
-    <div style={{ padding:'22px 40px', borderBottom:'1px solid rgba(26,18,9,0.07)', background:'rgba(255,255,255,0.98)' }}>
+    <div style={{ padding:'22px 40px', borderBottom:'1px solid rgba(26,18,9,0.07)', background:'rgba(250,247,240,0.98)' }}>
       <div style={{ maxWidth:'1400px', margin:'0 auto' }}>
         <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:'14px' }}>
           <div style={{ display:'flex', alignItems:'center', gap:'7px' }}>
@@ -102,7 +102,7 @@ function MegaMenu({ visible, activeKey, showCurrency, onClose }: { visible:boole
   const group = COLLECTIONS.find(c => c.key === activeKey);
   const show  = visible && (!!group || showCurrency);
   return (
-    <div style={{ position:'absolute', top:'100%', left:0, right:0, background:'rgba(255,255,255,0.98)', backdropFilter:'blur(16px)', borderTop:'1px solid rgba(26,18,9,0.07)', borderBottom:'1px solid rgba(26,18,9,0.07)', boxShadow:'0 16px 48px rgba(26,18,9,0.07)', opacity:show?1:0, transform:show?'translateY(0)':'translateY(-8px)', pointerEvents:show?'auto':'none', transition:'opacity 0.25s ease, transform 0.25s ease', zIndex:10 }}>
+    <div style={{ position:'absolute', top:'100%', left:0, right:0, background:'rgba(250,247,240,0.98)', backdropFilter:'blur(16px)', borderTop:'1px solid rgba(26,18,9,0.07)', borderBottom:'1px solid rgba(26,18,9,0.07)', boxShadow:'0 16px 48px rgba(26,18,9,0.07)', opacity:show?1:0, transform:show?'translateY(0)':'translateY(-8px)', pointerEvents:show?'auto':'none', transition:'opacity 0.25s ease, transform 0.25s ease', zIndex:10 }}>
       {showCurrency && <CurrencyPanel onClose={onClose} />}
       {group && (
         <div style={{ maxWidth:'1400px', margin:'0 auto', padding:'36px 40px' }}>
@@ -356,7 +356,7 @@ export default function Navbar() {
           transition:'transform 0.42s cubic-bezier(0.25,0.46,0.45,0.94), background 0.35s ease, border-color 0.35s ease', 
           background: isTransparent 
             ? (isHomepageLightSlide ? 'rgba(255, 255, 255, 0.02)' : 'rgba(255, 255, 255, 0.08)') 
-            : 'rgba(255,255,255,0.97)', 
+            : 'rgba(250,247,240,0.97)', 
           backdropFilter: isTransparent ? 'blur(8px)' : 'blur(14px)', 
           WebkitBackdropFilter: isTransparent ? 'blur(8px)' : 'blur(14px)', 
           borderBottom:`1px solid ${isTransparent ? (isHomepageLightSlide ? 'rgba(26,18,9,0.06)' : 'rgba(255,255,255,0.12)') : 'rgba(26,18,9,0.07)'}` 
@@ -651,7 +651,7 @@ export default function Navbar() {
           bottom:0, 
           width:'320px', 
           zIndex:50, 
-          background:'#ffffff', 
+          background:'#faf7f0', 
           transform: mobileOpen?'translateX(0)':'translateX(100%)', 
           transition:'transform 0.4s cubic-bezier(0.25,0.46,0.45,0.94)', 
           display:'flex', 
@@ -667,7 +667,7 @@ export default function Navbar() {
           justifyContent:'space-between', 
           padding:'18px 24px', 
           borderBottom:'1px solid rgba(26,18,9,0.08)',
-          background: '#ffffff',
+          background: '#faf7f0',
           position: 'sticky',
           top: 0,
           zIndex: 55
@@ -870,7 +870,7 @@ export default function Navbar() {
           display:'flex', 
           gap:'24px', 
           alignItems:'center',
-          background: '#ffffff'
+          background: '#faf7f0'
         }}>
           {!isSignedIn ? (
             <SignInButton mode="modal">

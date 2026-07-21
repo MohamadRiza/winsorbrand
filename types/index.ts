@@ -127,6 +127,7 @@ export interface IOrder {
   finalTotal?: number | null;
   createdAt?: Date;
   updatedAt?: Date;
+  deliveredAt?: Date | null;
 }
 
 export interface IReview {

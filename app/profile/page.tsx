@@ -1478,8 +1478,43 @@ export default function ProfilePage() {
                                   Model: {item.productModelNo} {item.colorVariant ? `— Variant: ${item.colorVariant}` : ''}
                                 </div>
                               </div>
-                              <div style={{ textAlign: 'right', fontSize: '12px', fontWeight: 550, color: '#8b6914' }}>
-                                {item.quantity} × LKR {item.price.toLocaleString()}
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
+                                <div style={{ textAlign: 'right', fontSize: '12px', fontWeight: 550, color: '#8b6914' }}>
+                                  {item.quantity} × LKR {item.price.toLocaleString()}
+                                </div>
+                                {o.status === 'delivered' && (
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setReviewItem({
+                                        orderId: o.orderRef,
+                                        productId: item.productId,
+                                        productTitle: item.productTitle,
+                                        productModelNo: item.productModelNo,
+                                        productThumbnail: item.productThumbnail,
+                                        colorVariant: item.colorVariant,
+                                        price: item.price,
+                                        daysLeft: 90,
+                                      });
+                                      setIsReviewModalOpen(true);
+                                    }}
+                                    style={{
+                                      background: 'rgba(139,105,20,0.07)',
+                                      border: '1px solid rgba(139,105,20,0.25)',
+                                      color: '#8b6914',
+                                      fontSize: '10.5px',
+                                      padding: '5px 10px',
+                                      borderRadius: '5px',
+                                      cursor: 'pointer',
+                                      fontFamily: "'Jost', sans-serif",
+                                      fontWeight: 600,
+                                      letterSpacing: '0.04em',
+                                      whiteSpace: 'nowrap',
+                                    }}
+                                  >
+                                    ★ Write Review
+                                  </button>
+                                )}
                               </div>
                             </div>
                           ))}
@@ -1609,13 +1644,13 @@ export default function ProfilePage() {
                 <div className="content-card">
                   <div className="card-header-block">
                     <h3 className="card-title">Pending Reviews</h3>
-                    <p className="card-subtitle">Products eligible for review (Delivered within the last 30 days).</p>
+                    <p className="card-subtitle">Products eligible for review (up to 90 days after delivery).</p>
                   </div>
                   {loadingReviews ? (
                     <p style={{ fontSize: '13px', color: 'rgba(26,18,9,0.5)', textAlign: 'center', padding: '20px 0' }}>Loading items...</p>
                   ) : pendingReviews.length === 0 ? (
                     <p style={{ fontSize: '13.5px', color: 'rgba(26,18,9,0.5)', textAlign: 'center', padding: '30px 0', margin: 0 }}>
-                      No pending reviews. Only purchased timepieces from delivered orders within the last 30 days can be reviewed.
+                      No pending reviews. Products from delivered orders are eligible for review up to 90 days after delivery.
                     </p>
                   ) : (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>

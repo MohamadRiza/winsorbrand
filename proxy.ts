@@ -77,21 +77,34 @@ export async function proxy(req: NextRequest, event: NextFetchEvent) {
     if (adminRes) return adminRes;
   }
 
-  // ✅ BYPASS Clerk middleware for all API routes and public page routes to prevent external server timeouts/CORS blocks
-  const isPublicPath = 
+  // ✅ BYPASS Clerk middleware for truly public routes only
+  // IMPORTANT: Do NOT add /api/reviews, /api/customer, /api/cart, /api/wishlist here
+  // Those routes use getAuth() and MUST go through clerkMiddleware
+  const isPublicPath =
     pathname === '/' ||
     pathname.startsWith('/collections') ||
     pathname.startsWith('/our-story') ||
     pathname.startsWith('/retailers') ||
-    (pathname.startsWith('/api') && !pathname.startsWith('/api/customer')) ||
+    pathname.startsWith('/gifts') ||
     pathname.startsWith('/_next') ||
-    pathname.includes('.');
+    pathname.includes('.') ||
+    // Only these specific public API routes bypass Clerk
+    pathname.startsWith('/api/products') ||
+    pathname.startsWith('/api/gift-categories') ||
+    pathname.startsWith('/api/upload') ||
+    pathname.startsWith('/api/coupons') ||
+    pathname.startsWith('/api/occasion') ||
+    pathname.startsWith('/api/contact') ||
+    pathname.startsWith('/api/careers');
 
   if (isPublicPath) {
     return NextResponse.next();
   }
 
-  // Otherwise, run Clerk middleware for other page routes
+  // Otherwise, run Clerk middleware — this covers:
+  // /api/reviews, /api/reviews/pending, /api/reviews/my
+  // /api/customer/*, /api/cart/*, /api/wishlist/*
+  // /profile, /sign-in, /sign-up, etc.
   return clerkMiddleware()(req, event);
 }
 

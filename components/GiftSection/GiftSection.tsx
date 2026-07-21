@@ -702,7 +702,7 @@ export default function GiftSection() {
   }, [activeCat]);
 
   return (
-    <section style={{ background: '#ffffff' }}>
+    <section style={{ background: '#faf7f0' }}>
       <style>{`
         @keyframes hero-watch-from-right {
           from { opacity: 0; transform: translateX(60px) scale(0.96); }
@@ -775,7 +775,7 @@ export default function GiftSection() {
       <div style={{
         padding: '48px 20px 32px',
         textAlign: 'center',
-        background: '#ffffff',
+        background: '#faf7f0',
       }}>
         <h2 style={{
           fontFamily: "'Cormorant Garamond', serif",
@@ -805,7 +805,7 @@ export default function GiftSection() {
       <div
         style={{
           borderBottom: '1px solid rgba(26, 18, 9, 0.05)',
-          background: '#ffffff',
+          background: '#faf7f0',
           position: 'sticky',
           top: 0,
           zIndex: 20,
