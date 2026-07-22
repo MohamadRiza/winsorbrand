@@ -186,6 +186,62 @@ function CurrencySelectorCompact() {
   );
 }
 
+function PaymentBadgesRow({ size = '22px', isMobile = false }: { size?: string; isMobile?: boolean }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', justifyContent: isMobile ? 'center' : 'flex-start' }}>
+      {/* Visa */}
+      <img 
+        src="https://cdn.jsdelivr.net/gh/datatrans/payment-logos@master/assets/cards/visa.svg" 
+        alt="Visa" 
+        style={{ height: size, width: 'auto', display: 'block', objectFit: 'contain' }} 
+      />
+      {/* Mastercard */}
+      <img 
+        src="https://cdn.jsdelivr.net/gh/datatrans/payment-logos@master/assets/cards/mastercard.svg" 
+        alt="Mastercard" 
+        style={{ height: size, width: 'auto', display: 'block', objectFit: 'contain' }} 
+      />
+      {/* Amex */}
+      <img 
+        src="https://cdn.jsdelivr.net/gh/aaronfagan/svg-credit-card-payment-icons@master/flat/amex.svg" 
+        alt="American Express" 
+        style={{ height: size, width: 'auto', display: 'block', objectFit: 'contain' }} 
+      />
+      {/* Apple Pay */}
+      <img 
+        src="https://cdn.jsdelivr.net/gh/datatrans/payment-logos@master/assets/wallets/apple-pay.svg" 
+        alt="Apple Pay" 
+        style={{ height: size, width: 'auto', display: 'block', objectFit: 'contain' }} 
+      />
+      {/* Google Pay */}
+      <img 
+        src="https://cdn.jsdelivr.net/gh/datatrans/payment-logos@master/assets/wallets/google-pay.svg" 
+        alt="Google Pay" 
+        style={{ height: size, width: 'auto', display: 'block', objectFit: 'contain' }} 
+      />
+      {/* Bank Transfer */}
+      <div style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: '4px',
+        background: '#ffffff',
+        border: '1px solid rgba(26,18,9,0.15)',
+        borderRadius: '3px',
+        padding: '2px 6px',
+        height: size,
+        boxSizing: 'border-box'
+      }}>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M3 21h18M3 10h18M5 6l7-3 7 3M4 10v11M20 10v11M8 14v3M12 14v3M16 14v3" />
+        </svg>
+        <span style={{ fontSize: '9.5px', fontWeight: 600, color: '#1a1209', fontFamily: "'Jost', sans-serif", whiteSpace: 'nowrap', letterSpacing: '0.02em' }}>
+          Bank Transfer
+        </span>
+      </div>
+    </div>
+  );
+}
+
 // ─────────────────────────────────────────────────────────────
 // MAIN FOOTER COMPONENT
 // ─────────────────────────────────────────────────────────────
@@ -556,12 +612,19 @@ export default function Footer() {
                 </button>
               </form>
 
-              {/* Currency Selector – Desktop Only (inside newsletter col) */}
+              {/* Currency Selector & Accepted Payment Cards – Desktop Only */}
               <div
                 className="ft-desktop-only"
-                style={{ marginTop: '28px', paddingTop: '20px', borderTop: '1px solid rgba(26,18,9,0.07)' }}
+                style={{ marginTop: '24px', paddingTop: '18px', borderTop: '1px solid rgba(26,18,9,0.07)', flexDirection: 'column', alignItems: 'flex-start', gap: '12px' }}
               >
                 <CurrencySelectorCompact />
+                
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', width: '100%' }}>
+                  <span style={{ fontSize: '10.5px', letterSpacing: '0.12em', color: 'rgba(26,18,9,0.5)', textTransform: 'uppercase', fontWeight: 600 }}>
+                    We Accept
+                  </span>
+                  <PaymentBadgesRow size="22px" />
+                </div>
               </div>
             </div>
 
@@ -612,9 +675,12 @@ export default function Footer() {
                 flexShrink: 0
               }}
             >
-              {/* Currency – Mobile / Tablet Only */}
-              <div className="ft-mobile-only" style={{ alignItems: 'center' }}>
+              {/* Currency & Payment Cards – Mobile / Tablet Only */}
+              <div className="ft-mobile-only" style={{ flexDirection: 'column', alignItems: 'center', gap: '10px' }}>
                 <CurrencySelectorCompact />
+                <div style={{ marginTop: '4px' }}>
+                  <PaymentBadgesRow size="20px" isMobile={true} />
+                </div>
               </div>
 
               {/* Copyright + Nexasoft – always together */}

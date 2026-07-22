@@ -9,83 +9,83 @@ import { useCurrency } from '@/app/context/CurrencyContext';
 type SectionKey = 'sports' | 'luxury' | 'limited' | 'new' | 'ladies';
 
 interface CloudinaryAsset { url: string; publicId: string; }
-interface ColorVariant    { colorName: string; colorHex: string; qty: number; image?: CloudinaryAsset; }
+interface ColorVariant { colorName: string; colorHex: string; qty: number; image?: CloudinaryAsset; }
 
 interface WatchProduct {
-  _id:                string;
-  title:              string;
-  modelNo:            string;
-  price:              number;
-  thumbnail:          CloudinaryAsset;
-  colorVariants:      ColorVariant[];
-  stickerEnabled:     boolean;
-  stickerText:        string;
+  _id: string;
+  title: string;
+  modelNo: string;
+  price: number;
+  thumbnail: CloudinaryAsset;
+  colorVariants: ColorVariant[];
+  stickerEnabled: boolean;
+  stickerText: string;
   collectionSections: SectionKey[];
-  images?:            CloudinaryAsset[];
-  specifications?:    any;
-  description?:       string;
+  images?: CloudinaryAsset[];
+  specifications?: any;
+  description?: string;
 }
 
 interface Section {
-  key:      SectionKey;
-  label:    string;
-  heading:  string;
-  sub:      string;
+  key: SectionKey;
+  label: string;
+  heading: string;
+  sub: string;
 }
 
 // ── Section config ─────────────────────────────────────────────────────────
 const SECTIONS: Section[] = [
-  { key:'sports',      label:'Sports',       heading:'Sports Collection',       sub:'Precision engineering for the active lifestyle' },
-  { key:'luxury',      label:'Classic',      heading:'Classic Collection',      sub:'Where style meets timeless design' },
-  { key:'limited',     label:'Limited Edition', heading:'Limited Edition',       sub:'Exclusive editions crafted in finite numbers' },
-  { key:'new',         label:'New Arrivals', heading:'New Arrivals Collection',  sub:'The latest masterpieces added to our collection' },
-  { key:'ladies',      label:'Ladies',       heading:'Ladies Collection',       sub:'Timeless luxury for her' },
+  { key: 'sports', label: 'Sports', heading: 'Sports Collection', sub: 'Precision engineering for the active lifestyle' },
+  { key: 'luxury', label: 'Classic', heading: 'Classic Collection', sub: 'Where style meets timeless design' },
+  { key: 'limited', label: 'Limited Edition', heading: 'Limited Edition', sub: 'Exclusive editions crafted in finite numbers' },
+  { key: 'new', label: 'New Arrivals', heading: 'New Arrivals Collection', sub: 'The latest masterpieces added to our collection' },
+  { key: 'ladies', label: 'Ladies', heading: 'Ladies Collection', sub: 'Timeless luxury for her' },
 ];
 
 // ── Watch Specs Formatter ──────────────────────────────────────────────────
 const formatWatchSpecs = (product: WatchProduct) => {
   if (product.specifications) {
-    const specs = product.specifications instanceof Map 
+    const specs = product.specifications instanceof Map
       ? Object.fromEntries(product.specifications)
       : product.specifications;
-      
+
     const diameter = specs['Case Size'] || specs['Diameter'] || specs['caseSize'] || specs['diameter'];
     const movement = specs['MovementType'] || specs['Movement'] || specs['movement'];
     const caseMaterial = specs['Case Material'] || specs['Material'] || specs['material'];
-    
+
     const parts = [diameter, movement, caseMaterial].filter(Boolean);
     if (parts.length > 0) {
       return parts.join(' - ');
     }
   }
-  
+
   if (product.description) {
     const desc = product.description.split('.')[0];
     if (desc && desc.length < 80) return desc;
   }
-  
+
   return 'Automatic watch - Premium Swiss Made';
 };
 
 // ── Skeleton Card ──────────────────────────────────────────────────────────
 function SkeletonCard() {
   return (
-    <div style={{ 
-      minWidth: '220px', 
+    <div style={{
+      minWidth: '220px',
       maxWidth: '220px',
       flexShrink: 0,
-      display:'flex', 
-      flexDirection:'column', 
-      gap:'16px',
+      display: 'flex',
+      flexDirection: 'column',
+      gap: '16px',
       background: '#faf7f0',
       padding: '24px 16px',
       border: '1px solid rgba(26, 18, 9, 0.06)',
       boxSizing: 'border-box',
     }}>
-      <div style={{ aspectRatio:'4/5', background:'rgba(26,18,9,0.04)', borderRadius: '0', animation:'wn-pulse 1.5s ease-in-out infinite' }}/>
-      <div style={{ height:'14px', width:'60%', background:'rgba(26,18,9,0.04)', animation:'wn-pulse 1.5s ease-in-out infinite' }}/>
-      <div style={{ height:'12px', width:'80%', background:'rgba(26,18,9,0.04)', animation:'wn-pulse 1.5s ease-in-out infinite' }}/>
-      <div style={{ height:'14px', width:'30%', background:'rgba(26,18,9,0.04)', animation:'wn-pulse 1.5s ease-in-out infinite' }}/>
+      <div style={{ aspectRatio: '4/5', background: 'rgba(26,18,9,0.04)', borderRadius: '0', animation: 'wn-pulse 1.5s ease-in-out infinite' }} />
+      <div style={{ height: '14px', width: '60%', background: 'rgba(26,18,9,0.04)', animation: 'wn-pulse 1.5s ease-in-out infinite' }} />
+      <div style={{ height: '12px', width: '80%', background: 'rgba(26,18,9,0.04)', animation: 'wn-pulse 1.5s ease-in-out infinite' }} />
+      <div style={{ height: '14px', width: '30%', background: 'rgba(26,18,9,0.04)', animation: 'wn-pulse 1.5s ease-in-out infinite' }} />
     </div>
   );
 }
@@ -227,7 +227,7 @@ function WatchCard({ product, index }: { product: WatchProduct; index: number })
   const toggleWishlist = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    
+
     const saved = localStorage.getItem('winsor_wishlist');
     let updated: string[] = [];
     if (saved) {
@@ -237,7 +237,7 @@ function WatchCard({ product, index }: { product: WatchProduct; index: number })
         console.warn(e);
       }
     }
-    
+
     if (isFav) {
       updated = updated.filter(id => id !== product._id);
       import('react-hot-toast').then(({ default: toast }) => toast.success('Removed from Wishlist'));
@@ -245,7 +245,7 @@ function WatchCard({ product, index }: { product: WatchProduct; index: number })
       updated = [...updated, product._id];
       import('react-hot-toast').then(({ default: toast }) => toast.success('Added to Wishlist'));
     }
-    
+
     localStorage.setItem('winsor_wishlist', JSON.stringify(updated));
     setIsFav(!isFav);
     window.dispatchEvent(new Event('storage'));
@@ -315,7 +315,7 @@ function WatchCard({ product, index }: { product: WatchProduct; index: number })
 
   return (
     <div
-      style={{ 
+      style={{
         display: 'flex',
         flexDirection: 'column',
         width: cardWidth,
@@ -338,19 +338,19 @@ function WatchCard({ product, index }: { product: WatchProduct; index: number })
       onMouseLeave={() => setCardHovered(false)}
     >
       {/* Upper Image Container */}
-      <div 
-        style={{ 
-          position: 'relative', 
+      <div
+        style={{
+          position: 'relative',
           width: '100%',
           height: isMobile ? '200px' : '270px',
-          background: '#faf7f0', 
-          overflow: 'hidden', 
+          background: '#faf7f0',
+          overflow: 'hidden',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
         }}
       >
-        <Link 
+        <Link
           href={`/collections/${product._id}`}
           style={{ position: 'absolute', inset: 0, zIndex: 1 }}
         >
@@ -388,22 +388,22 @@ function WatchCard({ product, index }: { product: WatchProduct; index: number })
           aria-label="Toggle Wishlist"
         >
           <svg width="13" height="13" viewBox="0 0 24 24" fill={isFav ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.8">
-            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
           </svg>
         </button>
 
         {/* Sticker badge */}
         {product.stickerEnabled && product.stickerText && (
           <div style={{
-            position: 'absolute', 
-            top: '16px', 
+            position: 'absolute',
+            top: '16px',
             left: '16px',
-            background: '#8B6914', 
+            background: '#8B6914',
             color: '#ffffff',
-            fontFamily: "'Jost', sans-serif", 
-            fontSize: '9px', 
+            fontFamily: "'Jost', sans-serif",
+            fontSize: '9px',
             fontWeight: 600,
-            letterSpacing: '0.1em', 
+            letterSpacing: '0.1em',
             padding: '4px 8px',
             textTransform: 'uppercase',
             zIndex: 2,
@@ -532,13 +532,13 @@ function WatchCard({ product, index }: { product: WatchProduct; index: number })
           }}>
             {product.title}
           </h3>
-          
+
           {/* Specifications subtitle */}
           <p style={{
-            fontFamily: "'Jost', sans-serif", 
-            fontSize: '12px', 
+            fontFamily: "'Jost', sans-serif",
+            fontSize: '12px',
             fontWeight: 400,
-            letterSpacing: '0.04em', 
+            letterSpacing: '0.04em',
             color: '#666666',
             margin: '0 0 10px 0',
             lineHeight: 1.4,
@@ -547,11 +547,11 @@ function WatchCard({ product, index }: { product: WatchProduct; index: number })
           }}>
             {formattedSpecs}
           </p>
-          
+
           {/* Pricing */}
           <p style={{
-            fontFamily: "'Jost', sans-serif", 
-            fontSize: '14px', 
+            fontFamily: "'Jost', sans-serif",
+            fontSize: '14px',
             fontWeight: 600,
             color: '#8B6914',
             margin: '0 0 6px 0',
@@ -563,23 +563,23 @@ function WatchCard({ product, index }: { product: WatchProduct; index: number })
           <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginTop: '2px' }}>
             <div style={{ display: 'flex', gap: '2px' }}>
               {Array.from({ length: 5 }).map((_, i) => (
-                <span 
-                  key={i} 
-                  style={{ 
-                    color: i < ratingStats.average ? '#c9a14a' : 'rgba(26,18,9,0.12)', 
+                <span
+                  key={i}
+                  style={{
+                    color: i < ratingStats.average ? '#c9a14a' : 'rgba(26,18,9,0.12)',
                     fontSize: '12px',
-                    lineHeight: 1 
+                    lineHeight: 1
                   }}
                 >
                   ★
                 </span>
               ))}
             </div>
-            <span style={{ 
-              fontSize: '10.5px', 
-              fontWeight: 500, 
-              color: 'rgba(26,18,9,0.4)', 
-              fontFamily: "'Jost', sans-serif" 
+            <span style={{
+              fontSize: '10.5px',
+              fontWeight: 500,
+              color: 'rgba(26,18,9,0.4)',
+              fontFamily: "'Jost', sans-serif"
             }}>
               ({ratingStats.count})
             </span>
@@ -616,11 +616,11 @@ interface CategoryCard {
 }
 
 const CATEGORIES: CategoryCard[] = [
-  { key: 'sports', label: 'Sports', image: '/category_HomeS/sport.webp', bgImage: '/category_HomeS/sport_bg.png', exploreText: 'EXPLORE →' },
-  { key: 'luxury', label: 'Classic', image: '/category_HomeS/classic.webp', bgImage: '/category_HomeS/classic_bg.png', exploreText: 'EXPLORE →' },
-  { key: 'limited', label: 'Limited Edition', image: '/category_HomeS/limitted.webp', bgImage: '/category_HomeS/limitted_bg.png', exploreText: 'EXPLORE →' },
-  { key: 'new', label: 'New Arrivals', image: '/category_HomeS/new_arrivals.webp', bgImage: '/category_HomeS/new_arrivals_bg.png', exploreText: 'EXPLORE →' },
-  { key: 'ladies', label: 'Ladies', image: '/category_HomeS/ladies.webp', bgImage: '/category_HomeS/ladies_bg.png', exploreText: 'EXPLORE →' },
+  { key: 'sports', label: 'Sports', image: '/category_HomeS/sport_bg.webp', bgImage: '/category_HomeS/sport_bg.webp', exploreText: 'EXPLORE →' },
+  { key: 'luxury', label: 'Classic', image: '/category_HomeS/classic_bg.webp', bgImage: '/category_HomeS/classic_bg.webp', exploreText: 'EXPLORE →' },
+  { key: 'limited', label: 'Limited Edition', image: '/category_HomeS/limitted_bg.webp', bgImage: '/category_HomeS/limitted_bg.webp', exploreText: 'EXPLORE →' },
+  { key: 'new', label: 'New Arrivals', image: '/category_HomeS/new_arrivals_bg.webp', bgImage: '/category_HomeS/new_arrivals_bg.webp', exploreText: 'EXPLORE →' },
+  { key: 'ladies', label: 'Ladies', image: '/category_HomeS/ladies_bg.webp', bgImage: '/category_HomeS/ladies_bg.webp', exploreText: 'EXPLORE →' },
 ];
 
 export default function CollectionsSection() {
@@ -647,7 +647,7 @@ export default function CollectionsSection() {
       try {
         setLoading(true);
         const productsData: Record<SectionKey, WatchProduct[]> = {} as Record<SectionKey, WatchProduct[]>;
-        
+
         for (const section of SECTIONS) {
           if (section.key === 'ladies') {
             const res = await fetch(`/api/products`);
@@ -665,10 +665,10 @@ export default function CollectionsSection() {
             const data = await res.json();
             if (data.success) {
               const ladiesWatches = data.data.filter((p: any) => {
-                const specs = p.specifications instanceof Map 
+                const specs = p.specifications instanceof Map
                   ? Object.fromEntries(p.specifications)
                   : (p.specifications || {});
-                
+
                 const genderKey = Object.keys(specs).find(k => k.toLowerCase() === 'gender');
                 if (genderKey) {
                   const val = String(specs[genderKey]).toLowerCase();
@@ -676,16 +676,16 @@ export default function CollectionsSection() {
                     return true;
                   }
                 }
-                
+
                 const titleLower = (p.title || '').toLowerCase();
                 const descLower = (p.description || '').toLowerCase();
-                
-                return titleLower.includes('women') || 
-                       titleLower.includes('ladies') || 
-                       titleLower.includes('lady') || 
-                       descLower.includes('women') ||
-                       descLower.includes('ladies') ||
-                       descLower.includes('lady');
+
+                return titleLower.includes('women') ||
+                  titleLower.includes('ladies') ||
+                  titleLower.includes('lady') ||
+                  descLower.includes('women') ||
+                  descLower.includes('ladies') ||
+                  descLower.includes('lady');
               });
               productsData[section.key] = ladiesWatches.slice(0, 10);
             }
@@ -708,7 +708,7 @@ export default function CollectionsSection() {
             }
           }
         }
-        
+
         setAllProducts(productsData);
         setProducts(productsData['sports'] || []);
       } catch (error) {
@@ -717,7 +717,7 @@ export default function CollectionsSection() {
         setLoading(false);
       }
     };
-    
+
     fetchAllProducts();
   }, []);
 
@@ -758,18 +758,18 @@ export default function CollectionsSection() {
   };
 
   const activeSectionLabel = activeSection === 'sports' ? 'SPORTS'
-                           : activeSection === 'luxury' ? 'CLASSIC'
-                           : activeSection === 'limited' ? 'LIMITED EDITION'
-                           : activeSection === 'new' ? 'NEW ARRIVALS'
-                           : 'LADIES';
+    : activeSection === 'luxury' ? 'CLASSIC'
+      : activeSection === 'limited' ? 'LIMITED EDITION'
+        : activeSection === 'new' ? 'NEW ARRIVALS'
+          : 'LADIES';
 
   const wrapperPadding = isMobile ? '0 16px' : '0 80px';
   const cardGap = isMobile ? '12px' : '16px';
 
   return (
-    <section id="collections" style={{ 
-      background:'#faf7f0', 
-      padding:'0 0 54px',
+    <section id="collections" style={{
+      background: '#faf7f0',
+      padding: '0 0 54px',
       fontFamily: "'Jost', sans-serif",
       borderBottom: '1px solid rgba(26,18,9,0.06)',
     }}>
@@ -815,7 +815,7 @@ export default function CollectionsSection() {
         }
       `}</style>
 
-      <div style={{ maxWidth:'1400px', margin:'0 auto' }}>
+      <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
 
         {/* Category Cards Selector Grid */}
         <div style={{
@@ -841,7 +841,7 @@ export default function CollectionsSection() {
             </div>
           )}
 
-          <div 
+          <div
             style={{
               display: 'flex',
               gap: isMobile ? '12px' : '24px',
@@ -887,7 +887,7 @@ export default function CollectionsSection() {
                     transition: 'all 0.35s ease',
                     boxShadow: isActive ? '0 8px 24px rgba(139,105,20,0.12)' : 'none',
                   }}
-                  className="wn-cat-card"
+                    className="wn-cat-card"
                   >
                     {/* Desktop View: Show background image with watch included */}
                     {!isMobile && (
@@ -916,7 +916,6 @@ export default function CollectionsSection() {
                           width: '100%',
                           height: '100%',
                           objectFit: 'contain',
-                          padding: '8px',
                           transform: isActive ? 'scale(1.05)' : 'scale(1)',
                           transition: 'transform 0.4s ease',
                         }}
@@ -1005,16 +1004,16 @@ export default function CollectionsSection() {
         {/* Horizontal Carousel */}
         <div style={{
           position: 'relative',
-          background: '#faf7f0', 
+          background: '#faf7f0',
           padding: '10px 0 24px',
         }}>
           {/* Scroll Container */}
           <div
             ref={scrollContainerRef}
             style={{
-              display:'flex',
+              display: 'flex',
               gap: cardGap,
-              overflowX:'auto',
+              overflowX: 'auto',
               padding: wrapperPadding,
               scrollBehavior: 'smooth',
               WebkitOverflowScrolling: 'touch',
@@ -1026,21 +1025,21 @@ export default function CollectionsSection() {
             {loading
               ? Array.from({ length: 4 }).map((_, i) => <SkeletonCard key={i} />)
               : (products && products.length > 0 ? (
-                  products.map((p, i) => (
-                    <WatchCard key={p._id} product={p} index={i} />
-                  ))
-                ) : (
-                  <div style={{
-                    padding: '40px 16px',
-                    width: '100%',
-                    textAlign: 'center',
-                    fontFamily: "'Jost', sans-serif",
-                    fontSize: '13px',
-                    color: 'rgba(26,18,9,0.5)'
-                  }}>
-                    No timepieces found in this collection.
-                  </div>
+                products.map((p, i) => (
+                  <WatchCard key={p._id} product={p} index={i} />
                 ))
+              ) : (
+                <div style={{
+                  padding: '40px 16px',
+                  width: '100%',
+                  textAlign: 'center',
+                  fontFamily: "'Jost', sans-serif",
+                  fontSize: '13px',
+                  color: 'rgba(26,18,9,0.5)'
+                }}>
+                  No timepieces found in this collection.
+                </div>
+              ))
             }
           </div>
         </div>

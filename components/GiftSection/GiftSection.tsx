@@ -73,6 +73,21 @@ const GraduationCapIcon = ({ size = 20, color = '#dfb15b' }: { size?: number; co
   </svg>
 );
 
+const CrownIcon = ({ size = 20, color = '#dfb15b' }: { size?: number; color?: string }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" style={{ color }}>
+    <path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5zm14 3c0 .6-.4 1-1 1H6c-.6 0-1-.4-1-1v-1h14v1z" />
+  </svg>
+);
+
+const FireworkIcon = ({ size = 20, color = '#ffd700' }: { size?: number; color?: string }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ color }}>
+    <path d="M12 2v4M12 18v4M2 12h4M18 12h4" />
+    <path d="M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83" />
+    <path d="M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
+    <circle cx="12" cy="12" r="2" fill={color} />
+  </svg>
+);
+
 const HeartIcon = ({ size = 20, color = '#ff4d6d' }: { size?: number; color?: string }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" style={{ color }}>
     <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
@@ -89,7 +104,7 @@ const BlossomIcon = ({ size = 20, color = '#fbcfe8' }: { size?: number; color?: 
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
     <circle cx="12" cy="12" r="3" />
     <path d="M12 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3z" />
-    <path d="M12 16a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3z" />
+    <path d="M12 16a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0 3-3z" />
     <path d="M5 12a3 3 0 0 0 3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0-3-3z" />
     <path d="M19 12a3 3 0 0 0-3-3 3 3 0 0 0 3 3 3 3 0 0 0-3 3 3 3 0 0 0 3-3z" />
   </svg>
@@ -137,6 +152,14 @@ function OccasionVibe({ slug }: { slug: string }) {
         };
       case 'new-year':
       case 'sinhala-tamil-new-year':
+        return {
+          type: 'fireworks',
+          count: 24,
+          IconComponent: FireworkIcon,
+          color: '#ffd700',
+          glow: '0 0 12px rgba(255,215,0,0.85)',
+          animationName: 'vibe-snow',
+        };
       case 'eid':
       case 'esala-perahera':
         return {
@@ -148,7 +171,23 @@ function OccasionVibe({ slug }: { slug: string }) {
           animationName: 'vibe-snow',
         };
       case 'mothers-day':
+        return {
+          type: 'mother-royal',
+          count: 22,
+          icons: [HeartIcon, CrownIcon],
+          colors: ['#ff4d6d', '#dfb15b'],
+          glow: '0 0 10px rgba(255,77,109,0.6)',
+          animationName: 'vibe-swirl',
+        };
       case 'fathers-day':
+        return {
+          type: 'father-royal',
+          count: 22,
+          icons: [HeartIcon, CrownIcon],
+          colors: ['#e11d48', '#dfb15b'],
+          glow: '0 0 10px rgba(225,29,72,0.6)',
+          animationName: 'vibe-swirl',
+        };
       case 'easter-sunday':
       case 'thai-pongal':
         return {
@@ -179,11 +218,18 @@ function OccasionVibe({ slug }: { slug: string }) {
       const duration = `${12 + Math.random() * 14}s`;
       const size = `${12 + Math.random() * 14}px`;
       const opacity = 0.15 + Math.random() * 0.45;
-      return { id: i, left, delay, duration, size, opacity };
+
+      const IconComp = (config as any).icons
+        ? (config as any).icons[i % (config as any).icons.length]
+        : config.IconComponent;
+
+      const particleColor = (config as any).colors
+        ? (config as any).colors[i % (config as any).colors.length]
+        : (config as any).color;
+
+      return { id: i, left, delay, duration, size, opacity, IconComp, particleColor };
     });
   }, [config]);
-
-  const IconComponent = config.IconComponent;
 
   return (
     <div style={{
@@ -214,29 +260,32 @@ function OccasionVibe({ slug }: { slug: string }) {
         }
       `}</style>
 
-      {particles.map(p => (
-        <span
-          key={p.id}
-          style={{
-            position: 'absolute',
-            top: '-25px',
-            bottom: 'auto',
-            left: p.left,
-            animationName: config.animationName,
-            animationDuration: p.duration,
-            animationDelay: p.delay,
-            animationIterationCount: 'infinite',
-            animationTimingFunction: 'linear',
-            opacity: 0,
-            display: 'inline-block',
-            transformOrigin: 'center',
-            filter: config.glow ? `drop-shadow(${config.glow})` : 'none',
-            ['--op' as any]: p.opacity,
-          }}
-        >
-          <IconComponent size={parseInt(p.size)} color={config.color} />
-        </span>
-      ))}
+      {particles.map(p => {
+        const Icon = p.IconComp || (config as any).IconComponent;
+        return (
+          <span
+            key={p.id}
+            style={{
+              position: 'absolute',
+              top: '-25px',
+              bottom: 'auto',
+              left: p.left,
+              animationName: config.animationName,
+              animationDuration: p.duration,
+              animationDelay: p.delay,
+              animationIterationCount: 'infinite',
+              animationTimingFunction: 'linear',
+              opacity: 0,
+              display: 'inline-block',
+              transformOrigin: 'center',
+              filter: config.glow ? `drop-shadow(${config.glow})` : 'none',
+              ['--op' as any]: p.opacity,
+            }}
+          >
+            <Icon size={parseInt(p.size)} color={p.particleColor || (config as any).color} />
+          </span>
+        );
+      })}
     </div>
   );
 }

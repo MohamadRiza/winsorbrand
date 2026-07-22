@@ -118,9 +118,9 @@ export default function Watch3DAssembly() {
         />
       )}
 
-      {/* Slide 1 & 2 Golden Waves (Light Mode Backdrop) */}
+      {/* Slide 1 & 2 Golden Arcs & Marble Texture Backdrop (Light Mode Backdrop) */}
       <div
-        className="absolute inset-0 pointer-events-none"
+        className="absolute inset-0 pointer-events-none overflow-hidden"
         style={{
           opacity: isDarkSlide ? 0 : 1,
           visibility: isDarkSlide ? 'hidden' : 'visible',
@@ -128,12 +128,54 @@ export default function Watch3DAssembly() {
           zIndex: 1
         }}
       >
-        <svg className="absolute right-0 top-0 h-full w-full" viewBox="0 0 1440 800" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M700 800 C 1100 800, 1440 500, 1440 0 L 1440 800 Z" fill="rgba(139, 105, 20, 0.02)" />
-          <path d="M800 800 C 1050 650, 1150 450, 1440 300" stroke="url(#goldGrad)" strokeWidth="3" opacity="0.45" />
-          <path d="M600 800 C 950 750, 1200 400, 1440 100" stroke="url(#goldGrad)" strokeWidth="1.5" opacity="0.2" />
+        {/* Photorealistic Marble & Gold Backdrop Image */}
+        <img
+          src="/hero_bg_marble.jpg"
+          alt="Winsor Luxury Marble Backdrop"
+          className="absolute inset-0 w-full h-full object-cover object-center"
+          style={{ opacity: 0.95 }}
+        />
+
+        {/* Soft Backlight Glow behind watch */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background: isMobile
+              ? 'radial-gradient(circle at 75% 45%, rgba(255,255,255,0.7) 0%, transparent 70%)'
+              : 'radial-gradient(circle at 70% 50%, rgba(255,255,255,0.6) 0%, transparent 65%)'
+          }}
+        />
+
+        {/* SVG Vector Backdrop: Gold Arcs & Concentric Circles */}
+        <svg
+          className="absolute inset-0 w-full h-full"
+          viewBox="0 0 1440 900"
+          preserveAspectRatio="xMidYMid slice"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          {/* Top-Right Concentric Arcs behind Watch */}
+          <circle cx="1180" cy="220" r="280" stroke="url(#goldGradLight)" strokeWidth="1.2" opacity="0.32" />
+          <circle cx="1180" cy="220" r="360" stroke="url(#goldGradLight)" strokeWidth="1" opacity="0.24" />
+          <circle cx="1180" cy="220" r="450" stroke="url(#goldGradLight)" strokeWidth="0.8" opacity="0.16" />
+          <circle cx="1180" cy="220" r="540" stroke="url(#goldGradLight)" strokeWidth="0.6" opacity="0.1" />
+
+          {/* Sweeping Bottom-Left to Center Gold Lines */}
+          <path
+            d="M -100 850 C 350 820, 750 680, 1250 280"
+            stroke="url(#goldGradLight)"
+            strokeWidth="1.8"
+            opacity="0.4"
+          />
+          <path
+            d="M -50 920 C 420 890, 850 720, 1380 340"
+            stroke="url(#goldGradLight)"
+            strokeWidth="1"
+            opacity="0.25"
+          />
+
           <defs>
-            <linearGradient id="goldGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+            <linearGradient id="goldGradLight" x1="0%" y1="100%" x2="100%" y2="0%">
               <stop offset="0%" stopColor="#8b6914" />
               <stop offset="50%" stopColor="#dfb15b" />
               <stop offset="100%" stopColor="#f3e3b8" />
@@ -279,14 +321,30 @@ export default function Watch3DAssembly() {
                     transition: 'transform 1s cubic-bezier(0.25, 1, 0.5, 1)',
                   }}
                 >
+                  {/* Realistic Ground Shadow under watch on Marble Pedestal */}
+                  <div
+                    className="pointer-events-none"
+                    style={{
+                      position: 'absolute',
+                      bottom: isMobile ? '-5px' : '-25px',
+                      left: '50%',
+                      transform: 'translateX(-50%)',
+                      width: isMobile ? '75%' : '70%',
+                      height: isMobile ? '16px' : '36px',
+                      background: 'radial-gradient(ellipse at center, rgba(26,18,9,0.25) 0%, rgba(26,18,9,0.06) 50%, transparent 75%)',
+                      borderRadius: '50%',
+                      filter: 'blur(5px)',
+                      zIndex: 1,
+                    }}
+                  />
                   <img
                     src={slide.image}
                     alt="Winsor Luxury Watch"
-                    className="floating-watch object-contain"
+                    className="floating-watch object-contain relative z-10"
                     style={{
                       maxHeight: isMobile ? '160px' : '520px',
                       width: '100%',
-                      filter: 'drop-shadow(0 15px 35px rgba(26,18,9,0.06))'
+                      filter: 'drop-shadow(0 20px 30px rgba(26,18,9,0.12))'
                     }}
                   />
                 </div>
