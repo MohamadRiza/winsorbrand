@@ -144,8 +144,25 @@ function AdminLoginContent() {
     <div 
       ref={containerRef}
       onMouseMove={handleGlobalMouseMove}
-      className="min-h-screen w-full flex bg-[#f7f4ee] overflow-hidden select-none"
+      className="min-h-screen w-full flex bg-[#f7f4ee] overflow-hidden select-none relative"
     >
+      {/* Luxury Marble background texture */}
+      <div 
+        className="fixed inset-0 pointer-events-none z-0" 
+        style={{ 
+          backgroundImage: 'url(/hero_bg_marble.jpg)', 
+          backgroundSize: 'cover', 
+          backgroundPosition: 'center', 
+          backgroundAttachment: 'fixed',
+          opacity: 0.95,
+        }} 
+      />
+      <div 
+        className="fixed inset-0 pointer-events-none z-0" 
+        style={{ 
+          backgroundColor: 'rgba(250, 247, 240, 0.93)',
+        }} 
+      />
 
       {/* LEFT — Brand image panel with 3D Parallax */}
       <div className="hidden lg:flex relative w-1/2 overflow-hidden">

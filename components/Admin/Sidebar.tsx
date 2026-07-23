@@ -11,7 +11,7 @@ type IconComponent = (props: { active: boolean }) => React.JSX.Element;
 
 // ── Icon Components (SVG - no external deps) ───────────────────────────────
 const DashboardIcon: IconComponent = ({ active }) => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={active ? '#f3e3b8' : '#c9a14a'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={active ? '#8B6914' : '#8d6d1b'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
     <rect x="3" y="3" width="7" height="7" rx="1" />
     <rect x="14" y="3" width="7" height="7" rx="1" />
     <rect x="3" y="14" width="7" height="7" rx="1" />
@@ -20,13 +20,13 @@ const DashboardIcon: IconComponent = ({ active }) => (
 );
 
 const ProductsIcon: IconComponent = ({ active }) => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={active ? '#f3e3b8' : '#c9a14a'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={active ? '#8B6914' : '#8d6d1b'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
     <path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
   </svg>
 );
 
 const OrdersIcon: IconComponent = ({ active }) => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={active ? '#f3e3b8' : '#c9a14a'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={active ? '#8B6914' : '#8d6d1b'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
     <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
     <line x1="3" y1="6" x2="21" y2="6" />
     <path d="M16 10a4 4 0 0 1-8 0" />
@@ -34,7 +34,7 @@ const OrdersIcon: IconComponent = ({ active }) => (
 );
 
 const CustomersIcon: IconComponent = ({ active }) => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={active ? '#f3e3b8' : '#c9a14a'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={active ? '#8B6914' : '#8d6d1b'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
     <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
     <circle cx="9" cy="7" r="4" />
     <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
@@ -43,20 +43,20 @@ const CustomersIcon: IconComponent = ({ active }) => (
 );
 
 const MessagesIcon: IconComponent = ({ active }) => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={active ? '#f3e3b8' : '#c9a14a'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={active ? '#8B6914' : '#8d6d1b'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
     <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
   </svg>
 );
 
 const JobsIcon: IconComponent = ({ active }) => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={active ? '#f3e3b8' : '#c9a14a'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={active ? '#8B6914' : '#8d6d1b'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
     <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
     <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
   </svg>
 );
 
 const StockIcon: IconComponent = ({ active }) => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={active ? '#f3e3b8' : '#c9a14a'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={active ? '#8B6914' : '#8d6d1b'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
     <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
     <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
     <line x1="12" y1="22.08" x2="12" y2="12" />
@@ -64,36 +64,36 @@ const StockIcon: IconComponent = ({ active }) => (
 );
 
 const SettingsIcon: IconComponent = ({ active }) => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={active ? '#f3e3b8' : '#c9a14a'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={active ? '#8B6914' : '#8d6d1b'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
     <circle cx="12" cy="12" r="3" />
     <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
   </svg>
 );
 
 const RetailerIcon: IconComponent = ({ active }) => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={active ? '#f3e3b8' : '#c9a14a'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={active ? '#8B6914' : '#8d6d1b'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
     <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
     <circle cx="12" cy="10" r="3" />
   </svg>
 );
 
 const StaffIcon: IconComponent = ({ active }) => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={active ? '#f3e3b8' : '#c9a14a'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={active ? '#8B6914' : '#8d6d1b'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
     <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
     <circle cx="9" cy="7" r="4" />
-    <path d="M19 8v4c0 1.5 1.5 2.5 1.5 2.5s1.5-1 1.5-2.5V8l-1.5-.75L19 8z" stroke="#c9a14a" strokeWidth="1.2" />
+    <path d="M19 8v4c0 1.5 1.5 2.5 1.5 2.5s1.5-1 1.5-2.5V8l-1.5-.75L19 8z" stroke="#8d6d1b" strokeWidth="1.2" />
   </svg>
 );
 
 const CouponsIcon: IconComponent = ({ active }) => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={active ? '#f3e3b8' : '#c9a14a'} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={active ? '#8B6914' : '#8d6d1b'} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
     <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" />
     <line x1="7" y1="7" x2="7.01" y2="7" />
   </svg>
 );
 
 const ReviewsIcon: IconComponent = ({ active }) => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={active ? '#f3e3b8' : '#c9a14a'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={active ? '#8B6914' : '#8d6d1b'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
     <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
     <path d="M9 10l2 2 4-4" />
   </svg>
@@ -312,12 +312,13 @@ export default function Sidebar({
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Jost:wght@300;400;500;600&display=swap');
         .sb-link { transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1); border: 1px solid transparent; margin: 0 8px; border-radius: 8px; }
-        .sb-link:hover { background: rgba(201, 161, 74, 0.08); border-color: rgba(201, 161, 74, 0.15); color: #ffffff !important; }
+        .sb-link:hover { background: rgba(139, 105, 20, 0.08); border-color: rgba(139, 105, 20, 0.18); color: #1a1209 !important; backdrop-filter: blur(8px); }
         .sb-link-active { 
-          background: linear-gradient(90deg, rgba(201, 161, 74, 0.18) 0%, rgba(139, 105, 20, 0.06) 100%) !important; 
-          border: 1px solid rgba(201, 161, 74, 0.35) !important;
+          background: linear-gradient(90deg, rgba(139, 105, 20, 0.15) 0%, rgba(201, 161, 74, 0.05) 100%) !important; 
+          border: 1px solid rgba(139, 105, 20, 0.32) !important;
           border-radius: 8px !important;
-          box-shadow: 0 4px 15px rgba(201, 161, 74, 0.05);
+          box-shadow: 0 4px 15px rgba(139, 105, 20, 0.08);
+          backdrop-filter: blur(8px);
         }
         .sb-scrollbar::-webkit-scrollbar { width: 4px; }
         .sb-scrollbar::-webkit-scrollbar-track { background: transparent; }
@@ -331,7 +332,7 @@ export default function Sidebar({
             transform: ${isMobileDrawerOpen ? 'translateX(0)' : 'translateX(-100%)'} !important;
             left: 0 !important;
             transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-            box-shadow: ${isMobileDrawerOpen ? '0 0 30px rgba(0,0,0,0.5)' : 'none'} !important;
+            box-shadow: ${isMobileDrawerOpen ? '0 0 30px rgba(26,18,9,0.2)' : 'none'} !important;
           }
           .sb-aside-collapsed-btn {
             display: none !important;
@@ -350,8 +351,11 @@ export default function Sidebar({
           position: 'fixed',
           left: 0,
           top: 0,
-          background: '#070605',
-          borderRight: '1px solid rgba(255, 255, 255, 0.05)',
+          background: 'rgba(250, 247, 240, 0.88)',
+          backdropFilter: 'blur(20px) saturate(180%)',
+          WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+          borderRight: '1px solid rgba(139, 105, 20, 0.18)',
+          boxShadow: '4px 0 25px rgba(26, 18, 9, 0.05)',
           display: 'flex',
           flexDirection: 'column',
           transition: 'width 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -392,7 +396,7 @@ export default function Sidebar({
               style={{
                 background: 'transparent',
                 border: 'none',
-                color: '#f3e3b8',
+                color: '#8B6914',
                 fontSize: '18px',
                 cursor: 'pointer',
                 padding: '4px 8px',
@@ -408,8 +412,8 @@ export default function Sidebar({
               onClick={() => setCollapsed(!collapsed)}
               className="sb-aside-collapsed-btn"
               style={{
-                background: 'rgba(139,105,20,0.15)',
-                border: 'none',
+                background: 'rgba(139,105,20,0.1)',
+                border: '1px solid rgba(139,105,20,0.2)',
                 borderRadius: '6px',
                 width: '28px',
                 height: '28px',
@@ -417,20 +421,18 @@ export default function Sidebar({
                 alignItems: 'center',
                 justifyContent: 'center',
                 cursor: 'pointer',
-                color: '#c9a14a',
+                color: '#8B6914',
                 fontSize: '14px',
-                transition: 'background 0.2s ease'
+                transition: 'all 0.2s ease'
               }}
-              onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(139,105,20,0.25)'}
-              onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(139,105,20,0.15)'}
+              onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(139,105,20,0.2)'}
+              onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(139,105,20,0.1)'}
               aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
             >
               {collapsed ? '›' : '‹'}
             </button>
           </div>
         </div>
-
-
 
         {/* Navigation */}
         <nav style={{ 
@@ -469,10 +471,10 @@ export default function Sidebar({
                     alignItems: 'center',
                     gap: '12px',
                     padding: collapsed ? '10px' : '10px 14px',
-                    color: active ? '#f3e3b8' : 'rgba(255, 255, 255, 0.75)',
+                    color: active ? '#8B6914' : 'rgba(26, 18, 9, 0.75)',
                     textDecoration: 'none',
                     fontSize: '13px',
-                    fontWeight: active ? 500 : 400,
+                    fontWeight: active ? 600 : 400,
                     letterSpacing: '0.03em',
                     position: 'relative',
                     whiteSpace: collapsed ? 'nowrap' : 'normal',
@@ -480,8 +482,8 @@ export default function Sidebar({
                   }}
                   onMouseEnter={(e) => {
                     if (!active) {
-                      e.currentTarget.style.background = 'rgba(201, 161, 74, 0.08)';
-                      e.currentTarget.style.borderColor = 'rgba(201, 161, 74, 0.15)';
+                      e.currentTarget.style.background = 'rgba(139, 105, 20, 0.08)';
+                      e.currentTarget.style.borderColor = 'rgba(139, 105, 20, 0.18)';
                     }
                   }}
                   onMouseLeave={(e) => {
@@ -497,8 +499,8 @@ export default function Sidebar({
                       <span style={{ flex: 1 }}>{item.label}</span>
                       {badge !== undefined && badge > 0 && (
                         <span style={{
-                          background: badge > 9 ? '#c9a14a' : '#8B6914',
-                          color: '#1a1209',
+                          background: '#8B6914',
+                          color: '#ffffff',
                           fontSize: '10px',
                           fontWeight: 600,
                           padding: '2px 7px',
@@ -522,7 +524,7 @@ export default function Sidebar({
                     display: 'flex', 
                     flexDirection: 'column', 
                     gap: '2px',
-                    borderLeft: '1px dashed rgba(139,105,20,0.2)',
+                    borderLeft: '1px dashed rgba(139,105,20,0.25)',
                     paddingLeft: '12px'
                   }}>
                     {item.children?.map((child) => {
@@ -537,10 +539,10 @@ export default function Sidebar({
                             alignItems: 'center',
                             gap: '8px',
                             padding: '8px 12px',
-                            color: childActive ? '#8B6914' : 'rgba(243,227,184,0.7)',
+                            color: childActive ? '#8B6914' : 'rgba(26, 18, 9, 0.65)',
                             textDecoration: 'none',
                             fontSize: '11px',
-                            fontWeight: childActive ? 500 : 400,
+                            fontWeight: childActive ? 600 : 400,
                             letterSpacing: '0.05em',
                             borderRadius: '4px',
                             transition: 'all 0.15s ease'
@@ -561,8 +563,8 @@ export default function Sidebar({
         {/* Footer / Profile Card */}
         <div style={{ 
           padding: '16px 20px', 
-          borderTop: '1px solid rgba(255,255,255,0.05)',
-          background: 'rgba(0, 0, 0, 0.2)',
+          borderTop: '1px solid rgba(139,105,20,0.15)',
+          background: 'rgba(250, 247, 240, 0.9)',
           position: 'relative'
         }}>
           {/* Popover Menu */}
@@ -573,10 +575,10 @@ export default function Sidebar({
               left: collapsed ? '12px' : '20px',
               right: collapsed ? 'auto' : '20px',
               width: collapsed ? '180px' : 'auto',
-              background: '#0c0a09',
-              border: '1px solid rgba(201, 161, 74, 0.3)',
+              background: '#ffffff',
+              border: '1px solid rgba(139, 105, 20, 0.25)',
               borderRadius: '8px',
-              boxShadow: '0 10px 25px rgba(0,0,0,0.5)',
+              boxShadow: '0 10px 25px rgba(26,18,9,0.12)',
               padding: '6px',
               display: 'flex',
               flexDirection: 'column',
@@ -589,7 +591,7 @@ export default function Sidebar({
                 style={{
                   padding: '8px 12px',
                   borderRadius: '6px',
-                  color: 'rgba(255, 255, 255, 0.8)',
+                  color: '#1a1209',
                   fontSize: '12px',
                   textDecoration: 'none',
                   display: 'flex',
@@ -597,7 +599,7 @@ export default function Sidebar({
                   gap: '8px',
                   transition: 'background 0.2s'
                 }}
-                onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'}
+                onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(139,105,20,0.06)'}
                 onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
               >
                 <SettingsIcon active={false} />
@@ -645,7 +647,7 @@ export default function Sidebar({
               borderRadius: '8px',
               transition: 'background 0.2s',
             }}
-            onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.03)'}
+            onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(139, 105, 20, 0.06)'}
             onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
           >
             <div style={{
@@ -656,11 +658,11 @@ export default function Sidebar({
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              color: '#1a1209',
+              color: '#ffffff',
               fontWeight: 600,
               fontSize: '13px',
               fontFamily: "'Jost', sans-serif",
-              border: '1px solid rgba(201, 161, 74, 0.4)',
+              border: '1px solid rgba(139, 105, 20, 0.4)',
               flexShrink: 0
             }}>
               {adminName?.charAt(0).toUpperCase()}
@@ -670,9 +672,9 @@ export default function Sidebar({
               <>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <p style={{ 
-                    color: '#ffffff', 
+                    color: '#1a1209', 
                     fontSize: '13px', 
-                    fontWeight: 500, 
+                    fontWeight: 600, 
                     margin: 0,
                     whiteSpace: 'nowrap',
                     overflow: 'hidden',
@@ -681,18 +683,18 @@ export default function Sidebar({
                     {adminName}
                   </p>
                   <p style={{ 
-                    color: '#c9a14a', 
+                    color: '#8B6914', 
                     fontSize: '11px', 
                     margin: 0,
                     textTransform: 'capitalize',
                     letterSpacing: '0.02em',
-                    fontWeight: 400
+                    fontWeight: 500
                   }}>
                     {adminRole === 'admin' ? 'Super Admin' : 'Staff'}
                   </p>
                 </div>
 
-                <div style={{ color: '#c9a14a', display: 'flex', alignItems: 'center' }}>
+                <div style={{ color: '#8B6914', display: 'flex', alignItems: 'center' }}>
                   <svg 
                     width="12" 
                     height="12" 

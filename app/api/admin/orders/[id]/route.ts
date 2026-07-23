@@ -38,35 +38,33 @@ export async function PATCH(
     const previousStatus = order.status;
 
     // Stock replenishment check:
-    // If the status is changing to 'cancelled' from a non-cancelled active state, restore inventory stock
+    // If the status is changing to 'cancelled' from a non-cancelled active state, restore inventory stock in parallel
     if (status === 'cancelled' && previousStatus !== 'cancelled') {
-      for (const item of order.items) {
-        const product = await Product.findById(item.productId);
-        if (product) {
-          const variant = product.colorVariants.find(v => v.colorName === item.colorVariant);
-          if (variant) {
-            variant.qty += item.quantity;
-            variant.inStock = variant.qty > 0;
-          } else if (product.colorVariants[0]) {
-            product.colorVariants[0].qty += item.quantity;
-            product.colorVariants[0].inStock = product.colorVariants[0].qty > 0;
+      await Promise.all(
+        order.items.map(async (item: any) => {
+          const product = await Product.findById(item.productId);
+          if (product) {
+            const variant = product.colorVariants.find(v => v.colorName === item.colorVariant);
+            if (variant) {
+              variant.qty += item.quantity;
+              variant.inStock = variant.qty > 0;
+            } else if (product.colorVariants[0]) {
+              product.colorVariants[0].qty += item.quantity;
+              product.colorVariants[0].inStock = product.colorVariants[0].qty > 0;
+            }
+            
+            const anyInStock = product.colorVariants.some(v => v.qty > 0);
+            if (anyInStock) {
+              product.isSoldOut = false;
+            }
+            
+            await product.save();
           }
-          
-          // Re-evaluate global sold out state (if any variant has qty > 0, isSoldOut is false)
-          const anyInStock = product.colorVariants.some(v => v.qty > 0);
-          if (anyInStock) {
-            product.isSoldOut = false;
-          }
-          
-          await product.save();
-        }
-      }
+        })
+      );
     }
 
-    // If we are reverting/rejecting a cancellation request and status is not cancelled,
-    // (no stock change is needed since stock was already decremented at checkout)
     order.status = status;
-    // Record delivery timestamp for the 30-day review eligibility window
     if (status === 'delivered' && !(order as any).deliveredAt) {
       (order as any).deliveredAt = new Date();
     }

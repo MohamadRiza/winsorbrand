@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import toast from 'react-hot-toast';
 
 interface MessageData {
@@ -20,7 +20,6 @@ interface MessageData {
 
 export default function AdminMessagesPage() {
   const [messages, setMessages] = useState<MessageData[]>([]);
-  const [filteredMessages, setFilteredMessages] = useState<MessageData[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterTab, setFilterTab] = useState<'all' | 'unread'>('all');
@@ -38,7 +37,6 @@ export default function AdminMessagesPage() {
       const data = await res.json();
       if (data.success) {
         setMessages(data.data || []);
-        setFilteredMessages(data.data || []);
       } else {
         throw new Error(data.error || 'Failed to fetch messages');
       }
@@ -55,17 +53,14 @@ export default function AdminMessagesPage() {
   }, []);
 
   // Filter messages on search query and filter tab change
-  useEffect(() => {
+  const filteredMessages = useMemo(() => {
     const q = searchQuery.toLowerCase().trim();
-    
     let result = messages;
     
-    // 1. Filter by Tab
     if (filterTab === 'unread') {
       result = result.filter(m => !m.read);
     }
     
-    // 2. Filter by Search Query
     if (q) {
       result = result.filter(m => 
         (m.name || '').toLowerCase().includes(q) ||
@@ -76,7 +71,7 @@ export default function AdminMessagesPage() {
       );
     }
     
-    setFilteredMessages(result);
+    return result;
   }, [searchQuery, filterTab, messages]);
 
   const handleToggleRead = async (id: string, currentRead: boolean) => {
@@ -88,11 +83,9 @@ export default function AdminMessagesPage() {
       });
       const data = await res.json();
       if (data.success) {
-        // Update local state
         setMessages(prev => prev.map(m => m._id === id ? { ...m, read: !currentRead } : m));
-        
-        // Update selected message in drawer
         setSelectedMessage(prev => prev && prev._id === id ? { ...prev, read: !currentRead } : prev);
+        toast.success(!currentRead ? 'Marked as Read' : 'Marked as Unread');
       } else {
         throw new Error(data.error || 'Failed to update status');
       }
@@ -106,7 +99,6 @@ export default function AdminMessagesPage() {
     setSelectedMessage(msg);
     setDrawerOpen(true);
     
-    // Automatically mark as read if it is unread when clicked
     if (!msg.read) {
       handleToggleRead(msg._id, false);
     }
@@ -123,7 +115,7 @@ export default function AdminMessagesPage() {
       });
       const data = await res.json();
       if (data.success) {
-        toast.success('Message deleted successfully.');
+        toast.success('Inquiry deleted successfully.');
         setMessages(prev => prev.filter(m => m._id !== id));
         setDrawerOpen(false);
         setSelectedMessage(null);
@@ -138,940 +130,367 @@ export default function AdminMessagesPage() {
     }
   };
 
+  const copyToClipboard = (text: string, label: string) => {
+    navigator.clipboard.writeText(text);
+    toast.success(`Copied ${label} to clipboard!`);
+  };
+
   // Metrics
   const totalInquiries = messages.length;
   const unreadInquiries = messages.filter(m => !m.read).length;
   const patronInquiries = messages.filter(m => m.isLoggedIn).length;
   const guestInquiries = totalInquiries - patronInquiries;
 
-  return (
-    <div style={pageContainerStyle}>
-      {/* Font & Custom Keyframe imports */}
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Jost:wght@300;400;500;600&display=swap');
-        .msg-input:focus { border-color: #8B6914 !important; box-shadow: 0 0 0 1px rgba(139,105,20,0.15); }
-        .msg-row { transition: background 0.18s ease; cursor: pointer; }
-        .msg-row:hover { background: rgba(139,105,20,0.03) !important; }
-        
-        @keyframes slideIn {
-          from { transform: translateX(100%); }
-          to { transform: translateX(0); }
-        }
-
-        @media (max-width: 992px) {
-          .msg-table-card { display: none !important; }
-          .msg-mobile-grid { display: flex !important; }
-        }
-      `}</style>
-
-      {/* Title Header */}
-      <div style={headerStyle}>
-        <div>
-          <h1 style={titleStyle}>CUSTOMER SUPPORT INQUIRIES</h1>
-          <p style={subtitleStyle}>Review, manage, and respond to patron and guest feedback submitted via Customer Care.</p>
-        </div>
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[450px]">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#8B6914]" />
+        <p className="mt-4 text-xs font-semibold text-[#8B6914] tracking-widest uppercase font-['Jost']">
+          Retrieving Support Inquiries…
+        </p>
       </div>
+    );
+  }
 
-      {/* Metrics Header */}
-      <div style={metricsRowStyle}>
-        <div style={metricCardStyle}>
-          <p style={metricLabelStyle}>TOTAL INQUIRIES</p>
-          <p style={metricValueStyle}>{totalInquiries}</p>
-        </div>
-        <div style={{ 
-          ...metricCardStyle, 
-          border: unreadInquiries > 0 ? '1px solid rgba(139,105,20,0.45)' : '1px solid rgba(139,105,20,0.15)', 
-          background: unreadInquiries > 0 ? 'rgba(139,105,20,0.02)' : '#ffffff' 
-        }}>
-          <p style={metricLabelStyle}>UNREAD INQUIRIES</p>
-          <p style={{ ...metricValueStyle, color: unreadInquiries > 0 ? '#8B6914' : '#1a1209' }}>
-            {unreadInquiries}
-            {unreadInquiries > 0 && (
-              <span style={{ fontSize: '13px', color: '#8B6914', marginLeft: '6px', verticalAlign: 'middle' }}>●</span>
-            )}
+  return (
+    <div className="space-y-6 font-['Jost'] select-none">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#8B6914]/15 pb-5">
+        <div>
+          <h1 className="font-['Cormorant_Garamond'] text-3xl font-semibold text-[#8B6914] tracking-wide">
+            CUSTOMER CARE INQUIRIES
+          </h1>
+          <p className="text-[#1a1209]/60 text-sm mt-0.5">
+            Review, manage, and respond to patron and guest feedback submitted via Customer Care.
           </p>
         </div>
-        <div style={metricCardStyle}>
-          <p style={metricLabelStyle}>PATRON INQUIRIES</p>
-          <p style={metricValueStyle}>{patronInquiries}</p>
+        <button
+          onClick={fetchMessages}
+          className="self-start sm:self-center px-4 py-2 bg-white border border-[#1a1209]/15 hover:border-[#8B6914] text-xs font-semibold text-[#1a1209] rounded-lg transition-all shadow-sm flex items-center gap-2 cursor-pointer"
+        >
+          <svg className="w-4 h-4 text-[#8B6914]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+          Refresh Inquiries
+        </button>
+      </div>
+
+      {/* Professional Metrics Row */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="bg-white border border-[#1a1209]/10 rounded-xl p-4 shadow-sm hover:border-[#8B6914]/30 transition-all">
+          <p className="text-[11px] font-semibold tracking-wider text-[#8B6914] uppercase">TOTAL INQUIRIES</p>
+          <p className="font-['Jost'] text-3xl font-bold text-[#1a1209] mt-1 tabular-nums font-mono">{totalInquiries.toLocaleString()}</p>
         </div>
-        <div style={metricCardStyle}>
-          <p style={metricLabelStyle}>GUEST INQUIRIES</p>
-          <p style={metricValueStyle}>{guestInquiries}</p>
+        <div className={`bg-white border rounded-xl p-4 shadow-sm transition-all ${
+          unreadInquiries > 0 ? 'border-amber-400 bg-amber-50/20 ring-1 ring-amber-400/30' : 'border-[#1a1209]/10'
+        }`}>
+          <div className="flex items-center justify-between">
+            <p className="text-[11px] font-semibold tracking-wider text-[#8B6914] uppercase">UNREAD INQUIRIES</p>
+            {unreadInquiries > 0 && <span className="h-2 w-2 rounded-full bg-amber-500 animate-ping" />}
+          </div>
+          <p className={`font-['Jost'] text-3xl font-bold mt-1 tabular-nums font-mono ${unreadInquiries > 0 ? 'text-amber-700' : 'text-[#1a1209]'}`}>
+            {unreadInquiries.toLocaleString()}
+          </p>
+        </div>
+        <div className="bg-white border border-[#1a1209]/10 rounded-xl p-4 shadow-sm hover:border-[#8B6914]/30 transition-all">
+          <p className="text-[11px] font-semibold tracking-wider text-[#8B6914] uppercase">PATRON INQUIRIES</p>
+          <p className="font-['Jost'] text-3xl font-bold text-[#1a1209] mt-1 tabular-nums font-mono">{patronInquiries.toLocaleString()}</p>
+        </div>
+        <div className="bg-white border border-[#1a1209]/10 rounded-xl p-4 shadow-sm hover:border-[#8B6914]/30 transition-all">
+          <p className="text-[11px] font-semibold tracking-wider text-[#8B6914] uppercase">GUEST INQUIRIES</p>
+          <p className="font-['Jost'] text-3xl font-bold text-[#1a1209] mt-1 tabular-nums font-mono">{guestInquiries.toLocaleString()}</p>
         </div>
       </div>
 
-      {/* Toolbar */}
-      <div style={toolbarStyle}>
-        <div style={{ position: 'relative', flex: 1, maxWidth: '420px' }}>
+      {/* Toolbar & Filter Tabs */}
+      <div className="bg-white border border-[#1a1209]/10 rounded-xl p-4 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="relative max-w-md w-full">
           <input
             type="text"
-            className="msg-input"
-            placeholder="Search inquiries by name, email, mobile, content..."
+            placeholder="Search by sender name, email, phone, subject or content..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            style={searchInputStyle}
+            className="w-full pl-10 pr-4 py-2.5 bg-[#fbf9f4] border border-[#1a1209]/15 rounded-lg text-sm text-[#1a1209] placeholder-[#1a1209]/40 focus:outline-none focus:border-[#8B6914] focus:ring-2 focus:ring-[#8B6914]/20 transition"
           />
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="rgba(26,18,9,0.38)" strokeWidth="1.8" style={searchIconStyle}>
-            <circle cx="11" cy="11" r="8"/>
-            <path d="m21 21-4.35-4.35"/>
+          <svg className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-[#1a1209]/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
         </div>
 
-        {/* Filter Tabs */}
-        <div style={tabContainerStyle}>
+        <div className="flex gap-2">
           <button 
             onClick={() => setFilterTab('all')} 
-            style={filterTab === 'all' ? activeTabStyle : inactiveTabStyle}
+            className={`px-4 py-2 text-xs font-semibold rounded-lg border transition-all cursor-pointer ${
+              filterTab === 'all'
+                ? 'bg-[#1a1209] text-[#faf7f0] border-[#1a1209] shadow-sm'
+                : 'bg-white text-[#1a1209]/70 border-[#1a1209]/10 hover:bg-[#faf7f0]/60'
+            }`}
           >
-            All Inquiries
+            All Inquiries ({totalInquiries})
           </button>
           <button 
             onClick={() => setFilterTab('unread')} 
-            style={filterTab === 'unread' ? activeTabStyle : inactiveTabStyle}
+            className={`px-4 py-2 text-xs font-semibold rounded-lg border transition-all cursor-pointer flex items-center gap-1.5 ${
+              filterTab === 'unread'
+                ? 'bg-[#1a1209] text-[#faf7f0] border-[#1a1209] shadow-sm'
+                : 'bg-white text-[#1a1209]/70 border-[#1a1209]/10 hover:bg-[#faf7f0]/60'
+            }`}
           >
             Unread Only
-            {unreadInquiries > 0 && <span style={tabBadgeStyle}>{unreadInquiries}</span>}
+            {unreadInquiries > 0 && (
+              <span className="px-1.5 py-0.5 bg-[#8B6914] text-white text-[10px] font-bold rounded-full font-mono">
+                {unreadInquiries}
+              </span>
+            )}
           </button>
         </div>
       </div>
 
-      {loading ? (
-        <div style={loadingWrapperStyle}>
-          <div style={spinnerStyle} />
-          <p style={loadingTextStyle}>Retrieving inquiries…</p>
-        </div>
-      ) : filteredMessages.length === 0 ? (
-        <div style={emptyWrapperStyle}>
-          <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="rgba(26,18,9,0.22)" strokeWidth="1" style={{ marginBottom: '14px' }}>
-            <circle cx="12" cy="12" r="10"/>
-            <line x1="8" y1="12" x2="16" y2="12"/>
+      {/* Messages Table Listing */}
+      {filteredMessages.length === 0 ? (
+        <div className="bg-white border border-dashed border-[#8B6914]/30 rounded-xl p-12 text-center">
+          <svg className="w-10 h-10 text-[#1a1209]/20 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10" strokeWidth="1.5" />
+            <line x1="8" y1="12" x2="16" y2="12" strokeWidth="1.5" />
           </svg>
-          <p style={emptyTextStyle}>No customer care inquiries found matching your criteria.</p>
+          <p className="text-sm text-[#1a1209]/60 font-medium">No customer care inquiries found matching your criteria.</p>
         </div>
       ) : (
-        <>
-          {/* DESKTOP TABLE VIEW */}
-          <div className="msg-table-card" style={tableCardStyle}>
-            <table style={tableStyle}>
-              <thead>
-                <tr style={tableHeaderRowStyle}>
-                  <th style={thStyle}>SENDER</th>
-                  <th style={thStyle}>STATUS</th>
-                  <th style={thStyle}>EMAIL ADDRESS</th>
-                  <th style={thStyle}>MOBILE CONTACT</th>
-                  <th style={thStyle}>SUBJECT</th>
-                  <th style={thStyle}>RECEIVED DATE</th>
+        <div className="bg-white border border-[#1a1209]/10 rounded-xl overflow-hidden shadow-sm">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead className="bg-[#1a1209] text-[#f3e3b8]">
+                <tr>
+                  <th className="px-6 py-3.5 text-[10px] font-semibold tracking-[0.15em] uppercase">SENDER</th>
+                  <th className="px-6 py-3.5 text-[10px] font-semibold tracking-[0.15em] uppercase">TYPE</th>
+                  <th className="px-6 py-3.5 text-[10px] font-semibold tracking-[0.15em] uppercase">EMAIL ADDRESS</th>
+                  <th className="px-6 py-3.5 text-[10px] font-semibold tracking-[0.15em] uppercase">MOBILE CONTACT</th>
+                  <th className="px-6 py-3.5 text-[10px] font-semibold tracking-[0.15em] uppercase">SUBJECT</th>
+                  <th className="px-6 py-3.5 text-[10px] font-semibold tracking-[0.15em] uppercase">RECEIVED DATE</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-[#1a1209]/5">
                 {filteredMessages.map((m) => (
-                  <tr key={m._id} className="msg-row" onClick={() => handleRowClick(m)} style={tableRowStyle}>
-                    <td style={tdStyle}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                        <div style={avatarContainerStyle}>
+                  <tr 
+                    key={m._id} 
+                    onClick={() => handleRowClick(m)}
+                    className="hover:bg-[#faf7f0]/50 transition-colors cursor-pointer"
+                  >
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 rounded-full border border-[#8B6914]/30 bg-[#faf7f0] flex items-center justify-center overflow-hidden flex-shrink-0">
                           {m.profileImage ? (
-                            <img src={m.profileImage} alt="Avatar" style={avatarStyle} />
+                            <img src={m.profileImage} alt="Avatar" className="w-full h-full object-cover" />
                           ) : (
-                            <div style={avatarFallbackStyle}>{m.name.charAt(0).toUpperCase()}</div>
+                            <span className="text-sm font-semibold text-[#8B6914]">
+                              {m.name.charAt(0).toUpperCase()}
+                            </span>
                           )}
                         </div>
-                        <span style={{ 
-                          ...patronNameStyle, 
-                          fontWeight: m.read ? 600 : 700,
-                          color: m.read ? 'rgba(26,18,9,0.8)' : '#1a1209'
-                        }}>{m.name}</span>
+                        <span className={`text-sm ${m.read ? 'font-medium text-[#1a1209]/80' : 'font-bold text-[#1a1209]'}`}>
+                          {m.name}
+                        </span>
                       </div>
                     </td>
-                    <td style={tdStyle}>
+                    <td className="px-6 py-4">
                       {m.isLoggedIn ? (
-                        <span style={patronBadgeStyle}>PATRON</span>
+                        <span className="px-2 py-0.5 bg-[#8B6914]/10 text-[#8B6914] border border-[#8B6914]/30 text-[9px] font-extrabold rounded uppercase tracking-wider">
+                          PATRON
+                        </span>
                       ) : (
-                        <span style={guestBadgeStyle}>GUEST</span>
+                        <span className="px-2 py-0.5 bg-gray-100 text-gray-600 border border-gray-200 text-[9px] font-bold rounded uppercase tracking-wider">
+                          GUEST
+                        </span>
                       )}
                     </td>
-                    <td style={tdStyle}>
-                      <span style={emailLinkStyle}>{m.email}</span>
+                    <td className="px-6 py-4 text-xs font-semibold text-[#8B6914]">
+                      {m.email}
                     </td>
-                    <td style={tdStyle}>
-                      <span style={textStyle}>{m.mobile}</span>
+                    <td className="px-6 py-4 text-xs text-[#1a1209]/80 font-mono">
+                      {m.mobile || '—'}
                     </td>
-                    <td style={tdStyle}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-2">
                         {!m.read && (
-                          <span 
-                            style={{ 
-                              width: '6px', 
-                              height: '6px', 
-                              borderRadius: '50%', 
-                              background: '#8B6914', 
-                              display: 'block', 
-                              flexShrink: 0 
-                            }} 
-                            title="Unread Message" 
-                          />
+                          <span className="w-2 h-2 rounded-full bg-[#8B6914] flex-shrink-0" title="Unread Message" />
                         )}
-                        <span style={{ 
-                          ...textStyle, 
-                          fontWeight: m.read ? 500 : 700, 
-                          color: m.read ? 'rgba(26,18,9,0.7)' : '#1a1209' 
-                        }}>
+                        <span className={`text-xs truncate max-w-[220px] ${m.read ? 'font-normal text-[#1a1209]/70' : 'font-bold text-[#1a1209]'}`}>
                           {m.subject}
                         </span>
                       </div>
                     </td>
-                    <td style={tdStyle}>
-                      <span style={dateStyle}>{new Date(m.createdAt).toLocaleDateString()}</span>
+                    <td className="px-6 py-4 text-xs text-[#1a1209]/50 font-mono">
+                      {new Date(m.createdAt).toLocaleDateString('en-US', {
+                        month: 'short',
+                        day: 'numeric',
+                        year: 'numeric',
+                      })}
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-
-          {/* MOBILE CARDS VIEW */}
-          <div className="msg-mobile-grid" style={mobileGridStyle}>
-            {filteredMessages.map((m) => (
-              <div key={m._id} onClick={() => handleRowClick(m)} style={mobileCardStyle}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '14px' }}>
-                  <div style={avatarContainerStyle}>
-                    {m.profileImage ? (
-                      <img src={m.profileImage} alt="Avatar" style={avatarStyle} />
-                    ) : (
-                      <div style={avatarFallbackStyle}>{m.name.charAt(0).toUpperCase()}</div>
-                    )}
-                  </div>
-                  <div>
-                    <h2 style={{ 
-                      ...patronNameStyle, 
-                      fontWeight: m.read ? 600 : 700,
-                      color: m.read ? 'rgba(26,18,9,0.8)' : '#1a1209'
-                    }}>{m.name}</h2>
-                    <p style={{ ...dateStyle, margin: 0 }}>Received: {new Date(m.createdAt).toLocaleDateString()}</p>
-                  </div>
-                  <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    {!m.read && (
-                      <span 
-                        style={{ 
-                          width: '6px', 
-                          height: '6px', 
-                          borderRadius: '50%', 
-                          background: '#8B6914', 
-                          display: 'block' 
-                        }} 
-                      />
-                    )}
-                    {m.isLoggedIn ? (
-                      <span style={patronBadgeStyle}>PATRON</span>
-                    ) : (
-                      <span style={guestBadgeStyle}>GUEST</span>
-                    )}
-                  </div>
-                </div>
-                
-                <div style={cardRowStyle}>
-                  <span style={cardLabelStyle}>Email:</span>
-                  <span style={{ ...textStyle, wordBreak: 'break-all' }}>{m.email}</span>
-                </div>
-                <div style={cardRowStyle}>
-                  <span style={cardLabelStyle}>Mobile:</span>
-                  <span>{m.mobile}</span>
-                </div>
-                <div style={cardRowStyle}>
-                  <span style={cardLabelStyle}>Subject:</span>
-                  <span style={{ 
-                    fontWeight: m.read ? 500 : 700,
-                    color: m.read ? 'rgba(26,18,9,0.8)' : '#1a1209'
-                  }}>{m.subject}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </>
+        </div>
       )}
 
       {/* DETAILS SLIDE-OUT DRAWER */}
       {drawerOpen && selectedMessage && (
-        <>
+        <div className="fixed inset-0 z-50 overflow-hidden select-none">
           {/* Overlay */}
-          <div onClick={() => setDrawerOpen(false)} style={overlayStyle} />
+          <div 
+            onClick={() => setDrawerOpen(false)} 
+            className="absolute inset-0 bg-[#1a1209]/50 backdrop-blur-sm transition-opacity duration-300"
+          />
           
           {/* Drawer Panel */}
-          <div style={drawerPanelStyle}>
-            <div style={drawerHeaderStyle}>
-              <h2 style={drawerTitleStyle}>SUPPORT INQUIRY DETAILS</h2>
-              <button onClick={() => setDrawerOpen(false)} style={drawerCloseBtnStyle}>✕</button>
-            </div>
-
-            <div style={drawerBodyStyle}>
-              {/* Profile Card Header */}
-              <div style={drawerProfileCardStyle}>
-                <div style={drawerAvatarContainerStyle}>
-                  {selectedMessage.profileImage ? (
-                    <img src={selectedMessage.profileImage} alt="Profile" style={drawerAvatarStyle} />
-                  ) : (
-                    <div style={drawerAvatarFallbackStyle}>{selectedMessage.name.charAt(0).toUpperCase()}</div>
-                  )}
-                </div>
-                <h3 style={drawerCustomerNameStyle}>{selectedMessage.name}</h3>
-                <p style={drawerCustomerSubStyle}>
-                  {selectedMessage.isLoggedIn ? 'REGISTERED WINSOR PATRON' : 'GUEST VISITOR'}
-                </p>
+          <div className="absolute inset-y-0 right-0 max-w-full flex pl-6 sm:pl-10">
+            <div className="w-screen max-w-xl bg-[#faf7f0] shadow-2xl border-l border-[#1a1209]/10 flex flex-col h-full transform transition-transform duration-300">
+              
+              {/* Drawer Header */}
+              <div className="px-6 py-5 bg-[#1a1209] text-[#f3e3b8] border-b border-[#8B6914]/30 flex items-center justify-between">
+                <h2 className="font-['Cormorant_Garamond'] text-xl font-bold tracking-wider uppercase">
+                  SUPPORT INQUIRY DETAILS
+                </h2>
+                <button 
+                  onClick={() => setDrawerOpen(false)} 
+                  className="text-[#f3e3b8]/60 hover:text-[#f3e3b8] text-xl font-bold transition-colors cursor-pointer p-1"
+                >
+                  ✕
+                </button>
               </div>
 
-              {/* Inquiry Credentials */}
-              <div style={drawerSectionStyle}>
-                <h4 style={sectionTitleStyle}>CONTACT INFORMATION</h4>
-                <div style={detailsBoxStyle}>
-                  <div style={detailFieldStyle}>
-                    <span style={detailLabelStyle}>EMAIL ADDRESS</span>
-                    <span style={detailValueStyle}>{selectedMessage.email}</span>
-                  </div>
-                  <div style={detailFieldStyle}>
-                    <span style={detailLabelStyle}>MOBILE CONTACT</span>
-                    <span style={detailValueStyle}>{selectedMessage.mobile}</span>
-                  </div>
-                  <div style={detailFieldStyle}>
-                    <span style={detailLabelStyle}>IP ADDRESS & DATE</span>
-                    <span style={detailValueStyle}>
-                      {selectedMessage.ipAddress} · {new Date(selectedMessage.createdAt).toLocaleString()}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Message Content */}
-              <div style={drawerSectionStyle}>
-                <h4 style={sectionTitleStyle}>MESSAGE BRIEF</h4>
-                <div style={detailsBoxStyle}>
-                  <div style={detailFieldStyle}>
-                    <span style={detailLabelStyle}>SUBJECT</span>
-                    <span style={{ ...detailValueStyle, color: '#8B6914', fontSize: '14.5px' }}>{selectedMessage.subject}</span>
-                  </div>
-                  <div style={{ ...detailFieldStyle, marginTop: '4px', borderTop: '1px solid rgba(26,18,9,0.06)', paddingTop: '12px' }}>
-                    <span style={detailLabelStyle}>MESSAGE BODY</span>
-                    <p style={messageContentStyle}>{selectedMessage.message}</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Actions Grid */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: 'auto', paddingTop: '20px' }}>
-                <div style={{ display: 'flex', gap: '12px' }}>
-                  <a 
-                    href={`mailto:${selectedMessage.email}?subject=Re: ${encodeURIComponent(selectedMessage.subject)}`}
-                    style={replyBtnStyle}
-                  >
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '8px' }}>
-                      <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
-                      <polyline points="22,6 12,13 2,6"/>
-                    </svg>
-                    Reply via Email
-                  </a>
-                  
-                  {/* Mark Read/Unread Toggle Button */}
-                  <button 
-                    onClick={() => handleToggleRead(selectedMessage._id, selectedMessage.read)}
-                    style={{
-                      ...secondaryBtnStyle,
-                      borderColor: selectedMessage.read ? 'rgba(26,18,9,0.2)' : 'rgba(139,105,20,0.5)',
-                      color: selectedMessage.read ? '#1a1209' : '#8B6914',
-                      background: selectedMessage.read ? 'transparent' : 'rgba(139,105,20,0.04)',
-                    }}
-                  >
-                    {selectedMessage.read ? (
-                      <>
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '6px' }}>
-                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                          <circle cx="12" cy="12" r="3"/>
-                        </svg>
-                        Mark Unread
-                      </>
+              {/* Drawer Body */}
+              <div className="flex-1 overflow-y-auto p-6 space-y-6">
+                
+                {/* Profile Card Header */}
+                <div className="bg-white border border-[#8B6914]/20 rounded-2xl p-6 flex flex-col items-center text-center shadow-sm">
+                  <div className="w-20 h-20 rounded-full border-2 border-[#8B6914] p-1 bg-[#faf7f0] flex items-center justify-center overflow-hidden mb-3">
+                    {selectedMessage.profileImage ? (
+                      <img src={selectedMessage.profileImage} alt="Profile" className="w-full h-full object-cover rounded-full" />
                     ) : (
-                      <>
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '6px' }}>
-                          <polyline points="20 6 9 17 4 12"/>
-                        </svg>
-                        Mark Read
-                      </>
+                      <span className="text-2xl font-bold text-[#8B6914]">
+                        {selectedMessage.name.charAt(0).toUpperCase()}
+                      </span>
                     )}
+                  </div>
+                  <h3 className="text-lg font-bold text-[#1a1209] capitalize">
+                    {selectedMessage.name}
+                  </h3>
+                  <p className="text-[10px] font-bold text-[#8B6914] tracking-wider uppercase font-mono mt-0.5">
+                    {selectedMessage.isLoggedIn ? 'REGISTERED WINSOR PATRON' : 'GUEST VISITOR'}
+                  </p>
+                </div>
+
+                {/* Sender Contact Info */}
+                <div className="space-y-2">
+                  <h4 className="text-[11px] font-bold tracking-wider text-[#8B6914] uppercase">CONTACT INFORMATION</h4>
+                  <div className="bg-white border border-[#1a1209]/10 rounded-xl p-4 space-y-3 text-xs">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="block text-[10px] font-semibold text-[#1a1209]/40 uppercase tracking-wider">EMAIL ADDRESS</span>
+                        <span className="font-semibold text-[#8B6914]">{selectedMessage.email}</span>
+                      </div>
+                      <button
+                        onClick={() => copyToClipboard(selectedMessage.email, 'Email')}
+                        className="px-2 py-1 bg-[#faf7f0] border border-[#8B6914]/20 text-[#8B6914] rounded text-[10px] font-bold hover:bg-[#8B6914] hover:text-white transition-all"
+                      >
+                        Copy
+                      </button>
+                    </div>
+                    <div className="flex items-center justify-between pt-2 border-t border-[#1a1209]/5">
+                      <div>
+                        <span className="block text-[10px] font-semibold text-[#1a1209]/40 uppercase tracking-wider">MOBILE CONTACT</span>
+                        <span className="font-mono text-[#1a1209] font-medium">{selectedMessage.mobile || '—'}</span>
+                      </div>
+                      {selectedMessage.mobile && (
+                        <button
+                          onClick={() => copyToClipboard(selectedMessage.mobile, 'Mobile Number')}
+                          className="px-2 py-1 bg-[#faf7f0] border border-[#8B6914]/20 text-[#8B6914] rounded text-[10px] font-bold hover:bg-[#8B6914] hover:text-white transition-all"
+                        >
+                          Copy
+                        </button>
+                      )}
+                    </div>
+                    <div className="pt-2 border-t border-[#1a1209]/5 font-mono text-[11px]">
+                      <span className="block text-[10px] font-semibold text-[#1a1209]/40 uppercase tracking-wider font-sans mb-0.5">IP ADDRESS & DATE</span>
+                      <span className="text-[#1a1209]/80">
+                        {selectedMessage.ipAddress} · {new Date(selectedMessage.createdAt).toLocaleString()}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Message Brief & High-Contrast Readable Message Body */}
+                <div className="space-y-2">
+                  <h4 className="text-[11px] font-bold tracking-wider text-[#8B6914] uppercase">MESSAGE BRIEF</h4>
+                  <div className="bg-white border border-[#1a1209]/10 rounded-xl p-5 space-y-4 shadow-sm">
+                    <div>
+                      <span className="block text-[10px] font-semibold text-[#1a1209]/40 uppercase tracking-wider mb-1">SUBJECT</span>
+                      <h5 className="text-base font-bold text-[#8B6914]">
+                        {selectedMessage.subject}
+                      </h5>
+                    </div>
+
+                    {/* ✅ HIGH-CONTRAST READABLE MESSAGE BODY (SUPPORTS 1000+ CHARS) */}
+                    <div className="pt-3 border-t border-[#1a1209]/10 space-y-1.5">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] font-bold text-[#1a1209]/60 tracking-wider uppercase">MESSAGE BODY</span>
+                        <span className="text-[10px] font-mono text-[#8B6914] font-bold">
+                          {selectedMessage.message.length} characters
+                        </span>
+                      </div>
+                      <div className="bg-[#faf7f0] border border-[#8B6914]/20 rounded-xl p-4 max-h-[350px] overflow-y-auto shadow-inner">
+                        <p className="text-sm font-['Jost'] text-[#1a1209] font-medium leading-relaxed whitespace-pre-wrap break-words">
+                          {selectedMessage.message}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Actions Grid */}
+                <div className="space-y-3 pt-4 border-t border-[#1a1209]/10">
+                  <div className="flex gap-3">
+                    <a 
+                      href={`mailto:${selectedMessage.email}?subject=Re: ${encodeURIComponent(selectedMessage.subject)}`}
+                      className="flex-1 py-3 bg-[#1a1209] hover:bg-[#8B6914] text-white text-xs font-semibold rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 002-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                      </svg>
+                      Reply via Email
+                    </a>
+                    
+                    <button 
+                      onClick={() => handleToggleRead(selectedMessage._id, selectedMessage.read)}
+                      className={`px-4 py-3 border text-xs font-semibold rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                        selectedMessage.read 
+                          ? 'border-[#1a1209]/20 text-[#1a1209] hover:bg-[#1a1209]/5' 
+                          : 'border-[#8B6914] text-[#8B6914] bg-[#8B6914]/10 hover:bg-[#8B6914] hover:text-white'
+                      }`}
+                    >
+                      {selectedMessage.read ? 'Mark Unread' : '✓ Mark Read'}
+                    </button>
+                  </div>
+                  
+                  <button 
+                    onClick={() => handleDeleteMessage(selectedMessage._id)} 
+                    disabled={deleting}
+                    className="w-full py-2.5 border border-red-200 text-red-600 hover:bg-red-50 text-xs font-semibold rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                    Delete Inquiry
                   </button>
                 </div>
-                
-                <button 
-                  onClick={() => handleDeleteMessage(selectedMessage._id)} 
-                  disabled={deleting}
-                  style={deleteBtnStyle}
-                >
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '6px' }}>
-                    <polyline points="3 6 5 6 21 6"/>
-                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
-                    <line x1="10" y1="11" x2="10" y2="17"/>
-                    <line x1="14" y1="11" x2="14" y2="17"/>
-                  </svg>
-                  Delete Inquiry
-                </button>
+
               </div>
             </div>
           </div>
-        </>
+        </div>
       )}
     </div>
   );
 }
-
-// Styling Declarations
-const pageContainerStyle: React.CSSProperties = {
-  fontFamily: "'Jost', sans-serif",
-  color: '#1a1209',
-  paddingTop: '10px',
-  minHeight: '90vh',
-};
-
-const headerStyle: React.CSSProperties = {
-  display: 'flex',
-  justifyContent: 'space-between',
-  alignItems: 'flex-start',
-  borderBottom: '1px solid rgba(139,105,20,0.15)',
-  paddingBottom: '20px',
-  marginBottom: '28px',
-};
-
-const titleStyle: React.CSSProperties = {
-  fontFamily: "'Cormorant Garamond', serif",
-  fontSize: '32px',
-  fontWeight: 600,
-  color: '#8B6914',
-  letterSpacing: '0.05em',
-  margin: '0 0 6px 0',
-};
-
-const subtitleStyle: React.CSSProperties = {
-  fontSize: '13.5px',
-  color: 'rgba(26,18,9,0.6)',
-  margin: 0,
-};
-
-const metricsRowStyle: React.CSSProperties = {
-  display: 'grid',
-  gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-  gap: '20px',
-  marginBottom: '28px',
-};
-
-const metricCardStyle: React.CSSProperties = {
-  background: '#ffffff',
-  border: '1px solid rgba(139,105,20,0.15)',
-  borderRadius: '8px',
-  padding: '20px',
-  boxShadow: '0 4px 12px rgba(26,18,9,0.02)',
-  boxSizing: 'border-box',
-};
-
-const metricLabelStyle: React.CSSProperties = {
-  fontSize: '10px',
-  fontWeight: 600,
-  letterSpacing: '0.12em',
-  color: '#8B6914',
-  margin: '0 0 8px 0',
-};
-
-const metricValueStyle: React.CSSProperties = {
-  fontFamily: "'Cormorant Garamond', serif",
-  fontSize: '32px',
-  fontWeight: 600,
-  color: '#1a1209',
-  margin: 0,
-};
-
-const toolbarStyle: React.CSSProperties = {
-  display: 'flex',
-  justifyContent: 'space-between',
-  alignItems: 'center',
-  marginBottom: '20px',
-  gap: '20px',
-  flexWrap: 'wrap',
-};
-
-const searchInputStyle: React.CSSProperties = {
-  width: '100%',
-  padding: '11px 16px 11px 40px',
-  background: '#ffffff',
-  border: '1px solid rgba(139,105,20,0.2)',
-  borderRadius: '6px',
-  outline: 'none',
-  fontSize: '13px',
-  color: '#1a1209',
-  transition: 'all 0.22s ease',
-  boxSizing: 'border-box',
-};
-
-const searchIconStyle: React.CSSProperties = {
-  position: 'absolute',
-  left: '14px',
-  top: '50%',
-  transform: 'translateY(-50%)',
-};
-
-const tabContainerStyle: React.CSSProperties = {
-  display: 'flex',
-  background: '#ffffff',
-  border: '1px solid rgba(139,105,20,0.15)',
-  borderRadius: '6px',
-  padding: '3px',
-  gap: '4px',
-};
-
-const activeTabStyle: React.CSSProperties = {
-  background: '#1a1209',
-  color: '#f3e3b8',
-  border: 'none',
-  borderRadius: '4px',
-  padding: '6px 14px',
-  fontSize: '12px',
-  fontWeight: 600,
-  cursor: 'pointer',
-  transition: 'all 0.2s ease',
-  display: 'flex',
-  alignItems: 'center',
-  gap: '6px',
-};
-
-const inactiveTabStyle: React.CSSProperties = {
-  background: 'transparent',
-  color: 'rgba(26,18,9,0.6)',
-  border: 'none',
-  borderRadius: '4px',
-  padding: '6px 14px',
-  fontSize: '12px',
-  fontWeight: 500,
-  cursor: 'pointer',
-  transition: 'all 0.2s ease',
-  display: 'flex',
-  alignItems: 'center',
-  gap: '6px',
-};
-
-const tabBadgeStyle: React.CSSProperties = {
-  background: '#8B6914',
-  color: '#ffffff',
-  fontSize: '9px',
-  fontWeight: 700,
-  borderRadius: '50%',
-  width: '15px',
-  height: '15px',
-  display: 'inline-flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-};
-
-const loadingWrapperStyle: React.CSSProperties = {
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  justifyContent: 'center',
-  padding: '100px 0',
-};
-
-const loadingTextStyle: React.CSSProperties = {
-  marginTop: '16px',
-  fontSize: '13px',
-  color: '#8B6914',
-  letterSpacing: '0.08em',
-};
-
-const spinnerStyle: React.CSSProperties = {
-  width: '32px',
-  height: '32px',
-  border: '2px solid rgba(139,105,20,0.12)',
-  borderTop: '2px solid #8B6914',
-  borderRadius: '50%',
-  animation: 'spin 0.8s linear infinite',
-};
-
-const emptyWrapperStyle: React.CSSProperties = {
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  justifyContent: 'center',
-  background: '#ffffff',
-  border: '1px dashed rgba(139,105,20,0.25)',
-  borderRadius: '8px',
-  padding: '60px 20px',
-  textAlign: 'center',
-};
-
-const emptyTextStyle: React.CSSProperties = {
-  fontSize: '13px',
-  color: 'rgba(26,18,9,0.5)',
-  margin: 0,
-};
-
-const tableCardStyle: React.CSSProperties = {
-  background: '#ffffff',
-  border: '1px solid rgba(139,105,20,0.15)',
-  borderRadius: '8px',
-  boxShadow: '0 4px 16px rgba(26,18,9,0.03)',
-  overflow: 'hidden',
-  display: 'block',
-};
-
-const tableStyle: React.CSSProperties = {
-  width: '100%',
-  borderCollapse: 'collapse',
-  textAlign: 'left',
-};
-
-const tableHeaderRowStyle: React.CSSProperties = {
-  background: '#1a1209',
-  borderBottom: '1px solid rgba(139,105,20,0.25)',
-};
-
-const thStyle: React.CSSProperties = {
-  padding: '14px 20px',
-  fontSize: '10px',
-  fontWeight: 600,
-  letterSpacing: '0.12em',
-  color: '#f3e3b8',
-  textTransform: 'uppercase',
-};
-
-const tableRowStyle: React.CSSProperties = {
-  borderBottom: '1px solid rgba(139,105,20,0.08)',
-};
-
-const tdStyle: React.CSSProperties = {
-  padding: '14px 20px',
-  verticalAlign: 'middle',
-};
-
-const avatarContainerStyle: React.CSSProperties = {
-  width: '34px',
-  height: '34px',
-  borderRadius: '50%',
-  border: '1px solid rgba(139,105,20,0.3)',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  background: '#faf7f0',
-  overflow: 'hidden',
-  flexShrink: 0,
-};
-
-const avatarStyle: React.CSSProperties = {
-  width: '100%',
-  height: '100%',
-  objectFit: 'cover',
-};
-
-const avatarFallbackStyle: React.CSSProperties = {
-  width: '100%',
-  height: '100%',
-  background: '#8B6914',
-  color: '#ffffff',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  fontSize: '14px',
-  fontWeight: 500,
-};
-
-const patronNameStyle: React.CSSProperties = {
-  fontSize: '13.5px',
-  fontWeight: 600,
-  color: '#1a1209',
-  textTransform: 'capitalize',
-};
-
-const emailLinkStyle: React.CSSProperties = {
-  fontSize: '13px',
-  color: '#8B6914',
-  fontWeight: 500,
-};
-
-const textStyle: React.CSSProperties = {
-  fontSize: '13px',
-  color: 'rgba(26,18,9,0.8)',
-};
-
-const dateStyle: React.CSSProperties = {
-  fontSize: '12px',
-  color: 'rgba(26,18,9,0.5)',
-};
-
-const patronBadgeStyle: React.CSSProperties = {
-  fontSize: '8.5px',
-  fontWeight: 600,
-  letterSpacing: '0.08em',
-  color: '#8B6914',
-  border: '1px solid rgba(139,105,20,0.3)',
-  borderRadius: '3px',
-  padding: '2px 8px',
-  background: 'rgba(139,105,20,0.05)',
-  display: 'inline-block',
-};
-
-const guestBadgeStyle: React.CSSProperties = {
-  fontSize: '8.5px',
-  fontWeight: 600,
-  letterSpacing: '0.08em',
-  color: 'rgba(26,18,9,0.6)',
-  border: '1px solid rgba(26,18,9,0.15)',
-  borderRadius: '3px',
-  padding: '2px 8px',
-  background: 'rgba(26,18,9,0.02)',
-  display: 'inline-block',
-};
-
-const mobileGridStyle: React.CSSProperties = {
-  display: 'none',
-  flexDirection: 'column',
-  gap: '16px',
-};
-
-const mobileCardStyle: React.CSSProperties = {
-  background: '#ffffff',
-  border: '1px solid rgba(139,105,20,0.15)',
-  borderRadius: '8px',
-  padding: '18px',
-  boxShadow: '0 4px 12px rgba(26,18,9,0.02)',
-  boxSizing: 'border-box',
-  cursor: 'pointer',
-};
-
-const cardRowStyle: React.CSSProperties = {
-  display: 'flex',
-  justifyContent: 'space-between',
-  fontSize: '12.5px',
-  padding: '6px 0',
-  borderBottom: '1px solid rgba(26,18,9,0.03)',
-};
-
-const cardLabelStyle: React.CSSProperties = {
-  color: 'rgba(26,18,9,0.45)',
-  fontWeight: 500,
-};
-
-const overlayStyle: React.CSSProperties = {
-  position: 'fixed',
-  inset: 0,
-  background: 'rgba(26, 18, 9, 0.45)',
-  backdropFilter: 'blur(3px)',
-  zIndex: 100,
-};
-
-const drawerPanelStyle: React.CSSProperties = {
-  position: 'fixed',
-  top: 0,
-  right: 0,
-  bottom: 0,
-  width: '460px',
-  maxWidth: '90%',
-  background: '#faf7f0',
-  boxShadow: '-8px 0 32px rgba(26,18,9,0.16)',
-  zIndex: 101,
-  display: 'flex',
-  flexDirection: 'column',
-  animation: 'slideIn 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)',
-};
-
-const drawerHeaderStyle: React.CSSProperties = {
-  display: 'flex',
-  justifyContent: 'space-between',
-  alignItems: 'center',
-  padding: '20px 24px',
-  borderBottom: '1px solid rgba(139,105,20,0.18)',
-  background: '#1a1209',
-  color: '#f3e3b8',
-};
-
-const drawerTitleStyle: React.CSSProperties = {
-  fontFamily: "'Cormorant Garamond', serif",
-  fontSize: '18px',
-  fontWeight: 600,
-  margin: 0,
-  letterSpacing: '0.08em',
-};
-
-const drawerCloseBtnStyle: React.CSSProperties = {
-  background: 'none',
-  border: 'none',
-  cursor: 'pointer',
-  color: 'rgba(243,227,184,0.6)',
-  fontSize: '18px',
-  transition: 'color 0.2s ease',
-};
-
-const drawerBodyStyle: React.CSSProperties = {
-  flex: 1,
-  overflowY: 'auto',
-  padding: '24px',
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '24px',
-};
-
-const drawerProfileCardStyle: React.CSSProperties = {
-  background: '#ffffff',
-  border: '1px solid rgba(139,105,20,0.12)',
-  borderRadius: '8px',
-  padding: '24px 16px',
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  boxShadow: '0 4px 12px rgba(26,18,9,0.02)',
-};
-
-const drawerAvatarContainerStyle: React.CSSProperties = {
-  width: '74px',
-  height: '74px',
-  borderRadius: '50%',
-  border: '2px solid #8B6914',
-  padding: '3px',
-  marginBottom: '14px',
-  background: '#faf7f0',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-};
-
-const drawerAvatarStyle: React.CSSProperties = {
-  width: '100%',
-  height: '100%',
-  borderRadius: '50%',
-  objectFit: 'cover',
-};
-
-const drawerAvatarFallbackStyle: React.CSSProperties = {
-  width: '100%',
-  height: '100%',
-  borderRadius: '50%',
-  background: '#8B6914',
-  color: '#ffffff',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  fontSize: '24px',
-  fontWeight: 500,
-};
-
-const drawerCustomerNameStyle: React.CSSProperties = {
-  fontSize: '17px',
-  fontWeight: 600,
-  margin: '0 0 4px 0',
-  textTransform: 'capitalize',
-};
-
-const drawerCustomerSubStyle: React.CSSProperties = {
-  fontSize: '10px',
-  letterSpacing: '0.08em',
-  color: 'rgba(26,18,9,0.4)',
-  margin: 0,
-  textTransform: 'uppercase',
-  fontWeight: 500,
-};
-
-const drawerSectionStyle: React.CSSProperties = {
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '10px',
-};
-
-const sectionTitleStyle: React.CSSProperties = {
-  fontSize: '10.5px',
-  fontWeight: 600,
-  letterSpacing: '0.12em',
-  color: '#8B6914',
-  margin: 0,
-};
-
-const detailsBoxStyle: React.CSSProperties = {
-  background: '#ffffff',
-  border: '1px solid rgba(26,18,9,0.06)',
-  borderRadius: '6px',
-  padding: '16px',
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '14px',
-};
-
-const detailFieldStyle: React.CSSProperties = {
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '4px',
-};
-
-const detailLabelStyle: React.CSSProperties = {
-  fontSize: '9px',
-  fontWeight: 500,
-  letterSpacing: '0.08em',
-  color: 'rgba(26,18,9,0.4)',
-};
-
-const detailValueStyle: React.CSSProperties = {
-  fontSize: '13px',
-  fontWeight: 500,
-  color: '#1a1209',
-};
-
-const messageContentStyle: React.CSSProperties = {
-  fontSize: '13.5px',
-  lineHeight: '1.6',
-  color: 'rgba(26,18,9,0.75)',
-  whiteSpace: 'pre-wrap',
-  margin: 0,
-  background: '#faf7f0',
-  border: '1px solid rgba(139,105,20,0.15)',
-  borderRadius: '4px',
-  padding: '12px 14px',
-};
-
-const replyBtnStyle: React.CSSProperties = {
-  flex: 1,
-  display: 'inline-flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  backgroundColor: '#1a1209',
-  color: '#f3e3b8',
-  border: 'none',
-  borderRadius: '4px',
-  padding: '12px 16px',
-  fontSize: '12.5px',
-  fontWeight: 500,
-  letterSpacing: '0.05em',
-  cursor: 'pointer',
-  textDecoration: 'none',
-  transition: 'background-color 0.2s ease',
-  textAlign: 'center',
-};
-
-const secondaryBtnStyle: React.CSSProperties = {
-  display: 'inline-flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  backgroundColor: 'transparent',
-  border: '1px solid rgba(26,18,9,0.2)',
-  borderRadius: '4px',
-  padding: '12px 16px',
-  fontSize: '12.5px',
-  fontWeight: 500,
-  letterSpacing: '0.05em',
-  cursor: 'pointer',
-  transition: 'all 0.2s ease',
-};
-
-const deleteBtnStyle: React.CSSProperties = {
-  display: 'inline-flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  backgroundColor: 'transparent',
-  color: '#c62828',
-  border: '1px solid rgba(198,40,40,0.3)',
-  borderRadius: '4px',
-  padding: '12px 18px',
-  fontSize: '12.5px',
-  fontWeight: 500,
-  letterSpacing: '0.05em',
-  cursor: 'pointer',
-  transition: 'all 0.2s ease',
-};

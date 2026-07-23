@@ -511,6 +511,32 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
           color: rgba(26, 18, 9, 0.4);
           cursor: not-allowed;
         }
+        .find-retailer-btn {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          width: 100%;
+          background: transparent;
+          color: #8B6914;
+          border: 1.5px solid #8B6914;
+          border-radius: 4px;
+          padding: 14px 20px;
+          font-family: 'Jost', sans-serif;
+          font-size: 13px;
+          font-weight: 500;
+          letter-spacing: 0.15em;
+          text-transform: uppercase;
+          text-decoration: none;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          box-sizing: border-box;
+        }
+        .find-retailer-btn:hover {
+          background: #8B6914;
+          color: #ffffff;
+          box-shadow: 0 4px 12px rgba(139,105,20,0.25);
+        }
 
         /* THREE ACCENTED BADGES */
         .features-badge-bar {
@@ -1185,6 +1211,20 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
               >
                 {isSoldOut ? 'Out of Stock' : 'Buy Now'}
               </button>
+            </div>
+
+            {/* Find a Retailer Button */}
+            <div style={{ marginTop: '12px', width: '100%' }}>
+              <Link
+                href="/retailers"
+                className="find-retailer-btn"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                  <circle cx="12" cy="10" r="3" />
+                </svg>
+                <span>Find a Retailer</span>
+              </Link>
             </div>
 
             {/* Three inline trust badges */}

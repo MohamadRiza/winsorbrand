@@ -168,14 +168,16 @@ export default function SidebarClientWrapper() {
           left: 0,
           right: 0,
           height: '60px',
-          backgroundColor: '#1a1209',
-          borderBottom: '1px solid rgba(139, 105, 20, 0.25)',
+          backgroundColor: 'rgba(14, 11, 8, 0.82)',
+          backdropFilter: 'blur(16px) saturate(180%)',
+          WebkitBackdropFilter: 'blur(16px) saturate(180%)',
+          borderBottom: '1px solid rgba(201, 161, 74, 0.2)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
           padding: '0 16px',
           zIndex: 30,
-          boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+          boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
         }}>
           {/* Hamburger Menu Toggle Button */}
           <button
@@ -240,8 +242,9 @@ export default function SidebarClientWrapper() {
           style={{
             position: 'fixed',
             inset: 0,
-            backgroundColor: 'rgba(26, 18, 9, 0.65)',
-            backdropFilter: 'blur(4px)',
+            backgroundColor: 'rgba(14, 11, 8, 0.45)',
+            backdropFilter: 'blur(8px)',
+            WebkitBackdropFilter: 'blur(8px)',
             zIndex: 35,
           }}
         />

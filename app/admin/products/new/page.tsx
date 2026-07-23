@@ -3,18 +3,57 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast';
-import { IProduct, CollectionSection, WarrantyOption, CloudinaryAsset, ColorVariant } from '@/types';
+import { CollectionSection, WarrantyOption, CloudinaryAsset, ColorVariant } from '@/types';
+import UploadProgressModal, { UploadProgressInfo } from '@/components/Admin/UploadProgressModal';
+import { uploadSingleFileWithXHR } from '@/lib/uploadHelper';
 
 const EMPTY_ASSET: CloudinaryAsset = { url: '', publicId: '' };
+
+interface StagedGalleryItem {
+  id: string;
+  file: File | null;
+  previewUrl: string;
+  asset: CloudinaryAsset;
+}
+
+interface StagedColorVariant extends ColorVariant {
+  file?: File | null;
+  previewUrl?: string | null;
+}
 
 export default function AddProductPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [uploadingImage, setUploadingImage] = useState(false);
   const [generatingDescription, setGeneratingDescription] = useState(false);
   const [isClient, setIsClient] = useState(false);
   const [giftCategories, setGiftCategories] = useState<Array<{ _id: string; slug: string; label: string; emoji: string }>>([]);
   
+  // Real Upload Telemetry State
+  const [uploadProgress, setUploadProgress] = useState<UploadProgressInfo>({
+    isOpen: false,
+    overallPercent: 0,
+    currentFileName: '',
+    currentIndex: 1,
+    totalFiles: 1,
+    loadedBytes: 0,
+    totalBytes: 0,
+  });
+
+  // Staged Media States for Zero-Delay Local Previews
+  const [thumbnailItem, setThumbnailItem] = useState<{ file: File | null; previewUrl: string | null; asset: CloudinaryAsset }>({
+    file: null,
+    previewUrl: null,
+    asset: EMPTY_ASSET,
+  });
+
+  const [galleryItems, setGalleryItems] = useState<StagedGalleryItem[]>([]);
+
+  const [videoItem, setVideoItem] = useState<{ file: File | null; previewUrl: string | null; asset: CloudinaryAsset }>({
+    file: null,
+    previewUrl: null,
+    asset: EMPTY_ASSET,
+  });
+
   const [formData, setFormData] = useState({
     title: '',
     brand: 'Winsor' as const,
@@ -24,10 +63,7 @@ export default function AddProductPage() {
     description: '',
     warranty: '1_year' as WarrantyOption,
     specifications: {} as Record<string, string>,
-    colorVariants: [] as ColorVariant[],
-    thumbnail: EMPTY_ASSET,
-    images: [] as CloudinaryAsset[],
-    video: EMPTY_ASSET,
+    colorVariants: [] as StagedColorVariant[],
     collectionSections: [] as CollectionSection[],
     giftCategories: [] as string[],
     isActive: true,
@@ -47,6 +83,21 @@ export default function AddProductPage() {
     correctedText: string;
     errorDetails: string;
   } | null>(null);
+
+  useEffect(() => {
+    setIsClient(true);
+    fetchGiftCategories();
+  }, []);
+
+  const fetchGiftCategories = async () => {
+    try {
+      const res = await fetch('/api/gift-categories');
+      const data = await res.json();
+      if (data.success) setGiftCategories(data.data || []);
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+    }
+  };
 
   const checkSpelling = async (fieldName: string, text: string) => {
     if (!text || !text.trim()) {
@@ -91,25 +142,7 @@ export default function AddProductPage() {
     toast.success('Spelling correction applied!');
   };
 
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
-
-  useEffect(() => {
-    fetchGiftCategories();
-  }, []);
-
-  const fetchGiftCategories = async () => {
-    try {
-      const res = await fetch('/api/gift-categories');
-      const data = await res.json();
-      if (data.success) setGiftCategories(data.data || []);
-    } catch (error) {
-      console.error('Error fetching categories:', error);
-    }
-  };
-
-  // ✅ Server-side AI description generation
+  // ✅ AI description generation
   const generateDescription = async () => {
     if (!formData.title?.trim() || !formData.modelNo?.trim()) {
       toast.error('Please enter product title and model number first');
@@ -126,15 +159,12 @@ export default function AddProductPage() {
           modelNo: formData.modelNo,
           watchShape: formData.watchShape,
           price: formData.price,
-          thumbnailUrl: formData.thumbnail?.url || '',
+          thumbnailUrl: thumbnailItem.previewUrl || thumbnailItem.asset.url || '',
         }),
       });
 
       const data = await res.json();
-      
-      if (!res.ok) {
-        throw new Error(data.error || 'Failed to generate description');
-      }
+      if (!res.ok) throw new Error(data.error || 'Failed to generate description');
 
       if (data.warning) {
         toast(data.warning, { icon: '⚠️' });
@@ -145,7 +175,6 @@ export default function AddProductPage() {
       }
       
       setFormData(prev => ({ ...prev, description: data.description }));
-      
     } catch (error: any) {
       console.error('AI Generation error:', error);
       toast.error(error.message || 'Failed to generate description');
@@ -154,80 +183,128 @@ export default function AddProductPage() {
     }
   };
 
-  // ✅ FIXED: Handle multiple file uploads for gallery + video
-  const handleImageUpload = async (files: FileList | File[], type: 'thumbnail' | 'gallery' | 'color' | 'video', variantIndex?: number) => {
-    const fileArray = Array.from(files);
-    if (fileArray.length === 0) return;
-
-    setUploadingImage(true);
-    
-    try {
-      for (const file of fileArray) {
-        const reader = new FileReader();
-        
-        await new Promise<void>((resolve, reject) => {
-          reader.onloadend = async () => {
-            try {
-              const base64 = reader.result as string;
-              const res = await fetch('/api/upload', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  file: base64,
-                  type: type === 'color' ? 'colorImage' : type,
-                  name: file.name,
-                }),
-              });
-
-              const data = await res.json();
-              if (!res.ok) throw new Error(data.error || 'Upload failed');
-
-              if (type === 'thumbnail') {
-                setFormData(prev => ({ ...prev, thumbnail: data.data }));
-              } else if (type === 'gallery') {
-                // ✅ Add multiple images to gallery
-                setFormData(prev => ({ ...prev, images: [...prev.images, data.data] }));
-              } else if (type === 'video') {
-                setFormData(prev => ({ ...prev, video: data.data }));
-              } else if (type === 'color' && variantIndex !== undefined) {
-                // ✅ Set image for specific color variant
-                setFormData(prev => ({
-                  ...prev,
-                  colorVariants: prev.colorVariants.map((v, i) => 
-                    i === variantIndex ? { ...v, image: data.data } : v
-                  )
-                }));
-              }
-              toast.success(`Uploaded: ${file.name}`);
-              resolve();
-            } catch (error: any) {
-              toast.error(error.message || 'Upload failed');
-              reject(error);
-            }
-          };
-          reader.onerror = () => reject(new Error('Failed to read file'));
-          reader.readAsDataURL(file);
-        });
-      }
-    } catch (error) {
-      console.error('Upload error:', error);
-    } finally {
-      setUploadingImage(false);
+  // ── Instant Local File Selection Handlers ────────────────────────────────
+  const handleThumbnailSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (thumbnailItem.previewUrl && thumbnailItem.previewUrl.startsWith('blob:')) {
+      URL.revokeObjectURL(thumbnailItem.previewUrl);
     }
+    const previewUrl = URL.createObjectURL(file);
+    setThumbnailItem({ file, previewUrl, asset: EMPTY_ASSET });
+    e.target.value = '';
   };
 
+  const removeThumbnail = () => {
+    if (thumbnailItem.previewUrl && thumbnailItem.previewUrl.startsWith('blob:')) {
+      URL.revokeObjectURL(thumbnailItem.previewUrl);
+    }
+    setThumbnailItem({ file: null, previewUrl: null, asset: EMPTY_ASSET });
+  };
+
+  const handleGallerySelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+    const availableSlots = 6 - galleryItems.length;
+    if (availableSlots <= 0) {
+      toast.error('Maximum 6 gallery images allowed');
+      return;
+    }
+    const filesToAdd = files.slice(0, availableSlots);
+    const newItems: StagedGalleryItem[] = filesToAdd.map(file => ({
+      id: Math.random().toString(36).substring(2),
+      file,
+      previewUrl: URL.createObjectURL(file),
+      asset: EMPTY_ASSET,
+    }));
+    setGalleryItems(prev => [...prev, ...newItems]);
+    e.target.value = '';
+  };
+
+  const removeGalleryItem = (id: string) => {
+    setGalleryItems(prev => {
+      const target = prev.find(item => item.id === id);
+      if (target?.previewUrl?.startsWith('blob:')) {
+        URL.revokeObjectURL(target.previewUrl);
+      }
+      return prev.filter(item => item.id !== id);
+    });
+  };
+
+  const handleVideoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (videoItem.previewUrl && videoItem.previewUrl.startsWith('blob:')) {
+      URL.revokeObjectURL(videoItem.previewUrl);
+    }
+    const previewUrl = URL.createObjectURL(file);
+    setVideoItem({ file, previewUrl, asset: EMPTY_ASSET });
+    e.target.value = '';
+  };
+
+  const removeVideo = () => {
+    if (videoItem.previewUrl && videoItem.previewUrl.startsWith('blob:')) {
+      URL.revokeObjectURL(videoItem.previewUrl);
+    }
+    setVideoItem({ file: null, previewUrl: null, asset: EMPTY_ASSET });
+  };
+
+  const handleVariantImageSelect = (idx: number, e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setFormData(prev => ({
+      ...prev,
+      colorVariants: prev.colorVariants.map((v, i) => {
+        if (i === idx) {
+          if (v.previewUrl && v.previewUrl.startsWith('blob:')) {
+            URL.revokeObjectURL(v.previewUrl);
+          }
+          return {
+            ...v,
+            file,
+            previewUrl: URL.createObjectURL(file),
+            image: undefined,
+          };
+        }
+        return v;
+      })
+    }));
+    e.target.value = '';
+  };
+
+  const removeVariantImage = (idx: number) => {
+    setFormData(prev => ({
+      ...prev,
+      colorVariants: prev.colorVariants.map((v, i) => {
+        if (i === idx) {
+          if (v.previewUrl && v.previewUrl.startsWith('blob:')) {
+            URL.revokeObjectURL(v.previewUrl);
+          }
+          return {
+            ...v,
+            file: null,
+            previewUrl: null,
+            image: undefined,
+          };
+        }
+        return v;
+      })
+    }));
+  };
+
+  // ── Color Variants and Specs Helpers ─────────────────────────────────────
   const addColorVariant = () => {
-    // ✅ Limit to 10 color variants
     if (formData.colorVariants.length >= 10) {
       toast.error('Maximum 10 color variants allowed');
       return;
     }
-    
-    const newVariant: ColorVariant = {
+    const newVariant: StagedColorVariant = {
       colorName: '',
       colorHex: '#000000',
       qty: 0,
       inStock: false,
+      file: null,
+      previewUrl: null,
       image: undefined,
     };
     setFormData(prev => ({ ...prev, colorVariants: [...prev.colorVariants, newVariant] }));
@@ -243,7 +320,10 @@ export default function AddProductPage() {
   };
 
   const removeColorVariant = (index: number) => {
-    setFormData(prev => ({ ...prev, colorVariants: prev.colorVariants.filter((_, i) => i !== index) }));
+    setFormData(prev => ({
+      ...prev,
+      colorVariants: prev.colorVariants.filter((_, i) => i !== index)
+    }));
   };
 
   const addSpecification = () => {
@@ -278,7 +358,6 @@ export default function AddProductPage() {
     });
   };
 
-
   const getTotalStock = () => formData.colorVariants.reduce((sum, v) => sum + v.qty, 0);
 
   useEffect(() => {
@@ -288,11 +367,16 @@ export default function AddProductPage() {
     }
   }, [formData.colorVariants]);
 
+  // ── Form Submit: Real XHR Telemetry Progress Upload & Database Creation ──
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.title?.trim() || !formData.modelNo?.trim() || !formData.price || !formData.thumbnail?.url) {
+    if (!formData.title?.trim() || !formData.modelNo?.trim() || !formData.price) {
       toast.error('Please fill in all required fields');
+      return;
+    }
+    if (!thumbnailItem.file && !thumbnailItem.asset.url) {
+      toast.error('Please select a thumbnail image');
       return;
     }
     if (formData.colorVariants.length === 0) {
@@ -304,16 +388,129 @@ export default function AddProductPage() {
       return;
     }
 
+    // 1. Gather all pending files
+    interface PendingTask {
+      file: File;
+      type: 'thumbnail' | 'gallery' | 'colorImage' | 'video';
+      applyResult: (asset: CloudinaryAsset) => void;
+    }
+
+    const tasks: PendingTask[] = [];
+
+    let finalThumbnail: CloudinaryAsset = thumbnailItem.asset;
+    if (thumbnailItem.file) {
+      tasks.push({
+        file: thumbnailItem.file,
+        type: 'thumbnail',
+        applyResult: (asset) => { finalThumbnail = asset; }
+      });
+    }
+
+    const finalGallery: CloudinaryAsset[] = galleryItems.map(g => g.asset);
+    galleryItems.forEach((item, idx) => {
+      if (item.file) {
+        tasks.push({
+          file: item.file,
+          type: 'gallery',
+          applyResult: (asset) => { finalGallery[idx] = asset; }
+        });
+      }
+    });
+
+    let finalVideo: CloudinaryAsset | undefined = videoItem.asset.url ? videoItem.asset : undefined;
+    if (videoItem.file) {
+      tasks.push({
+        file: videoItem.file,
+        type: 'video',
+        applyResult: (asset) => { finalVideo = asset; }
+      });
+    }
+
+    const finalVariants = formData.colorVariants.map(v => ({ ...v }));
+    formData.colorVariants.forEach((v, idx) => {
+      if (v.file) {
+        tasks.push({
+          file: v.file,
+          type: 'colorImage',
+          applyResult: (asset) => { finalVariants[idx].image = asset; }
+        });
+      }
+    });
+
     setLoading(true);
+
     try {
-      // ✅ Clean data before sending to avoid Mongoose validation errors
+      // 2. Perform uploads with XHR byte progress modal if files exist
+      if (tasks.length > 0) {
+        const totalBytes = tasks.reduce((sum, t) => sum + t.file.size, 0);
+        let completedPreviousBytes = 0;
+
+        setUploadProgress({
+          isOpen: true,
+          overallPercent: 0,
+          currentFileName: tasks[0].file.name,
+          currentIndex: 1,
+          totalFiles: tasks.length,
+          loadedBytes: 0,
+          totalBytes,
+        });
+
+        for (let i = 0; i < tasks.length; i++) {
+          const task = tasks[i];
+
+          setUploadProgress(prev => ({
+            ...prev,
+            currentFileName: task.file.name,
+            currentIndex: i + 1,
+          }));
+
+          const asset = await uploadSingleFileWithXHR(
+            task.file,
+            task.type,
+            (fileLoadedBytes) => {
+              const currentTotal = completedPreviousBytes + Math.min(fileLoadedBytes, task.file.size);
+              const pct = Math.min(99, Math.round((currentTotal / totalBytes) * 100));
+              setUploadProgress(prev => ({
+                ...prev,
+                loadedBytes: currentTotal,
+                overallPercent: pct,
+              }));
+            }
+          );
+
+          task.applyResult(asset);
+          completedPreviousBytes += task.file.size;
+
+          const fileDonePct = Math.min(99, Math.round((completedPreviousBytes / totalBytes) * 100));
+          setUploadProgress(prev => ({
+            ...prev,
+            loadedBytes: completedPreviousBytes,
+            overallPercent: fileDonePct,
+          }));
+        }
+
+        setUploadProgress(prev => ({
+          ...prev,
+          loadedBytes: totalBytes,
+          overallPercent: 100,
+        }));
+
+        await new Promise(r => setTimeout(r, 400));
+      }
+
+      // 3. Submit payload to API
       const payload = {
         ...formData,
-        colorVariants: formData.colorVariants.map(v => ({
-          ...v,
-          image: (v.image?.url) ? v.image : undefined
-        })),
-        video: (formData.video?.url) ? formData.video : undefined
+        thumbnail: finalThumbnail,
+        images: finalGallery.filter(img => img && img.url),
+        video: (finalVideo && finalVideo.url) ? finalVideo : undefined,
+        colorVariants: finalVariants.map(v => ({
+          colorName: v.colorName,
+          colorHex: v.colorHex,
+          qty: v.qty,
+          inStock: v.qty > 0,
+          image: (v.image && v.image.url) ? v.image : undefined
+        }))
       };
 
       const res = await fetch('/api/products', {
@@ -331,15 +528,18 @@ export default function AddProductPage() {
       console.error('Create error:', error);
       toast.error(error.message || 'Failed to create product');
     } finally {
+      setUploadProgress(prev => ({ ...prev, isOpen: false }));
       setLoading(false);
     }
   };
 
-  // ✅ Pre-compute disabled state to avoid hydration mismatch
   const isGenerateDisabled = generatingDescription || !formData.title?.trim() || !formData.modelNo?.trim();
 
   return (
     <div className="space-y-6">
+      {/* Upload Progress Modal Popup */}
+      <UploadProgressModal info={uploadProgress} />
+
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -435,82 +635,78 @@ export default function AddProductPage() {
             <div>
               <label className="block text-[11px] font-semibold tracking-[0.2em] uppercase text-[#1a1209]/70 mb-2">Thumbnail Image *</label>
               <div className="flex items-center gap-4">
-                {formData.thumbnail?.url ? (
+                {(thumbnailItem.previewUrl || thumbnailItem.asset.url) ? (
                   <div className="relative w-32 h-32 rounded-lg overflow-hidden border border-[#1a1209]/10">
-                    <img src={formData.thumbnail.url} alt="Thumbnail" className="w-full h-full object-cover" />
-                    <button type="button" onClick={() => setFormData(prev => ({ ...prev, thumbnail: EMPTY_ASSET }))} className="absolute top-1 right-1 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600">×</button>
+                    <img src={thumbnailItem.previewUrl || thumbnailItem.asset.url} alt="Thumbnail" className="w-full h-full object-cover" />
+                    <button type="button" onClick={removeThumbnail} className="absolute top-1 right-1 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 font-bold text-sm">×</button>
                   </div>
                 ) : (
-                  <label className="flex flex-col items-center justify-center w-32 h-32 border-2 border-dashed border-[#1a1209]/20 rounded-lg cursor-pointer hover:border-[#8B6914] transition-colors">
+                  <label className="flex flex-col items-center justify-center w-32 h-32 border-2 border-dashed border-[#1a1209]/20 rounded-lg cursor-pointer hover:border-[#8B6914] transition-colors bg-[#fbf9f4]">
                     <svg className="w-8 h-8 text-[#1a1209]/40 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                    <span className="text-xs text-[#1a1209]/60">Upload</span>
+                    <span className="text-xs text-[#1a1209]/60 font-medium">Select Image</span>
                     <input 
                       type="file" 
                       accept="image/*" 
-                      onChange={(e) => e.target.files && handleImageUpload(e.target.files, 'thumbnail')} 
-                      disabled={uploadingImage} 
+                      onChange={handleThumbnailSelect} 
                       className="hidden" 
                     />
                   </label>
                 )}
-                {uploadingImage && <div className="text-sm text-[#8B6914]">Uploading...</div>}
               </div>
             </div>
 
-            {/* Gallery - ✅ Max 6 images */}
+            {/* Gallery - Max 6 images */}
             <div>
               <label className="block text-[11px] font-semibold tracking-[0.2em] uppercase text-[#1a1209]/70 mb-2">
                 Gallery Images (Max 6)
               </label>
               <div className="flex gap-4 flex-wrap">
-                {formData.images.map((img, idx) => (
-                  <div key={idx} className="relative w-24 h-24 rounded-lg overflow-hidden border border-[#1a1209]/10">
-                    <img src={img.url} alt={`Gallery ${idx + 1}`} className="w-full h-full object-cover" />
+                {galleryItems.map((item) => (
+                  <div key={item.id} className="relative w-24 h-24 rounded-lg overflow-hidden border border-[#1a1209]/10">
+                    <img src={item.previewUrl || item.asset.url} alt="Gallery" className="w-full h-full object-cover" />
                     <button
                       type="button"
-                      onClick={() => setFormData(prev => ({ ...prev, images: prev.images.filter((_, i) => i !== idx) }))}
-                      className="absolute top-1 right-1 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 text-sm"
+                      onClick={() => removeGalleryItem(item.id)}
+                      className="absolute top-1 right-1 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 text-sm font-bold"
                     >
                       ×
                     </button>
                   </div>
                 ))}
-                {formData.images.length < 6 && (
-                  <label className="flex flex-col items-center justify-center w-24 h-24 border-2 border-dashed border-[#1a1209]/20 rounded-lg cursor-pointer hover:border-[#8B6914] transition-colors">
+                {galleryItems.length < 6 && (
+                  <label className="flex flex-col items-center justify-center w-24 h-24 border-2 border-dashed border-[#1a1209]/20 rounded-lg cursor-pointer hover:border-[#8B6914] transition-colors bg-[#fbf9f4]">
                     <svg className="w-6 h-6 text-[#1a1209]/40 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
-                    <span className="text-xs text-[#1a1209]/60">Add</span>
+                    <span className="text-xs text-[#1a1209]/60 font-medium">Add Images</span>
                     <input 
                       type="file" 
                       accept="image/*" 
                       multiple
-                      onChange={(e) => e.target.files && handleImageUpload(e.target.files, 'gallery')} 
-                      disabled={uploadingImage || formData.images.length >= 6} 
+                      onChange={handleGallerySelect} 
                       className="hidden" 
                     />
                   </label>
                 )}
               </div>
-              <p className="text-xs text-[#1a1209]/40 mt-1">Select up to 6 files to upload at once (Ctrl/Cmd + Click)</p>
+              <p className="text-xs text-[#1a1209]/50 mt-1">Select files to preview instantly. Files will upload upon clicking Create Product.</p>
             </div>
 
             {/* Video (Optional) */}
             <div>
               <label className="block text-[11px] font-semibold tracking-[0.2em] uppercase text-[#1a1209]/70 mb-2">Product Video (Optional)</label>
               <div className="flex items-center gap-4">
-                {formData.video?.url ? (
+                {(videoItem.previewUrl || videoItem.asset.url) ? (
                   <div className="relative w-48 h-32 rounded-lg overflow-hidden border border-[#1a1209]/10">
-                    <video src={formData.video.url} controls className="w-full h-full object-cover" />
-                    <button type="button" onClick={() => setFormData(prev => ({ ...prev, video: EMPTY_ASSET }))} className="absolute top-1 right-1 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600">×</button>
+                    <video src={videoItem.previewUrl || videoItem.asset.url} controls className="w-full h-full object-cover" />
+                    <button type="button" onClick={removeVideo} className="absolute top-1 right-1 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 font-bold text-sm">×</button>
                   </div>
                 ) : (
-                  <label className="flex flex-col items-center justify-center w-48 h-32 border-2 border-dashed border-[#1a1209]/20 rounded-lg cursor-pointer hover:border-[#8B6914] transition-colors">
+                  <label className="flex flex-col items-center justify-center w-48 h-32 border-2 border-dashed border-[#1a1209]/20 rounded-lg cursor-pointer hover:border-[#8B6914] transition-colors bg-[#fbf9f4]">
                     <svg className="w-8 h-8 text-[#1a1209]/40 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
-                    <span className="text-xs text-[#1a1209]/60">Upload Video</span>
+                    <span className="text-xs text-[#1a1209]/60 font-medium">Select Video</span>
                     <input 
                       type="file" 
                       accept="video/*" 
-                      onChange={(e) => e.target.files && handleImageUpload(e.target.files, 'video')} 
-                      disabled={uploadingImage} 
+                      onChange={handleVideoSelect} 
                       className="hidden" 
                     />
                   </label>
@@ -520,7 +716,7 @@ export default function AddProductPage() {
           </div>
         </div>
 
-        {/* Color Variants & Stock - ✅ FIXED: Image upload per variant */}
+        {/* Color Variants & Stock */}
         <div className="bg-white rounded-xl border border-[#1a1209]/10 p-6">
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-['Jost'] font-semibold text-[#1a1209]">Color Variants & Stock</h3>
@@ -528,7 +724,7 @@ export default function AddProductPage() {
               type="button"
               onClick={addColorVariant}
               disabled={formData.colorVariants.length >= 10}
-              className="px-3 py-1.5 bg-[#8B6914] text-white text-sm rounded-lg hover:bg-[#6f5410] transition-colors disabled:opacity-50"
+              className="px-3 py-1.5 bg-[#8B6914] text-white text-sm rounded-lg hover:bg-[#6f5410] transition-colors disabled:opacity-50 font-medium"
             >
               + Add Variant (Max 10)
             </button>
@@ -545,7 +741,7 @@ export default function AddProductPage() {
                       value={variant.colorName}
                       onChange={(e) => updateColorVariant(idx, 'colorName', e.target.value)}
                       placeholder="e.g., Gold"
-                      className="w-full px-3 py-2 bg-white border border-[#1a1209]/15 rounded text-sm"
+                      className="w-full px-3 py-2 bg-white border border-[#1a1209]/15 rounded text-sm text-[#1a1209] placeholder-[#1a1209]/40"
                     />
                   </div>
                   
@@ -563,7 +759,7 @@ export default function AddProductPage() {
                         type="text"
                         value={variant.colorHex}
                         onChange={(e) => updateColorVariant(idx, 'colorHex', e.target.value)}
-                        className="flex-1 px-3 py-2 bg-white border border-[#1a1209]/15 rounded text-sm"
+                        className="flex-1 px-3 py-2 bg-white border border-[#1a1209]/15 rounded text-sm text-[#1a1209]"
                       />
                     </div>
                   </div>
@@ -576,7 +772,7 @@ export default function AddProductPage() {
                       value={variant.qty}
                       onChange={(e) => updateColorVariant(idx, 'qty', Number(e.target.value))}
                       min="0"
-                      className="w-full px-3 py-2 bg-white border border-[#1a1209]/15 rounded text-sm"
+                      className="w-full px-3 py-2 bg-white border border-[#1a1209]/15 rounded text-sm text-[#1a1209]"
                     />
                   </div>
                   
@@ -585,46 +781,45 @@ export default function AddProductPage() {
                     <button
                       type="button"
                       onClick={() => removeColorVariant(idx)}
-                      className="px-3 py-2 text-red-600 hover:bg-red-50 rounded text-sm transition-colors"
+                      className="px-3 py-2 text-red-600 hover:bg-red-50 rounded text-sm transition-colors font-medium"
                     >
                       Remove
                     </button>
                   </div>
                 </div>
                 
-                {/* ✅ NEW: Variant Image Upload */}
+                {/* Variant Image Upload */}
                 <div className="mt-4 pt-4 border-t border-[#1a1209]/10">
                   <label className="block text-[11px] font-semibold tracking-[0.2em] uppercase text-[#1a1209]/70 mb-2">
-                    Variant Image (Max 6 per variant)
+                    Variant Image
                   </label>
                   <div className="flex items-center gap-4">
-                    {variant.image?.url ? (
+                    {(variant.previewUrl || variant.image?.url) ? (
                       <div className="relative w-20 h-20 rounded-lg overflow-hidden border border-[#1a1209]/10">
-                        <img src={variant.image.url} alt={variant.colorName} className="w-full h-full object-cover" />
+                        <img src={variant.previewUrl || variant.image?.url} alt={variant.colorName} className="w-full h-full object-cover" />
                         <button
                           type="button"
-                          onClick={() => updateColorVariant(idx, 'image', undefined)}
-                          className="absolute top-1 right-1 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 text-xs"
+                          onClick={() => removeVariantImage(idx)}
+                          className="absolute top-1 right-1 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 text-xs font-bold"
                         >
                           ×
                         </button>
                       </div>
                     ) : (
-                      <label className="flex flex-col items-center justify-center w-20 h-20 border-2 border-dashed border-[#1a1209]/20 rounded-lg cursor-pointer hover:border-[#8B6914] transition-colors">
+                      <label className="flex flex-col items-center justify-center w-20 h-20 border-2 border-dashed border-[#1a1209]/20 rounded-lg cursor-pointer hover:border-[#8B6914] transition-colors bg-white">
                         <svg className="w-5 h-5 text-[#1a1209]/40 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                        <span className="text-[10px] text-[#1a1209]/60">Upload</span>
+                        <span className="text-[10px] text-[#1a1209]/60 font-medium">Select Image</span>
                         <input
                           type="file"
                           accept="image/*"
-                          onChange={(e) => e.target.files && handleImageUpload(e.target.files, 'color', idx)}
-                          disabled={uploadingImage}
+                          onChange={(e) => handleVariantImageSelect(idx, e)}
                           className="hidden"
                         />
                       </label>
                     )}
-                    {variant.image?.url && (
+                    {(variant.previewUrl || variant.image?.url) && (
                       <span className="text-xs text-[#1a1209]/60">
-                        Image for {variant.colorName || 'this variant'}
+                        Image selected for {variant.colorName || 'this variant'}
                       </span>
                     )}
                   </div>
@@ -632,7 +827,7 @@ export default function AddProductPage() {
               </div>
             ))}
             {formData.colorVariants.length === 0 && (
-              <p className="text-sm text-[#1a1209]/40 text-center py-4">No color variants added</p>
+              <p className="text-sm text-[#1a1209]/50 text-center py-4">No color variants added</p>
             )}
           </div>
 
@@ -662,7 +857,7 @@ export default function AddProductPage() {
                 {(['sports', 'new', 'luxury', 'limited', 'bestsellers'] as CollectionSection[]).map((section) => (
                   <label key={section} className="flex items-center gap-3 cursor-pointer">
                     <input type="checkbox" checked={formData.collectionSections.includes(section)} onChange={() => toggleCollectionSection(section)} className="w-4 h-4 text-[#8B6914] border-[#1a1209]/20 rounded focus:ring-[#8B6914]" />
-                    <span className="text-sm font-['Jost'] capitalize">{section}</span>
+                    <span className="text-sm font-['Jost'] font-medium text-[#1a1209] capitalize">{section}</span>
                   </label>
                 ))}
               </div>
@@ -673,7 +868,7 @@ export default function AddProductPage() {
                 {giftCategories.map((cat) => (
                   <label key={cat._id} className="flex items-center gap-3 cursor-pointer">
                     <input type="checkbox" checked={formData.giftCategories.includes(cat.slug)} onChange={() => toggleGiftCategory(cat.slug)} className="w-4 h-4 text-[#8B6914] border-[#1a1209]/20 rounded focus:ring-[#8B6914]" />
-                    <span className="text-sm font-['Jost']">{cat.emoji} {cat.label}</span>
+                    <span className="text-sm font-['Jost'] font-medium text-[#1a1209]">{cat.emoji} {cat.label}</span>
                   </label>
                 ))}
               </div>
@@ -687,7 +882,7 @@ export default function AddProductPage() {
           <div className="space-y-3">
             <label className="flex items-center gap-3 cursor-pointer">
               <input type="checkbox" checked={formData.isActive} onChange={(e) => setFormData(prev => ({ ...prev, isActive: e.target.checked }))} className="w-4 h-4 text-[#8B6914] border-[#1a1209]/20 rounded focus:ring-[#8B6914]" />
-              <span className="text-sm font-['Jost']">Active (Visible on website)</span>
+              <span className="text-sm font-['Jost'] font-medium text-[#1a1209]">Active (Visible on website)</span>
             </label>
             <label className="flex items-center gap-3 cursor-pointer p-3 bg-red-50 rounded-lg border border-red-200">
               <input type="checkbox" checked={formData.isSoldOut || getTotalStock() === 0} onChange={(e) => setFormData(prev => ({ ...prev, isSoldOut: e.target.checked }))} disabled={getTotalStock() === 0} className="w-4 h-4 text-red-600 border-red-300 rounded focus:ring-red-600 disabled:opacity-50" />
@@ -695,16 +890,16 @@ export default function AddProductPage() {
             </label>
             <label className="flex items-center gap-3 cursor-pointer">
               <input type="checkbox" checked={formData.showOnHome} onChange={(e) => setFormData(prev => ({ ...prev, showOnHome: e.target.checked }))} className="w-4 h-4 text-[#8B6914] border-[#1a1209]/20 rounded focus:ring-[#8B6914]" />
-              <span className="text-sm font-['Jost']">Show on Homepage Collections</span>
+              <span className="text-sm font-['Jost'] font-medium text-[#1a1209]">Show on Homepage Collections</span>
             </label>
             <div className="flex items-center gap-3 pt-2">
               <input type="checkbox" checked={formData.stickerEnabled} onChange={(e) => setFormData(prev => ({ ...prev, stickerEnabled: e.target.checked }))} className="w-4 h-4 text-[#8B6914] border-[#1a1209]/20 rounded focus:ring-[#8B6914]" />
-              <span className="text-sm font-['Jost']">Enable Sticker Badge</span>
+              <span className="text-sm font-['Jost'] font-medium text-[#1a1209]">Enable Sticker Badge</span>
             </div>
             {formData.stickerEnabled && (
               <div className="ml-7">
-                <input type="text" value={formData.stickerText} onChange={(e) => setFormData(prev => ({ ...prev, stickerText: e.target.value }))} placeholder="e.g., New Arrival, Limited Edition" maxLength={40} className="w-full max-w-md px-3 py-2 bg-[#fbf9f4] border border-[#1a1209]/15 rounded text-sm" />
-                <p className="text-xs text-[#1a1209]/40 mt-1">Max 40 characters</p>
+                <input type="text" value={formData.stickerText} onChange={(e) => setFormData(prev => ({ ...prev, stickerText: e.target.value }))} placeholder="e.g., New Arrival, Limited Edition" maxLength={40} className="w-full max-w-md px-3 py-2 bg-[#fbf9f4] border border-[#1a1209]/15 rounded text-sm text-[#1a1209] placeholder-[#1a1209]/50" />
+                <p className="text-xs text-[#1a1209]/50 mt-1">Max 40 characters</p>
               </div>
             )}
           </div>
@@ -713,15 +908,17 @@ export default function AddProductPage() {
         {/* Submit Button */}
         <div className="flex items-center justify-end gap-4">
           <button type="button" onClick={() => router.back()} className="px-6 py-3 border border-[#1a1209]/20 text-[#1a1209] rounded-lg hover:bg-[#1a1209]/5 transition-colors font-['Jost']">Cancel</button>
-          <button type="submit" disabled={loading || uploadingImage} className="px-8 py-3 bg-gradient-to-r from-[#1a1209] to-[#2a1d10] text-white rounded-lg hover:from-[#2a1d10] hover:to-[#3a2815] transition-all font-['Jost'] disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-lg">
+          <button type="submit" disabled={loading} className="px-8 py-3 bg-gradient-to-r from-[#1a1209] to-[#2a1d10] text-white rounded-lg hover:from-[#2a1d10] hover:to-[#3a2815] transition-all font-['Jost'] disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-lg cursor-pointer">
             {loading ? (
-              <><svg className="animate-spin h-5 w-5" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>Creating...</>
+              <><svg className="animate-spin h-5 w-5" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>Processing...</>
             ) : (
               <><svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>Create Product</>
             )}
           </button>
         </div>
       </form>
+
+      {/* Spell check modal */}
       {spellCheckResult && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[99999] p-4">
           <div className="bg-white border border-[#8B6914]/30 rounded-xl max-w-md w-full p-6 shadow-2xl animate-in fade-in zoom-in duration-200">

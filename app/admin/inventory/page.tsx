@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo, FormEvent } from 'react';
 import Image from 'next/image';
 import { toast } from 'react-hot-toast';
 import PermissionGate from '@/components/Admin/PermissionGate';
@@ -63,6 +63,7 @@ export default function InventoryManagementPage() {
   const [activeTab, setActiveTab] = useState<'all' | 'in_stock' | 'low_stock' | 'out_stock'>('all');
   const [showSettingsPanel, setShowSettingsPanel] = useState(false);
   const [savingSettings, setSavingSettings] = useState(false);
+  const [replenishingAll, setReplenishingAll] = useState(false);
 
   // Settings form states
   const [lowStockInput, setLowStockInput] = useState(10);
@@ -120,7 +121,7 @@ export default function InventoryManagementPage() {
     }
   };
 
-  const handleSaveSettings = async (e: React.FormEvent) => {
+  const handleSaveSettings = async (e: FormEvent) => {
     e.preventDefault();
     setSavingSettings(true);
 
@@ -142,7 +143,7 @@ export default function InventoryManagementPage() {
         setSettings(json.data);
         toast.success('Inventory thresholds updated successfully!');
         setShowSettingsPanel(false);
-        fetchInventoryData(); // Refresh list to reflect new thresholds categorizations
+        fetchInventoryData();
       }
     } catch (err: any) {
       toast.error(err.message);
@@ -153,10 +154,12 @@ export default function InventoryManagementPage() {
 
   // Adjust stock API caller
   const handleUpdateStockQty = async (itemId: string, newQty: number) => {
-    // Optimistic UI updates
+    const validQty = Math.max(0, newQty);
+
+    // Optimistic UI update
     setItemsList(prev => prev.map(item => {
       if (item.variantId === itemId) {
-        return { ...item, qty: newQty, isSaving: true, isSaved: false };
+        return { ...item, qty: validQty, isSaving: true, isSaved: false };
       }
       return item;
     }));
@@ -171,7 +174,7 @@ export default function InventoryManagementPage() {
         body: JSON.stringify({
           productId: itemObj.productId,
           variantId: itemId,
-          qty: newQty,
+          qty: validQty,
         }),
       });
 
@@ -204,31 +207,72 @@ export default function InventoryManagementPage() {
       }
     } catch (err: any) {
       toast.error(err.message);
-      // Revert quantity on fail
       fetchInventoryData();
     }
   };
 
-  // Filtering Logic
-  const filteredItems = itemsList.filter(item => {
-    // 1. Text Search Filter
-    const matchesSearch =
-      item.productTitle.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.productModelNo.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.colorName.toLowerCase().includes(searchQuery.toLowerCase());
-
-    // 2. Tab Filter
-    let matchesTab = true;
-    if (activeTab === 'in_stock') {
-      matchesTab = item.qty > settings.lowStockThreshold;
-    } else if (activeTab === 'low_stock') {
-      matchesTab = item.qty > settings.outOfStockThreshold && item.qty <= settings.lowStockThreshold;
-    } else if (activeTab === 'out_stock') {
-      matchesTab = item.qty <= settings.outOfStockThreshold;
+  // 1-Click Batch Low Stock Replenish (+10 units)
+  const handleBatchReplenishLowStock = async () => {
+    const lowStockItems = itemsList.filter(item => item.qty <= settings.lowStockThreshold);
+    if (lowStockItems.length === 0) {
+      toast.success('All timepiece variants are well-stocked!');
+      return;
     }
 
-    return matchesSearch && matchesTab;
-  });
+    if (!confirm(`Replenish stock (+10 units) for all ${lowStockItems.length} low-stock timepiece variants?`)) {
+      return;
+    }
+
+    setReplenishingAll(true);
+    const toastId = toast.loading(`Replenishing ${lowStockItems.length} items...`);
+
+    try {
+      await Promise.all(
+        lowStockItems.map(item =>
+          fetch('/api/admin/inventory/adjust', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              productId: item.productId,
+              variantId: item.variantId,
+              qty: item.qty + 10,
+            }),
+          })
+        )
+      );
+
+      toast.dismiss(toastId);
+      toast.success(`Successfully replenished ${lowStockItems.length} items with +10 units each!`);
+      fetchInventoryData();
+    } catch (err: any) {
+      toast.dismiss(toastId);
+      toast.error('Failed to complete batch replenishment.');
+      fetchInventoryData();
+    } finally {
+      setReplenishingAll(false);
+    }
+  };
+
+  // Filtering Logic
+  const filteredItems = useMemo(() => {
+    return itemsList.filter(item => {
+      const matchesSearch =
+        item.productTitle.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.productModelNo.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.colorName.toLowerCase().includes(searchQuery.toLowerCase());
+
+      let matchesTab = true;
+      if (activeTab === 'in_stock') {
+        matchesTab = item.qty > settings.lowStockThreshold;
+      } else if (activeTab === 'low_stock') {
+        matchesTab = item.qty > settings.outOfStockThreshold && item.qty <= settings.lowStockThreshold;
+      } else if (activeTab === 'out_stock') {
+        matchesTab = item.qty <= settings.outOfStockThreshold;
+      }
+
+      return matchesSearch && matchesTab;
+    });
+  }, [itemsList, searchQuery, activeTab, settings]);
 
   // Calculate aggregates based on settings
   const totalVariants = itemsList.length;
@@ -238,46 +282,66 @@ export default function InventoryManagementPage() {
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#8B6914]"></div>
-        <p className="text-xs text-[#1a1209]/60 uppercase tracking-widest">Loading Stock Listings…</p>
+      <div className="flex flex-col items-center justify-center min-h-[450px]">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#8B6914]" />
+        <p className="mt-4 text-xs font-semibold text-[#8B6914] tracking-widest uppercase font-['Jost']">
+          Loading Stock Inventory & Variants…
+        </p>
       </div>
     );
   }
 
   return (
     <PermissionGate permissions={['inventory_manage']}>
-      <div className="space-y-6 font-['Jost'] text-[#1a1209]">
+      <div className="space-y-6 font-['Jost'] text-[#1a1209] select-none">
         
         {/* Header Block */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#8B6914]/15 pb-5">
           <div>
-            <h1 className="font-['Cormorant_Garamond'] text-3xl font-semibold text-[#1a1209]">
-              Inventory Management
+            <h1 className="font-['Cormorant_Garamond'] text-3xl font-semibold text-[#8B6914] tracking-wide">
+              INVENTORY MANAGEMENT
             </h1>
-            <p className="text-sm text-[#1a1209]/60 mt-1">
+            <p className="text-sm text-[#1a1209]/60 mt-0.5">
               Review stock metrics, configure alert triggers, and replenish timepiece quantities.
             </p>
           </div>
           
-          <button
-            onClick={() => setShowSettingsPanel(!showSettingsPanel)}
-            className="px-4 py-2.5 border border-[#8B6914]/30 hover:border-[#8B6914] text-[#8B6914] hover:bg-[#8B6914]/5 text-xs font-semibold uppercase tracking-wider rounded-lg transition-all flex items-center gap-2"
-          >
-            <span>⚙️</span>
-            <span>{showSettingsPanel ? 'Hide Settings' : 'Threshold Settings'}</span>
-          </button>
+          <div className="flex flex-wrap gap-2">
+            {lowStockCount > 0 && (
+              <button
+                onClick={handleBatchReplenishLowStock}
+                disabled={replenishingAll}
+                className="px-4 py-2.5 bg-[#8B6914] hover:bg-[#1a1209] text-white text-xs font-semibold uppercase tracking-wider rounded-xl transition-all shadow-md flex items-center gap-2 cursor-pointer disabled:opacity-50"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+                Replenish Low Stock ({lowStockCount})
+              </button>
+            )}
+
+            <button
+              onClick={() => setShowSettingsPanel(!showSettingsPanel)}
+              className="px-4 py-2.5 bg-white border border-[#1a1209]/15 hover:border-[#8B6914] text-[#1a1209] hover:text-[#8B6914] text-xs font-semibold uppercase tracking-wider rounded-xl transition-all shadow-sm flex items-center gap-2 cursor-pointer"
+            >
+              <svg className="w-4 h-4 text-[#8B6914]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+              <span>{showSettingsPanel ? 'Hide Thresholds' : 'Threshold Settings'}</span>
+            </button>
+          </div>
         </div>
 
         {/* Configurations Threshold Form Card */}
         {showSettingsPanel && (
           <form 
             onSubmit={handleSaveSettings}
-            className="bg-[#fbf9f4] border border-[#8B6914]/20 rounded-xl p-6 shadow-md grid grid-cols-1 md:grid-cols-3 gap-6 animate-fadeIn"
+            className="bg-white border border-[#8B6914]/25 rounded-2xl p-6 shadow-md grid grid-cols-1 md:grid-cols-3 gap-6 animate-fadeIn"
           >
             <div>
-              <label className="block text-[11px] font-semibold tracking-wider uppercase text-[#1a1209]/70 mb-2">
-                Low Stock Threshold
+              <label className="block text-[10px] font-bold tracking-wider uppercase text-[#8B6914] mb-2">
+                LOW STOCK THRESHOLD
               </label>
               <input
                 type="number"
@@ -285,16 +349,16 @@ export default function InventoryManagementPage() {
                 value={lowStockInput}
                 onChange={(e) => setLowStockInput(Number(e.target.value))}
                 required
-                className="w-full px-4 py-2.5 bg-white border border-[#1a1209]/15 rounded-lg text-sm text-[#1a1209] focus:outline-none focus:border-[#8B6914]"
+                className="w-full px-4 py-2.5 bg-[#fbf9f4] border border-[#1a1209]/15 rounded-xl text-sm font-mono font-bold text-[#1a1209] focus:outline-none focus:border-[#8B6914]"
               />
               <span className="text-[10px] text-[#1a1209]/45 mt-1 block">
-                Flag warnings when quantities drop to this value.
+                Flag warnings when variant quantities drop to or below this value.
               </span>
             </div>
 
             <div>
-              <label className="block text-[11px] font-semibold tracking-wider uppercase text-[#1a1209]/70 mb-2">
-                Out of Stock Threshold
+              <label className="block text-[10px] font-bold tracking-wider uppercase text-[#8B6914] mb-2">
+                OUT OF STOCK THRESHOLD
               </label>
               <input
                 type="number"
@@ -303,151 +367,130 @@ export default function InventoryManagementPage() {
                 value={outOfStockInput}
                 onChange={(e) => setOutOfStockInput(Number(e.target.value))}
                 required
-                className="w-full px-4 py-2.5 bg-white border border-[#1a1209]/15 rounded-lg text-sm text-[#1a1209] focus:outline-none focus:border-[#8B6914]"
+                className="w-full px-4 py-2.5 bg-[#fbf9f4] border border-[#1a1209]/15 rounded-xl text-sm font-mono font-bold text-[#1a1209] focus:outline-none focus:border-[#8B6914]"
               />
               <span className="text-[10px] text-[#1a1209]/45 mt-1 block">
-                Quantity at or below which item is marked empty (Max 5).
+                Quantity at or below which item is marked sold out (Max 5).
               </span>
             </div>
 
             <div>
-              <label className="block text-[11px] font-semibold tracking-wider uppercase text-[#1a1209]/70 mb-3">
-                Dashboard Alert Popup
+              <label className="block text-[10px] font-bold tracking-wider uppercase text-[#8B6914] mb-2">
+                LOGIN ALERT NOTIFICATIONS
               </label>
-              <div className="flex items-center justify-between">
-                <label className="flex items-center gap-2 text-xs font-semibold uppercase text-[#1a1209]/80 cursor-pointer">
+              <div className="flex items-center justify-between mt-1">
+                <label className="flex items-center gap-2.5 text-xs font-semibold text-[#1a1209] cursor-pointer">
                   <input
                     type="checkbox"
                     checked={alertNotifyInput}
                     onChange={(e) => setAlertNotifyInput(e.target.checked)}
-                    className="rounded text-[#8B6914] focus:ring-[#8B6914]/20 w-4 h-4"
+                    className="rounded text-[#8B6914] focus:ring-[#8B6914]/20 w-4 h-4 cursor-pointer"
                   />
-                  <span>Show alert popup on login</span>
+                  <span>Alert popup on admin login</span>
                 </label>
                 
                 <button
                   type="submit"
                   disabled={savingSettings}
-                  className="px-5 py-2.5 bg-[#8B6914] hover:bg-[#c9a14a] disabled:opacity-50 text-white font-semibold text-xs uppercase tracking-wider rounded-lg shadow-sm transition-all"
+                  className="px-5 py-2.5 bg-[#1a1209] hover:bg-[#8B6914] disabled:opacity-50 text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow-sm transition-all cursor-pointer"
                 >
                   {savingSettings ? 'Saving…' : 'Save Config'}
                 </button>
               </div>
-              <span className="text-[10px] text-[#1a1209]/45 mt-2.5 block">
-                Toggles whether admins receive warnings on login.
-              </span>
             </div>
           </form>
         )}
 
-        {/* Proximity Summary Row */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="bg-white border border-[#1a1209]/10 rounded-xl p-4 shadow-sm flex items-center justify-between">
-            <div>
-              <p className="text-[10px] font-semibold tracking-wider text-[#1a1209]/50 uppercase">Total Variants</p>
-              <p className="text-2xl font-bold font-['Cormorant_Garamond'] mt-1">{totalVariants}</p>
-            </div>
-            <span className="text-2xl text-[#1a1209]/30">⌚</span>
+        {/* Professional Tabular Metrics Cards */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="bg-white border border-[#1a1209]/10 rounded-xl p-4 shadow-sm hover:border-[#8B6914]/30 transition-all">
+            <p className="text-[11px] font-semibold tracking-wider text-[#8B6914] uppercase">TOTAL VARIANTS</p>
+            <p className="font-['Jost'] text-3xl font-bold text-[#1a1209] mt-1 tabular-nums font-mono">{totalVariants.toLocaleString()}</p>
           </div>
-
-          <div className="bg-white border border-green-100 rounded-xl p-4 shadow-sm flex items-center justify-between">
-            <div>
-              <p className="text-[10px] font-semibold tracking-wider text-green-700/60 uppercase">In Stock Items</p>
-              <p className="text-2xl font-bold text-green-700 font-['Cormorant_Garamond'] mt-1">{inStockCount}</p>
-            </div>
-            <span className="text-2xl text-green-700/30">✓</span>
+          <div className="bg-white border border-[#1a1209]/10 rounded-xl p-4 shadow-sm hover:border-[#8B6914]/30 transition-all">
+            <p className="text-[11px] font-semibold tracking-wider text-[#8B6914] uppercase">IN STOCK ITEMS</p>
+            <p className="font-['Jost'] text-3xl font-bold text-emerald-700 mt-1 tabular-nums font-mono">{inStockCount.toLocaleString()}</p>
           </div>
-
-          <div className="bg-white border border-amber-100 rounded-xl p-4 shadow-sm flex items-center justify-between">
-            <div>
-              <p className="text-[10px] font-semibold tracking-wider text-amber-700/60 uppercase">Low Stock Warning</p>
-              <p className="text-2xl font-bold text-[#8B6914] font-['Cormorant_Garamond'] mt-1">{lowStockCount}</p>
-            </div>
-            <span className="text-2xl text-[#8B6914]/30">⚠️</span>
+          <div className="bg-white border border-[#1a1209]/10 rounded-xl p-4 shadow-sm hover:border-[#8B6914]/30 transition-all">
+            <p className="text-[11px] font-semibold tracking-wider text-[#8B6914] uppercase">LOW STOCK WARNING</p>
+            <p className="font-['Jost'] text-3xl font-bold text-amber-700 mt-1 tabular-nums font-mono">{lowStockCount.toLocaleString()}</p>
           </div>
-
-          <div className="bg-white border border-red-100 rounded-xl p-4 shadow-sm flex items-center justify-between">
-            <div>
-              <p className="text-[10px] font-semibold tracking-wider text-red-700/60 uppercase">Out of Stock</p>
-              <p className="text-2xl font-bold text-red-600 font-['Cormorant_Garamond'] mt-1">{outOfStockCount}</p>
-            </div>
-            <span className="text-2xl text-red-600/30">✕</span>
+          <div className="bg-white border border-[#1a1209]/10 rounded-xl p-4 shadow-sm hover:border-[#8B6914]/30 transition-all">
+            <p className="text-[11px] font-semibold tracking-wider text-[#8B6914] uppercase">OUT OF STOCK</p>
+            <p className="font-['Jost'] text-3xl font-bold text-rose-600 mt-1 tabular-nums font-mono">{outOfStockCount.toLocaleString()}</p>
           </div>
         </div>
 
-        {/* Filter Toolbar & Tabs */}
-        <div className="bg-white border border-[#1a1209]/10 rounded-xl p-4 shadow-sm space-y-4">
-          <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
-            
-            {/* Search Input */}
-            <div className="relative w-full md:w-80">
-              <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-sm">🔍</span>
-              <input
-                type="text"
-                placeholder="Search timepiece name or model..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 bg-[#fbf9f4] border border-[#1a1209]/15 rounded-lg text-xs placeholder-[#1a1209]/45 focus:outline-none focus:border-[#8B6914]"
-              />
-            </div>
+        {/* Filter Toolbar & Segmented Tabs */}
+        <div className="bg-white border border-[#1a1209]/10 rounded-xl p-4 shadow-sm flex flex-col md:flex-row gap-4 items-center justify-between">
+          <div className="relative max-w-md w-full">
+            <svg className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-[#1a1209]/40 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            <input
+              type="text"
+              placeholder="Search timepiece name, model number, or color variant..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-4 py-2.5 bg-[#fbf9f4] border border-[#1a1209]/15 rounded-lg text-sm text-[#1a1209] placeholder-[#1a1209]/40 focus:outline-none focus:border-[#8B6914] focus:ring-2 focus:ring-[#8B6914]/20 transition"
+            />
+          </div>
 
-            {/* Segmented Filter Tabs */}
-            <div className="flex bg-[#fbf9f4] border border-[#1a1209]/10 rounded-lg p-1 w-full md:w-auto">
-              <button
-                onClick={() => setActiveTab('all')}
-                className={`flex-1 md:flex-none px-4 py-1.5 rounded-md text-[11px] font-semibold uppercase tracking-wider transition-all ${
-                  activeTab === 'all'
-                    ? 'bg-[#1a1209] text-white shadow-sm'
-                    : 'text-[#1a1209]/60 hover:text-[#1a1209]'
-                }`}
-              >
-                All Items
-              </button>
-              <button
-                onClick={() => setActiveTab('in_stock')}
-                className={`flex-1 md:flex-none px-4 py-1.5 rounded-md text-[11px] font-semibold uppercase tracking-wider transition-all ${
-                  activeTab === 'in_stock'
-                    ? 'bg-green-700 text-white shadow-sm'
-                    : 'text-green-700/70 hover:text-green-700'
-                }`}
-              >
-                In Stock
-              </button>
-              <button
-                onClick={() => setActiveTab('low_stock')}
-                className={`flex-1 md:flex-none px-4 py-1.5 rounded-md text-[11px] font-semibold uppercase tracking-wider transition-all ${
-                  activeTab === 'low_stock'
-                    ? 'bg-[#8B6914] text-white shadow-sm'
-                    : 'text-[#8B6914]/80 hover:text-[#8B6914]'
-                }`}
-              >
-                Low Stock
-              </button>
-              <button
-                onClick={() => setActiveTab('out_stock')}
-                className={`flex-1 md:flex-none px-4 py-1.5 rounded-md text-[11px] font-semibold uppercase tracking-wider transition-all ${
-                  activeTab === 'out_stock'
-                    ? 'bg-red-600 text-white shadow-sm'
-                    : 'text-red-600/80 hover:text-red-600'
-                }`}
-              >
-                Out of Stock
-              </button>
-            </div>
+          <div className="flex bg-[#fbf9f4] border border-[#1a1209]/10 rounded-lg p-1 w-full md:w-auto">
+            <button
+              onClick={() => setActiveTab('all')}
+              className={`flex-1 md:flex-none px-4 py-2 rounded-md text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer ${
+                activeTab === 'all'
+                  ? 'bg-[#1a1209] text-white shadow-sm'
+                  : 'text-[#1a1209]/60 hover:text-[#1a1209]'
+              }`}
+            >
+              All Items ({totalVariants})
+            </button>
+            <button
+              onClick={() => setActiveTab('in_stock')}
+              className={`flex-1 md:flex-none px-4 py-2 rounded-md text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer ${
+                activeTab === 'in_stock'
+                  ? 'bg-emerald-700 text-white shadow-sm'
+                  : 'text-emerald-800/70 hover:text-emerald-800'
+              }`}
+            >
+              In Stock ({inStockCount})
+            </button>
+            <button
+              onClick={() => setActiveTab('low_stock')}
+              className={`flex-1 md:flex-none px-4 py-2 rounded-md text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer ${
+                activeTab === 'low_stock'
+                  ? 'bg-[#8B6914] text-white shadow-sm'
+                  : 'text-[#8B6914]/80 hover:text-[#8B6914]'
+              }`}
+            >
+              Low Stock ({lowStockCount})
+            </button>
+            <button
+              onClick={() => setActiveTab('out_stock')}
+              className={`flex-1 md:flex-none px-4 py-2 rounded-md text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer ${
+                activeTab === 'out_stock'
+                  ? 'bg-rose-600 text-white shadow-sm'
+                  : 'text-rose-600/80 hover:text-rose-600'
+              }`}
+            >
+              Out of Stock ({outOfStockCount})
+            </button>
           </div>
         </div>
 
         {/* Listings Catalog */}
         <div className="bg-white border border-[#1a1209]/10 rounded-xl overflow-hidden shadow-sm">
           <div className="overflow-x-auto">
-            <table className="w-full text-left">
-              <thead className="bg-[#faf7f0] border-b border-[#1a1209]/10">
+            <table className="w-full text-left border-collapse">
+              <thead className="bg-[#1a1209] text-[#f3e3b8]">
                 <tr>
-                  <th className="px-6 py-4 text-xs font-semibold tracking-wider text-[#1a1209]/80 uppercase">Timepiece / Model</th>
-                  <th className="px-6 py-4 text-xs font-semibold tracking-wider text-[#1a1209]/80 uppercase">Variant Details</th>
-                  <th className="px-6 py-4 text-xs font-semibold tracking-wider text-[#1a1209]/80 uppercase">Stock Status</th>
-                  <th className="px-6 py-4 text-xs font-semibold tracking-wider text-[#1a1209]/80 uppercase text-center w-52">Quantity Adjustment</th>
-                  <th className="px-6 py-4 text-xs font-semibold tracking-wider text-[#1a1209]/80 uppercase w-20">Saved</th>
+                  <th className="px-6 py-3.5 text-[10px] font-semibold tracking-[0.15em] uppercase">TIMEPIECE / MODEL</th>
+                  <th className="px-6 py-3.5 text-[10px] font-semibold tracking-[0.15em] uppercase">COLOR VARIANT</th>
+                  <th className="px-6 py-3.5 text-[10px] font-semibold tracking-[0.15em] uppercase">STOCK STATUS</th>
+                  <th className="px-6 py-3.5 text-[10px] font-semibold tracking-[0.15em] uppercase text-center min-w-[240px]">QUANTITY ADJUSTMENT</th>
+                  <th className="px-6 py-3.5 text-[10px] font-semibold tracking-[0.15em] uppercase text-center w-28">STATUS</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#1a1209]/5">
@@ -456,11 +499,11 @@ export default function InventoryManagementPage() {
                   const isLowStock = item.qty > settings.outOfStockThreshold && item.qty <= settings.lowStockThreshold;
                   
                   return (
-                    <tr key={item.variantId} className="hover:bg-[#faf7f0]/10 transition-colors">
+                    <tr key={item.variantId} className="hover:bg-[#faf7f0]/50 transition-colors">
                       {/* Image & Title */}
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-4">
-                          <div className="relative w-12 h-12 bg-[#faf7f0] border border-[#1a1209]/10 rounded overflow-hidden flex-shrink-0 group">
+                          <div className="relative w-12 h-12 bg-[#faf7f0] border border-[#1a1209]/10 rounded-xl overflow-hidden flex-shrink-0 group">
                             <Image
                               src={item.productThumbnail}
                               alt={item.productTitle}
@@ -469,10 +512,10 @@ export default function InventoryManagementPage() {
                             />
                           </div>
                           <div>
-                            <h4 className="font-['Cormorant_Garamond'] text-sm font-bold text-[#1a1209]">
+                            <h4 className="font-bold text-sm text-[#1a1209]">
                               {item.productTitle}
                             </h4>
-                            <p className="text-[10px] text-[#1a1209]/55 font-mono uppercase tracking-wide mt-0.5">
+                            <p className="text-[11px] text-[#1a1209]/50 font-mono uppercase tracking-wide mt-0.5">
                               Model: {item.productModelNo}
                             </p>
                           </div>
@@ -483,7 +526,7 @@ export default function InventoryManagementPage() {
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-2.5">
                           <span 
-                            className="inline-block w-4 h-4 rounded-full border border-[#1a1209]/20"
+                            className="inline-block w-4 h-4 rounded-full border border-[#1a1209]/20 shadow-sm"
                             style={{ backgroundColor: item.colorHex }}
                           />
                           <span className="text-xs font-semibold text-[#1a1209]/80 uppercase tracking-wide">
@@ -492,31 +535,37 @@ export default function InventoryManagementPage() {
                         </div>
                       </td>
 
-                      {/* Status */}
+                      {/* Stock Status Badge */}
                       <td className="px-6 py-4">
-                        <span className={`inline-flex px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border ${
+                        <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border ${
                           isOutOfStock
-                            ? 'bg-red-50 text-red-600 border-red-200'
+                            ? 'bg-rose-50 text-rose-700 border-rose-200'
                             : isLowStock
-                              ? 'bg-amber-50 text-[#8B6914] border-amber-200'
-                              : 'bg-green-50 text-green-700 border-green-200'
+                              ? 'bg-amber-50 text-amber-800 border-amber-300'
+                              : 'bg-emerald-50 text-emerald-800 border-emerald-200'
                         }`}>
-                          {isOutOfStock ? 'Out of Stock' : isLowStock ? 'Low Stock' : 'In Stock'}
+                          <span className={`w-1.5 h-1.5 rounded-full ${
+                            isOutOfStock ? 'bg-rose-500' : isLowStock ? 'bg-amber-500' : 'bg-emerald-500'
+                          }`} />
+                          {isOutOfStock ? 'Out of Stock' : isLowStock ? 'Low Stock Warning' : 'In Stock'}
                         </span>
                       </td>
 
-                      {/* Adjuster */}
+                      {/* ✅ PRO QUANTITY ADJUSTMENT UX WITH QUICK PRESETS (+5, +10) */}
                       <td className="px-6 py-4">
-                        <div className="flex items-center justify-center gap-2">
+                        <div className="flex items-center justify-center gap-1.5">
+                          {/* Decrement Button */}
                           <button
                             type="button"
                             disabled={item.qty === 0 || item.isSaving}
                             onClick={() => handleUpdateStockQty(item.variantId, item.qty - 1)}
-                            className="w-8 h-8 rounded-lg bg-[#fbf9f4] hover:bg-[#8B6914]/10 disabled:opacity-40 border border-[#1a1209]/15 flex items-center justify-center text-sm font-bold text-[#1a1209] transition-all"
+                            className="w-8 h-8 rounded-lg bg-[#faf7f0] hover:bg-[#8B6914] hover:text-white disabled:opacity-30 border border-[#1a1209]/15 flex items-center justify-center text-sm font-bold text-[#1a1209] transition-all cursor-pointer"
+                            title="Decrease quantity by 1"
                           >
                             -
                           </button>
                           
+                          {/* Monospace Direct Input */}
                           <input
                             type="number"
                             min="0"
@@ -525,7 +574,6 @@ export default function InventoryManagementPage() {
                             onChange={(e) => {
                               const v = e.target.value === '' ? 0 : Number(e.target.value);
                               if (!isNaN(v) && v >= 0) {
-                                // Update local value immediately for typing feel
                                 setItemsList(prev => prev.map(i => {
                                   if (i.variantId === item.variantId) {
                                     return { ...i, qty: v };
@@ -540,28 +588,56 @@ export default function InventoryManagementPage() {
                                 handleUpdateStockQty(item.variantId, v);
                               }
                             }}
-                            className="w-16 py-1 border border-[#1a1209]/15 rounded-lg text-center text-xs font-semibold bg-[#fbf9f4] focus:outline-none focus:border-[#8B6914] focus:bg-white"
+                            className="w-16 py-1.5 border border-[#1a1209]/15 rounded-lg text-center text-xs font-mono font-bold bg-white text-[#1a1209] focus:outline-none focus:border-[#8B6914] focus:ring-2 focus:ring-[#8B6914]/20"
                           />
 
+                          {/* Increment Button */}
                           <button
                             type="button"
                             disabled={item.isSaving}
                             onClick={() => handleUpdateStockQty(item.variantId, item.qty + 1)}
-                            className="w-8 h-8 rounded-lg bg-[#fbf9f4] hover:bg-[#8B6914]/10 disabled:opacity-40 border border-[#1a1209]/15 flex items-center justify-center text-sm font-bold text-[#1a1209] transition-all"
+                            className="w-8 h-8 rounded-lg bg-[#faf7f0] hover:bg-[#8B6914] hover:text-white disabled:opacity-30 border border-[#1a1209]/15 flex items-center justify-center text-sm font-bold text-[#1a1209] transition-all cursor-pointer"
+                            title="Increase quantity by 1"
                           >
                             +
                           </button>
+
+                          {/* Quick Presets (+5, +10) */}
+                          <div className="flex gap-1 ml-1">
+                            <button
+                              type="button"
+                              disabled={item.isSaving}
+                              onClick={() => handleUpdateStockQty(item.variantId, item.qty + 5)}
+                              className="px-2 py-1 bg-white hover:bg-[#faf7f0] border border-[#1a1209]/15 rounded-md text-[10px] font-mono font-bold text-[#8B6914] transition-all cursor-pointer"
+                              title="Quick add +5 stock"
+                            >
+                              +5
+                            </button>
+                            <button
+                              type="button"
+                              disabled={item.isSaving}
+                              onClick={() => handleUpdateStockQty(item.variantId, item.qty + 10)}
+                              className="px-2 py-1 bg-white hover:bg-[#faf7f0] border border-[#1a1209]/15 rounded-md text-[10px] font-mono font-bold text-[#8B6914] transition-all cursor-pointer"
+                              title="Quick add +10 stock"
+                            >
+                              +10
+                            </button>
+                          </div>
                         </div>
                       </td>
 
-                      {/* Saved indicator */}
+                      {/* Saved Indicator */}
                       <td className="px-6 py-4 text-center">
                         {item.isSaving ? (
-                          <span className="inline-block w-4 h-4 border-2 border-[#8B6914] border-t-transparent rounded-full animate-spin" />
+                          <div className="flex items-center justify-center gap-1.5 text-xs text-[#8B6914] font-semibold">
+                            <span className="w-3.5 h-3.5 border-2 border-[#8B6914] border-t-transparent rounded-full animate-spin" />
+                          </div>
                         ) : item.isSaved ? (
-                          <span className="text-green-600 text-sm font-semibold animate-pulse">✓</span>
+                          <span className="px-2 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-bold rounded-full animate-pulse">
+                            ✓ Saved
+                          </span>
                         ) : (
-                          <span className="text-[#1a1209]/30 text-xs font-light">-</span>
+                          <span className="text-[#1a1209]/30 text-xs font-mono">-</span>
                         )}
                       </td>
                     </tr>
@@ -572,11 +648,13 @@ export default function InventoryManagementPage() {
           </div>
 
           {filteredItems.length === 0 && (
-            <div className="text-center py-20 bg-white">
-              <span className="text-3xl block mb-2">📦</span>
-              <h3 className="font-semibold text-sm">No Matching Timepieces Found</h3>
+            <div className="text-center py-16 bg-white">
+              <svg className="w-12 h-12 text-[#1a1209]/20 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+              </svg>
+              <h3 className="font-semibold text-sm text-[#1a1209]">No Matching Timepiece Variants Found</h3>
               <p className="text-xs text-[#1a1209]/45 mt-1">
-                Refine your query terms or check the tab filters.
+                Refine your query terms or check the category tab filters.
               </p>
             </div>
           )}

@@ -21,7 +21,15 @@ export default async function AdminLayout({ children }: { children: ReactNode })
   }
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: '#faf7f0' }}>
+    <div style={{ 
+      display: 'flex', 
+      minHeight: '100vh', 
+      backgroundColor: '#faf7f0',
+      backgroundImage: 'linear-gradient(rgba(250, 247, 240, 0.93), rgba(250, 247, 240, 0.93)), url(/hero_bg_marble.jpg)',
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      backgroundAttachment: 'fixed'
+    }}>
       <SidebarClientWrapper />
       
       <main style={{ 

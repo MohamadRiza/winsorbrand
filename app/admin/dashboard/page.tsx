@@ -42,15 +42,17 @@ interface StatCardProps {
 
 const StatCard = ({ title, value, icon, href, color = 'gold', isRevenue = false }: StatCardProps): React.JSX.Element => {
   const [hovered, setHovered] = useState(false);
+  const strVal = String(value);
+  const fontSize = strVal.length > 9 ? '20px' : strVal.length > 7 ? '22px' : '28px';
   
   if (isRevenue) {
     return (
       <div 
         style={{
-          background: 'linear-gradient(135deg, #1f160c 0%, #050403 100%)',
-          border: hovered ? '1px solid #c9a14a' : '1px solid rgba(201,161,74,0.3)',
+          background: 'linear-gradient(135deg, #ffffff 0%, #faf7f0 100%)',
+          border: hovered ? '1px solid #8B6914' : '1px solid rgba(139,105,20,0.25)',
           borderRadius: '14px',
-          padding: '24px 20px',
+          padding: '18px 16px',
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'space-between',
@@ -59,46 +61,54 @@ const StatCard = ({ title, value, icon, href, color = 'gold', isRevenue = false 
           overflow: 'hidden',
           transition: 'all 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
           transform: hovered ? 'translateY(-4px)' : 'translateY(0)',
-          boxShadow: hovered ? '0 12px 28px rgba(0,0,0,0.3)' : '0 2px 8px rgba(0,0,0,0.1)',
+          boxShadow: hovered ? '0 12px 28px rgba(139,105,20,0.12)' : '0 2px 10px rgba(0,0,0,0.02)',
         }}
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
       >
-        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '16px' }}>
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
           <div style={{
-            width: '40px',
-            height: '40px',
-            borderRadius: '10px',
-            background: 'rgba(201, 161, 74, 0.15)',
+            width: '36px',
+            height: '36px',
+            borderRadius: '9px',
+            background: 'rgba(139, 105, 20, 0.1)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            color: '#c9a14a',
+            color: '#8B6914',
             flexShrink: 0,
-            border: '1px solid rgba(201, 161, 74, 0.35)',
+            border: '1px solid rgba(139, 105, 20, 0.25)',
           }}>
             {icon}
           </div>
-          <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
             <p style={{
               fontFamily: "'Jost', sans-serif",
               fontSize: '10px',
               fontWeight: 600,
-              letterSpacing: '0.12em',
-              color: '#c9a14a',
+              letterSpacing: '0.1em',
+              color: '#8B6914',
               margin: 0,
               textTransform: 'uppercase',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
             }}>
               {title}
             </p>
             <p style={{
-              fontFamily: "'Cormorant Garamond', serif",
-              fontSize: '30px',
-              fontWeight: 600,
-              color: '#ffffff',
+              fontFamily: "'Jost', sans-serif",
+              fontSize,
+              fontWeight: 700,
+              letterSpacing: '-0.02em',
+              color: '#1a1209',
               margin: '4px 0 0',
-              lineHeight: 1.05,
-            }}>
+              lineHeight: 1.1,
+              fontFeatureSettings: '"tnum"',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+            }} title={strVal}>
               {value}
             </p>
           </div>
@@ -112,8 +122,9 @@ const StatCard = ({ title, value, icon, href, color = 'gold', isRevenue = false 
           alignItems: 'center',
           gap: '4px',
           fontFamily: "'Jost', sans-serif",
+          fontWeight: 500,
         }}>
-          ↑ 12.5% vs last month
+          <span style={{ background: 'rgba(46,204,113,0.1)', padding: '2px 6px', borderRadius: '4px', fontWeight: 600 }}>↑ 12.5%</span> vs last month
         </p>
       </div>
     );
@@ -135,7 +146,7 @@ const StatCard = ({ title, value, icon, href, color = 'gold', isRevenue = false 
         background: '#fff',
         border: hovered ? `1px solid ${colors.text}` : `1px solid rgba(26,18,9,0.08)`,
         borderRadius: '14px',
-        padding: '20px 20px',
+        padding: '18px 16px',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
@@ -151,11 +162,11 @@ const StatCard = ({ title, value, icon, href, color = 'gold', isRevenue = false 
       onMouseLeave={() => setHovered(false)}
       onClick={() => href && (window.location.href = href)}
     >
-      <div style={{ display: 'flex', alignItems: 'flex-start', gap: '16px' }}>
+      <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
         <div style={{
-          width: '40px',
-          height: '40px',
-          borderRadius: '10px',
+          width: '36px',
+          height: '36px',
+          borderRadius: '9px',
           background: colors.bg,
           display: 'flex',
           alignItems: 'center',
@@ -166,26 +177,34 @@ const StatCard = ({ title, value, icon, href, color = 'gold', isRevenue = false 
         }}>
           {icon}
         </div>
-        <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
           <p style={{
             fontFamily: "'Jost', sans-serif",
             fontSize: '10px',
             fontWeight: 600,
-            letterSpacing: '0.12em',
+            letterSpacing: '0.1em',
             color: 'rgba(26,18,9,0.5)',
             margin: 0,
             textTransform: 'uppercase',
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
           }}>
             {title}
           </p>
           <p style={{
-            fontFamily: "'Cormorant Garamond', serif",
-            fontSize: '32px',
-            fontWeight: 600,
+            fontFamily: "'Jost', sans-serif",
+            fontSize,
+            fontWeight: 700,
+            letterSpacing: '-0.02em',
             color: '#1a1209',
             margin: '4px 0 0',
-            lineHeight: 1.05,
-          }}>
+            lineHeight: 1.1,
+            fontFeatureSettings: '"tnum"',
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+          }} title={strVal}>
             {value}
           </p>
         </div>
@@ -443,15 +462,15 @@ export default function AdminDashboard(): React.JSX.Element {
       
       {/* Executive Welcome Banner */}
       <div style={{
-        background: 'radial-gradient(circle at right, #1f160c 0%, #050403 100%)',
-        border: '1px solid rgba(201,161,74,0.3)',
+        background: 'linear-gradient(135deg, rgba(255,255,255,0.96) 0%, rgba(250,247,240,0.98) 100%)',
+        border: '1px solid rgba(139,105,20,0.22)',
         borderRadius: '16px',
         padding: isMobile ? '24px 20px' : '32px 40px',
-        color: '#f3e3b8',
+        color: '#1a1209',
         marginBottom: '32px',
         position: 'relative',
         overflow: 'hidden',
-        boxShadow: '0 8px 32px rgba(26,18,9,0.2), inset 0 0 50px rgba(139,105,20,0.05)',
+        boxShadow: '0 8px 30px rgba(26,18,9,0.04), inset 0 0 40px rgba(139,105,20,0.03)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
@@ -466,7 +485,7 @@ export default function AdminDashboard(): React.JSX.Element {
             top: '-20px',
             bottom: '-20px',
             width: '180px',
-            opacity: 0.9,
+            opacity: 0.92,
             pointerEvents: 'none',
             display: 'flex',
             alignItems: 'center',
@@ -479,7 +498,7 @@ export default function AdminDashboard(): React.JSX.Element {
                 height: '140%',
                 objectFit: 'contain',
                 transform: 'rotate(15deg) translateY(-5px)',
-                filter: 'drop-shadow(0 15px 25px rgba(0,0,0,0.75))',
+                filter: 'drop-shadow(0 15px 25px rgba(139,105,20,0.18))',
               }}
             />
           </div>
@@ -491,7 +510,7 @@ export default function AdminDashboard(): React.JSX.Element {
             fontSize: '11px',
             fontWeight: 600,
             letterSpacing: '0.2em',
-            color: '#c9a14a',
+            color: '#8B6914',
             margin: '0 0 8px',
             textTransform: 'uppercase',
           }}>
@@ -500,8 +519,8 @@ export default function AdminDashboard(): React.JSX.Element {
           <h2 style={{
             fontFamily: "'Cormorant Garamond', serif",
             fontSize: isMobile ? '28px' : '36px',
-            fontWeight: 400,
-            color: '#f3e3b8',
+            fontWeight: 500,
+            color: '#1a1209',
             margin: '0 0 8px',
             lineHeight: 1.2,
           }}>
@@ -510,7 +529,7 @@ export default function AdminDashboard(): React.JSX.Element {
           <p style={{
             fontFamily: "'Jost', sans-serif",
             fontSize: '13.5px',
-            color: 'rgba(243,227,184,0.75)',
+            color: 'rgba(26,18,9,0.68)',
             margin: 0,
             maxWidth: '520px',
             lineHeight: 1.5,
@@ -521,19 +540,19 @@ export default function AdminDashboard(): React.JSX.Element {
 
         {/* Date Widget */}
         <div style={{
-          background: 'rgba(26, 18, 9, 0.65)',
-          border: '1px solid rgba(201, 161, 74, 0.3)',
+          background: 'rgba(250, 247, 240, 0.9)',
+          border: '1px solid rgba(139, 105, 20, 0.22)',
           padding: '16px 20px',
           borderRadius: '12px',
           backdropFilter: 'blur(10px)',
-          boxShadow: '0 8px 24px rgba(0,0,0,0.25)',
+          boxShadow: '0 4px 16px rgba(26,18,9,0.04)',
           width: '200px',
           flexShrink: 0,
           zIndex: 5,
           marginTop: isMobile ? '16px' : '0',
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#c9a14a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
               <line x1="16" y1="2" x2="16" y2="6" />
               <line x1="8" y1="2" x2="8" y2="6" />
@@ -543,7 +562,7 @@ export default function AdminDashboard(): React.JSX.Element {
               margin: 0,
               fontSize: '10px',
               fontWeight: 600,
-              color: '#c9a14a',
+              color: '#8B6914',
               textTransform: 'uppercase',
               letterSpacing: '0.12em'
             }}>
@@ -554,18 +573,18 @@ export default function AdminDashboard(): React.JSX.Element {
             margin: 0,
             fontFamily: "'Jost', sans-serif",
             fontSize: '14px',
-            color: '#ffffff',
-            fontWeight: 500
+            color: '#1a1209',
+            fontWeight: 600
           }}>
             {new Date().toLocaleDateString('en-US', { weekday: 'long' })},
           </p>
           <p style={{
             margin: '2px 0 0',
-            fontFamily: "'Cormorant Garamond', serif",
-            fontSize: '20px',
-            color: '#f3e3b8',
+            fontFamily: "'Jost', sans-serif",
+            fontSize: '16px',
+            color: '#8B6914',
             fontWeight: 600,
-            letterSpacing: '0.02em'
+            letterSpacing: '0.01em'
           }}>
             {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
           </p>
@@ -575,7 +594,7 @@ export default function AdminDashboard(): React.JSX.Element {
       {/* Metrics Grid */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(235px, 1fr))',
         gap: '20px',
         marginBottom: '32px',
       }}>
@@ -740,7 +759,7 @@ export default function AdminDashboard(): React.JSX.Element {
             </div>
 
             <div style={{ marginBottom: '16px' }}>
-              <p style={{ margin: 0, fontSize: '28px', fontWeight: 600, color: '#1a1209', fontFamily: "'Cormorant Garamond', serif" }}>
+              <p style={{ margin: 0, fontSize: '28px', fontWeight: 700, color: '#1a1209', fontFamily: "'Jost', sans-serif", letterSpacing: '-0.02em', fontFeatureSettings: '"tnum"' }}>
                 ${(stats.totalRevenue || 0).toLocaleString()}
               </p>
               <p style={{ margin: '2px 0 0', fontSize: '11px', color: '#2ecc71', display: 'flex', alignItems: 'center', gap: '4px' }}>
@@ -827,11 +846,36 @@ export default function AdminDashboard(): React.JSX.Element {
             
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               {[
-                { label: 'Add New Product', href: '/admin/products/new', color: '#8B6914', icon: '📦' },
-                { label: 'Process Orders', href: '/admin/orders', color: '#3498db', icon: '💼' },
-                { label: 'Review Applications', href: '/admin/careers/applications', color: '#9b59b6', icon: '📄' },
-                { label: 'Manage Inventory', href: '/admin/inventory', color: '#2ecc71', icon: '🛡️' },
-                { label: 'View Messages', href: '/admin/messages', color: '#e74c3c', icon: '💬' },
+                { 
+                  label: 'Add New Product', 
+                  href: '/admin/products/new', 
+                  color: '#8B6914', 
+                  icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg> 
+                },
+                { 
+                  label: 'Process Orders', 
+                  href: '/admin/orders', 
+                  color: '#3498db', 
+                  icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3498db" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg> 
+                },
+                { 
+                  label: 'Review Applications', 
+                  href: '/admin/careers/applications', 
+                  color: '#9b59b6', 
+                  icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9b59b6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg> 
+                },
+                { 
+                  label: 'Manage Inventory', 
+                  href: '/admin/inventory', 
+                  color: '#2ecc71', 
+                  icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2ecc71" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/></svg> 
+                },
+                { 
+                  label: 'View Messages', 
+                  href: '/admin/messages', 
+                  color: '#e74c3c', 
+                  icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#e74c3c" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> 
+                },
               ].map((action) => (
                 <Link
                   key={action.href}
@@ -851,7 +895,7 @@ export default function AdminDashboard(): React.JSX.Element {
                   }}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                    <span style={{ fontSize: '14px' }}>{action.icon}</span>
+                    <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{action.icon}</span>
                     <span style={{
                       fontFamily: "'Jost', sans-serif",
                       fontSize: '13px',
@@ -953,7 +997,7 @@ export default function AdminDashboard(): React.JSX.Element {
                 alignItems: 'center',
                 justifyContent: 'center',
               }}>
-                <span style={{ fontSize: '18px', fontWeight: 600, fontFamily: "'Cormorant Garamond', serif" }}>
+                <span style={{ fontSize: '20px', fontWeight: 700, fontFamily: "'Jost', sans-serif", color: '#1a1209', fontFeatureSettings: '"tnum"' }}>
                   {totalOrders}
                 </span>
                 <span style={{ fontSize: '8px', color: 'rgba(26,18,9,0.5)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>

@@ -7,27 +7,27 @@ import { useCurrency } from '@/app/context/CurrencyContext';
 
 // ── Types ─────────────────────────────────────────────────────────────────
 interface GiftCategory {
-  _id:       string;
-  slug:      string;
-  label:     string;
-  emoji:     string;
+  _id: string;
+  slug: string;
+  label: string;
+  emoji: string;
   sortOrder: number;
   /** Optional: admin can attach a hero background per category */
   heroBackground?: string;
 }
 interface CloudinaryAsset { url: string; publicId: string; }
-interface ColorVariant    { colorName: string; colorHex: string; qty: number; }
+interface ColorVariant { colorName: string; colorHex: string; qty: number; }
 interface GiftProduct {
-  _id:            string;
-  title:          string;
-  modelNo:        string;
-  price:          number;
-  thumbnail:      CloudinaryAsset;
+  _id: string;
+  title: string;
+  modelNo: string;
+  price: number;
+  thumbnail: CloudinaryAsset;
   /** Optional transparent watch render for the hero stage */
-  heroImage?:     CloudinaryAsset;
-  colorVariants:  ColorVariant[];
+  heroImage?: CloudinaryAsset;
+  colorVariants: ColorVariant[];
   stickerEnabled: boolean;
-  stickerText:    string;
+  stickerText: string;
   giftCategories: string[];
 }
 
@@ -39,7 +39,7 @@ const FALLBACK_BACKGROUNDS = [
 
 const OCCASION_BACKGROUNDS: Record<string, string> = {
   'eid': '/gift_categories/eid.png',
-  'new-year': '/gift_categories/new_year.avif',
+  'new-year': '/gift_categories/new_year.webp',
   'valentines-day': "/gift_categories/valentines_day.png",
   'christmas': '/gift_categories/xmass.avif',
   'graduation': '/gift_categories/Graduation.png',
@@ -435,7 +435,7 @@ function HeroStage({
       />
 
       {/* Ambient Vibe light leak leak overlay */}
-      <div 
+      <div
         style={{
           position: 'absolute',
           inset: 0,
@@ -863,73 +863,73 @@ export default function GiftSection() {
         <div className="gift-tabs">
           {loadingCats
             ? Array.from({ length: 5 }).map((_, i) => (
-                <div
-                  key={i}
-                  style={{
-                    width: 120,
-                    height: 36,
-                    margin: '8px',
-                    background: '#f5f5f5',
-                    borderRadius: 30,
-                    animation: 'pulse 1.4s infinite',
-                  }}
-                />
-              ))
+              <div
+                key={i}
+                style={{
+                  width: 120,
+                  height: 36,
+                  margin: '8px',
+                  background: '#f5f5f5',
+                  borderRadius: 30,
+                  animation: 'pulse 1.4s infinite',
+                }}
+              />
+            ))
             : categories.map((cat) => {
-                const isActive = cat.slug === activeSlug;
-                const getActiveTabStyle = (slug: string) => {
-                  const norm = slug.toLowerCase();
-                  switch (norm) {
-                    case 'christmas':
-                      return {
-                        background: '#a81c1c',
-                        borderColor: '#a81c1c',
-                        color: '#ffffff',
-                        boxShadow: '0 4px 15px rgba(168, 28, 28, 0.35)',
-                      };
-                    case 'valentines-day':
-                      return {
-                        background: '#db2777',
-                        borderColor: '#db2777',
-                        color: '#ffffff',
-                        boxShadow: '0 4px 15px rgba(219, 39, 119, 0.35)',
-                      };
-                    case 'graduation':
-                      return {
-                        background: '#8b6914',
-                        borderColor: '#8b6914',
-                        color: '#ffffff',
-                        boxShadow: '0 4px 15px rgba(139, 105, 20, 0.35)',
-                      };
-                    case 'new-year':
-                    case 'sinhala-tamil-new-year':
-                      return {
-                        background: '#c9a14a',
-                        borderColor: '#c9a14a',
-                        color: '#ffffff',
-                        boxShadow: '0 4px 15px rgba(201, 161, 74, 0.35)',
-                      };
-                    default:
-                      return {
-                        background: '#1a1209',
-                        borderColor: '#1a1209',
-                        color: '#ffffff',
-                        boxShadow: '0 4px 15px rgba(26, 18, 9, 0.25)',
-                      };
-                  }
-                };
+              const isActive = cat.slug === activeSlug;
+              const getActiveTabStyle = (slug: string) => {
+                const norm = slug.toLowerCase();
+                switch (norm) {
+                  case 'christmas':
+                    return {
+                      background: '#a81c1c',
+                      borderColor: '#a81c1c',
+                      color: '#ffffff',
+                      boxShadow: '0 4px 15px rgba(168, 28, 28, 0.35)',
+                    };
+                  case 'valentines-day':
+                    return {
+                      background: '#db2777',
+                      borderColor: '#db2777',
+                      color: '#ffffff',
+                      boxShadow: '0 4px 15px rgba(219, 39, 119, 0.35)',
+                    };
+                  case 'graduation':
+                    return {
+                      background: '#8b6914',
+                      borderColor: '#8b6914',
+                      color: '#ffffff',
+                      boxShadow: '0 4px 15px rgba(139, 105, 20, 0.35)',
+                    };
+                  case 'new-year':
+                  case 'sinhala-tamil-new-year':
+                    return {
+                      background: '#c9a14a',
+                      borderColor: '#c9a14a',
+                      color: '#ffffff',
+                      boxShadow: '0 4px 15px rgba(201, 161, 74, 0.35)',
+                    };
+                  default:
+                    return {
+                      background: '#1a1209',
+                      borderColor: '#1a1209',
+                      color: '#ffffff',
+                      boxShadow: '0 4px 15px rgba(26, 18, 9, 0.25)',
+                    };
+                }
+              };
 
-                return (
-                  <button
-                    key={cat._id}
-                    onClick={() => setActiveSlug(cat.slug)}
-                    className={`gift-tab-btn ${isActive ? 'active' : ''}`}
-                    style={isActive ? getActiveTabStyle(cat.slug) : {}}
-                  >
-                    <span>{cat.label}</span>
-                  </button>
-                );
-              })}
+              return (
+                <button
+                  key={cat._id}
+                  onClick={() => setActiveSlug(cat.slug)}
+                  className={`gift-tab-btn ${isActive ? 'active' : ''}`}
+                  style={isActive ? getActiveTabStyle(cat.slug) : {}}
+                >
+                  <span>{cat.label}</span>
+                </button>
+              );
+            })}
         </div>
       </div>
 
