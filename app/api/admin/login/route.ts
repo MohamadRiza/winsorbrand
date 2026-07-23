@@ -114,13 +114,17 @@ export async function POST(req: NextRequest) {
         );
       }
 
-      // Map session duration to maxAge and expiresIn values
+      // Map session duration to maxAge and expiresIn values (MAX: 24h / 1 Day)
       const SESSION_DURATIONS: Record<string, { maxAge: number; expiresIn: string | undefined }> = {
         '15m': { maxAge: 15 * 60, expiresIn: '15m' },
         '30m': { maxAge: 30 * 60, expiresIn: '30m' },
         '1h': { maxAge: 60 * 60, expiresIn: '1h' },
         '2h': { maxAge: 2 * 60 * 60, expiresIn: '2h' },
-        'unlimited': { maxAge: 10 * 365 * 24 * 60 * 60, expiresIn: '3650d' }, // 10 years
+        '4h': { maxAge: 4 * 60 * 60, expiresIn: '4h' },
+        '8h': { maxAge: 8 * 60 * 60, expiresIn: '8h' },
+        '12h': { maxAge: 12 * 60 * 60, expiresIn: '12h' },
+        '24h': { maxAge: 24 * 60 * 60, expiresIn: '24h' },
+        '1d': { maxAge: 24 * 60 * 60, expiresIn: '24h' },
       };
 
       const durationKey = SESSION_DURATIONS[sessionDuration] ? sessionDuration : '15m';

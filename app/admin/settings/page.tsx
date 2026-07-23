@@ -21,6 +21,10 @@ export default function SettingsPage() {
   const [selfConfirmPassword, setSelfConfirmPassword] = useState('');
   const [selfUpdating, setSelfUpdating] = useState(false);
 
+  // Eye icon show/hide password states
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
   useEffect(() => {
     fetchProfile();
   }, []);
@@ -52,7 +56,12 @@ export default function SettingsPage() {
     const finalPass = 'WS-' + pass;
     setSelfPassword(finalPass);
     setSelfConfirmPassword(finalPass);
-    toast.success('Secure password generated!');
+    setShowPassword(true);
+    setShowConfirmPassword(true);
+    
+    // Auto-copy generated password to system clipboard
+    navigator.clipboard.writeText(finalPass);
+    toast.success('⚡ Secure password generated & copied to clipboard!');
   };
 
   const handleSelfUpdate = async (e: FormEvent) => {
@@ -82,6 +91,8 @@ export default function SettingsPage() {
       toast.success('Profile credentials updated successfully!');
       setSelfPassword('');
       setSelfConfirmPassword('');
+      setShowPassword(false);
+      setShowConfirmPassword(false);
       fetchProfile();
     } catch (error: any) {
       toast.error(error.message);
@@ -118,137 +129,232 @@ export default function SettingsPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#8B6914]"></div>
+      <div className="flex flex-col items-center justify-center min-h-[450px]">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#8B6914]" />
+        <p className="mt-4 text-xs font-semibold text-[#8B6914] tracking-widest uppercase font-['Jost']">
+          Loading System Settings…
+        </p>
       </div>
     );
   }
 
   return (
     <PermissionGate permission="settings_manage">
-      <div className="space-y-6 font-['Jost'] text-[#1a1209]">
-        {/* Header */}
-        <div>
-          <h1 className="font-['Cormorant_Garamond'] text-3xl font-semibold text-[#1a1209]">
-            System Settings
-          </h1>
-          <p className="text-[#1a1209]/60 mt-1">
-            {currentUser?.role === 'admin' 
-              ? 'Update your administrator credentials and system access parameters.' 
-              : 'View your staff profile, check account expiration limits, and edit credentials.'}
-          </p>
-        </div>
+      <div 
+        className="min-h-screen font-['Jost'] text-[#1a1209] p-4 sm:p-8 select-none"
+        style={{
+          backgroundImage: `linear-gradient(rgba(250, 247, 240, 0.93), rgba(250, 247, 240, 0.93)), url('/hero_bg_marble.jpg')`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundAttachment: 'fixed',
+        }}
+      >
+        <div className="max-w-6xl mx-auto space-y-6">
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          
-          {/* Left Card: Account Metadata */}
-          <div className="bg-white border border-[#1a1209]/10 rounded-xl p-6 shadow-sm space-y-6">
-            <h3 className="font-semibold text-lg border-b border-[#1a1209]/5 pb-3">Profile Details</h3>
-            
-            <div className="grid grid-cols-3 text-sm">
-              <span className="text-[#1a1209]/50">Username</span>
-              <span className="col-span-2 font-semibold text-[#1a1209]">{currentUser?.username}</span>
-            </div>
-            <div className="grid grid-cols-3 text-sm">
-              <span className="text-[#1a1209]/50">Access Role</span>
-              <span className="col-span-2 uppercase font-semibold tracking-wider text-xs text-[#8B6914] bg-[#8B6914]/10 px-2 py-0.5 rounded border border-[#8B6914]/20 w-fit">
-                {currentUser?.role}
-              </span>
-            </div>
-            <div className="grid grid-cols-3 text-sm">
-              <span className="text-[#1a1209]/50">Account Lifespan</span>
-              <span className="col-span-2 font-semibold text-[#1a1209]">
-                {currentUser?.isTemporary ? 'Temporary Access' : 'Permanent Access'}
-              </span>
-            </div>
-
-            {currentUser?.isTemporary && currentUser?.expiresAt && (
-              <div className="p-4 bg-amber-50/50 border border-amber-300/60 rounded-xl space-y-2.5">
-                <div className="flex items-center gap-2 text-amber-800">
-                  <span className="text-lg">⏳</span>
-                  <span className="text-xs font-semibold uppercase tracking-wider">Access Expiration Tracker</span>
-                </div>
-                <p className="text-sm text-amber-900/90 leading-relaxed">
-                  This staff account credentials will expire in:
-                </p>
-                <p className="text-xl font-bold text-amber-700 tracking-wide">
-                  {expiryTimerDetails}
-                </p>
-                <p className="text-[11px] text-amber-800/80 leading-normal border-t border-amber-300/30 pt-2">
-                  Note: To protect database systems, temporary staff members cannot change their usernames and passwords directly. If you require credentials renewals or access extension, please notify your system administrator.
-                </p>
-              </div>
-            )}
+          {/* ── Page Header ── */}
+          <div className="border-b border-[#8B6914]/20 pb-5">
+            <h1 className="font-['Cormorant_Garamond'] text-3xl font-semibold text-[#8B6914] tracking-wide">
+              SYSTEM SETTINGS & PROFILE CREDENTIALS
+            </h1>
+            <p className="text-sm text-[#1a1209]/60 mt-0.5">
+              {currentUser?.role === 'admin' 
+                ? 'Update your administrator credentials and system access parameters.' 
+                : 'View your staff profile, check account expiration limits, and edit credentials.'}
+            </p>
           </div>
 
-          {/* Right Card: Credential Modification Form (Permanent Users) */}
-          <div className="bg-white border border-[#1a1209]/10 rounded-xl p-6 shadow-sm">
-            <h3 className="font-semibold text-lg border-b border-[#1a1209]/5 pb-3">Update Access Credentials</h3>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
             
-            {currentUser?.isTemporary ? (
-              <div className="flex flex-col items-center justify-center py-12 text-center text-[#1a1209]/40">
-                <svg className="w-12 h-12 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                </svg>
-                <p className="text-sm font-medium">Credentials Locked</p>
-                <p className="text-xs max-w-xs mt-1">Temporary accounts cannot edit login information for security compliance.</p>
+            {/* Left Card: Account Metadata */}
+            <div className="bg-white/95 backdrop-blur-sm border border-[#8B6914]/25 rounded-2xl p-6 shadow-lg space-y-6">
+              <div className="border-b border-[#1a1209]/10 pb-4">
+                <h3 className="font-['Cormorant_Garamond'] text-xl font-bold text-[#1a1209] uppercase tracking-wider">
+                  PROFILE METADATA
+                </h3>
+                <p className="text-xs text-[#8B6914] font-semibold mt-0.5">Account role privileges & authentication status</p>
               </div>
-            ) : (
-              <form onSubmit={handleSelfUpdate} className="space-y-4 pt-3">
-                <div>
-                  <label className="block text-[11px] font-semibold tracking-wider uppercase text-[#1a1209]/60 mb-2">Username</label>
-                  <input
-                    type="text"
-                    value={selfUsername}
-                    onChange={(e) => setSelfUsername(e.target.value)}
-                    required
-                    className="w-full px-4.5 py-2.5 bg-[#fbf9f4] border border-[#1a1209]/15 rounded-lg text-[#1a1209]"
-                  />
+              
+              <div className="space-y-4 text-sm">
+                <div className="flex justify-between items-center py-2 border-b border-[#1a1209]/5">
+                  <span className="text-xs font-bold text-[#8B6914] uppercase">Username</span>
+                  <span className="font-mono font-bold text-[#1a1209]">{currentUser?.username}</span>
                 </div>
 
-                <div>
-                  <label className="block text-[11px] font-semibold tracking-wider uppercase text-[#1a1209]/60 mb-2">New Password (Optional)</label>
-                  <div className="flex gap-2">
-                    <input
-                      type="password"
-                      value={selfPassword}
-                      onChange={(e) => setSelfPassword(e.target.value)}
-                      placeholder="Leave blank to keep current password"
-                      className="flex-1 px-4.5 py-2.5 bg-[#fbf9f4] border border-[#1a1209]/15 rounded-lg text-[#1a1209]"
-                    />
-                    <button
-                      type="button"
-                      onClick={generatePassword}
-                      className="px-3 py-2 bg-[#8B6914]/10 hover:bg-[#8B6914]/20 border border-[#8B6914]/30 rounded-lg text-xs font-semibold text-[#8B6914] transition self-end h-[42px]"
-                    >
-                      Generate
-                    </button>
+                <div className="flex justify-between items-center py-2 border-b border-[#1a1209]/5">
+                  <span className="text-xs font-bold text-[#8B6914] uppercase">Access Role</span>
+                  <span className="uppercase font-mono font-bold text-xs text-[#8B6914] bg-[#faf7f0] px-3 py-1 rounded-lg border border-[#8B6914]/30">
+                    {currentUser?.role}
+                  </span>
+                </div>
+
+                <div className="flex justify-between items-center py-2 border-b border-[#1a1209]/5">
+                  <span className="text-xs font-bold text-[#8B6914] uppercase">Account Lifespan</span>
+                  <span className="font-mono font-bold text-xs text-[#1a1209]">
+                    {currentUser?.isTemporary ? '⏳ Temporary Access' : '🛡️ Permanent Access'}
+                  </span>
+                </div>
+              </div>
+
+              {currentUser?.isTemporary && currentUser?.expiresAt && (
+                <div className="p-4 bg-amber-50 border border-amber-300 rounded-xl space-y-2.5">
+                  <div className="flex items-center gap-2 text-amber-900 font-bold text-xs uppercase tracking-wider">
+                    <svg className="w-4 h-4 text-amber-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span>Access Expiration Tracker</span>
                   </div>
+                  <p className="text-xs text-amber-800 leading-relaxed">
+                    This staff account credentials will expire in:
+                  </p>
+                  <p className="text-2xl font-bold font-mono text-amber-700 tracking-wide">
+                    {expiryTimerDetails}
+                  </p>
+                  <p className="text-[11px] text-amber-800/80 leading-normal border-t border-amber-300/40 pt-2">
+                    Note: Temporary staff members cannot edit credentials directly. For renewals, contact your administrator.
+                  </p>
                 </div>
+              )}
+            </div>
 
-                {selfPassword && (
+            {/* Right Card: Credential Modification Form with Eye Toggle Icons */}
+            <div className="bg-white/95 backdrop-blur-sm border border-[#8B6914]/25 rounded-2xl p-6 shadow-lg space-y-6">
+              <div className="border-b border-[#1a1209]/10 pb-4">
+                <h3 className="font-['Cormorant_Garamond'] text-xl font-bold text-[#1a1209] uppercase tracking-wider">
+                  UPDATE ACCESS CREDENTIALS
+                </h3>
+                <p className="text-xs text-[#8B6914] font-semibold mt-0.5">Modify login username & password authentication</p>
+              </div>
+              
+              {currentUser?.isTemporary ? (
+                <div className="flex flex-col items-center justify-center py-12 text-center text-[#1a1209]/40">
+                  <svg className="w-12 h-12 mb-3 text-[#8B6914]/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                  <p className="text-sm font-semibold text-[#1a1209]">Credentials Locked</p>
+                  <p className="text-xs max-w-xs mt-1 text-[#1a1209]/50">Temporary accounts cannot edit login credentials for security compliance.</p>
+                </div>
+              ) : (
+                <form onSubmit={handleSelfUpdate} className="space-y-4">
                   <div>
-                    <label className="block text-[11px] font-semibold tracking-wider uppercase text-[#1a1209]/60 mb-2">Confirm Password</label>
+                    <label className="block text-[10px] font-bold tracking-wider uppercase text-[#8B6914] mb-1.5">
+                      ACCOUNT USERNAME <span className="text-red-500">*</span>
+                    </label>
                     <input
-                      type="password"
-                      value={selfConfirmPassword}
-                      onChange={(e) => setSelfConfirmPassword(e.target.value)}
+                      type="text"
+                      value={selfUsername}
+                      onChange={(e) => setSelfUsername(e.target.value)}
                       required
-                      className="w-full px-4.5 py-2.5 bg-[#fbf9f4] border border-[#1a1209]/15 rounded-lg text-[#1a1209]"
+                      className="w-full px-4 py-2.5 bg-[#fbf9f4] border border-[#1a1209]/15 rounded-xl font-mono text-xs font-bold text-[#1a1209] focus:outline-none focus:border-[#8B6914]"
                     />
                   </div>
-                )}
 
-                <button
-                  type="submit"
-                  disabled={selfUpdating}
-                  className="w-full mt-4 py-3 bg-[#1a1209] hover:bg-[#2a1d10] text-white text-xs font-semibold tracking-wider uppercase rounded-lg disabled:opacity-50 transition-all shadow-md"
-                >
-                  {selfUpdating ? 'Saving Credentials…' : 'Save Credentials'}
-                </button>
-              </form>
-            )}
+                  {/* Password Field with Eye Icon */}
+                  <div>
+                    <label className="block text-[10px] font-bold tracking-wider uppercase text-[#8B6914] mb-1.5">
+                      NEW PASSWORD (OPTIONAL)
+                    </label>
+                    <div className="flex gap-2">
+                      <div className="relative flex-1">
+                        <input
+                          type={showPassword ? 'text' : 'password'}
+                          value={selfPassword}
+                          onChange={(e) => setSelfPassword(e.target.value)}
+                          placeholder="Leave blank to keep current password"
+                          className="w-full pl-4 pr-10 py-2.5 bg-[#fbf9f4] border border-[#1a1209]/15 rounded-xl font-mono text-xs font-bold text-[#1a1209] focus:outline-none focus:border-[#8B6914]"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-[#1a1209]/40 hover:text-[#8B6914] transition-colors cursor-pointer p-1"
+                          title={showPassword ? 'Hide password' : 'Show password'}
+                        >
+                          {showPassword ? (
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24" />
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M1 1l22 22" />
+                            </svg>
+                          ) : (
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                          )}
+                        </button>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={generatePassword}
+                        className="px-3.5 py-2.5 bg-[#8B6914] hover:bg-[#1a1209] text-white text-xs font-bold font-mono rounded-xl transition-all shadow-sm cursor-pointer whitespace-nowrap"
+                      >
+                        ⚡ Generate
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Confirm Password Field with Eye Icon */}
+                  {selfPassword && (
+                    <div className="animate-fadeIn">
+                      <label className="block text-[10px] font-bold tracking-wider uppercase text-[#8B6914] mb-1.5">
+                        CONFIRM NEW PASSWORD <span className="text-red-500">*</span>
+                      </label>
+                      <div className="relative">
+                        <input
+                          type={showConfirmPassword ? 'text' : 'password'}
+                          value={selfConfirmPassword}
+                          onChange={(e) => setSelfConfirmPassword(e.target.value)}
+                          required
+                          placeholder="Re-type new password"
+                          className="w-full pl-4 pr-10 py-2.5 bg-[#fbf9f4] border border-[#1a1209]/15 rounded-xl font-mono text-xs font-bold text-[#1a1209] focus:outline-none focus:border-[#8B6914]"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-[#1a1209]/40 hover:text-[#8B6914] transition-colors cursor-pointer p-1"
+                          title={showConfirmPassword ? 'Hide password' : 'Show password'}
+                        >
+                          {showConfirmPassword ? (
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24" />
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M1 1l22 22" />
+                            </svg>
+                          ) : (
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* ⚠ Critical Password Warning Callout Banner */}
+                  <div className="p-3.5 bg-amber-50 border border-amber-300 rounded-xl space-y-1">
+                    <div className="flex items-center gap-2 text-amber-900 font-bold text-[11px] uppercase tracking-wider">
+                      <svg className="w-4 h-4 text-amber-700 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                      </svg>
+                      <span>CRITICAL: SAVE OR COPY YOUR PASSWORD</span>
+                    </div>
+                    <p className="text-[11px] text-amber-800 leading-relaxed">
+                      Please copy and save your new password in a password manager or secure location before updating. Passwords are encrypted in the database and cannot be retrieved if forgotten.
+                    </p>
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={selfUpdating}
+                    className="w-full mt-2 py-3 bg-[#1a1209] hover:bg-[#8B6914] text-[#faf7f0] text-xs font-bold uppercase tracking-wider rounded-xl transition-all shadow-md cursor-pointer disabled:opacity-50"
+                  >
+                    {selfUpdating ? 'Saving Credentials…' : 'Save Updated Credentials'}
+                  </button>
+                </form>
+              )}
+            </div>
+
           </div>
+
         </div>
       </div>
     </PermissionGate>

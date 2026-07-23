@@ -161,18 +161,18 @@ export default function CollectionsPage() {
     const titleLower = product.title.toLowerCase();
     const descLower = product.description.toLowerCase();
     if (
-      titleLower.includes('ladies') || 
-      titleLower.includes('women') || 
-      titleLower.includes('diamond') || 
-      descLower.includes('ladies') || 
+      titleLower.includes('ladies') ||
+      titleLower.includes('women') ||
+      titleLower.includes('diamond') ||
+      descLower.includes('ladies') ||
       descLower.includes('women')
     ) {
       return 'Ladies';
     }
     if (
-      titleLower.includes('gents') || 
-      titleLower.includes('men') || 
-      descLower.includes('gents') || 
+      titleLower.includes('gents') ||
+      titleLower.includes('men') ||
+      descLower.includes('gents') ||
       descLower.includes('men')
     ) {
       return 'Gents';
@@ -1284,8 +1284,8 @@ export default function CollectionsPage() {
           </div>
 
           {SLIDES[currentSlide].type === 'video' && (
-            <button 
-              className="hero-video-mute-btn" 
+            <button
+              className="hero-video-mute-btn"
               onClick={(e) => {
                 e.stopPropagation();
                 setIsMuted(!isMuted);
@@ -1293,9 +1293,9 @@ export default function CollectionsPage() {
               aria-label={isMuted ? "Unmute video" : "Mute video"}
             >
               {isMuted ? (
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 5 6 9H2v6h4l5 4V5zM23 9l-6 6M17 9l6 6"/></svg>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 5 6 9H2v6h4l5 4V5zM23 9l-6 6M17 9l6 6" /></svg>
               ) : (
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 5 6 9H2v6h4l5 4V5zM19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 5 6 9H2v6h4l5 4V5zM19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07" /></svg>
               )}
             </button>
           )}
@@ -1327,13 +1327,13 @@ export default function CollectionsPage() {
           {/* GENDER & COLLECTION FILTER HEADER CARDS (4 Columns) */}
           <div className="gender-header-row">
             {/* Card 1: Gents */}
-            <div 
+            <div
               className={`gender-header-card ${selectedGender === 'gents' ? 'active' : ''}`}
               onClick={() => setSelectedGender(selectedGender === 'gents' ? 'all' : 'gents')}
             >
               <div className="gender-card-img-wrapper">
-                <Image 
-                  src="/winsor_man.png" 
+                <Image
+                  src="/winsor_man.png"
                   alt="Gents"
                   fill
                   sizes="(max-width: 768px) 50vw, 350px"
@@ -1348,18 +1348,18 @@ export default function CollectionsPage() {
                 <span>Shop Men's Watches</span>
               </div>
               <div className="gender-header-arrow">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="12" cy="12" r="10"/><path d="M8 12h8M12 8l4 4-4 4"/></svg>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="12" cy="12" r="10" /><path d="M8 12h8M12 8l4 4-4 4" /></svg>
               </div>
             </div>
 
             {/* Card 2: Ladies */}
-            <div 
+            <div
               className={`gender-header-card ${selectedGender === 'ladies' ? 'active' : ''}`}
               onClick={() => setSelectedGender(selectedGender === 'ladies' ? 'all' : 'ladies')}
             >
               <div className="gender-card-img-wrapper">
-                <Image 
-                  src="/winsor_girl_G.png" 
+                <Image
+                  src="/winsor_girl_G.png"
                   alt="Ladies"
                   fill
                   sizes="(max-width: 768px) 50vw, 350px"
@@ -1374,18 +1374,18 @@ export default function CollectionsPage() {
                 <span>Shop Women's Watches</span>
               </div>
               <div className="gender-header-arrow">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="12" cy="12" r="10"/><path d="M8 12h8M12 8l4 4-4 4"/></svg>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="12" cy="12" r="10" /><path d="M8 12h8M12 8l4 4-4 4" /></svg>
               </div>
             </div>
 
             {/* Card 3: Gifts */}
-            <div 
+            <div
               className={`gender-header-card ${selectedGender === 'gifts' ? 'active' : ''}`}
               onClick={() => setSelectedGender(selectedGender === 'gifts' ? 'all' : 'gifts')}
             >
               <div className="gender-card-img-wrapper">
-                <Image 
-                  src="/graduation_gift.png" 
+                <Image
+                  src="/graduation_gift.png"
                   alt="Gifts"
                   fill
                   sizes="(max-width: 768px) 50vw, 350px"
@@ -1400,18 +1400,18 @@ export default function CollectionsPage() {
                 <span>Shop Gift Timepieces</span>
               </div>
               <div className="gender-header-arrow">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="12" cy="12" r="10"/><path d="M8 12h8M12 8l4 4-4 4"/></svg>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="12" cy="12" r="10" /><path d="M8 12h8M12 8l4 4-4 4" /></svg>
               </div>
             </div>
 
             {/* Card 4: Limited Edition */}
-            <div 
+            <div
               className={`gender-header-card ${selectedSection === 'limited' ? 'active' : ''}`}
               onClick={() => setSelectedSection(selectedSection === 'limited' ? 'all' : 'limited')}
             >
               <div className="gender-card-img-wrapper">
-                <Image 
-                  src="/watch-hero.jpg" 
+                <Image
+                  src="/watch-hero.jpg"
                   alt="Limited Edition"
                   fill
                   sizes="(max-width: 768px) 50vw, 350px"
@@ -1426,7 +1426,7 @@ export default function CollectionsPage() {
                 <span>Exclusive Timepieces</span>
               </div>
               <div className="gender-header-arrow">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="12" cy="12" r="10"/><path d="M8 12h8M12 8l4 4-4 4"/></svg>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="12" cy="12" r="10" /><path d="M8 12h8M12 8l4 4-4 4" /></svg>
               </div>
             </div>
           </div>
@@ -1437,35 +1437,35 @@ export default function CollectionsPage() {
               {/* Track 1 */}
               <div className="benefits-marquee-track">
                 <div className="benefit-item">
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="12" cy="12" r="10"/><path d="m12 6-2 4h4l-2 4"/></svg>
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="12" cy="12" r="10" /><path d="m12 6-2 4h4l-2 4" /></svg>
                   <div>
                     <h4>Japan Movement</h4>
                     <span>UAE Registered Brand</span>
                   </div>
                 </div>
                 <div className="benefit-item">
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>
                   <div>
                     <h4>1 Year Warranty</h4>
                     <span>Sri Lanka & UAE</span>
                   </div>
                 </div>
                 <div className="benefit-item">
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="1" y="3" width="15" height="13" rx="2" ry="2"/><line x1="16" y1="8" x2="20" y2="8"/><line x1="16" y1="12" x2="22" y2="12"/></svg>
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="1" y="3" width="15" height="13" rx="2" ry="2" /><line x1="16" y1="8" x2="20" y2="8" /><line x1="16" y1="12" x2="22" y2="12" /></svg>
                   <div>
                     <h4>Free Shipping</h4>
                     <span>UAE & Sri Lanka</span>
                   </div>
                 </div>
                 <div className="benefit-item">
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" /><path d="M21 3v5h-5" /></svg>
                   <div>
                     <h4>Easy Returns</h4>
                     <span>Within 7 Days</span>
                   </div>
                 </div>
                 <div className="benefit-item">
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
                   <div>
                     <h4>Secure Payments</h4>
                     <span>Trusted & Verified</span>
@@ -1476,35 +1476,35 @@ export default function CollectionsPage() {
               {/* Track 2 (Duplicate for Seamless Loop) */}
               <div className="benefits-marquee-track" aria-hidden="true">
                 <div className="benefit-item">
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="12" cy="12" r="10"/><path d="m12 6-2 4h4l-2 4"/></svg>
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="12" cy="12" r="10" /><path d="m12 6-2 4h4l-2 4" /></svg>
                   <div>
                     <h4>Japan Movement</h4>
                     <span>UAE Registered Brand</span>
                   </div>
                 </div>
                 <div className="benefit-item">
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>
                   <div>
                     <h4>1 Year Warranty</h4>
                     <span>Sri Lanka & UAE</span>
                   </div>
                 </div>
                 <div className="benefit-item">
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="1" y="3" width="15" height="13" rx="2" ry="2"/><line x1="16" y1="8" x2="20" y2="8"/><line x1="16" y1="12" x2="22" y2="12"/></svg>
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="1" y="3" width="15" height="13" rx="2" ry="2" /><line x1="16" y1="8" x2="20" y2="8" /><line x1="16" y1="12" x2="22" y2="12" /></svg>
                   <div>
                     <h4>Free Shipping</h4>
                     <span>UAE & Sri Lanka</span>
                   </div>
                 </div>
                 <div className="benefit-item">
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" /><path d="M21 3v5h-5" /></svg>
                   <div>
                     <h4>Easy Returns</h4>
                     <span>Within 7 Days</span>
                   </div>
                 </div>
                 <div className="benefit-item">
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
                   <div>
                     <h4>Secure Payments</h4>
                     <span>Trusted & Verified</span>
@@ -1563,8 +1563,8 @@ export default function CollectionsPage() {
 
           {/* Mobile Filter Toggle Button */}
           <div className="mobile-filter-toggle-container md:hidden" style={{ margin: '0 auto 20px', maxWidth: '1400px', width: '100%' }}>
-            <button 
-              onClick={() => setShowMobileFilters(!showMobileFilters)} 
+            <button
+              onClick={() => setShowMobileFilters(!showMobileFilters)}
               className="mobile-filter-toggle-btn"
               style={{
                 width: '100%',
@@ -1585,7 +1585,7 @@ export default function CollectionsPage() {
               }}
             >
               <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" /></svg>
                 {showMobileFilters ? 'Hide Filters & Search' : 'Show Filters & Search'}
               </span>
               <span>{showMobileFilters ? '▲' : '▼'}</span>
@@ -1603,7 +1603,7 @@ export default function CollectionsPage() {
                 onChange={e => setSearchQuery(e.target.value)}
                 className="search-input"
               />
-              <svg className="search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+              <svg className="search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" /></svg>
             </div>
 
             {/* Gift Occasion Filter */}
@@ -1706,17 +1706,17 @@ export default function CollectionsPage() {
                         <div className="watch-card-footer">
                           <span className="watch-card-price">{convertPrice(product.price)}</span>
                           <div className="watch-card-actions">
-                            <button 
+                            <button
                               onClick={() => product._id && toggleWishlist(product._id)}
                               className={`card-action-btn ${isFav ? 'active' : ''}`}
                               aria-label="Toggle Wishlist"
                             >
                               <svg width="14" height="14" viewBox="0 0 24 24" fill={isFav ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.8">
-                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
                               </svg>
                             </button>
                             {!isSoldOut && (
-                              <button 
+                              <button
                                 onClick={() => {
                                   product._id && addToCart(product._id, 1, undefined, product);
                                 }}
@@ -1724,9 +1724,9 @@ export default function CollectionsPage() {
                                 aria-label="Add to cart"
                               >
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-                                  <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
-                                  <line x1="3" y1="6" x2="21" y2="6"/>
-                                  <path d="M16 10a4 4 0 0 1-8 0"/>
+                                  <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+                                  <line x1="3" y1="6" x2="21" y2="6" />
+                                  <path d="M16 10a4 4 0 0 1-8 0" />
                                 </svg>
                               </button>
                             )}
@@ -1745,53 +1745,53 @@ export default function CollectionsPage() {
             <div className="ribbon-content marquee-content">
               <div className="marquee-track">
                 <span className="ribbon-highlight font-semibold">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: '6px', verticalAlign: 'middle', display: 'inline-block', color: '#8b6914' }}><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: '6px', verticalAlign: 'middle', display: 'inline-block', color: '#8b6914' }}><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>
                   TRUSTED BY WATCH ENTHUSIASTS WORLDWIDE
                 </span>
                 <span className="ribbon-sep">|</span>
                 <span>
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: '6px', verticalAlign: 'middle', display: 'inline-block', color: '#8b6914' }}><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: '6px', verticalAlign: 'middle', display: 'inline-block', color: '#8b6914' }}><circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" /></svg>
                   JAPAN MOVEMENT
                 </span>
                 <span className="ribbon-sep">|</span>
                 <span>
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: '6px', verticalAlign: 'middle', display: 'inline-block', color: '#8b6914' }}><path d="M6 3h12l4 6-10 12L2 9z"/></svg>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: '6px', verticalAlign: 'middle', display: 'inline-block', color: '#8b6914' }}><path d="M6 3h12l4 6-10 12L2 9z" /></svg>
                   SAPPHIRE CRYSTAL
                 </span>
                 <span className="ribbon-sep">|</span>
                 <span>
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: '6px', verticalAlign: 'middle', display: 'inline-block', color: '#8b6914' }}><path d="M12 22a7 7 0 0 0 7-7c0-4.3-7-11-7-11S5 10.7 5 15a7 7 0 0 0 7 7z"/></svg>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: '6px', verticalAlign: 'middle', display: 'inline-block', color: '#8b6914' }}><path d="M12 22a7 7 0 0 0 7-7c0-4.3-7-11-7-11S5 10.7 5 15a7 7 0 0 0 7 7z" /></svg>
                   WATER RESISTANT
                 </span>
                 <span className="ribbon-sep">|</span>
                 <span>
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: '6px', verticalAlign: 'middle', display: 'inline-block', color: '#8b6914' }}><circle cx="12" cy="8" r="7"/><path d="M8.21 13.89L7 23l5-3 5 3-1.21-9.12"/></svg>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: '6px', verticalAlign: 'middle', display: 'inline-block', color: '#8b6914' }}><circle cx="12" cy="8" r="7" /><path d="M8.21 13.89L7 23l5-3 5 3-1.21-9.12" /></svg>
                   PREMIUM MATERIALS
                 </span>
               </div>
               <div className="marquee-track" aria-hidden="true">
                 <span className="ribbon-highlight font-semibold">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: '6px', verticalAlign: 'middle', display: 'inline-block', color: '#8b6914' }}><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: '6px', verticalAlign: 'middle', display: 'inline-block', color: '#8b6914' }}><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>
                   TRUSTED BY WATCH ENTHUSIASTS WORLDWIDE
                 </span>
                 <span className="ribbon-sep">|</span>
                 <span>
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: '6px', verticalAlign: 'middle', display: 'inline-block', color: '#8b6914' }}><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: '6px', verticalAlign: 'middle', display: 'inline-block', color: '#8b6914' }}><circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" /></svg>
                   JAPAN MOVEMENT
                 </span>
                 <span className="ribbon-sep">|</span>
                 <span>
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: '6px', verticalAlign: 'middle', display: 'inline-block', color: '#8b6914' }}><path d="M6 3h12l4 6-10 12L2 9z"/></svg>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: '6px', verticalAlign: 'middle', display: 'inline-block', color: '#8b6914' }}><path d="M6 3h12l4 6-10 12L2 9z" /></svg>
                   SAPPHIRE CRYSTAL
                 </span>
                 <span className="ribbon-sep">|</span>
                 <span>
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: '6px', verticalAlign: 'middle', display: 'inline-block', color: '#8b6914' }}><path d="M12 22a7 7 0 0 0 7-7c0-4.3-7-11-7-11S5 10.7 5 15a7 7 0 0 0 7 7z"/></svg>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: '6px', verticalAlign: 'middle', display: 'inline-block', color: '#8b6914' }}><path d="M12 22a7 7 0 0 0 7-7c0-4.3-7-11-7-11S5 10.7 5 15a7 7 0 0 0 7 7z" /></svg>
                   WATER RESISTANT
                 </span>
                 <span className="ribbon-sep">|</span>
                 <span>
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: '6px', verticalAlign: 'middle', display: 'inline-block', color: '#8b6914' }}><circle cx="12" cy="8" r="7"/><path d="M8.21 13.89L7 23l5-3 5 3-1.21-9.12"/></svg>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: '6px', verticalAlign: 'middle', display: 'inline-block', color: '#8b6914' }}><circle cx="12" cy="8" r="7" /><path d="M8.21 13.89L7 23l5-3 5 3-1.21-9.12" /></svg>
                   PREMIUM MATERIALS
                 </span>
               </div>
@@ -1801,7 +1801,7 @@ export default function CollectionsPage() {
           {/* NEWSLETTER BANNER */}
           <div className="newsletter-banner">
             <div className="newsletter-image-block">
-              <img src="/watch-conquest.jpg" alt="Macro watch movement gears" />
+              <img src="/collections_pg.webp" alt="Macro watch movement gears" />
             </div>
             <div className="newsletter-form-block">
               <span className="newsletter-tag">STAY TIMELESS</span>

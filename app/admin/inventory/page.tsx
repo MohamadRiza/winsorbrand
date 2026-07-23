@@ -45,6 +45,7 @@ interface FlattenedItem {
   colorName: string;
   colorHex: string;
   qty: number;
+  originalQty: number;
   inStock: boolean;
   isSaving: boolean;
   isSaved: boolean;
@@ -63,7 +64,7 @@ export default function InventoryManagementPage() {
   const [activeTab, setActiveTab] = useState<'all' | 'in_stock' | 'low_stock' | 'out_stock'>('all');
   const [showSettingsPanel, setShowSettingsPanel] = useState(false);
   const [savingSettings, setSavingSettings] = useState(false);
-  const [replenishingAll, setReplenishingAll] = useState(false);
+  const [savingAll, setSavingAll] = useState(false);
 
   // Settings form states
   const [lowStockInput, setLowStockInput] = useState(10);
@@ -92,7 +93,7 @@ export default function InventoryManagementPage() {
           setAlertNotifyInput(json.settings.alertNotificationsEnabled);
         }
 
-        // Flatten products into variant items list
+        // Flatten products into variant items list with originalQty tracking
         const flattened: FlattenedItem[] = [];
         (json.data || []).forEach((prod: Product) => {
           prod.colorVariants.forEach((variant) => {
@@ -105,6 +106,7 @@ export default function InventoryManagementPage() {
               colorName: variant.colorName,
               colorHex: variant.colorHex,
               qty: variant.qty,
+              originalQty: variant.qty,
               inStock: variant.inStock,
               isSaving: false,
               isSaved: false,
@@ -152,20 +154,24 @@ export default function InventoryManagementPage() {
     }
   };
 
-  // Adjust stock API caller
-  const handleUpdateStockQty = async (itemId: string, newQty: number) => {
+  // Local Qty Change Handler (0ms instant UI response, dirty flag set)
+  const handleLocalQtyChange = (variantId: string, newQty: number) => {
     const validQty = Math.max(0, newQty);
-
-    // Optimistic UI update
     setItemsList(prev => prev.map(item => {
-      if (item.variantId === itemId) {
-        return { ...item, qty: validQty, isSaving: true, isSaved: false };
+      if (item.variantId === variantId) {
+        return { ...item, qty: validQty, isSaved: false };
       }
       return item;
     }));
+  };
 
-    const itemObj = itemsList.find(item => item.variantId === itemId);
+  // Save Single Item Variant Stock (Triggered by clicking "Done / Save Qty" button)
+  const handleSaveSingleVariantStock = async (variantId: string) => {
+    const itemObj = itemsList.find(item => item.variantId === variantId);
     if (!itemObj) return;
+
+    // Indicate saving state
+    setItemsList(prev => prev.map(item => item.variantId === variantId ? { ...item, isSaving: true } : item));
 
     try {
       const res = await fetch('/api/admin/inventory/adjust', {
@@ -173,8 +179,8 @@ export default function InventoryManagementPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           productId: itemObj.productId,
-          variantId: itemId,
-          qty: validQty,
+          variantId: variantId,
+          qty: itemObj.qty,
         }),
       });
 
@@ -182,11 +188,14 @@ export default function InventoryManagementPage() {
       if (!res.ok) throw new Error(json.error || 'Failed to adjust stock');
 
       if (json.success) {
+        toast.success(`Saved stock for ${itemObj.productTitle} (${itemObj.colorName})`);
+        
         setItemsList(prev => prev.map(item => {
-          if (item.variantId === itemId) {
+          if (item.variantId === variantId) {
             return {
               ...item,
               qty: json.data.qty,
+              originalQty: json.data.qty,
               inStock: json.data.inStock,
               isSaving: false,
               isSaved: true
@@ -195,62 +204,69 @@ export default function InventoryManagementPage() {
           return item;
         }));
 
-        // Fade out "saved" indicator after 2 seconds
         setTimeout(() => {
-          setItemsList(prev => prev.map(item => {
-            if (item.variantId === itemId) {
-              return { ...item, isSaved: false };
-            }
-            return item;
-          }));
-        }, 2000);
+          setItemsList(prev => prev.map(item => item.variantId === variantId ? { ...item, isSaved: false } : item));
+        }, 2500);
       }
     } catch (err: any) {
       toast.error(err.message);
-      fetchInventoryData();
+      setItemsList(prev => prev.map(item => item.variantId === variantId ? { ...item, isSaving: false } : item));
     }
   };
 
-  // 1-Click Batch Low Stock Replenish (+10 units)
-  const handleBatchReplenishLowStock = async () => {
-    const lowStockItems = itemsList.filter(item => item.qty <= settings.lowStockThreshold);
-    if (lowStockItems.length === 0) {
-      toast.success('All timepiece variants are well-stocked!');
-      return;
-    }
+  // Save All Pending Changes (Triggered by Global Sticky Bar)
+  const handleSaveAllPendingChanges = async () => {
+    const modifiedItems = itemsList.filter(item => item.qty !== item.originalQty);
+    if (modifiedItems.length === 0) return;
 
-    if (!confirm(`Replenish stock (+10 units) for all ${lowStockItems.length} low-stock timepiece variants?`)) {
-      return;
-    }
-
-    setReplenishingAll(true);
-    const toastId = toast.loading(`Replenishing ${lowStockItems.length} items...`);
+    setSavingAll(true);
+    const toastId = toast.loading(`Saving ${modifiedItems.length} modified stock quantities...`);
 
     try {
       await Promise.all(
-        lowStockItems.map(item =>
+        modifiedItems.map(item =>
           fetch('/api/admin/inventory/adjust', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               productId: item.productId,
               variantId: item.variantId,
-              qty: item.qty + 10,
+              qty: item.qty,
             }),
           })
         )
       );
 
       toast.dismiss(toastId);
-      toast.success(`Successfully replenished ${lowStockItems.length} items with +10 units each!`);
-      fetchInventoryData();
+      toast.success(`Successfully saved all ${modifiedItems.length} stock quantity adjustments!`);
+      
+      setItemsList(prev => prev.map(item => ({
+        ...item,
+        originalQty: item.qty,
+        isSaving: false,
+        isSaved: true,
+      })));
+
+      setTimeout(() => {
+        setItemsList(prev => prev.map(item => ({ ...item, isSaved: false })));
+      }, 2500);
     } catch (err: any) {
       toast.dismiss(toastId);
-      toast.error('Failed to complete batch replenishment.');
+      toast.error('Failed to save all changes. Reverting to database values.');
       fetchInventoryData();
     } finally {
-      setReplenishingAll(false);
+      setSavingAll(false);
     }
+  };
+
+  // Reset All Pending Local Changes
+  const handleResetAllChanges = () => {
+    setItemsList(prev => prev.map(item => ({
+      ...item,
+      qty: item.originalQty,
+      isSaved: false,
+    })));
+    toast.success('Reset all modified quantities to current database stock.');
   };
 
   // Filtering Logic
@@ -274,6 +290,11 @@ export default function InventoryManagementPage() {
     });
   }, [itemsList, searchQuery, activeTab, settings]);
 
+  // Modified items count
+  const modifiedItemsCount = useMemo(() => {
+    return itemsList.filter(i => i.qty !== i.originalQty).length;
+  }, [itemsList]);
+
   // Calculate aggregates based on settings
   const totalVariants = itemsList.length;
   const inStockCount = itemsList.filter(item => item.qty > settings.lowStockThreshold).length;
@@ -293,7 +314,7 @@ export default function InventoryManagementPage() {
 
   return (
     <PermissionGate permissions={['inventory_manage']}>
-      <div className="space-y-6 font-['Jost'] text-[#1a1209] select-none">
+      <div className="space-y-6 font-['Jost'] text-[#1a1209] select-none pb-20">
         
         {/* Header Block */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#8B6914]/15 pb-5">
@@ -302,24 +323,11 @@ export default function InventoryManagementPage() {
               INVENTORY MANAGEMENT
             </h1>
             <p className="text-sm text-[#1a1209]/60 mt-0.5">
-              Review stock metrics, configure alert triggers, and replenish timepiece quantities.
+              Review stock metrics, adjust timepiece quantities, and save changes to update inventory.
             </p>
           </div>
           
           <div className="flex flex-wrap gap-2">
-            {lowStockCount > 0 && (
-              <button
-                onClick={handleBatchReplenishLowStock}
-                disabled={replenishingAll}
-                className="px-4 py-2.5 bg-[#8B6914] hover:bg-[#1a1209] text-white text-xs font-semibold uppercase tracking-wider rounded-xl transition-all shadow-md flex items-center gap-2 cursor-pointer disabled:opacity-50"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                </svg>
-                Replenish Low Stock ({lowStockCount})
-              </button>
-            )}
-
             <button
               onClick={() => setShowSettingsPanel(!showSettingsPanel)}
               className="px-4 py-2.5 bg-white border border-[#1a1209]/15 hover:border-[#8B6914] text-[#1a1209] hover:text-[#8B6914] text-xs font-semibold uppercase tracking-wider rounded-xl transition-all shadow-sm flex items-center gap-2 cursor-pointer"
@@ -480,7 +488,7 @@ export default function InventoryManagementPage() {
           </div>
         </div>
 
-        {/* Listings Catalog */}
+        {/* Listings Catalog Table */}
         <div className="bg-white border border-[#1a1209]/10 rounded-xl overflow-hidden shadow-sm">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
@@ -489,17 +497,21 @@ export default function InventoryManagementPage() {
                   <th className="px-6 py-3.5 text-[10px] font-semibold tracking-[0.15em] uppercase">TIMEPIECE / MODEL</th>
                   <th className="px-6 py-3.5 text-[10px] font-semibold tracking-[0.15em] uppercase">COLOR VARIANT</th>
                   <th className="px-6 py-3.5 text-[10px] font-semibold tracking-[0.15em] uppercase">STOCK STATUS</th>
-                  <th className="px-6 py-3.5 text-[10px] font-semibold tracking-[0.15em] uppercase text-center min-w-[240px]">QUANTITY ADJUSTMENT</th>
-                  <th className="px-6 py-3.5 text-[10px] font-semibold tracking-[0.15em] uppercase text-center w-28">STATUS</th>
+                  <th className="px-6 py-3.5 text-[10px] font-semibold tracking-[0.15em] uppercase text-center min-w-[280px]">QUANTITY ADJUSTMENT</th>
+                  <th className="px-6 py-3.5 text-[10px] font-semibold tracking-[0.15em] uppercase text-center w-36">SAVE / DONE</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#1a1209]/5">
                 {filteredItems.map((item) => {
                   const isOutOfStock = item.qty <= settings.outOfStockThreshold;
                   const isLowStock = item.qty > settings.outOfStockThreshold && item.qty <= settings.lowStockThreshold;
+                  const isModified = item.qty !== item.originalQty;
                   
                   return (
-                    <tr key={item.variantId} className="hover:bg-[#faf7f0]/50 transition-colors">
+                    <tr 
+                      key={item.variantId} 
+                      className={`transition-colors ${isModified ? 'bg-amber-50/40 hover:bg-amber-50/60' : 'hover:bg-[#faf7f0]/50'}`}
+                    >
                       {/* Image & Title */}
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-4">
@@ -551,14 +563,14 @@ export default function InventoryManagementPage() {
                         </span>
                       </td>
 
-                      {/* ✅ PRO QUANTITY ADJUSTMENT UX WITH QUICK PRESETS (+5, +10) */}
+                      {/* Quantity Adjustment Input Controls */}
                       <td className="px-6 py-4">
                         <div className="flex items-center justify-center gap-1.5">
                           {/* Decrement Button */}
                           <button
                             type="button"
                             disabled={item.qty === 0 || item.isSaving}
-                            onClick={() => handleUpdateStockQty(item.variantId, item.qty - 1)}
+                            onClick={() => handleLocalQtyChange(item.variantId, item.qty - 1)}
                             className="w-8 h-8 rounded-lg bg-[#faf7f0] hover:bg-[#8B6914] hover:text-white disabled:opacity-30 border border-[#1a1209]/15 flex items-center justify-center text-sm font-bold text-[#1a1209] transition-all cursor-pointer"
                             title="Decrease quantity by 1"
                           >
@@ -573,29 +585,20 @@ export default function InventoryManagementPage() {
                             disabled={item.isSaving}
                             onChange={(e) => {
                               const v = e.target.value === '' ? 0 : Number(e.target.value);
-                              if (!isNaN(v) && v >= 0) {
-                                setItemsList(prev => prev.map(i => {
-                                  if (i.variantId === item.variantId) {
-                                    return { ...i, qty: v };
-                                  }
-                                  return i;
-                                }));
-                              }
+                              handleLocalQtyChange(item.variantId, v);
                             }}
-                            onBlur={(e) => {
-                              const v = Number(e.target.value);
-                              if (!isNaN(v) && v >= 0) {
-                                handleUpdateStockQty(item.variantId, v);
-                              }
-                            }}
-                            className="w-16 py-1.5 border border-[#1a1209]/15 rounded-lg text-center text-xs font-mono font-bold bg-white text-[#1a1209] focus:outline-none focus:border-[#8B6914] focus:ring-2 focus:ring-[#8B6914]/20"
+                            className={`w-16 py-1.5 border rounded-lg text-center text-xs font-mono font-bold transition-all ${
+                              isModified 
+                                ? 'border-[#8B6914] bg-amber-50 text-[#8B6914] ring-2 ring-[#8B6914]/20' 
+                                : 'border-[#1a1209]/15 bg-white text-[#1a1209] focus:outline-none focus:border-[#8B6914]'
+                            }`}
                           />
 
                           {/* Increment Button */}
                           <button
                             type="button"
                             disabled={item.isSaving}
-                            onClick={() => handleUpdateStockQty(item.variantId, item.qty + 1)}
+                            onClick={() => handleLocalQtyChange(item.variantId, item.qty + 1)}
                             className="w-8 h-8 rounded-lg bg-[#faf7f0] hover:bg-[#8B6914] hover:text-white disabled:opacity-30 border border-[#1a1209]/15 flex items-center justify-center text-sm font-bold text-[#1a1209] transition-all cursor-pointer"
                             title="Increase quantity by 1"
                           >
@@ -607,7 +610,7 @@ export default function InventoryManagementPage() {
                             <button
                               type="button"
                               disabled={item.isSaving}
-                              onClick={() => handleUpdateStockQty(item.variantId, item.qty + 5)}
+                              onClick={() => handleLocalQtyChange(item.variantId, item.qty + 5)}
                               className="px-2 py-1 bg-white hover:bg-[#faf7f0] border border-[#1a1209]/15 rounded-md text-[10px] font-mono font-bold text-[#8B6914] transition-all cursor-pointer"
                               title="Quick add +5 stock"
                             >
@@ -616,7 +619,7 @@ export default function InventoryManagementPage() {
                             <button
                               type="button"
                               disabled={item.isSaving}
-                              onClick={() => handleUpdateStockQty(item.variantId, item.qty + 10)}
+                              onClick={() => handleLocalQtyChange(item.variantId, item.qty + 10)}
                               className="px-2 py-1 bg-white hover:bg-[#faf7f0] border border-[#1a1209]/15 rounded-md text-[10px] font-mono font-bold text-[#8B6914] transition-all cursor-pointer"
                               title="Quick add +10 stock"
                             >
@@ -626,18 +629,31 @@ export default function InventoryManagementPage() {
                         </div>
                       </td>
 
-                      {/* Saved Indicator */}
+                      {/* ✅ DEDICATED DONE / SAVE BUTTON PER ROW */}
                       <td className="px-6 py-4 text-center">
                         {item.isSaving ? (
-                          <div className="flex items-center justify-center gap-1.5 text-xs text-[#8B6914] font-semibold">
+                          <div className="flex items-center justify-center gap-1.5 text-xs text-[#8B6914] font-semibold font-mono">
                             <span className="w-3.5 h-3.5 border-2 border-[#8B6914] border-t-transparent rounded-full animate-spin" />
+                            <span>Saving...</span>
                           </div>
+                        ) : isModified ? (
+                          <button
+                            type="button"
+                            onClick={() => handleSaveSingleVariantStock(item.variantId)}
+                            className="px-3.5 py-1.5 bg-[#8B6914] hover:bg-[#1a1209] text-white text-xs font-bold font-mono rounded-lg transition-all shadow-md flex items-center justify-center gap-1 mx-auto cursor-pointer animate-pulse"
+                            title="Save stock adjustment to database"
+                          >
+                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                            </svg>
+                            Save Qty
+                          </button>
                         ) : item.isSaved ? (
-                          <span className="px-2 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-bold rounded-full animate-pulse">
+                          <span className="px-2.5 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-bold rounded-full animate-pulse font-mono">
                             ✓ Saved
                           </span>
                         ) : (
-                          <span className="text-[#1a1209]/30 text-xs font-mono">-</span>
+                          <span className="text-xs text-[#1a1209]/40 font-mono">✓ In Sync</span>
                         )}
                       </td>
                     </tr>
@@ -659,6 +675,42 @@ export default function InventoryManagementPage() {
             </div>
           )}
         </div>
+
+        {/* ✅ STICKY FLOATING ACTION BAR FOR PENDING BATCH SAVES */}
+        {modifiedItemsCount > 0 && (
+          <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 bg-[#1a1209] text-[#f3e3b8] border border-[#8B6914]/40 rounded-2xl px-6 py-3.5 shadow-2xl flex items-center gap-6 animate-slideUp">
+            <div className="flex items-center gap-3">
+              <span className="w-3 h-3 rounded-full bg-amber-400 animate-ping" />
+              <span className="text-xs font-semibold tracking-wider font-mono">
+                {modifiedItemsCount} {modifiedItemsCount === 1 ? 'Variant Qty Modified' : 'Variant Quantities Modified'}
+              </span>
+            </div>
+            
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={handleResetAllChanges}
+                disabled={savingAll}
+                className="px-4 py-1.5 border border-[#f3e3b8]/20 hover:border-[#f3e3b8] text-xs font-semibold text-[#f3e3b8] rounded-xl transition-all cursor-pointer disabled:opacity-50"
+              >
+                Discard
+              </button>
+              
+              <button
+                type="button"
+                onClick={handleSaveAllPendingChanges}
+                disabled={savingAll}
+                className="px-5 py-2 bg-[#8B6914] hover:bg-white hover:text-[#1a1209] text-white text-xs font-bold rounded-xl transition-all shadow-md flex items-center gap-1.5 cursor-pointer disabled:opacity-50 font-mono"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+                {savingAll ? 'Saving All...' : 'Save All Changes'}
+              </button>
+            </div>
+          </div>
+        )}
+
       </div>
     </PermissionGate>
   );

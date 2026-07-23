@@ -18,9 +18,15 @@ export async function POST(req: NextRequest) {
         const loc = redirectRes.headers.get('location');
         if (loc) {
           resolvedUrl = loc;
+        } else {
+          // If HEAD redirect is manual, try GET with follow
+          const getRes = await fetch(resolvedUrl, { redirect: 'follow' });
+          if (getRes.url) {
+            resolvedUrl = getRes.url;
+          }
         }
       } catch (err) {
-        console.error('Failed to resolve redirect HEAD:', err);
+        console.error('Failed to resolve redirect HEAD/GET:', err);
       }
     }
 
@@ -51,7 +57,7 @@ export async function POST(req: NextRequest) {
       console.error('Failed to fetch page HTML:', err);
     }
 
-    // 3. Extract place name and precise coordinates from the resolved URL path
+    // 3. Extract place name from resolved URL path
     let urlParsedName = '';
     const nameMatch = resolvedUrl.match(/\/maps\/place\/([^/@]+)/);
     if (nameMatch) {
@@ -61,24 +67,33 @@ export async function POST(req: NextRequest) {
     let latitude: number | null = null;
     let longitude: number | null = null;
     
-    // First try the precise pin coordinates (!3d...!4d...) in URL
-    const pinMatch = resolvedUrl.match(/!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/);
-    if (pinMatch) {
-      latitude = parseFloat(pinMatch[1]);
-      longitude = parseFloat(pinMatch[2]);
-    } else {
-      // Fallback to viewport center coordinates (@lat,lng)
-      const geoMatch = resolvedUrl.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
-      if (geoMatch) {
-        latitude = parseFloat(geoMatch[1]);
-        longitude = parseFloat(geoMatch[2]);
-      } else {
-        const queryMatch = resolvedUrl.match(/ll=(-?\d+\.\d+),(-?\d+\.\d+)/);
-        if (queryMatch) {
-          latitude = parseFloat(queryMatch[1]);
-          longitude = parseFloat(queryMatch[2]);
-        }
-      }
+    // Comprehensive Coordinate Extraction from Google Maps URL:
+    // Pattern A: !3d<lat>!4d<lng>
+    const pinMatch3d4d = resolvedUrl.match(/!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/);
+    // Pattern B: !1d<lng>!2d<lat> (common in directions & place links)
+    const pinMatch1d2d = resolvedUrl.match(/!1d(-?\d+\.\d+)!2d(-?\d+\.\d+)/);
+    // Pattern C: !2d<lng>!3d<lat>
+    const pinMatch2d3d = resolvedUrl.match(/!2d(-?\d+\.\d+)!3d(-?\d+\.\d+)/);
+    // Pattern D: @<lat>,<lng>
+    const geoMatch = resolvedUrl.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
+    // Pattern E: q=<lat>,<lng> or ll=<lat>,<lng>
+    const queryMatch = resolvedUrl.match(/(?:q|ll)=(-?\d+\.\d+),(-?\d+\.\d+)/);
+
+    if (pinMatch1d2d) {
+      longitude = parseFloat(pinMatch1d2d[1]);
+      latitude = parseFloat(pinMatch1d2d[2]);
+    } else if (pinMatch3d4d) {
+      latitude = parseFloat(pinMatch3d4d[1]);
+      longitude = parseFloat(pinMatch3d4d[2]);
+    } else if (pinMatch2d3d) {
+      longitude = parseFloat(pinMatch2d3d[1]);
+      latitude = parseFloat(pinMatch2d3d[2]);
+    } else if (geoMatch) {
+      latitude = parseFloat(geoMatch[1]);
+      longitude = parseFloat(geoMatch[2]);
+    } else if (queryMatch) {
+      latitude = parseFloat(queryMatch[1]);
+      longitude = parseFloat(queryMatch[2]);
     }
 
     // 4. Helper function to extract details natively when Gemini is unavailable
@@ -104,9 +119,9 @@ export async function POST(req: NextRequest) {
       let parsedCity = '';
       let parsedCountry = '';
       
-      const addrLower = (parsedAddress + ' ' + parsedName).toLowerCase();
+      const addrLower = (parsedAddress + ' ' + parsedName + ' ' + resolvedUrl).toLowerCase();
       const countriesList = [
-        { name: 'Sri Lanka', keywords: ['sri lanka', 'colombo', 'kandy', 'galle', 'mahabage', 'wattala'] },
+        { name: 'Sri Lanka', keywords: ['sri lanka', 'colombo', 'kandy', 'galle', 'mahabage', 'wattala', '00200', '00300'] },
         { name: 'United States', keywords: ['usa', 'united states', 'new york', 'california'] },
         { name: 'United Kingdom', keywords: ['uk', 'united kingdom', 'london', 'manchester'] },
         { name: 'Singapore', keywords: ['singapore'] },
@@ -130,7 +145,6 @@ export async function POST(req: NextRequest) {
         }
       }
 
-      // Special check for Wattala / Mahabage Sri Lanka
       if (addrLower.includes('mahabage') || addrLower.includes('wattala')) {
         parsedCity = 'Wattala';
         parsedCountry = 'Sri Lanka';
@@ -141,8 +155,8 @@ export async function POST(req: NextRequest) {
         address: parsedAddress,
         city: parsedCity,
         country: parsedCountry,
-        latitude: latitude || undefined,
-        longitude: longitude || undefined,
+        latitude: latitude !== null ? latitude : undefined,
+        longitude: longitude !== null ? longitude : undefined,
       };
     };
 
@@ -152,7 +166,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ 
         success: true, 
         data: getFallbackData(),
-        warning: 'Gemini AI was not configured. Extracted basic details from the page.'
+        warning: 'Gemini AI key not set. Extracted location details using URL metadata parser.'
       });
     }
 
@@ -165,24 +179,23 @@ Extracted Place Name from URL: ${urlParsedName}
 Extracted Coordinates: Lat ${latitude}, Lng ${longitude}
 
 Your task is to identify and extract the following details for our database:
-- name: Shop/Boutique Name (use the 'Extracted Place Name from URL' above if it represents the shop name, e.g. 'Thilakma Mahabage')
-- address: Street Address (e.g. 'Celestial Residencies, 12 Alfred Pl')
+- name: Shop/Boutique Name (use the 'Extracted Place Name from URL' above if it represents the shop name, e.g. 'One Galle Face Mall' or 'Thilakma Mahabage')
+- address: Street Address (e.g. '1A Centre Road, Colombo 00200')
 - city: City (e.g. 'Colombo' or 'Wattala')
 - country: Country (e.g. 'Sri Lanka')
-- latitude: Latitude (use the coordinates above, or infer them if missing)
-- longitude: Longitude (use the coordinates above, or infer them if missing)
+- latitude: Latitude (use the extracted Lat ${latitude} above if available, or infer precise latitude number)
+- longitude: Longitude (use the extracted Lng ${longitude} above if available, or infer precise longitude number)
 
-If you are not sure about city or country, deduce them based on the address or place name (e.g. Thilakma Mahabage is located in Mahabage/Wattala, Sri Lanka).
 Return ONLY a JSON object in this format, with no markdown code blocks, backticks or extra text:
 {
   "name": "Shop Name",
   "address": "Street Address",
   "city": "City",
   "country": "Country",
-  "latitude": 7.0215734,
-  "longitude": 79.8992763
+  "latitude": 6.9271601,
+  "longitude": 79.8446964
 }
-Ensure the latitude and longitude are numbers, not strings.`;
+Ensure latitude and longitude are returned as numbers.`;
 
     let geminiRes;
     try {
@@ -193,7 +206,7 @@ Ensure the latitude and longitude are numbers, not strings.`;
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             contents: [{ parts: [{ text: prompt }] }],
-            generationConfig: { temperature: 0.2, maxOutputTokens: 350 },
+            generationConfig: { temperature: 0.1, maxOutputTokens: 350 },
           }),
         }
       );
@@ -202,7 +215,7 @@ Ensure the latitude and longitude are numbers, not strings.`;
       return NextResponse.json({
         success: true,
         data: getFallbackData(),
-        warning: 'AI connection failed. Extracted basic details from the page.'
+        warning: 'AI connection failed. Extracted location details using URL metadata parser.'
       });
     }
 
@@ -212,14 +225,13 @@ Ensure the latitude and longitude are numbers, not strings.`;
       return NextResponse.json({
         success: true,
         data: getFallbackData(),
-        warning: 'AI quota exceeded. Extracted basic details from the page.'
+        warning: 'AI quota error. Extracted location details using URL metadata parser.'
       });
     }
 
     const data = await geminiRes.json();
     let responseText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
     
-    // Clean up Markdown JSON wrapper if returned
     if (responseText.includes('```')) {
       responseText = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
     }
@@ -232,8 +244,8 @@ Ensure the latitude and longitude are numbers, not strings.`;
         address: parsed.address || '',
         city: parsed.city || '',
         country: parsed.country || '',
-        latitude: parsed.latitude !== undefined ? Number(parsed.latitude) : (latitude || undefined),
-        longitude: parsed.longitude !== undefined ? Number(parsed.longitude) : (longitude || undefined)
+        latitude: parsed.latitude !== undefined && !isNaN(Number(parsed.latitude)) ? Number(parsed.latitude) : (latitude || undefined),
+        longitude: parsed.longitude !== undefined && !isNaN(Number(parsed.longitude)) ? Number(parsed.longitude) : (longitude || undefined)
       };
 
       return NextResponse.json({ success: true, data: result });
@@ -242,15 +254,12 @@ Ensure the latitude and longitude are numbers, not strings.`;
       return NextResponse.json({
         success: true,
         data: getFallbackData(),
-        warning: 'AI returned invalid data format. Extracted basic details from the page.'
+        warning: 'AI returned invalid formatting. Extracted location details using URL metadata parser.'
       });
     }
 
   } catch (error: any) {
     console.error('Resolve Maps Link error:', error);
-    return NextResponse.json({ 
-      success: false, 
-      error: 'Could not connect to Google Maps to resolve link. Please check the URL and your connection.' 
-    }, { status: 500 });
+    return NextResponse.json({ success: false, error: error.message || 'Server error' }, { status: 500 });
   }
 }
