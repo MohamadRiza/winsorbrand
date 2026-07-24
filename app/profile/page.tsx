@@ -107,12 +107,12 @@ export default function ProfilePage() {
 
   const membershipTier = getMembershipTier(orders.length);
 
-  // Fetch Reviews Data
+  // Fetch Reviews Data on mount & tab change
   useEffect(() => {
-    if (activeTab === 'reviews') {
+    if (isSignedIn) {
       fetchReviewsData();
     }
-  }, [activeTab]);
+  }, [isSignedIn, activeTab]);
 
   const fetchReviewsData = async () => {
     setLoadingReviews(true);
@@ -130,6 +130,16 @@ export default function ProfilePage() {
     } finally {
       setLoadingReviews(false);
     }
+  };
+
+  // Helper: Check if a product item in an order has already been reviewed
+  const isItemReviewed = (productId: string, orderRef?: string) => {
+    return myReviews.some((r: any) => {
+      const pId = typeof r.productId === 'object' ? r.productId?._id : r.productId;
+      const matchesProduct = pId?.toString() === productId?.toString();
+      const matchesOrder = orderRef && r.orderId ? r.orderId === orderRef : true;
+      return matchesProduct && matchesOrder;
+    });
   };
 
   const handleReviewImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -396,9 +406,16 @@ export default function ProfilePage() {
 
   const completionPercentage = getCompletionPercentage();
 
-  // Active / Completed Orders calculation
-  const activeOrdersCount = orders.filter(o => o.status !== 'Delivered' && o.status !== 'Cancelled').length;
-  const completedOrdersCount = orders.filter(o => o.status === 'Delivered').length;
+  // Active / Completed Orders calculation (Synced with MongoDB lowercase status schema)
+  const activeOrdersCount = orders.filter(o => {
+    const s = (o.status || '').toLowerCase();
+    return s === 'pending' || s === 'processing' || s === 'shipped';
+  }).length;
+
+  const completedOrdersCount = orders.filter(o => {
+    const s = (o.status || '').toLowerCase();
+    return s === 'delivered';
+  }).length;
 
   // Filtered Wishlist Products
   const wishlistedProducts = allProducts.filter(p => wishlistIds.includes(p._id));
@@ -437,18 +454,15 @@ export default function ProfilePage() {
     );
   }
 
-  // Mock list of orders if no orders exist, using local assets
-  const displayOrders = orders.length > 0 ? orders.slice(0, 3).map(o => ({
+  // Real patron orders mapping (synced with MongoDB database)
+  const displayOrders = orders.slice(0, 5).map(o => ({
     orderRef: o.orderRef,
     date: new Date(o.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-    status: o.status,
+    status: (o.status || 'pending').toLowerCase(),
+    statusLabel: (o.status || 'pending').replace('_', ' ').toUpperCase(),
     productTitle: o.items[0]?.productTitle || 'Winsor Timepiece',
     productThumbnail: o.items[0]?.productThumbnail || '/mens-watch-highlight.png'
-  })) : [
-    { orderRef: 'WT12345', date: 'May 12, 2026', status: 'Delivered', productTitle: 'Winsor Heritage Chronograph', productThumbnail: '/mens-watch-highlight.png' },
-    { orderRef: 'WT12310', date: 'May 05, 2026', status: 'Processing', productTitle: 'Winsor Classic Automatic', productThumbnail: '/mens-watch-highlight.png' },
-    { orderRef: 'WT12288', date: 'Apr 28, 2026', status: 'Shipped', productTitle: 'Winsor Sport Evo', productThumbnail: '/mens-watch-highlight.png' },
-  ];
+  }));
 
   return (
     <div className="profile-page-container">
@@ -456,7 +470,10 @@ export default function ProfilePage() {
         @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Jost:wght@300;400;500;600;700&display=swap');
 
         .profile-page-container {
-          background: #f7f3eb;
+          background-image: linear-gradient(to bottom, rgba(250, 247, 240, 0.94), rgba(250, 247, 240, 0.96)), url('/hero_bg_marble.jpg');
+          background-size: cover;
+          background-position: center;
+          background-attachment: fixed;
           min-height: 100vh;
           padding: 130px 24px 80px;
           font-family: 'Jost', sans-serif;
@@ -466,12 +483,13 @@ export default function ProfilePage() {
         .profile-loading-wrapper {
           min-height: 80vh;
           display: flex; align-items: center; justify-content: center;
-          background: #f7f3eb;
+          background-image: linear-gradient(to bottom, rgba(250, 247, 240, 0.94), rgba(250, 247, 240, 0.96)), url('/hero_bg_marble.jpg');
+          background-size: cover;
         }
         .profile-spinner {
-          width: 32px; height: 32px;
-          border: 2px solid rgba(139,105,20,0.12);
-          border-top: 2px solid #8B6914;
+          width: 36px; height: 36px;
+          border: 3px solid rgba(139,105,20,0.15);
+          border-top: 3px solid #8B6914;
           border-radius: 50%;
           animation: spin 0.8s linear infinite;
         }
@@ -479,10 +497,11 @@ export default function ProfilePage() {
 
         /* ── Access Card ── */
         .access-card {
-          background: #fff;
-          border: 1px solid rgba(26,18,9,0.06);
-          box-shadow: 0 12px 36px rgba(26,18,9,0.04);
-          border-radius: 16px;
+          background: rgba(255, 255, 255, 0.95);
+          backdrop-filter: blur(12px);
+          border: 1px solid rgba(139,105,20,0.2);
+          box-shadow: 0 20px 50px rgba(26,18,9,0.08);
+          border-radius: 20px;
           max-width: 500px;
           margin: 60px auto;
           padding: 48px 36px;
@@ -500,92 +519,158 @@ export default function ProfilePage() {
 
         /* ── Portal Wrapper ── */
         .profile-portal-wrapper {
-          max-width: 1140px;
+          max-width: 1160px;
           margin: 0 auto;
           display: flex; flex-direction: column;
           gap: 28px;
         }
 
-        /* ── Header Banner (desktop) ── */
+        /* ── Futuristic Hero Header Banner ── */
         .portal-header-banner {
-          background: #fff;
-          border: 1px solid rgba(139,105,20,0.12);
-          border-radius: 16px;
-          padding: 28px 36px;
-          display: flex; align-items: center; gap: 28px;
-          position: relative; overflow: hidden;
-          box-shadow: 0 8px 32px rgba(26,18,9,0.04);
+          background: linear-gradient(135deg, rgba(26, 18, 9, 0.95) 0%, rgba(40, 28, 15, 0.92) 50%, rgba(20, 14, 7, 0.96) 100%), url('/hero_bg_marble.jpg');
+          background-size: cover;
+          background-position: center;
+          border: 1px solid rgba(212, 175, 55, 0.35);
+          border-radius: 24px;
+          padding: 36px 42px;
+          display: flex;
+          align-items: center;
+          gap: 32px;
+          position: relative;
+          overflow: hidden;
+          box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25), 0 0 30px rgba(139, 105, 20, 0.15);
+          backdrop-filter: blur(16px);
         }
         .banner-watermark {
           position: absolute; right: -20px; top: 50%;
           transform: translateY(-50%);
-          width: 260px; height: auto;
-          opacity: 0.04; pointer-events: none;
+          width: 320px; height: auto;
+          opacity: 0.08; pointer-events: none;
           mix-blend-mode: luminosity;
+        }
+        .banner-glow-effect {
+          position: absolute;
+          top: -50%;
+          right: -10%;
+          width: 450px;
+          height: 450px;
+          background: radial-gradient(circle, rgba(212, 175, 55, 0.15) 0%, transparent 70%);
+          pointer-events: none;
         }
         .avatar-wrapper {
           position: relative;
-          width: 96px; height: 96px; flex-shrink: 0;
+          width: 105px; height: 105px; flex-shrink: 0;
         }
         .avatar-img {
           width: 100%; height: 100%;
           border-radius: 50%;
-          border: 3px solid #8b6914;
-          padding: 2px;
+          border: 3px solid #d4af37;
+          box-shadow: 0 0 20px rgba(212, 175, 55, 0.4), inset 0 0 10px rgba(0,0,0,0.5);
+          padding: 3px;
           object-fit: cover;
-          background: #faf7f0;
+          background: #1a1209;
         }
         .avatar-fallback {
           width: 100%; height: 100%;
           border-radius: 50%;
-          border: 3px solid #8b6914;
-          background: linear-gradient(135deg, #8b6914, #c9a84c);
-          color: #fff;
+          border: 3px solid #d4af37;
+          box-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
+          background: linear-gradient(135deg, #1a1209 0%, #8b6914 100%);
+          color: #f3e3b8;
           display: flex; align-items: center; justify-content: center;
-          font-size: 32px; font-weight: 500;
+          font-size: 36px; font-weight: 600;
+          font-family: 'Cormorant Garamond', serif;
         }
         .avatar-edit-btn {
           position: absolute; bottom: 2px; right: 2px;
-          width: 26px; height: 26px;
-          background: #8b6914;
-          border: 2px solid #fff;
+          width: 28px; height: 28px;
+          background: #d4af37;
+          border: 2px solid #1a1209;
           border-radius: 50%;
           display: flex; align-items: center; justify-content: center;
-          color: #fff; cursor: pointer;
-          box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-          transition: all 0.2s;
+          color: #1a1209; cursor: pointer;
+          box-shadow: 0 2px 10px rgba(0,0,0,0.4);
+          transition: all 0.25s ease;
         }
-        .avatar-edit-btn:hover { transform: scale(1.12); background: #1a1209; }
-        .header-info-block { display: flex; flex-direction: column; gap: 6px; z-index: 2; }
+        .avatar-edit-btn:hover { transform: scale(1.15); background: #ffffff; color: #8b6914; }
+
+        .header-info-block { display: flex; flex-direction: column; gap: 8px; z-index: 2; width: 100%; }
         .patron-badge {
-          display: inline-flex; align-items: center; gap: 5px;
-          background: rgba(139,105,20,0.07);
-          border: 1px solid rgba(139,105,20,0.22);
-          color: #8b6914;
-          font-size: 9px; font-weight: 700; letter-spacing: 0.16em;
-          padding: 4px 10px; border-radius: 20px;
+          display: inline-flex; align-items: center; gap: 6px;
+          background: rgba(212, 175, 55, 0.12);
+          border: 1px solid rgba(212, 175, 55, 0.4);
+          color: #f3e3b8;
+          font-size: 10px; font-weight: 700; letter-spacing: 0.2em;
+          padding: 5px 14px; border-radius: 30px;
           width: fit-content; text-transform: uppercase;
+          box-shadow: 0 0 12px rgba(212, 175, 55, 0.15);
         }
+        .patron-badge-dot {
+          width: 6px; height: 6px; border-radius: 50%;
+          background: #d4af37;
+          box-shadow: 0 0 8px #d4af37;
+          animation: pulseGold 2s infinite;
+        }
+        @keyframes pulseGold {
+          0%, 100% { opacity: 1; transform: scale(1); }
+          50% { opacity: 0.5; transform: scale(1.3); }
+        }
+
         .patron-name {
           font-family: 'Cormorant Garamond', serif;
-          font-size: 28px; font-weight: 600;
-          color: #1a1209; margin: 0; letter-spacing: 0.02em;
+          font-size: 32px; font-weight: 600;
+          color: #ffffff; margin: 0; letter-spacing: 0.02em;
+          text-shadow: 0 2px 10px rgba(0,0,0,0.5);
         }
-        .member-since { font-size: 11.5px; color: rgba(26,18,9,0.4); margin-top: -2px; }
+        .member-since { font-size: 12px; color: rgba(255, 255, 255, 0.55); margin-top: -4px; letter-spacing: 0.04em; }
 
-        /* ── Stats Row ── */
-        .stats-row {
-          display: flex; flex-wrap: wrap;
-          gap: 16px 20px;
-          margin-top: 12px;
-          border-top: 1px dashed rgba(139,105,20,0.15);
-          padding-top: 12px;
+        /* ── Futuristic Metrics Grid in Hero ── */
+        .hero-stats-grid {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 16px;
+          margin-top: 14px;
+          border-top: 1px solid rgba(212, 175, 55, 0.2);
+          padding-top: 16px;
+          width: 100%;
         }
-        .stat-item {
-          display: flex; align-items: center; gap: 7px;
-          font-size: 12px; color: rgba(26,18,9,0.7); font-weight: 500;
+        .hero-stat-card {
+          background: rgba(255, 255, 255, 0.05);
+          border: 1px solid rgba(212, 175, 55, 0.25);
+          border-radius: 14px;
+          padding: 12px 16px;
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          backdrop-filter: blur(10px);
+          transition: all 0.3s ease;
         }
-        .stat-icon { color: #8b6914; display: flex; align-items: center; }
+        .hero-stat-card:hover {
+          background: rgba(212, 175, 55, 0.12);
+          border-color: #d4af37;
+          transform: translateY(-2px);
+          box-shadow: 0 6px 20px rgba(212, 175, 55, 0.15);
+        }
+        .hero-stat-icon-wrapper {
+          width: 36px; height: 36px;
+          border-radius: 10px;
+          background: rgba(212, 175, 55, 0.15);
+          border: 1px solid rgba(212, 175, 55, 0.3);
+          display: flex; align-items: center; justify-content: center;
+          color: #d4af37; flex-shrink: 0;
+        }
+        .hero-stat-val {
+          font-family: 'Jost', monospace;
+          font-variant-numeric: tabular-nums;
+          font-size: 20px; font-weight: 700;
+          color: #ffffff; line-height: 1;
+        }
+        .hero-stat-lbl {
+          font-size: 10px; font-weight: 600;
+          color: rgba(255, 255, 255, 0.6);
+          text-transform: uppercase; letter-spacing: 0.1em;
+          margin-top: 3px;
+        }
 
         /* ── Portal Grid ── */
         .portal-main-grid {
@@ -781,24 +866,20 @@ export default function ProfilePage() {
         @media (max-width: 768px) {
 
           /* ── Shell ── */
-          .profile-page-container { padding: 0 0 96px; background: #f0ebe0; }
+          .profile-page-container { padding: 0 0 96px; background-attachment: scroll; }
           .profile-portal-wrapper { padding: 0; gap: 0; }
 
           /* ── Hero Header ── */
           .portal-header-banner {
-            background: linear-gradient(160deg, #1a1209 0%, #2d1f0e 40%, #3d2b14 100%);
-            border: none; border-radius: 0;
+            background: linear-gradient(160deg, rgba(26, 18, 9, 0.98) 0%, rgba(40, 28, 15, 0.96) 50%, rgba(20, 14, 7, 0.98) 100%), url('/hero_bg_marble.jpg');
+            background-size: cover;
+            border-radius: 0 0 24px 24px;
+            border-left: none; border-right: none; border-top: none;
             flex-direction: column; align-items: center; text-align: center;
-            padding: 80px 24px 32px;
+            padding: 100px 16px 28px;
             gap: 0; margin-bottom: 0;
-            box-shadow: none;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
             position: relative;
-          }
-          .portal-header-banner::after {
-            content: '';
-            position: absolute; bottom: 0; left: 0; right: 0; height: 40px;
-            background: linear-gradient(to bottom, transparent, #f0ebe0);
-            pointer-events: none;
           }
           .banner-watermark {
             display: block !important;
@@ -815,48 +896,89 @@ export default function ProfilePage() {
             z-index: 2;
           }
           .avatar-img {
-            border: 3px solid rgba(196,161,70,0.8);
-            box-shadow: 0 0 0 4px rgba(139,105,20,0.25), 0 8px 24px rgba(0,0,0,0.35);
+            border: 3px solid rgba(212,175,55,0.9);
+            box-shadow: 0 0 0 4px rgba(139,105,20,0.25), 0 8px 24px rgba(0,0,0,0.4);
           }
           .avatar-fallback {
-            border: 3px solid rgba(196,161,70,0.8);
-            box-shadow: 0 0 0 4px rgba(139,105,20,0.25), 0 8px 24px rgba(0,0,0,0.35);
+            border: 3px solid rgba(212,175,55,0.9);
+            box-shadow: 0 0 0 4px rgba(139,105,20,0.25), 0 8px 24px rgba(0,0,0,0.4);
           }
           .avatar-edit-btn {
-            background: rgba(26,18,9,0.8);
-            border-color: rgba(196,161,70,0.5);
+            background: #d4af37;
+            border-color: #1a1209;
+            color: #1a1209;
           }
 
           /* ── Name & Badge ── */
-          .header-info-block { align-items: center; gap: 8px; position: relative; z-index: 2; }
+          .header-info-block { align-items: center; text-align: center; gap: 8px; position: relative; z-index: 2; }
           .patron-badge {
-            background: rgba(196,161,70,0.15);
-            border-color: rgba(196,161,70,0.4);
-            color: #d4af37;
+            background: rgba(212,175,55,0.15);
+            border-color: rgba(212,175,55,0.4);
+            color: #f3e3b8;
             font-size: 8.5px;
           }
-          .patron-name { font-size: 26px; color: #ffffff; letter-spacing: 0.04em; }
-          .member-since { color: rgba(255,255,255,0.45); font-size: 11px; }
+          .patron-name { font-size: 24px; color: #ffffff; letter-spacing: 0.03em; }
+          .member-since { color: rgba(255,255,255,0.55); font-size: 11px; text-align: center; }
 
           /* ── Stats: 2×2 luxury tiles ── */
-          .stats-row {
-            display: grid; grid-template-columns: 1fr 1fr;
-            gap: 8px; margin-top: 18px; padding-top: 0;
-            border-top: none; width: 100%;
+          .hero-stats-grid {
+            display: grid; grid-template-columns: repeat(2, 1fr);
+            gap: 10px; margin-top: 18px; padding-top: 16px;
+            border-top: 1px solid rgba(212,175,55,0.2); width: 100%;
             position: relative; z-index: 2;
           }
-          .stat-item {
-            flex-direction: column; justify-content: center; align-items: center; gap: 4px;
-            background: rgba(255,255,255,0.07);
-            border: 1px solid rgba(196,161,70,0.2);
-            border-radius: 10px;
-            padding: 12px 8px;
-            font-size: 11px;
-            color: rgba(255,255,255,0.85);
-            font-weight: 500;
-            backdrop-filter: blur(8px);
+          .hero-stat-card {
+            padding: 10px 12px;
+            gap: 10px;
+            background: rgba(255,255,255,0.06);
+            border-radius: 12px;
           }
-          .stat-icon { color: #d4af37; }
+          .hero-stat-icon-wrapper {
+            width: 32px; height: 32px;
+          }
+          .hero-stat-val {
+            font-size: 16px;
+          }
+          .hero-stat-lbl {
+            font-size: 8.5px;
+          }
+
+          /* ── Dashboard command stat tiles 2x2 compact grid for mobile ── */
+          .dashboard-metrics-grid {
+            display: grid !important;
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 10px !important;
+            margin-top: 14px !important;
+          }
+          .metric-tile-card {
+            padding: 12px 10px !important;
+            border-radius: 12px !important;
+          }
+          .metric-tile-label {
+            font-size: 8.5px !important;
+            letter-spacing: 0.04em !important;
+          }
+          .metric-tile-value {
+            font-size: 22px !important;
+            margin-top: 4px !important;
+          }
+          .metric-tile-sub {
+            font-size: 9px !important;
+            margin-top: 4px !important;
+            line-height: 1.25 !important;
+          }
+          .dashboard-welcome-banner {
+            padding: 16px 14px !important;
+            border-radius: 12px !important;
+          }
+          .dashboard-welcome-banner h4 {
+            font-size: 18px !important;
+            margin-bottom: 6px !important;
+          }
+          .dashboard-welcome-banner p {
+            font-size: 12px !important;
+            line-height: 1.5 !important;
+          }
 
           /* ── Sticky bottom tab bar ── */
           .portal-sidebar-desktop { display: none !important; }
@@ -866,10 +988,11 @@ export default function ProfilePage() {
             z-index: 200;
             overflow-x: auto; -webkit-overflow-scrolling: touch;
             gap: 0; padding: 0 0 env(safe-area-inset-bottom, 0px);
-            background: #1a1209;
-            border-top: 1px solid rgba(196,161,70,0.2);
+            background: rgba(26, 18, 9, 0.96);
+            backdrop-filter: blur(16px);
+            border-top: 1px solid rgba(212,175,55,0.3);
             scrollbar-width: none;
-            box-shadow: 0 -4px 24px rgba(0,0,0,0.25);
+            box-shadow: 0 -6px 28px rgba(0,0,0,0.35);
           }
           .mobile-tab-bar::-webkit-scrollbar { display: none; }
           .mobile-tab-pill {
@@ -881,21 +1004,22 @@ export default function ProfilePage() {
             background: transparent;
             font-family: 'Jost', sans-serif;
             font-size: 9px; font-weight: 650; letter-spacing: 0.06em;
-            color: rgba(255,255,255,0.38);
-            cursor: pointer; flex-shrink: 0; min-width: 58px;
+            color: rgba(255,255,255,0.4);
+            cursor: pointer; flex-shrink: 0; min-width: 60px;
             transition: all 0.15s ease; text-transform: uppercase;
           }
-          .mobile-tab-pill svg { opacity: 0.4; transition: opacity 0.15s; }
-          .mobile-tab-pill.active { border-top-color: #d4af37; color: #d4af37; }
+          .mobile-tab-pill svg { opacity: 0.5; transition: opacity 0.15s; }
+          .mobile-tab-pill.active { border-top-color: #d4af37; color: #d4af37; background: rgba(212,175,55,0.06); }
           .mobile-tab-pill.active svg { opacity: 1; }
-          .mobile-tab-pill.logout-pill { color: rgba(220,80,80,0.55); }
-          .mobile-tab-pill.logout-pill svg { opacity: 0.55; }
+          .mobile-tab-pill.logout-pill { color: rgba(220,80,80,0.7); }
+          .mobile-tab-pill.logout-pill svg { opacity: 0.7; }
 
           /* ── Compact completion strip ── */
           .mobile-completion-strip {
             display: flex; align-items: center; gap: 14px;
-            background: #fff;
-            border-bottom: 1px solid rgba(26,18,9,0.07);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(139,105,20,0.12);
             padding: 12px 18px;
           }
           .mcs-ring { flex-shrink: 0; }
@@ -913,10 +1037,12 @@ export default function ProfilePage() {
 
           /* ── Content layout ── */
           .portal-main-grid { grid-template-columns: 1fr; gap: 0; }
-          .portal-content-panel { gap: 14px; padding: 16px 16px 8px; }
+          .portal-content-panel { gap: 14px; padding: 16px 14px 8px; }
           .content-card {
-            padding: 20px 18px; border-radius: 14px;
-            box-shadow: 0 2px 16px rgba(26,18,9,0.04);
+            padding: 20px 16px; border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(26,18,9,0.05);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(8px);
           }
           .card-title { font-size: 20px; }
           .card-subtitle { font-size: 11.5px; }
@@ -946,9 +1072,11 @@ export default function ProfilePage() {
 
 
       <div className="profile-portal-wrapper">
-        {/* TOP PATRON HEADER BANNER */}
+        {/* TOP PATRON HEADER BANNER (FUTURISTIC MARBLE HERO) */}
         <div className="portal-header-banner">
+          <div className="banner-glow-effect" />
           <img src="/womens-watch-highlight.png" alt="" className="banner-watermark" />
+
           <div className="avatar-wrapper">
             {user.imageUrl ? (
               <img src={user.imageUrl} alt="Profile" className="avatar-img" />
@@ -956,7 +1084,7 @@ export default function ProfilePage() {
               <div className="avatar-fallback">{user.firstName?.charAt(0) || 'U'}</div>
             )}
             <div className="avatar-edit-btn" onClick={() => openUserProfile()} title="Edit Profile Details">
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                 <path d="M12 20h9" />
                 <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
               </svg>
@@ -964,53 +1092,74 @@ export default function ProfilePage() {
           </div>
 
           <div className="header-info-block">
-            <div className="patron-badge">
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ marginRight: '2px' }}>
-                <path d="M2 4l3 12h14l3-12-6 7-4-7-4 7-6-7z" fill="currentColor" />
-                <path d="M3 20h18v2H3z" fill="currentColor" />
-              </svg>
-              {membershipTier}
+            <div className="flex items-center justify-between w-full flex-wrap gap-2">
+              <div className="patron-badge">
+                <span className="patron-badge-dot" />
+                <span>✦ {membershipTier} ✦</span>
+              </div>
+              <span className="font-mono text-[10px] text-[#f3e3b8]/80 tracking-widest uppercase bg-black/40 px-3 py-1 rounded-full border border-[#d4af37]/35 shadow-inner">
+                PATRON ID: #WS-{(user.id || '987654').slice(-6).toUpperCase()}
+              </span>
             </div>
+
             <h1 className="patron-name">{fullName || 'WINSOR PATRON'}</h1>
             <span className="member-since">
-              Member since {user.createdAt ? new Date(user.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long' }) : 'June 2026'}
+              Member since {user.createdAt ? new Date(user.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long' }) : 'June 2026'} • Verified Winsor Maison Client
             </span>
 
-            <div className="stats-row">
-              <div className="stat-item">
-                <span className="stat-icon">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            {/* Professional Numbers Hero Stats Grid */}
+            <div className="hero-stats-grid">
+              <div className="hero-stat-card">
+                <div className="hero-stat-icon-wrapper">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
                     <line x1="16" y1="2" x2="16" y2="6" />
                     <line x1="8" y1="2" x2="8" y2="6" />
                     <line x1="3" y1="10" x2="21" y2="10" />
                   </svg>
-                </span>
-                <span>{orders.length} Orders</span>
+                </div>
+                <div>
+                  <div className="hero-stat-val">{orders.length.toString().padStart(2, '0')}</div>
+                  <div className="hero-stat-lbl">ACQUISITIONS</div>
+                </div>
               </div>
-              <div className="stat-item">
-                <span className="stat-icon">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+
+              <div className="hero-stat-card">
+                <div className="hero-stat-icon-wrapper">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
                   </svg>
-                </span>
-                <span>{wishlistCount} Wishlist</span>
+                </div>
+                <div>
+                  <div className="hero-stat-val">{wishlistCount.toString().padStart(2, '0')}</div>
+                  <div className="hero-stat-lbl">WISHLIST</div>
+                </div>
               </div>
-              <div className="stat-item">
-                <span className="stat-icon">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+
+              <div className="hero-stat-card">
+                <div className="hero-stat-icon-wrapper">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
                   </svg>
-                </span>
-                <span>{50 + orders.length * 25} Reward Points</span>
+                </div>
+                <div>
+                  <div className="hero-stat-val">{(50 + orders.length * 25).toLocaleString()}</div>
+                  <div className="hero-stat-lbl">POINTS</div>
+                </div>
               </div>
-              <div className="stat-item">
-                <span className="stat-icon">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+
+              <div className="hero-stat-card">
+                <div className="hero-stat-icon-wrapper">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
                   </svg>
-                </span>
-                <span>{membershipTier.toLowerCase().replace(/\b\w/g, c => c.toUpperCase())}</span>
+                </div>
+                <div>
+                  <div className="hero-stat-val text-xs text-[#d4af37] font-semibold font-sans tracking-wide uppercase">
+                    {membershipTier.replace(' MEMBER', '').replace(' PATRON', '')}
+                  </div>
+                  <div className="hero-stat-lbl">VIP PRIVILEGE</div>
+                </div>
               </div>
             </div>
           </div>
@@ -1410,36 +1559,151 @@ export default function ProfilePage() {
             {/* DASHBOARD TAB */}
             {activeTab === 'dashboard' && (
               <div className="content-card">
-                <div className="card-header-block">
-                  <h3 className="card-title">Patron Dashboard</h3>
-                  <p className="card-subtitle">Welcome back to the Winsor Brand private portal.</p>
+                <div className="card-header-block flex items-center justify-between">
+                  <div>
+                    <h3 className="card-title">Patron Command Dashboard</h3>
+                    <p className="card-subtitle">Overview of your timepiece acquisitions, wishlist, and rewards.</p>
+                  </div>
+                  <span className="font-mono text-[10px] text-[#8b6914] font-bold px-3 py-1 bg-[#8b6914]/10 rounded-full border border-[#8b6914]/30 uppercase tracking-widest">
+                    SYSTEM STATUS: ACTIVE
+                  </span>
                 </div>
-                <div className="dashboard-welcome-banner">
-                  <h4 style={{ margin: '0 0 6px 0', fontFamily: 'Cormorant Garamond, serif', fontSize: '18px', color: '#8b6914' }}>
-                    Welcome Back, {user.firstName || 'Winsor Patron'}!
+
+                {/* Futuristic Welcome Banner */}
+                <div className="dashboard-welcome-banner relative overflow-hidden" style={{ background: 'linear-gradient(135deg, rgba(26,18,9,0.04) 0%, rgba(139,105,20,0.08) 100%)', border: '1px solid rgba(139,105,20,0.25)', borderRadius: '14px', padding: '24px' }}>
+                  <div style={{ position: 'absolute', right: '-20px', top: '-20px', opacity: 0.05, pointerEvents: 'none' }}>
+                    <svg width="200" height="200" viewBox="0 0 24 24" fill="none" stroke="#8b6914" strokeWidth="1">
+                      <circle cx="12" cy="12" r="10" />
+                      <path d="M12 6v6l4 2" />
+                    </svg>
+                  </div>
+                  <h4 style={{ margin: '0 0 8px 0', fontFamily: 'Cormorant Garamond, serif', fontSize: '22px', color: '#1a1209', fontWeight: 600 }}>
+                    Welcome to Your Private Curation, {user.firstName || 'Winsor Patron'}
                   </h4>
-                  <p style={{ margin: 0, fontSize: '12.5px', color: 'rgba(26,18,9,0.6)', lineHeight: 1.5 }}>
-                    As a verified **Winsor Patron**, you have exclusive access to priority timepiece reservations, complimentary bespoke gifting options, and dedicated shipping transit routing.
+                  <p style={{ margin: 0, fontSize: '13px', color: 'rgba(26,18,9,0.65)', lineHeight: 1.6, maxWidth: '680px' }}>
+                    As a verified <strong style={{ color: '#8b6914' }}>{membershipTier}</strong>, you receive priority allocations for limited-edition watch releases, complimentary bespoke packaging, and dedicated boutique concierge access.
                   </p>
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px', marginTop: '12px' }}>
-                  <div style={{ background: '#faf7f0', border: '1px solid rgba(139,105,20,0.1)', padding: '16px', borderRadius: '8px' }}>
-                    <div style={{ fontSize: '10px', textTransform: 'uppercase', color: 'rgba(26,18,9,0.5)', fontWeight: 600 }}>Active Shipments</div>
-                    <div style={{ fontSize: '28px', fontFamily: 'Cormorant Garamond, serif', color: '#1a1209', fontWeight: 650, marginTop: '4px' }}>
-                      {activeOrdersCount}
+                {/* 4 Quick Stat Tiles with Tabular Numbers */}
+                <div className="dashboard-metrics-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px', marginTop: '20px' }}>
+                  <div className="metric-tile-card" style={{ background: 'linear-gradient(135deg, #ffffff 0%, #faf7f0 100%)', border: '1px solid rgba(139,105,20,0.18)', padding: '20px', borderRadius: '14px', boxShadow: '0 4px 15px rgba(26,18,9,0.03)' }}>
+                    <div className="metric-tile-label" style={{ fontSize: '10.5px', textTransform: 'uppercase', color: 'rgba(26,18,9,0.5)', fontWeight: 700, letterSpacing: '0.1em' }}>Active Shipments</div>
+                    <div className="metric-tile-value" style={{ fontSize: '32px', fontFamily: 'Jost, monospace', fontVariantNumeric: 'tabular-nums', color: '#1a1209', fontWeight: 700, marginTop: '6px', lineHeight: 1 }}>
+                      {activeOrdersCount.toString().padStart(2, '0')}
+                    </div>
+                    <div className="metric-tile-sub" style={{ fontSize: '10.5px', color: 'rgba(26,18,9,0.45)', marginTop: '8px' }}>
+                      {activeOrdersCount > 0 ? '🚚 In transit via express courier' : '✓ No active pending dispatches'}
                     </div>
                   </div>
-                  <div style={{ background: '#faf7f0', border: '1px solid rgba(139,105,20,0.1)', padding: '16px', borderRadius: '8px' }}>
-                    <div style={{ fontSize: '10px', textTransform: 'uppercase', color: 'rgba(26,18,9,0.5)', fontWeight: 600 }}>Completed Acquisitions</div>
-                    <div style={{ fontSize: '28px', fontFamily: 'Cormorant Garamond, serif', color: '#1a1209', fontWeight: 650, marginTop: '4px' }}>
-                      {completedOrdersCount}
+
+                  <div className="metric-tile-card" style={{ background: 'linear-gradient(135deg, #ffffff 0%, #faf7f0 100%)', border: '1px solid rgba(139,105,20,0.18)', padding: '20px', borderRadius: '14px', boxShadow: '0 4px 15px rgba(26,18,9,0.03)' }}>
+                    <div className="metric-tile-label" style={{ fontSize: '10.5px', textTransform: 'uppercase', color: 'rgba(26,18,9,0.5)', fontWeight: 700, letterSpacing: '0.1em' }}>Delivered Acquisitions</div>
+                    <div className="metric-tile-value" style={{ fontSize: '32px', fontFamily: 'Jost, monospace', fontVariantNumeric: 'tabular-nums', color: '#8b6914', fontWeight: 700, marginTop: '6px', lineHeight: 1 }}>
+                      {completedOrdersCount.toString().padStart(2, '0')}
+                    </div>
+                    <div className="metric-tile-sub" style={{ fontSize: '10.5px', color: 'rgba(26,18,9,0.45)', marginTop: '8px' }}>
+                      {orders.length} Total orders recorded
                     </div>
                   </div>
-                  <div style={{ background: '#faf7f0', border: '1px solid rgba(139,105,20,0.1)', padding: '16px', borderRadius: '8px' }}>
-                    <div style={{ fontSize: '10px', textTransform: 'uppercase', color: 'rgba(26,18,9,0.5)', fontWeight: 600 }}>Membership Tier</div>
-                    <div style={{ fontSize: '15px', fontFamily: 'Jost, sans-serif', color: '#8b6914', fontWeight: 650, marginTop: '8px', letterSpacing: '0.05em' }}>
-                      {membershipTier}
+
+                  <div className="metric-tile-card" style={{ background: 'linear-gradient(135deg, #ffffff 0%, #faf7f0 100%)', border: '1px solid rgba(139,105,20,0.18)', padding: '20px', borderRadius: '14px', boxShadow: '0 4px 15px rgba(26,18,9,0.03)' }}>
+                    <div className="metric-tile-label" style={{ fontSize: '10.5px', textTransform: 'uppercase', color: 'rgba(26,18,9,0.5)', fontWeight: 700, letterSpacing: '0.1em' }}>Reward Point Balance</div>
+                    <div className="metric-tile-value" style={{ fontSize: '32px', fontFamily: 'Jost, monospace', fontVariantNumeric: 'tabular-nums', color: '#1a1209', fontWeight: 700, marginTop: '6px', lineHeight: 1 }}>
+                      {(50 + orders.length * 25).toLocaleString()}
+                    </div>
+                    <div className="metric-tile-sub" style={{ fontSize: '10.5px', color: '#8b6914', fontWeight: 600, marginTop: '8px' }}>
+                      +25 Points per timepiece order
+                    </div>
+                  </div>
+
+                  <div className="metric-tile-card" style={{ background: 'linear-gradient(135deg, #ffffff 0%, #faf7f0 100%)', border: '1px solid rgba(139,105,20,0.18)', padding: '20px', borderRadius: '14px', boxShadow: '0 4px 15px rgba(26,18,9,0.03)' }}>
+                    <div className="metric-tile-label" style={{ fontSize: '10.5px', textTransform: 'uppercase', color: 'rgba(26,18,9,0.5)', fontWeight: 700, letterSpacing: '0.1em' }}>Saved Wishlist</div>
+                    <div className="metric-tile-value" style={{ fontSize: '32px', fontFamily: 'Jost, monospace', fontVariantNumeric: 'tabular-nums', color: '#8b6914', fontWeight: 700, marginTop: '6px', lineHeight: 1 }}>
+                      {wishlistCount.toString().padStart(2, '0')}
+                    </div>
+                    <div className="metric-tile-sub" style={{ fontSize: '10.5px', color: 'rgba(26,18,9,0.45)', marginTop: '8px' }}>
+                      Favorite watch designs saved
+                    </div>
+                  </div>
+                </div>
+
+                {/* Bottom Split: Recent Acquisitions & Black Card Privileges */}
+                <div className="portal-bottom-split" style={{ marginTop: '24px' }}>
+                  {/* Left: Recent Activity */}
+                  <div>
+                    <h4 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '20px', fontWeight: 600, color: '#1a1209', margin: '0 0 14px 0' }}>
+                      Recent Timepiece Activity
+                    </h4>
+                    <div className="recent-orders-list">
+                      {displayOrders.length > 0 ? (
+                        displayOrders.map((o: any, idx: number) => (
+                          <div key={idx} className="recent-order-item">
+                            <div className="order-watch-thumb">
+                              <img src={o.productThumbnail} alt={o.productTitle} />
+                            </div>
+                            <div className="recent-order-info">
+                              <p className="order-item-title">{o.productTitle}</p>
+                              <p className="order-ref-date font-mono text-[11px]">Ref: #{o.orderRef} • {o.date}</p>
+                            </div>
+                            <div className={`status-badge ${o.status}`}>
+                              {o.statusLabel}
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        <div style={{ background: '#faf7f0', border: '1px solid rgba(139,105,20,0.15)', borderRadius: '12px', padding: '24px 16px', textAlign: 'center' }}>
+                          <svg className="w-8 h-8 text-[#8B6914] mx-auto mb-2 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                          </svg>
+                          <p style={{ margin: '0 0 6px 0', fontSize: '13px', fontWeight: 600, color: '#1a1209' }}>No Timepiece Acquisitions Yet</p>
+                          <p style={{ margin: 0, fontSize: '11.5px', color: 'rgba(26,18,9,0.5)', lineHeight: 1.5 }}>
+                            Your order history is empty. Explore our luxury watch catalog to make your first acquisition.
+                          </p>
+                          <Link href="/collections" style={{ display: 'inline-block', marginTop: '12px', background: '#1a1209', color: '#faf7f0', fontSize: '10.5px', fontWeight: 700, letterSpacing: '0.12em', padding: '8px 16px', borderRadius: '8px', textTransform: 'uppercase' }}>
+                            Explore Collections →
+                          </Link>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Right: Black Card Privileges */}
+                  <div>
+                    <h4 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '20px', fontWeight: 600, color: '#1a1209', margin: '0 0 14px 0' }}>
+                      Patron Membership Benefits
+                    </h4>
+                    <div className="patron-black-card">
+                      <div className="black-card-gold-seal">⚜</div>
+                      <h5 className="black-card-title">✦ {membershipTier} PRIVILEGES ✦</h5>
+                      <p className="black-card-desc">Your exclusive membership status grants tier 1 perks across all global Winsor boutiques.</p>
+                      
+                      <div className="benefits-checklist" style={{ marginTop: '16px' }}>
+                        <div className="benefit-check-item">
+                          <span className="benefit-check-icon">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg>
+                          </span>
+                          <span style={{ color: '#ffffff', fontSize: '12px' }}>First right to limited releases & allocations</span>
+                        </div>
+                        <div className="benefit-check-item">
+                          <span className="benefit-check-icon">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg>
+                          </span>
+                          <span style={{ color: '#ffffff', fontSize: '12px' }}>Complimentary lifetime horology maintenance</span>
+                        </div>
+                        <div className="benefit-check-item">
+                          <span className="benefit-check-icon">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg>
+                          </span>
+                          <span style={{ color: '#ffffff', fontSize: '12px' }}>Bespoke gift engraving & luxury box wrapping</span>
+                        </div>
+                        <div className="benefit-check-item">
+                          <span className="benefit-check-icon">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg>
+                          </span>
+                          <span style={{ color: '#ffffff', fontSize: '12px' }}>Direct VIP concierge support 24/7</span>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -1482,38 +1746,62 @@ export default function ProfilePage() {
                                 <div style={{ textAlign: 'right', fontSize: '12px', fontWeight: 550, color: '#8b6914' }}>
                                   {item.quantity} × LKR {item.price.toLocaleString()}
                                 </div>
-                                {o.status === 'delivered' && (
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      setReviewItem({
-                                        orderId: o.orderRef,
-                                        productId: item.productId,
-                                        productTitle: item.productTitle,
-                                        productModelNo: item.productModelNo,
-                                        productThumbnail: item.productThumbnail,
-                                        colorVariant: item.colorVariant,
-                                        price: item.price,
-                                        daysLeft: 90,
-                                      });
-                                      setIsReviewModalOpen(true);
-                                    }}
-                                    style={{
-                                      background: 'rgba(139,105,20,0.07)',
-                                      border: '1px solid rgba(139,105,20,0.25)',
-                                      color: '#8b6914',
-                                      fontSize: '10.5px',
-                                      padding: '5px 10px',
-                                      borderRadius: '5px',
-                                      cursor: 'pointer',
-                                      fontFamily: "'Jost', sans-serif",
-                                      fontWeight: 600,
-                                      letterSpacing: '0.04em',
-                                      whiteSpace: 'nowrap',
-                                    }}
-                                  >
-                                    ★ Write Review
-                                  </button>
+                                {o.status.toLowerCase() === 'delivered' && (
+                                  isItemReviewed(item.productId, o.orderRef) ? (
+                                    <span
+                                      style={{
+                                        display: 'inline-flex',
+                                        alignItems: 'center',
+                                        gap: '4px',
+                                        background: 'rgba(46, 125, 50, 0.08)',
+                                        border: '1px solid rgba(46, 125, 50, 0.28)',
+                                        color: '#2e7d32',
+                                        fontSize: '10.5px',
+                                        padding: '5px 11px',
+                                        borderRadius: '20px',
+                                        fontFamily: "'Jost', sans-serif",
+                                        fontWeight: 700,
+                                        letterSpacing: '0.04em',
+                                        whiteSpace: 'nowrap',
+                                      }}
+                                    >
+                                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg>
+                                      Reviewed
+                                    </span>
+                                  ) : (
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        setReviewItem({
+                                          orderId: o.orderRef,
+                                          productId: item.productId,
+                                          productTitle: item.productTitle,
+                                          productModelNo: item.productModelNo,
+                                          productThumbnail: item.productThumbnail,
+                                          colorVariant: item.colorVariant,
+                                          price: item.price,
+                                          daysLeft: 90,
+                                        });
+                                        setIsReviewModalOpen(true);
+                                      }}
+                                      style={{
+                                        background: 'rgba(139,105,20,0.07)',
+                                        border: '1px solid rgba(139,105,20,0.25)',
+                                        color: '#8b6914',
+                                        fontSize: '10.5px',
+                                        padding: '5px 11px',
+                                        borderRadius: '6px',
+                                        cursor: 'pointer',
+                                        fontFamily: "'Jost', sans-serif",
+                                        fontWeight: 600,
+                                        letterSpacing: '0.04em',
+                                        whiteSpace: 'nowrap',
+                                        transition: 'all 0.2s ease',
+                                      }}
+                                    >
+                                      ★ Write Review
+                                    </button>
+                                  )
                                 )}
                               </div>
                             </div>
@@ -1698,49 +1986,76 @@ export default function ProfilePage() {
                   ) : (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                       {myReviews.map((rev, idx) => (
-                        <div key={idx} style={{ border: '1px solid rgba(26,18,9,0.08)', borderRadius: '8px', padding: '20px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(26,18,9,0.05)', paddingBottom: '10px' }}>
+                        <div key={idx} style={{ border: '1px solid rgba(139,105,20,0.15)', borderRadius: '12px', padding: '20px', background: '#faf7f0', display: 'flex', flexDirection: 'column', gap: '14px', width: '100%', boxSizing: 'border-box' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(139,105,20,0.12)', paddingBottom: '12px', flexWrap: 'wrap', gap: '10px' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                              <div style={{ width: '40px', height: '40px', position: 'relative', borderRadius: '4px', overflow: 'hidden', border: '1px solid rgba(26,18,9,0.05)' }}>
-                                <img src={rev.productId?.thumbnail?.url || '/white.webp'} alt={rev.productId?.title || 'Timepiece'} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                              <div style={{ width: '44px', height: '44px', position: 'relative', borderRadius: '8px', overflow: 'hidden', border: '1px solid rgba(26,18,9,0.08)', background: '#ffffff', padding: '2px', flexShrink: 0 }}>
+                                <img src={rev.productId?.thumbnail?.url || '/mens-watch-highlight.png'} alt={rev.productId?.title || 'Timepiece'} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
                               </div>
                               <div>
-                                <h4 style={{ margin: '0 0 2px 0', fontSize: '13.5px', fontWeight: 600 }}>{rev.productId?.title || 'Timepiece'}</h4>
-                                <span style={{ fontSize: '11px', color: 'rgba(26,18,9,0.4)', textTransform: 'uppercase' }}>Model: {rev.productId?.modelNo || 'N/A'}</span>
+                                <h4 style={{ margin: '0 0 2px 0', fontSize: '14px', fontWeight: 650, color: '#1a1209' }}>{rev.productId?.title || 'Timepiece'}</h4>
+                                <span style={{ fontSize: '11px', color: '#8b6914', fontFamily: 'Jost, monospace', fontWeight: 600 }}>Model: #{rev.productId?.modelNo || 'N/A'}</span>
                               </div>
                             </div>
 
                             {/* Status badge */}
                             <span style={{
-                              fontSize: '9px',
-                              fontWeight: 650,
-                              padding: '4px 10px',
-                              borderRadius: '4px',
+                              fontSize: '9.5px',
+                              fontWeight: 700,
+                              padding: '4px 12px',
+                              borderRadius: '20px',
                               textTransform: 'uppercase',
-                              background: rev.status === 'approved' ? 'rgba(46,125,50,0.1)' : rev.status === 'rejected' ? 'rgba(198,40,40,0.1)' : 'rgba(239,108,0,0.1)',
-                              color: rev.status === 'approved' ? '#2e7d32' : rev.status === 'rejected' ? '#c62828' : '#ef6c00',
+                              letterSpacing: '0.06em',
+                              background: rev.status === 'approved' ? 'rgba(46,125,50,0.08)' : rev.status === 'rejected' ? 'rgba(198,40,40,0.08)' : 'rgba(212,175,55,0.12)',
+                              color: rev.status === 'approved' ? '#2e7d32' : rev.status === 'rejected' ? '#c62828' : '#8b6914',
+                              border: rev.status === 'approved' ? '1px solid rgba(46,125,50,0.25)' : rev.status === 'rejected' ? '1px solid rgba(198,40,40,0.25)' : '1px solid rgba(212,175,55,0.3)',
                             }}>
-                              {rev.status === 'pending' ? 'Pending Approval' : rev.status}
+                              {rev.status === 'pending' ? '⏳ Pending Approval' : rev.status === 'approved' ? '✓ Approved' : '✕ Rejected'}
                             </span>
                           </div>
 
-                          {/* Review Details */}
-                          <div>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px' }}>
-                              {Array.from({ length: 5 }).map((_, i) => (
-                                <span key={i} style={{ color: i < rev.rating ? '#FFC107' : '#E0E0E0', fontSize: '14px' }}>★</span>
-                              ))}
-                              <span style={{ fontSize: '11px', color: 'rgba(26,18,9,0.4)', marginLeft: '6px' }}>
-                                Reviewed on {new Date(rev.createdAt).toLocaleDateString()}
+                          {/* Review Details with word wrapping fix */}
+                          <div style={{ width: '100%', minWidth: 0 }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '10px', flexWrap: 'wrap' }}>
+                              <div style={{ display: 'flex', gap: '2px' }}>
+                                {Array.from({ length: 5 }).map((_, i) => (
+                                  <span key={i} style={{ color: i < rev.rating ? '#d4af37' : '#d1c7b7', fontSize: '16px', lineHeight: 1 }}>★</span>
+                                ))}
+                              </div>
+                              <span style={{ fontSize: '11px', color: 'rgba(26,18,9,0.5)', marginLeft: '6px', fontWeight: 500 }}>
+                                Reviewed on {new Date(rev.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                               </span>
+                              {rev.isAnonymous && (
+                                <span style={{ fontSize: '10px', background: 'rgba(26,18,9,0.06)', color: 'rgba(26,18,9,0.6)', padding: '2px 8px', borderRadius: '10px', marginLeft: 'auto', fontWeight: 600 }}>
+                                  🔒 Anonymous Review
+                                </span>
+                              )}
                             </div>
-                            <p style={{ margin: '0 0 10px 0', fontSize: '13px', lineHeight: 1.5, color: 'rgba(26,18,9,0.7)' }}>{rev.comment}</p>
+
+                            {/* Long text container with word-break & max-height scroll */}
+                            <div style={{
+                              background: '#ffffff',
+                              border: '1px solid rgba(26,18,9,0.06)',
+                              borderRadius: '10px',
+                              padding: '14px 16px',
+                              fontSize: '13.5px',
+                              lineHeight: 1.6,
+                              color: '#1a1209',
+                              wordBreak: 'break-word',
+                              overflowWrap: 'anywhere',
+                              whiteSpace: 'pre-wrap',
+                              boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.02)',
+                              maxHeight: '280px',
+                              overflowY: 'auto',
+                            }}>
+                              {rev.comment}
+                            </div>
 
                             {/* Attached Images */}
                             {rev.images && rev.images.length > 0 && (
-                              <div style={{ display: 'flex', gap: '8px' }}>
+                              <div style={{ display: 'flex', gap: '10px', marginTop: '12px' }}>
                                 {rev.images.map((url: string, i: number) => (
-                                  <a href={url} target="_blank" rel="noopener noreferrer" key={i} style={{ position: 'relative', width: '50px', height: '50px', borderRadius: '4px', overflow: 'hidden', border: '1px solid rgba(26,18,9,0.05)' }}>
+                                  <a href={url} target="_blank" rel="noopener noreferrer" key={i} style={{ position: 'relative', width: '56px', height: '56px', borderRadius: '8px', overflow: 'hidden', border: '1px solid rgba(139,105,20,0.25)', boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
                                     <img src={url} alt="Review attachment" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                   </a>
                                 ))}
@@ -1831,115 +2146,249 @@ export default function ProfilePage() {
         </div>
       </div>
 
-      {/* WRITE REVIEW MODAL */}
+      {/* WRITE REVIEW MODAL (LUXURY OVERLAY) */}
       {isReviewModalOpen && reviewItem && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 1000, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', fontFamily: "'Jost', sans-serif" }}>
-          <div style={{ background: '#fff', borderRadius: '8px', padding: '30px', maxWidth: '480px', width: '100%', boxShadow: '0 10px 40px rgba(0,0,0,0.15)', maxHeight: '90vh', overflowY: 'auto' }}>
-            <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '24px', fontWeight: 500, margin: '0 0 8px 0', color: '#1a1209' }}>Write a Review</h2>
-            <p style={{ margin: '0 0 20px 0', fontSize: '12.5px', color: 'rgba(26,18,9,0.5)' }}>For: {reviewItem.productTitle} (Model: {reviewItem.productModelNo})</p>
+        <div style={{ position: 'fixed', inset: 0, zIndex: 1000, background: 'rgba(10, 7, 4, 0.75)', backdropFilter: 'blur(12px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', fontFamily: "'Jost', sans-serif" }}>
+          <div style={{ background: '#ffffff', borderRadius: '20px', maxWidth: '520px', width: '100%', boxShadow: '0 25px 60px rgba(0,0,0,0.35)', maxHeight: '90vh', display: 'flex', flexDirection: 'column', overflow: 'hidden', border: '1px solid rgba(212,175,55,0.3)' }}>
+            
+            {/* Dark Luxury Header */}
+            <div style={{ background: 'linear-gradient(135deg, #1a1209 0%, #2c1f0c 100%)', padding: '20px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', color: '#f3e3b8', borderBottom: '1px solid rgba(212,175,55,0.25)' }}>
+              <div>
+                <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '22px', fontWeight: 600, margin: 0, letterSpacing: '0.04em', color: '#ffffff' }}>
+                  ✦ WRITE TIMEPIECE REVIEW ✦
+                </h2>
+                <p style={{ margin: '3px 0 0 0', fontSize: '11px', color: 'rgba(243,227,184,0.7)', letterSpacing: '0.05em' }}>
+                  Share your experience with the Winsor horology community
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setIsReviewModalOpen(false);
+                  setReviewItem(null);
+                }}
+                style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'rgba(212,175,55,0.15)', border: '1px solid rgba(212,175,55,0.3)', color: '#d4af37', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', transition: 'all 0.2s ease', flexShrink: 0 }}
+                title="Close"
+              >
+                ✕
+              </button>
+            </div>
 
-            <form onSubmit={handleSubmitReview}>
-              {/* Star Selection */}
-              <div style={{ marginBottom: '20px' }}>
-                <label style={{ display: 'block', fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', marginBottom: '8px', color: 'rgba(26,18,9,0.6)' }}>Select Rating *</label>
-                <div style={{ display: 'flex', gap: '8px' }}>
-                  {[1, 2, 3, 4, 5].map((num) => (
-                    <button
-                      key={num}
-                      type="button"
-                      onClick={() => setReviewRating(num)}
-                      style={{
-                        background: 'none',
-                        border: 'none',
-                        cursor: 'pointer',
-                        fontSize: '28px',
-                        color: reviewRating >= num ? '#FFC107' : '#E0E0E0',
-                        padding: 0,
-                      }}
-                    >
-                      ★
-                    </button>
-                  ))}
+            {/* Scrollable Modal Content */}
+            <div style={{ padding: '24px', overflowY: 'auto', flex: 1 }}>
+              
+              {/* Product Item Brief Card */}
+              <div style={{ background: '#faf7f0', border: '1px solid rgba(139,105,20,0.18)', borderRadius: '12px', padding: '12px 16px', display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '22px' }}>
+                <div style={{ width: '48px', height: '48px', borderRadius: '8px', background: '#ffffff', border: '1px solid rgba(26,18,9,0.08)', padding: '3px', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <img src={reviewItem.productThumbnail || '/mens-watch-highlight.png'} alt={reviewItem.productTitle} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
+                </div>
+                <div>
+                  <h4 style={{ margin: 0, fontSize: '13.5px', fontWeight: 650, color: '#1a1209' }}>{reviewItem.productTitle}</h4>
+                  <div style={{ fontSize: '11px', color: '#8b6914', fontFamily: 'Jost, monospace', fontWeight: 600, marginTop: '2px' }}>
+                    Model: #{reviewItem.productModelNo} {reviewItem.colorVariant ? `• Variant: ${reviewItem.colorVariant}` : ''}
+                  </div>
                 </div>
               </div>
 
-              {/* Comment text */}
-              <div style={{ marginBottom: '20px' }}>
-                <label style={{ display: 'block', fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', marginBottom: '8px', color: 'rgba(26,18,9,0.6)' }}>Your Feedback *</label>
-                <textarea
-                  required
-                  rows={4}
-                  placeholder="Describe your experience with the timepiece's craftsmanship, packaging, and quality details..."
-                  value={reviewComment}
-                  onChange={(e) => setReviewComment(e.target.value)}
-                  style={{ width: '100%', padding: '12px', borderRadius: '4px', border: '1px solid rgba(26,18,9,0.15)', outline: 'none', resize: 'vertical', fontSize: '13px', color: '#1a1209' }}
-                />
-              </div>
-
-              {/* Image Attachments */}
-              <div style={{ marginBottom: '20px' }}>
-                <label style={{ display: 'block', fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', marginBottom: '8px', color: 'rgba(26,18,9,0.6)' }}>Attach Photos (Max 2)</label>
-                <input
-                  type="file"
-                  multiple
-                  accept="image/*"
-                  onChange={handleReviewImageUpload}
-                  disabled={uploadingReviewImg || reviewImages.length >= 2}
-                  style={{ fontSize: '12px' }}
-                />
-
-                {uploadingReviewImg && <p style={{ fontSize: '11px', color: '#8B6914', margin: '6px 0 0 0' }}>Uploading image attachments...</p>}
-
-                {reviewImages.length > 0 && (
-                  <div style={{ display: 'flex', gap: '8px', marginTop: '10px' }}>
-                    {reviewImages.map((url, i) => (
-                      <div key={i} style={{ position: 'relative', width: '50px', height: '50px', borderRadius: '4px', overflow: 'hidden' }}>
-                        <img src={url} alt="Attached review item" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                        <button
-                          type="button"
-                          onClick={() => setReviewImages(prev => prev.filter((_, idx) => idx !== i))}
-                          style={{ position: 'absolute', top: 2, right: 2, background: 'rgba(0,0,0,0.6)', border: 'none', color: '#fff', width: '14px', height: '14px', borderRadius: '50%', fontSize: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                        >
-                          ✕
-                        </button>
-                      </div>
+              <form onSubmit={handleSubmitReview}>
+                {/* Rating selection */}
+                <div style={{ marginBottom: '22px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                    <label style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#1a1209' }}>
+                      Overall Rating *
+                    </label>
+                    <span style={{ fontSize: '11px', fontWeight: 600, color: '#8b6914' }}>
+                      {reviewRating === 5 && '5.0 / 5.0 — Exceptional Quality'}
+                      {reviewRating === 4 && '4.0 / 5.0 — Very Good'}
+                      {reviewRating === 3 && '3.0 / 5.0 — Satisfactory'}
+                      {reviewRating === 2 && '2.0 / 5.0 — Below Expectations'}
+                      {reviewRating === 1 && '1.0 / 5.0 — Poor Experience'}
+                    </span>
+                  </div>
+                  <div style={{ display: 'flex', gap: '8px', background: '#faf7f0', padding: '10px 16px', borderRadius: '10px', border: '1px solid rgba(139,105,20,0.15)', width: 'fit-content' }}>
+                    {[1, 2, 3, 4, 5].map((num) => (
+                      <button
+                        key={num}
+                        type="button"
+                        onClick={() => setReviewRating(num)}
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          cursor: 'pointer',
+                          fontSize: '26px',
+                          color: reviewRating >= num ? '#d4af37' : '#d1c7b7',
+                          padding: 0,
+                          transition: 'transform 0.15s ease',
+                          lineHeight: 1,
+                        }}
+                        onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.2)')}
+                        onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
+                      >
+                        ★
+                      </button>
                     ))}
                   </div>
-                )}
-              </div>
+                </div>
 
-              {/* Anonymous Checkbox */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '24px' }}>
-                <input
-                  id="review-anonymous"
-                  type="checkbox"
-                  checked={reviewAnonymous}
-                  onChange={(e) => setReviewAnonymous(e.target.checked)}
-                />
-                <label htmlFor="review-anonymous" style={{ fontSize: '13px', color: 'rgba(26,18,9,0.8)', cursor: 'pointer' }}>Review anonymously (masks your profile name)</label>
-              </div>
+                {/* Feedback Comment */}
+                <div style={{ marginBottom: '22px' }}>
+                  <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '8px', color: '#1a1209' }}>
+                    Your Detailed Review *
+                  </label>
+                  <textarea
+                    required
+                    rows={4}
+                    placeholder="Describe your experience with the timepiece's craftsmanship, movement precision, packaging presentation, and overall horology details..."
+                    value={reviewComment}
+                    onChange={(e) => setReviewComment(e.target.value)}
+                    style={{
+                      width: '100%',
+                      padding: '14px',
+                      borderRadius: '10px',
+                      border: '1px solid rgba(139,105,20,0.25)',
+                      background: '#ffffff',
+                      outline: 'none',
+                      resize: 'vertical',
+                      fontSize: '13px',
+                      color: '#1a1209',
+                      lineHeight: 1.5,
+                      boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.02)',
+                    }}
+                  />
+                </div>
 
-              {/* Actions */}
-              <div style={{ display: 'flex', gap: '12px' }}>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsReviewModalOpen(false);
-                    setReviewItem(null);
-                  }}
-                  style={{ flex: 1, padding: '12px', borderRadius: '4px', border: '1px solid rgba(26,18,9,0.15)', background: 'transparent', cursor: 'pointer', fontSize: '12px', fontWeight: 500 }}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={submittingReview || uploadingReviewImg}
-                  style={{ flex: 1, padding: '12px', borderRadius: '4px', background: '#1a1209', color: '#fff', border: 'none', cursor: 'pointer', fontSize: '12px', fontWeight: 500 }}
-                >
-                  {submittingReview ? 'Submitting...' : 'Submit Review'}
-                </button>
-              </div>
-            </form>
+                {/* Styled Photo Attachment Dropzone */}
+                <div style={{ marginBottom: '22px' }}>
+                  <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '8px', color: '#1a1209' }}>
+                    Attach Timepiece Photos (Max 2)
+                  </label>
+                  
+                  <div style={{ position: 'relative' }}>
+                    <input
+                      id="review-photo-upload"
+                      type="file"
+                      multiple
+                      accept="image/*"
+                      onChange={handleReviewImageUpload}
+                      disabled={uploadingReviewImg || reviewImages.length >= 2}
+                      style={{ display: 'none' }}
+                    />
+                    <label
+                      htmlFor="review-photo-upload"
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '10px',
+                        padding: '16px',
+                        borderRadius: '10px',
+                        border: '2px dashed rgba(139,105,20,0.3)',
+                        background: uploadingReviewImg || reviewImages.length >= 2 ? '#f5f2eb' : '#faf7f0',
+                        cursor: uploadingReviewImg || reviewImages.length >= 2 ? 'not-allowed' : 'pointer',
+                        transition: 'all 0.2s ease',
+                      }}
+                    >
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8b6914" strokeWidth="2">
+                        <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+                        <circle cx="12" cy="13" r="4" />
+                      </svg>
+                      <span style={{ fontSize: '12.5px', fontWeight: 600, color: '#1a1209' }}>
+                        {uploadingReviewImg
+                          ? 'Uploading Photo...'
+                          : reviewImages.length >= 2
+                          ? 'Maximum 2 Photos Uploaded'
+                          : 'Click to Choose & Attach Photos'}
+                      </span>
+                    </label>
+                  </div>
+                  <div style={{ fontSize: '10.5px', color: 'rgba(26,18,9,0.5)', marginTop: '6px' }}>
+                    Supported formats: PNG, JPG, WEBP. Maximum 2 image attachments.
+                  </div>
+
+                  {/* Thumbnail previews */}
+                  {reviewImages.length > 0 && (
+                    <div style={{ display: 'flex', gap: '12px', marginTop: '12px' }}>
+                      {reviewImages.map((url, i) => (
+                        <div key={i} style={{ position: 'relative', width: '64px', height: '64px', borderRadius: '8px', overflow: 'hidden', border: '1px solid rgba(139,105,20,0.3)', boxShadow: '0 3px 10px rgba(0,0,0,0.1)' }}>
+                          <img src={url} alt="Attached review item" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                          <button
+                            type="button"
+                            onClick={() => setReviewImages(prev => prev.filter((_, idx) => idx !== i))}
+                            style={{ position: 'absolute', top: 3, right: 3, background: 'rgba(26,18,9,0.85)', border: '1px solid #d4af37', color: '#ffffff', width: '18px', height: '18px', borderRadius: '50%', fontSize: '9px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                            title="Remove photo"
+                          >
+                            ✕
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Anonymous Checkbox */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '26px', background: '#faf7f0', padding: '12px 16px', borderRadius: '10px', border: '1px solid rgba(139,105,20,0.15)' }}>
+                  <input
+                    id="review-anonymous"
+                    type="checkbox"
+                    checked={reviewAnonymous}
+                    onChange={(e) => setReviewAnonymous(e.target.checked)}
+                    style={{ width: '16px', height: '16px', accentColor: '#8b6914', cursor: 'pointer' }}
+                  />
+                  <label htmlFor="review-anonymous" style={{ fontSize: '12.5px', color: '#1a1209', fontWeight: 550, cursor: 'pointer', userSelect: 'none' }}>
+                    Publish review anonymously (masks your profile name for privacy)
+                  </label>
+                </div>
+
+                {/* High Contrast Action Buttons */}
+                <div style={{ display: 'flex', gap: '12px' }}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsReviewModalOpen(false);
+                      setReviewItem(null);
+                    }}
+                    style={{
+                      flex: 1,
+                      padding: '14px',
+                      borderRadius: '10px',
+                      border: '1px solid rgba(26,18,9,0.25)',
+                      background: '#f4efe6',
+                      color: '#1a1209',
+                      cursor: 'pointer',
+                      fontSize: '12px',
+                      fontWeight: 700,
+                      letterSpacing: '0.1em',
+                      textTransform: 'uppercase',
+                      transition: 'all 0.2s ease',
+                    }}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={submittingReview || uploadingReviewImg}
+                    style={{
+                      flex: 1.5,
+                      padding: '14px',
+                      borderRadius: '10px',
+                      background: 'linear-gradient(135deg, #1a1209 0%, #362510 100%)',
+                      color: '#d4af37',
+                      border: '1px solid #d4af37',
+                      cursor: submittingReview || uploadingReviewImg ? 'not-allowed' : 'pointer',
+                      fontSize: '12px',
+                      fontWeight: 700,
+                      letterSpacing: '0.12em',
+                      textTransform: 'uppercase',
+                      boxShadow: '0 4px 15px rgba(26,18,9,0.25)',
+                      opacity: submittingReview || uploadingReviewImg ? 0.6 : 1,
+                      transition: 'all 0.2s ease',
+                    }}
+                  >
+                    {submittingReview ? 'Submitting...' : 'Submit Review'}
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
       )}

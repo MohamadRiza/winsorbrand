@@ -7,6 +7,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useCurrency, CURRENCIES, CurrencyOption } from '@/app/context/CurrencyContext';
 import { SignInButton, UserButton, useUser } from '@clerk/nextjs';
 import { useCart } from '@/app/context/CartContext';
+import CountryFlag from '@/components/CountryFlag';
 
 const TOP_LEFT_LINKS  = [
   { label: 'Collections',   href: '/collections'   },
@@ -83,7 +84,7 @@ function CurrencyPanel({ onClose }: { onClose: () => void }) {
               <button key={c.code} onClick={() => { setCurrency(c.code); onClose(); }}
                 style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:'3px', padding:'8px 4px', border: isSel?'1px solid #8B6914':'1px solid rgba(26,18,9,0.07)', borderRadius:'5px', background: isSel?'rgba(139,105,20,0.06)':'transparent', cursor:'pointer', transition:'all 0.18s ease', position:'relative' }}>
                 {isDet && !isSel && <span style={{ position:'absolute', top:'-5px', right:'-4px', background:'#8B6914', color:'#fff', fontSize:'7px', padding:'1px 4px', borderRadius:'3px', fontFamily:"'Jost',sans-serif" }}>AUTO</span>}
-                <span style={{ fontSize:'17px', lineHeight:1 }}>{c.flag}</span>
+                <CountryFlag iso={c.iso} width={20} height={14} />
                 <span style={{ fontFamily:"'Jost',sans-serif", fontSize:'10px', fontWeight:500, color: isSel?'#8B6914':'#1a1209', letterSpacing:'0.05em' }}>{c.code}</span>
                 <span style={{ fontFamily:"'Jost',sans-serif", fontSize:'9px', color:'rgba(26,18,9,0.38)' }}>{c.symbol}</span>
               </button>
@@ -408,7 +409,7 @@ export default function Navbar() {
               {/* Currency - Desktop */}
               <button className="wn-desk-only wn-a" onMouseEnter={() => { cancelClose(); openCurrency(); }}
                 style={{ display:'flex', alignItems:'center', gap:'5px', color: tca, fontFamily:"'Jost',sans-serif", fontSize:'11px', letterSpacing:'0.08em', background:'none', border:'none', cursor:'pointer', transition:'color 0.2s ease' }}>
-                <GlobeIcon /><span>{selected.flag} {selected.code}</span><ChevronDn />
+                <GlobeIcon /><CountryFlag iso={selected.iso} width={16} height={11} /><span>{selected.code}</span><ChevronDn />
               </button>
               <div className="wn-desk-only" style={{ width:'1px', height:'14px', background: div, transition:'background 0.35s ease' }}/>
               
@@ -719,8 +720,9 @@ export default function Navbar() {
           >
             <div style={{ display:'flex', alignItems:'center', gap:'8px' }}>
               <GlobeIcon />
+              <CountryFlag iso={selected.iso} width={18} height={13} />
               <span style={{ fontFamily:"'Jost',sans-serif", fontSize:'12px', color:'#1a1209' }}>
-                {selected.flag} {selected.code} — {selected.label}
+                {selected.code} — {selected.label}
               </span>
             </div>
             <ChevronDn />
@@ -755,7 +757,7 @@ export default function Navbar() {
                   onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(139,105,20,0.03)'}
                   onMouseLeave={(e) => e.currentTarget.style.background = 'none'}
                 >
-                  <span style={{ fontSize:'16px', lineHeight:1 }}>{c.flag}</span>
+                  <CountryFlag iso={c.iso} width={20} height={14} />
                   <span style={{ fontFamily:"'Jost',sans-serif", fontSize:'13px', fontWeight: selected.code===c.code?600:400 }}>
                     {c.code}
                   </span>

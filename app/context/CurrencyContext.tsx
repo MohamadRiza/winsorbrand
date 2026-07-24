@@ -8,27 +8,28 @@ export interface CurrencyOption {
   label:  string;
   symbol: string;
   flag:   string;
+  iso:    string;
 }
 
 export const CURRENCIES: CurrencyOption[] = [
-  { code: 'LKR', label: 'Sri Lankan Rupee',      symbol: 'LKR',  flag: '🇱🇰' },
-  { code: 'USD', label: 'US Dollar',              symbol: 'USD',   flag: '🇺🇸' },
-  { code: 'GBP', label: 'British Pound',          symbol: 'GBP',   flag: '🇬🇧' },
-  { code: 'EUR', label: 'Euro',                   symbol: 'EUR',   flag: '🇪🇺' },
-  { code: 'AUD', label: 'Australian Dollar',      symbol: 'AUD',  flag: '🇦🇺' },
-  { code: 'NZD', label: 'New Zealand Dollar',     symbol: 'NZD', flag: '🇳🇿' },
-  { code: 'CAD', label: 'Canadian Dollar',        symbol: 'CAD',  flag: '🇨🇦' },
-  { code: 'CHF', label: 'Swiss Franc',            symbol: 'CHF',  flag: '🇨🇭' },
-  { code: 'HKD', label: 'Hong Kong Dollar',       symbol: 'HKD', flag: '🇭🇰' },
-  { code: 'SGD', label: 'Singapore Dollar',       symbol: 'SGD',  flag: '🇸🇬' },
-  { code: 'MYR', label: 'Malaysian Ringgit',      symbol: 'MYR',  flag: '🇲🇾' },
-  { code: 'IDR', label: 'Indonesian Rupiah',      symbol: 'IDR',  flag: '🇮🇩' },
-  { code: 'CNY', label: 'Chinese Yuan',           symbol: 'CNY',   flag: '🇨🇳' },
-  { code: 'JPY', label: 'Japanese Yen',           symbol: 'JPY',   flag: '🇯🇵' },
-  { code: 'INR', label: 'Indian Rupee',           symbol: 'INR',   flag: '🇮🇳' },
-  { code: 'AED', label: 'UAE Dirham',             symbol: 'AED', flag: '🇦🇪' },
-  { code: 'QAR', label: 'Qatari Riyal',           symbol: 'QAR',  flag: '🇶🇦' },
-  { code: 'MVR', label: 'Maldivian Rufiyaa',      symbol: 'MVR',  flag: '🇲🇻' },
+  { code: 'LKR', label: 'Sri Lankan Rupee',      symbol: 'LKR',  flag: '🇱🇰', iso: 'lk' },
+  { code: 'USD', label: 'US Dollar',              symbol: 'USD',   flag: '🇺🇸', iso: 'us' },
+  { code: 'GBP', label: 'British Pound',          symbol: 'GBP',   flag: '🇬🇧', iso: 'gb' },
+  { code: 'EUR', label: 'Euro',                   symbol: 'EUR',   flag: '🇪🇺', iso: 'eu' },
+  { code: 'AUD', label: 'Australian Dollar',      symbol: 'AUD',  flag: '🇦🇺', iso: 'au' },
+  { code: 'NZD', label: 'New Zealand Dollar',     symbol: 'NZD', flag: '🇳🇿', iso: 'nz' },
+  { code: 'CAD', label: 'Canadian Dollar',        symbol: 'CAD',  flag: '🇨🇦', iso: 'ca' },
+  { code: 'CHF', label: 'Swiss Franc',            symbol: 'CHF',  flag: '🇨🇭', iso: 'ch' },
+  { code: 'HKD', label: 'Hong Kong Dollar',       symbol: 'HKD', flag: '🇭🇰', iso: 'hk' },
+  { code: 'SGD', label: 'Singapore Dollar',       symbol: 'SGD',  flag: '🇸🇬', iso: 'sg' },
+  { code: 'MYR', label: 'Malaysian Ringgit',      symbol: 'MYR',  flag: '🇲🇾', iso: 'my' },
+  { code: 'IDR', label: 'Indonesian Rupiah',      symbol: 'IDR',  flag: '🇮🇩', iso: 'id' },
+  { code: 'CNY', label: 'Chinese Yuan',           symbol: 'CNY',   flag: '🇨🇳', iso: 'cn' },
+  { code: 'JPY', label: 'Japanese Yen',           symbol: 'JPY',   flag: '🇯🇵', iso: 'jp' },
+  { code: 'INR', label: 'Indian Rupee',           symbol: 'INR',   flag: '🇮🇳', iso: 'in' },
+  { code: 'AED', label: 'UAE Dirham',             symbol: 'AED', flag: '🇦🇪', iso: 'ae' },
+  { code: 'QAR', label: 'Qatari Riyal',           symbol: 'QAR',  flag: '🇶🇦', iso: 'qa' },
+  { code: 'MVR', label: 'Maldivian Rufiyaa',      symbol: 'MVR',  flag: '🇲🇻', iso: 'mv' },
 ];
 
 // Map country currency codes returned by ip-api to our supported list

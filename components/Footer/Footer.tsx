@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useCurrency, CURRENCIES, CurrencyOption } from '@/app/context/CurrencyContext';
 import { useState } from 'react';
+import CountryFlag from '@/components/CountryFlag';
 
 // ─────────────────────────────────────────────────────────────
 // ICON COMPONENTS
@@ -133,7 +134,8 @@ function CurrencySelectorCompact() {
         aria-expanded={isOpen}
       >
         <GlobeIcon />
-        <span>{selected.flag} {selected.code}</span>
+        <CountryFlag iso={selected.iso} width={16} height={11} />
+        <span>{selected.code}</span>
         <ChevronDn />
       </button>
 
@@ -147,7 +149,7 @@ function CurrencySelectorCompact() {
           border: '1px solid rgba(26,18,9,0.1)',
           borderRadius: '6px',
           padding: '8px',
-          minWidth: '140px',
+          minWidth: '150px',
           maxHeight: '200px',
           overflowY: 'auto',
           boxShadow: '0 -4px 20px rgba(26,18,9,0.08)',
@@ -176,7 +178,7 @@ function CurrencySelectorCompact() {
               onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(139,105,20,0.04)'}
               onMouseLeave={(e) => e.currentTarget.style.background = 'none'}
             >
-              <span style={{ fontSize: '14px' }}>{c.flag}</span>
+              <CountryFlag iso={c.iso} width={18} height={13} />
               <span style={{ fontWeight: selected.code === c.code ? 600 : 400 }}>{c.code}</span>
             </button>
           ))}

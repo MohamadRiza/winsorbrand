@@ -76,6 +76,24 @@ export default function CollectionsPage() {
   // Mobile Filters Toggle State
   const [showMobileFilters, setShowMobileFilters] = useState(false);
 
+  // Newsletter Subscribe State
+  const [subscriberEmail, setSubscriberEmail] = useState('');
+  const [subscribing, setSubscribing] = useState(false);
+
+  const handleSubscribe = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!subscriberEmail || !subscriberEmail.includes('@')) {
+      toast.error('Please enter a valid email address.');
+      return;
+    }
+    setSubscribing(true);
+    setTimeout(() => {
+      toast.success('Welcome to The Winsor Circle! Check your inbox shortly.');
+      setSubscriberEmail('');
+      setSubscribing(false);
+    }, 800);
+  };
+
   // API States
   const [products, setProducts] = useState<IProduct[]>([]);
   const [giftCategories, setGiftCategories] = useState<IGiftCategory[]>([]);
@@ -874,56 +892,218 @@ export default function CollectionsPage() {
           opacity: 0.25;
         }
 
-        /* ── NEWSLETTER BANNER ── */
+        /* ── NEWSLETTER BANNER (WINSOR CIRCLE) ── */
         .newsletter-banner {
           display: grid;
           grid-template-columns: 1fr 1fr;
-          border-radius: 16px;
+          border-radius: 24px;
           overflow: hidden;
-          border: 1px solid rgba(26,18,9,0.06);
-          background: #fff;
-          margin: 0 auto 24px;
-          max-width: 1400px;
+          border: 1px solid rgba(139, 105, 20, 0.25);
+          background: linear-gradient(135deg, #ffffff 0%, #faf7f0 100%);
+          margin: 40px auto 30px;
+          max-width: 1350px;
           width: 100%;
-          box-shadow: 0 4px 20px rgba(0,0,0,0.01);
+          box-shadow: 0 20px 50px -15px rgba(26, 18, 9, 0.08), 0 8px 20px -6px rgba(139, 105, 20, 0.12);
+          transition: transform 0.4s ease, box-shadow 0.4s ease;
+        }
+        .newsletter-banner:hover {
+          box-shadow: 0 25px 60px -15px rgba(26, 18, 9, 0.12), 0 10px 25px -5px rgba(139, 105, 20, 0.18);
         }
         .newsletter-image-block {
           height: 100%;
           position: relative;
-          min-height: 300px;
+          min-height: 440px;
+          overflow: hidden;
         }
         .newsletter-image-block img {
           width: 100%;
           height: 100%;
           object-fit: cover;
+          transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
+        .newsletter-banner:hover .newsletter-image-block img {
+          transform: scale(1.04);
+        }
+        .newsletter-image-overlay {
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(to right, rgba(26, 18, 9, 0.15), rgba(26, 18, 9, 0.5));
+        }
+        .newsletter-image-badge {
+          position: absolute;
+          bottom: 24px;
+          left: 24px;
+          background: rgba(26, 18, 9, 0.85);
+          backdrop-filter: blur(8px);
+          border: 1px solid rgba(217, 184, 120, 0.4);
+          padding: 8px 16px;
+          border-radius: 30px;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          color: #f3e3b8;
+          box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        .badge-gold-dot {
+          width: 6px;
+          height: 6px;
+          border-radius: 50%;
+          background: #8B6914;
+          box-shadow: 0 0 8px #8B6914;
+        }
+
         .newsletter-form-block {
-          padding: 40px 6%;
+          padding: 48px 8%;
           display: flex;
           flex-direction: column;
           justify-content: center;
+          position: relative;
+          background: radial-gradient(circle at top right, rgba(139, 105, 20, 0.06), transparent 60%);
+        }
+        .newsletter-tag-container {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          margin-bottom: 12px;
+        }
+        .gold-line {
+          height: 1px;
+          width: 24px;
+          background: #8B6914;
         }
         .newsletter-tag {
-          font-size: 10px;
-          color: #8b6914;
+          font-size: 10.5px;
+          color: #8B6914;
           letter-spacing: 0.25em;
-          font-weight: 600;
-          margin-bottom: 12px;
-          display: block;
+          font-weight: 700;
+          text-transform: uppercase;
         }
-        .newsletter-form-block h3 {
+        .newsletter-title {
           font-family: 'Cormorant Garamond', serif;
-          font-size: 26px;
-          font-weight: 400;
+          font-size: 34px;
+          font-weight: 600;
+          color: #1a1209;
           margin: 0 0 10px;
-          letter-spacing: 0.02em;
+          letter-spacing: -0.01em;
+          line-height: 1.15;
         }
-        .newsletter-form-block p {
+        .newsletter-desc {
           font-size: 13.5px;
-          color: rgba(26,18,9,0.55);
-          line-height: 1.5;
-          margin: 0 0 16px;
+          color: rgba(26, 18, 9, 0.65);
+          line-height: 1.6;
+          margin: 0 0 24px;
         }
+
+        .newsletter-perks-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 12px;
+          margin-bottom: 24px;
+        }
+        .perk-item {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          background: rgba(250, 247, 240, 0.7);
+          border: 1px solid rgba(139, 105, 20, 0.18);
+          padding: 10px 14px;
+          border-radius: 12px;
+        }
+        .perk-icon {
+          width: 32px;
+          height: 32px;
+          border-radius: 8px;
+          background: rgba(139, 105, 20, 0.1);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+        }
+        .perk-title {
+          font-size: 11px;
+          font-weight: 700;
+          color: #1a1209;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+        }
+        .perk-desc {
+          font-size: 10.5px;
+          color: rgba(26, 18, 9, 0.55);
+          margin: 0;
+          line-height: 1.2;
+        }
+
+        .newsletter-form {
+          display: flex;
+          flex-direction: row;
+          gap: 10px;
+          margin-bottom: 14px;
+        }
+        .input-wrapper {
+          position: relative;
+          flex: 1;
+        }
+        .input-icon {
+          position: absolute;
+          left: 14px;
+          top: 50%;
+          transform: translateY(-50%);
+          width: 16px;
+          height: 16px;
+          color: rgba(26, 18, 9, 0.4);
+          pointer-events: none;
+        }
+        .input-wrapper input {
+          width: 100%;
+          background: #ffffff;
+          border: 1px solid rgba(26, 18, 9, 0.18);
+          padding: 14px 16px 14px 42px;
+          font-size: 13px;
+          font-family: inherit;
+          border-radius: 12px;
+          color: #1a1209;
+          transition: all 0.25s ease;
+        }
+        .input-wrapper input:focus {
+          outline: none;
+          border-color: #8B6914;
+          box-shadow: 0 0 0 3px rgba(139, 105, 20, 0.12);
+          background: #ffffff;
+        }
+        .newsletter-submit-btn {
+          background: #1a1209;
+          color: #faf7f0;
+          border: 1px solid #1a1209;
+          padding: 14px 24px;
+          font-size: 11px;
+          letter-spacing: 0.15em;
+          text-transform: uppercase;
+          font-weight: 700;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          border-radius: 12px;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          white-space: nowrap;
+          box-shadow: 0 4px 12px rgba(26, 18, 9, 0.15);
+        }
+        .newsletter-submit-btn:hover {
+          background: #8B6914;
+          border-color: #8B6914;
+          color: #ffffff;
+          transform: translateY(-1px);
+          box-shadow: 0 6px 16px rgba(139, 105, 20, 0.25);
+        }
+
+        .newsletter-footer-note {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          font-size: 11px;
+          color: rgba(26, 18, 9, 0.5);
+        }
+
         .hero-video-mute-btn {
           position: absolute;
           right: 6%;
@@ -946,45 +1126,6 @@ export default function CollectionsPage() {
           background: #8b6914;
           border-color: #8b6914;
           transform: scale(1.08);
-        }
-        .newsletter-form {
-          display: flex;
-          gap: 12px;
-          margin-bottom: 12px;
-        }
-        .newsletter-form input {
-          flex: 1;
-          background: #faf7f0;
-          border: 1px solid rgba(26,18,9,0.08);
-          padding: 14px 20px;
-          font-size: 12.5px;
-          font-family: inherit;
-          border-radius: 4px;
-          color: #1a1209;
-        }
-        .newsletter-form input:focus {
-          outline: none;
-          border-color: #8b6914;
-        }
-        .newsletter-form button {
-          background: #8b6914;
-          color: #fff;
-          border: none;
-          padding: 14px 28px;
-          font-size: 11px;
-          letter-spacing: 0.12em;
-          text-transform: uppercase;
-          font-weight: 500;
-          cursor: pointer;
-          transition: all 0.3s ease;
-          border-radius: 4px;
-        }
-        .newsletter-form button:hover {
-          background: #a37c17;
-        }
-        .newsletter-note {
-          font-size: 11px;
-          color: rgba(26,18,9,0.4);
         }
 
         /* ── SKELETON CARD ── */
@@ -1798,20 +1939,85 @@ export default function CollectionsPage() {
             </div>
           </div>
 
-          {/* NEWSLETTER BANNER */}
-          <div className="newsletter-banner">
+          {/* NEWSLETTER BANNER — SUBSCRIBE FOR UPDATES */}
+          <div className="newsletter-banner shadow-2xl">
             <div className="newsletter-image-block">
-              <img src="/collections_pg.webp" alt="Macro watch movement gears" />
+              <img src="/collections_pg.webp" alt="Winsor Maison Timepiece Collection" />
+              <div className="newsletter-image-overlay" />
+              <div className="newsletter-image-badge">
+                <span className="badge-gold-dot" />
+                <span className="badge-text font-mono uppercase tracking-widest text-[10px]">WINSOR VIP INSIDER</span>
+              </div>
             </div>
+
             <div className="newsletter-form-block">
-              <span className="newsletter-tag">STAY TIMELESS</span>
-              <h3>Join The Winsor Circle</h3>
-              <p>Get early access to new collections, exclusive offers and insider stories.</p>
-              <form onSubmit={e => e.preventDefault()} className="newsletter-form">
-                <input type="email" placeholder="Enter your email address" required />
-                <button type="submit">SUBSCRIBE</button>
+              <div className="newsletter-header">
+                <div className="newsletter-tag-container">
+                  <span className="gold-line" />
+                  <span className="newsletter-tag">✦ STAY IN THE LOOP ✦</span>
+                  <span className="gold-line" />
+                </div>
+                <h3 className="newsletter-title font-serif">Subscribe To Winsor Updates</h3>
+                <p className="newsletter-desc">
+                  Be the first to know about new timepiece launches, brand news, exclusive offers, and special promotions delivered straight to your inbox.
+                </p>
+              </div>
+
+              {/* Luxury Subscription Perks Grid */}
+              <div className="newsletter-perks-grid">
+                <div className="perk-item">
+                  <div className="perk-icon">
+                    <svg className="w-4 h-4 text-[#8B6914]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h4 className="perk-title">New Product Releases</h4>
+                    <p className="perk-desc">First look at new watch collections</p>
+                  </div>
+                </div>
+
+                <div className="perk-item">
+                  <div className="perk-icon">
+                    <svg className="w-4 h-4 text-[#8B6914]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h4 className="perk-title">News & Special Offers</h4>
+                    <p className="perk-desc">Exclusive deals & brand updates</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Form */}
+              <form onSubmit={handleSubscribe} className="newsletter-form">
+                <div className="input-wrapper">
+                  <svg className="input-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
+                  <input
+                    type="email"
+                    value={subscriberEmail}
+                    onChange={(e) => setSubscriberEmail(e.target.value)}
+                    placeholder="Enter your email address..."
+                    required
+                  />
+                </div>
+                <button type="submit" disabled={subscribing} className="newsletter-submit-btn">
+                  {subscribing ? 'SUBSCRIBING…' : 'SUBSCRIBE NOW'}
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                  </svg>
+                </button>
               </form>
-              <span className="newsletter-note">No spam. Unsubscribe anytime.</span>
+
+              <div className="newsletter-footer-note">
+                <svg className="w-3.5 h-3.5 text-[#8B6914]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+                <span>Instant updates. Zero spam. Unsubscribe anytime in 1-click.</span>
+              </div>
             </div>
           </div>
         </div>
