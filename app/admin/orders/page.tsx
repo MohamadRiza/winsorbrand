@@ -112,7 +112,8 @@ export default function AdminOrdersPage() {
       if (searchQuery) {
         const query = searchQuery.toLowerCase();
         const matchesRef = order.orderRef.toLowerCase().includes(query);
-        const matchesClerk = order.clerkId.toLowerCase().includes(query);
+        const matchesClerk = (order.clerkId ?? '').toLowerCase().includes(query);
+        const matchesGuest = (order.guestName ?? '').toLowerCase().includes(query) || (order.guestEmail ?? '').toLowerCase().includes(query);
         const matchesCity = order.shippingAddress?.city?.toLowerCase().includes(query);
         const matchesMobile = order.shippingAddress?.mobile?.toLowerCase().includes(query);
         const matchesItems = order.items.some(item => 
@@ -120,7 +121,7 @@ export default function AdminOrdersPage() {
           item.productModelNo.toLowerCase().includes(query)
         );
 
-        return matchesRef || matchesClerk || matchesCity || matchesMobile || matchesItems;
+        return matchesRef || matchesClerk || matchesGuest || matchesCity || matchesMobile || matchesItems;
       }
 
       return true;
@@ -320,7 +321,10 @@ export default function AdminOrdersPage() {
                           )}
                         </div>
                         <span className="text-xs text-[#1a1209]/50 mt-0.5 truncate font-mono">
-                          ID: {order.clerkId.slice(0, 14)}...
+                          {order.isGuestOrder
+                            ? `Guest: ${(order.guestName || 'Unknown').slice(0, 14)}`
+                            : `ID: ${(order.clerkId ?? '').slice(0, 14)}...`
+                          }
                         </span>
                       </div>
                     </td>

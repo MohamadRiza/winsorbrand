@@ -7,6 +7,7 @@ import { useUser, SignInButton } from '@clerk/nextjs';
 import { useCart } from '@/app/context/CartContext';
 import { useCurrency } from '@/app/context/CurrencyContext';
 import toast from 'react-hot-toast';
+import GuestCheckoutModal from '@/components/Checkout/GuestCheckoutModal';
 
 export default function CartPage() {
   const { isLoaded: userLoaded, isSignedIn } = useUser();
@@ -57,6 +58,9 @@ export default function CartPage() {
     validationToken: string;
   }
   const [appliedCoupon, setAppliedCoupon] = useState<CouponResult | null>(null);
+
+  // Guest checkout modal
+  const [showGuestCheckoutModal, setShowGuestCheckoutModal] = useState(false);
 
   // Open Gifting Modal
   const openGiftingModal = (key: string) => {
@@ -323,7 +327,8 @@ export default function CartPage() {
     }
 
     if (!isSignedIn) {
-      toast.error('Please sign in to proceed to checkout.');
+      // Open guest checkout modal instead of blocking
+      setShowGuestCheckoutModal(true);
       return;
     }
 
@@ -2366,8 +2371,29 @@ export default function CartPage() {
               )}
             </>
           )}
-        </div>
       </div>
+    </div>
+
+    {/* ── Guest Checkout Modal (for non-signed-in cart checkout) ──── */}
+    <GuestCheckoutModal
+      isOpen={showGuestCheckoutModal}
+      onClose={() => setShowGuestCheckoutModal(false)}
+      items={selectedItemsList.map(item => ({
+        productId: item.productId,
+        productTitle: item.product?.title || 'Timepiece',
+        productModelNo: item.product?.modelNo || 'N/A',
+        productThumbnail: item.product?.thumbnail?.url || '',
+        colorVariant: item.colorVariant,
+        quantity: item.quantity,
+        price: item.product?.price || 0,
+      }))}
+      onLoginClick={() => setShowGuestCheckoutModal(false)}
+      onOrderSuccess={(orderRef) => {
+        clearCart();
+        // Keep modal open so step 4 success popup (ref code + copy button + PDF receipt) is displayed to guest
+      }}
+    />
+
     </>
   );
 }

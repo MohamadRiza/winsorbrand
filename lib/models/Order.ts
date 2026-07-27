@@ -30,7 +30,8 @@ const OrderShippingAddressSchema = new Schema({
 const OrderSchema = new Schema<IOrderDocument>({
   clerkId: {
     type: String,
-    required: [true, 'Clerk ID is required'],
+    required: false,   // Optional — null for guest orders
+    default: null,
     index: true,
   },
   orderRef: {
@@ -71,6 +72,29 @@ const OrderSchema = new Schema<IOrderDocument>({
     type: Boolean,
     default: false,
   },
+  // ── Guest Order Fields ─────────────────────────────────────
+  isGuestOrder: {
+    type: Boolean,
+    default: false,
+    index: true,
+  },
+  guestName: {
+    type: String,
+    trim: true,
+    default: null,
+  },
+  guestEmail: {
+    type: String,
+    trim: true,
+    lowercase: true,
+    default: null,
+    index: true,
+  },
+  guestMobile: {
+    type: String,
+    trim: true,
+    default: null,
+  },
   // ── Coupon / Discount Fields ───────────────────────────────
   couponCode: {
     type: String,
@@ -91,7 +115,7 @@ const OrderSchema = new Schema<IOrderDocument>({
   },
   finalTotal: {
     type: Number,
-    default: null,  // null means no coupon applied, equals subtotal
+    default: null,
     min: 0,
   },
   // ── Delivery Tracking ─────────────────────────────────────

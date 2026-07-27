@@ -112,7 +112,7 @@ export interface IOrderShippingAddress {
 
 export interface IOrder {
   _id?: string;
-  clerkId: string;
+  clerkId?: string | null;   // null for guest orders
   orderRef: string;
   items: IOrderItem[];
   shippingAddress: IOrderShippingAddress;
@@ -120,6 +120,11 @@ export interface IOrder {
   status: OrderStatus;
   cancelReason?: string;
   isGift?: boolean;
+  // Guest order fields
+  isGuestOrder?: boolean;
+  guestName?: string | null;
+  guestEmail?: string | null;
+  guestMobile?: string | null;
   // Coupon / Discount fields
   couponCode?: string | null;
   couponDiscountPercent?: number;

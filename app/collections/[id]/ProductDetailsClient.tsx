@@ -7,6 +7,9 @@ import { useCurrency } from '@/app/context/CurrencyContext';
 import { IProduct, ColorVariant, WARRANTY_LABELS } from '@/types';
 import { useCart } from '@/app/context/CartContext';
 import { useRouter } from 'next/navigation';
+import { useUser } from '@clerk/nextjs';
+import GuestCheckoutModal from '@/components/Checkout/GuestCheckoutModal';
+import BuyNowModal from '@/components/Checkout/BuyNowModal';
 
 interface ProductDetailsClientProps {
   id: string;
@@ -16,6 +19,12 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
   const { convertPrice } = useCurrency();
   const { addToCart } = useCart();
   const router = useRouter();
+  const { isSignedIn } = useUser();
+
+  // Buy Now modal states
+  const [showGuestModal, setShowGuestModal] = useState(false);
+  const [showBuyNowModal, setShowBuyNowModal] = useState(false);
+  const [buyerProfile, setBuyerProfile] = useState<any>(null);
 
   // API States
   const [product, setProduct] = useState<IProduct | null>(null);
@@ -224,12 +233,29 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
     setShowToast(true);
   };
 
-  // Buy Now
-  const handleBuyNow = () => {
+  // Buy Now — auth-aware
+  const handleBuyNow = async () => {
     if (!product) return;
-    const colorVariantName = selectedVariant?.colorName || '';
-    addToCart(product._id!, 1, colorVariantName, product);
-    router.push('/cart');
+
+    if (!isSignedIn) {
+      // Guest flow — open guest checkout modal
+      setShowGuestModal(true);
+      return;
+    }
+
+    // Signed-in flow — fetch profile then open direct purchase modal
+    try {
+      const res = await fetch('/api/customer/profile');
+      const data = await res.json();
+      if (data.success && data.data) {
+        setBuyerProfile(data.data);
+      } else {
+        setBuyerProfile(null);
+      }
+    } catch {
+      setBuyerProfile(null);
+    }
+    setShowBuyNowModal(true);
   };
 
   // Close toast automatically after 4 seconds
@@ -1689,6 +1715,49 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
         </div>
 
       </div>
+
+      {/* ── Guest Checkout Modal (not signed in) ──────────────────────── */}
+      {product && (
+        <GuestCheckoutModal
+          isOpen={showGuestModal}
+          onClose={() => setShowGuestModal(false)}
+          items={[{
+            productId: product._id!,
+            productTitle: product.title,
+            productModelNo: product.modelNo,
+            productThumbnail: product.thumbnail?.url || '',
+            colorVariant: selectedVariant?.colorName,
+            quantity: 1,
+            price: product.price,
+          }]}
+          onLoginClick={() => setShowGuestModal(false)}
+          onOrderSuccess={(ref) => {
+            // Keep modal open so step 4 success popup (ref code + copy button + PDF receipt) is shown to guest
+          }}
+        />
+      )}
+
+      {/* ── Buy Now Modal (signed in — direct purchase) ───────────────── */}
+      {product && (
+        <BuyNowModal
+          isOpen={showBuyNowModal}
+          onClose={() => setShowBuyNowModal(false)}
+          item={{
+            productId: product._id!,
+            productTitle: product.title,
+            productModelNo: product.modelNo,
+            productThumbnail: product.thumbnail?.url || '',
+            colorVariant: selectedVariant?.colorName,
+            quantity: 1,
+            price: product.price,
+          }}
+          profile={buyerProfile}
+          onOrderSuccess={() => {
+            // Keep modal open so step 4 success popup (ref code + copy button + PDF receipt) is shown
+          }}
+        />
+      )}
+
     </>
   );
 }
