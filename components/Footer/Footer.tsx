@@ -79,6 +79,7 @@ const FOOTER_LINKS = {
     { label: 'Press', href: '/press' },
   ],
   support: [
+    { label: 'Track Order', href: '/orders/track' },
     { label: 'Customer Care', href: '/customer-care' },
     { label: 'Shipping & Returns', href: '/shipping' },
     { label: 'Warranty', href: '/warranty' },
