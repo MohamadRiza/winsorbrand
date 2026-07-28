@@ -48,6 +48,10 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
   // Reviews States
   const [reviews, setReviews] = useState<any[]>([]);
   const [loadingReviews, setLoadingReviews] = useState(false);
+  const [reviewFilter, setReviewFilter] = useState<'all' | 'photos' | 1 | 2 | 3 | 4 | 5>('all');
+  const [reviewPage, setReviewPage] = useState(1);
+  const [lightboxImg, setLightboxImg] = useState<string | null>(null);
+  const REVIEWS_PER_PAGE = 8;
 
   // Fetch product data on mount/id change
   useEffect(() => {
@@ -1150,7 +1154,29 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
           }
           .reviews-layout-grid {
             grid-template-columns: 1fr !important;
-            gap: 30px !important;
+            gap: 24px !important;
+          }
+          .rev-summary-sidebar {
+            position: relative !important;
+            top: 0 !important;
+            padding: 20px !important;
+          }
+          .rev-photo-strip {
+            gap: 6px !important;
+          }
+          .rev-filter-row {
+            gap: 6px !important;
+          }
+          .rev-filter-btn {
+            padding: 6px 10px !important;
+            font-size: 10px !important;
+          }
+          .rev-card {
+            padding: 16px !important;
+          }
+          .rev-img-thumb {
+            width: 56px !important;
+            height: 56px !important;
           }
         }
       `}</style>
@@ -1635,107 +1661,256 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
                   No reviews submitted yet for this timepiece.
                 </p>
               </div>
-            ) : (
-              <div className="reviews-layout-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 2.2fr', gap: '50px', alignItems: 'flex-start' }}>
-                {/* Left Card: Summary Stats */}
-                <div style={{ background: '#FAF7F0', border: '1px solid rgba(26,18,9,0.06)', borderRadius: '8px', padding: '30px', position: 'sticky', top: '100px' }}>
-                  <h4 style={{ margin: '0 0 16px 0', fontSize: '15px', fontWeight: 600, borderBottom: '1px solid rgba(26,18,9,0.06)', paddingBottom: '10px' }}>Rating Summary</h4>
-                  <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginBottom: '8px' }}>
-                    <span style={{ fontSize: '48px', fontWeight: 500, fontFamily: "'Cormorant Garamond', serif", lineHeight: 1 }}>{reviewsStats.average}</span>
-                    <span style={{ fontSize: '14px', color: 'rgba(26,18,9,0.4)' }}>out of 5</span>
-                  </div>
-                  
-                  {/* Rating Stars */}
-                  <div style={{ display: 'flex', gap: '3px', marginBottom: '16px' }}>
-                    {Array.from({ length: 5 }).map((_, i) => (
-                      <span key={i} style={{ color: i < Math.round(reviewsStats.average) ? '#FFC107' : '#E0E0E0', fontSize: '20px' }}>★</span>
-                    ))}
-                  </div>
-                  
-                  <span style={{ fontSize: '12px', color: 'rgba(26,18,9,0.5)', display: 'block', marginBottom: '24px' }}>
-                    Based on {reviewsStats.count} verified patron {reviewsStats.count === 1 ? 'review' : 'reviews'}
-                  </span>
+            ) : (() => {
+              // Compute filtered reviews
+              const filteredRevs = reviews.filter(r => {
+                if (reviewFilter === 'photos') return r.images && r.images.length > 0;
+                if (typeof reviewFilter === 'number') return Math.round(r.rating) === reviewFilter;
+                return true;
+              });
+              const totalPages = Math.ceil(filteredRevs.length / REVIEWS_PER_PAGE);
+              const pagedRevs = filteredRevs.slice((reviewPage - 1) * REVIEWS_PER_PAGE, reviewPage * REVIEWS_PER_PAGE);
+              const allPhotoUrls = reviews.flatMap(r => r.images || []);
 
-                  {/* Distribution bars */}
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                    {([5, 4, 3, 2, 1] as const).map(stars => {
-                      const count = starDistribution[stars] || 0;
-                      const percentage = reviews.length > 0 ? (count / reviews.length) * 100 : 0;
-                      return (
-                        <div key={stars} style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '12px' }}>
-                          <span style={{ width: '42px', color: 'rgba(26,18,9,0.6)', fontWeight: 500 }}>{stars} Star</span>
-                          <div style={{ flex: 1, height: '6px', background: 'rgba(26,18,9,0.06)', borderRadius: '3px', overflow: 'hidden' }}>
-                            <div style={{ width: `${percentage}%`, height: '100%', background: '#8B6914', borderRadius: '3px' }} />
-                          </div>
-                          <span style={{ width: '28px', textAlign: 'right', color: 'rgba(26,18,9,0.4)' }}>{count}</span>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
+              return (
+                <div className="reviews-layout-grid" style={{ display: 'grid', gridTemplateColumns: '300px 1fr', gap: '48px', alignItems: 'flex-start' }}>
 
-                {/* Right Card: Reviews List */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-                  {reviews.map((rev, idx) => {
-                    const dispName = rev.isAnonymous ? maskReviewerName(rev.username) : rev.username;
-                    return (
-                      <div key={idx} style={{ borderBottom: '1px solid rgba(26,18,9,0.06)', paddingBottom: '24px', display: 'flex', gap: '16px' }}>
-                        {/* Avatar */}
-                        <div style={{ flexShrink: 0 }}>
-                          {rev.isAnonymous || !rev.userAvatar ? (
-                            <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: '#8B6914', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600, fontSize: '16.5px', textTransform: 'uppercase', fontFamily: "'Jost', sans-serif" }}>
-                              {dispName ? dispName[0] : 'C'}
-                            </div>
-                          ) : (
-                            <div style={{ width: '40px', height: '40px', borderRadius: '50%', overflow: 'hidden', position: 'relative', border: '1px solid rgba(26,18,9,0.05)' }}>
-                              <img src={rev.userAvatar} alt={dispName} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                            </div>
-                          )}
-                        </div>
+                  {/* ── LEFT: Summary Sidebar ── */}
+                  <div className="rev-summary-sidebar" style={{ background: '#FAF7F0', border: '1px solid rgba(26,18,9,0.07)', borderRadius: '16px', padding: '28px', position: 'sticky', top: '100px' }}>
+                    <h4 style={{ margin: '0 0 20px 0', fontSize: '13px', fontWeight: 700, letterSpacing: '0.15em', textTransform: 'uppercase', color: '#1a1209', borderBottom: '1px solid rgba(26,18,9,0.07)', paddingBottom: '14px' }}>Rating Summary</h4>
 
-                        {/* Details */}
-                        <div style={{ flex: 1 }}>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '6px' }}>
-                            <div>
-                              <h5 style={{ margin: '0 0 2px 0', fontSize: '14.5px', fontWeight: 600, color: '#1a1209' }}>{dispName}</h5>
-                              <span style={{ fontSize: '10.5px', color: '#8B6914', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 550 }}>
-                                ✓ Verified Purchase
-                              </span>
-                            </div>
-                            <span style={{ fontSize: '11.5px', color: 'rgba(26,18,9,0.4)' }}>
-                              {new Date(rev.createdAt).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })}
-                            </span>
-                          </div>
-
-                          {/* Stars */}
-                          <div style={{ display: 'flex', gap: '2px', marginBottom: '10px' }}>
-                            {Array.from({ length: 5 }).map((_, i) => (
-                              <span key={i} style={{ color: i < rev.rating ? '#FFC107' : '#E0E0E0', fontSize: '13px' }}>★</span>
-                            ))}
-                          </div>
-
-                          {/* Comment */}
-                          <p style={{ margin: '0 0 12px 0', fontSize: '13.5px', lineHeight: 1.5, color: 'rgba(26,18,9,0.75)' }}>{rev.comment}</p>
-
-                          {/* Images */}
-                          {rev.images && rev.images.length > 0 && (
-                            <div style={{ display: 'flex', gap: '8px' }}>
-                              {rev.images.map((url: string, i: number) => (
-                                <a href={url} target="_blank" rel="noopener noreferrer" key={i} style={{ position: 'relative', width: '70px', height: '70px', borderRadius: '4px', overflow: 'hidden', border: '1px solid rgba(26,18,9,0.05)', display: 'block' }}>
-                                  <img src={url} alt="patron upload" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                                </a>
-                              ))}
-                            </div>
-                          )}
-                        </div>
+                    {/* Big score */}
+                    <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+                      <div style={{ fontSize: '60px', fontWeight: 500, fontFamily: "'Cormorant Garamond', serif", lineHeight: 1, color: '#1a1209' }}>{reviewsStats.average}</div>
+                      <div style={{ display: 'flex', justifyContent: 'center', gap: '4px', margin: '8px 0 6px' }}>
+                        {Array.from({ length: 5 }).map((_, i) => (
+                          <svg key={i} width="16" height="16" viewBox="0 0 24 24" fill={i < Math.round(reviewsStats.average) ? '#8B6914' : 'none'} stroke="#8B6914" strokeWidth="1.5">
+                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                          </svg>
+                        ))}
                       </div>
-                    );
-                  })}
+                      <span style={{ fontSize: '12px', color: 'rgba(26,18,9,0.45)' }}>{reviewsStats.count} verified review{reviewsStats.count !== 1 ? 's' : ''}</span>
+                    </div>
+
+                    {/* Distribution bars — also act as filters */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '9px', marginBottom: '22px' }}>
+                      {([5, 4, 3, 2, 1] as const).map(stars => {
+                        const count = starDistribution[stars] || 0;
+                        const pct = reviews.length > 0 ? (count / reviews.length) * 100 : 0;
+                        const isActive = reviewFilter === stars;
+                        return (
+                          <button
+                            key={stars}
+                            onClick={() => { setReviewFilter(isActive ? 'all' : stars); setReviewPage(1); }}
+                            style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '12px', background: isActive ? 'rgba(139,105,20,0.08)' : 'none', border: isActive ? '1px solid rgba(139,105,20,0.3)' : '1px solid transparent', borderRadius: '6px', padding: '4px 6px', cursor: 'pointer', width: '100%', textAlign: 'left', transition: 'all 0.2s' }}
+                          >
+                            <span style={{ width: '38px', color: 'rgba(26,18,9,0.7)', fontWeight: 600, fontFamily: "'Jost',sans-serif", fontSize: '11px' }}>{stars} ★</span>
+                            <div style={{ flex: 1, height: '6px', background: 'rgba(26,18,9,0.06)', borderRadius: '3px', overflow: 'hidden' }}>
+                              <div style={{ width: `${pct}%`, height: '100%', background: '#8B6914', borderRadius: '3px', transition: 'width 0.4s ease' }} />
+                            </div>
+                            <span style={{ width: '22px', textAlign: 'right', color: 'rgba(26,18,9,0.4)', fontSize: '11px' }}>{count}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    {/* Photo gallery strip */}
+                    {allPhotoUrls.length > 0 && (
+                      <div>
+                        <div style={{ fontSize: '11px', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(26,18,9,0.5)', marginBottom: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <span>Customer Photos</span>
+                          <span style={{ color: '#8B6914' }}>{allPhotoUrls.length}</span>
+                        </div>
+                        <div className="rev-photo-strip" style={{ display: 'flex', flexWrap: 'wrap', gap: '7px' }}>
+                          {allPhotoUrls.slice(0, 9).map((url: string, i: number) => (
+                            <button
+                              key={i}
+                              onClick={() => { setLightboxImg(url); setReviewFilter('photos'); setReviewPage(1); }}
+                              className="rev-img-thumb"
+                              style={{ width: '62px', height: '62px', borderRadius: '8px', overflow: 'hidden', border: '1.5px solid rgba(26,18,9,0.08)', cursor: 'pointer', padding: 0, background: 'none', position: 'relative', flexShrink: 0, transition: 'border-color 0.2s, transform 0.2s' }}
+                            >
+                              <img src={url} alt={`Review photo ${i+1}`} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                              {i === 8 && allPhotoUrls.length > 9 && (
+                                <div style={{ position: 'absolute', inset: 0, background: 'rgba(26,18,9,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '13px', fontWeight: 700 }}>+{allPhotoUrls.length - 9}</div>
+                              )}
+                            </button>
+                          ))}
+                        </div>
+                        <button
+                          onClick={() => { setReviewFilter('photos'); setReviewPage(1); }}
+                          style={{ marginTop: '10px', width: '100%', background: reviewFilter === 'photos' ? '#8B6914' : 'transparent', color: reviewFilter === 'photos' ? '#fff' : '#8B6914', border: '1.5px solid #8B6914', borderRadius: '8px', padding: '9px 14px', fontSize: '11px', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer', transition: 'all 0.25s', fontFamily: "'Jost',sans-serif" }}
+                        >
+                          {reviewFilter === 'photos' ? '✓ Showing Photos Only' : 'Show Reviews with Photos'}
+                        </button>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* ── RIGHT: Filter Tabs + Cards ── */}
+                  <div>
+                    {/* Filter pill row */}
+                    <div className="rev-filter-row" style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '24px' }}>
+                      {(['all', 'photos', 5, 4, 3, 2, 1] as const).map(f => {
+                        const label = f === 'all' ? `All (${reviews.length})` : f === 'photos' ? `📷 With Photos (${allPhotoUrls.length})` : `${'★'.repeat(f)} ${f} Star (${starDistribution[f as 1|2|3|4|5] || 0})`;
+                        const isActive = reviewFilter === f;
+                        return (
+                          <button
+                            key={String(f)}
+                            className="rev-filter-btn"
+                            onClick={() => { setReviewFilter(f); setReviewPage(1); }}
+                            style={{ padding: '7px 14px', borderRadius: '100px', fontSize: '11.5px', fontWeight: 600, fontFamily: "'Jost',sans-serif", letterSpacing: '0.05em', cursor: 'pointer', border: isActive ? '1.5px solid #8B6914' : '1.5px solid rgba(26,18,9,0.12)', background: isActive ? '#8B6914' : '#fff', color: isActive ? '#fff' : 'rgba(26,18,9,0.7)', transition: 'all 0.2s', whiteSpace: 'nowrap' }}
+                          >
+                            {label}
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    {/* Results count */}
+                    {filteredRevs.length === 0 ? (
+                      <div style={{ textAlign: 'center', padding: '48px 20px', border: '1px dashed rgba(26,18,9,0.12)', borderRadius: '12px' }}>
+                        <p style={{ fontSize: '14px', color: 'rgba(26,18,9,0.4)', margin: 0 }}>No reviews match this filter.</p>
+                        <button onClick={() => { setReviewFilter('all'); setReviewPage(1); }} style={{ marginTop: '12px', background: 'none', border: '1px solid rgba(26,18,9,0.2)', borderRadius: '8px', padding: '8px 16px', fontSize: '12px', cursor: 'pointer', color: '#8B6914', fontWeight: 600 }}>Clear Filter</button>
+                      </div>
+                    ) : (
+                      <>
+                        <p style={{ fontSize: '12px', color: 'rgba(26,18,9,0.4)', marginBottom: '18px', fontFamily: "'Jost',sans-serif" }}>
+                          Showing {(reviewPage - 1) * REVIEWS_PER_PAGE + 1}–{Math.min(reviewPage * REVIEWS_PER_PAGE, filteredRevs.length)} of {filteredRevs.length} review{filteredRevs.length !== 1 ? 's' : ''}
+                        </p>
+
+                        {/* Review cards */}
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
+                          {pagedRevs.map((rev, idx) => {
+                            const dispName = rev.isAnonymous ? maskReviewerName(rev.username) : rev.username;
+                            return (
+                              <div
+                                key={idx}
+                                className="rev-card"
+                                style={{ padding: '20px 0', borderBottom: '1px solid rgba(26,18,9,0.07)', display: 'flex', gap: '14px' }}
+                              >
+                                {/* Avatar */}
+                                <div style={{ flexShrink: 0 }}>
+                                  {rev.isAnonymous || !rev.userAvatar ? (
+                                    <div style={{ width: '42px', height: '42px', borderRadius: '50%', background: 'linear-gradient(135deg, #8B6914, #b8922a)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '17px', textTransform: 'uppercase', fontFamily: "'Jost',sans-serif", flexShrink: 0 }}>
+                                      {dispName ? dispName[0] : 'C'}
+                                    </div>
+                                  ) : (
+                                    <div style={{ width: '42px', height: '42px', borderRadius: '50%', overflow: 'hidden', border: '2px solid rgba(139,105,20,0.2)', flexShrink: 0 }}>
+                                      <img src={rev.userAvatar} alt={dispName} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                    </div>
+                                  )}
+                                </div>
+
+                                {/* Content */}
+                                <div style={{ flex: 1, minWidth: 0 }}>
+                                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '5px', flexWrap: 'wrap', gap: '4px' }}>
+                                    <div>
+                                      <span style={{ fontSize: '14px', fontWeight: 700, color: '#1a1209', fontFamily: "'Jost',sans-serif" }}>{dispName}</span>
+                                      <span style={{ marginLeft: '8px', fontSize: '10px', color: '#8B6914', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 600 }}>✓ Verified Purchase</span>
+                                    </div>
+                                    <span style={{ fontSize: '11px', color: 'rgba(26,18,9,0.35)', fontFamily: "'Jost',sans-serif", flexShrink: 0 }}>
+                                      {new Date(rev.createdAt).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })}
+                                    </span>
+                                  </div>
+
+                                  {/* Stars */}
+                                  <div style={{ display: 'flex', gap: '3px', marginBottom: '10px', alignItems: 'center' }}>
+                                    {Array.from({ length: 5 }).map((_, i) => (
+                                      <svg key={i} width="13" height="13" viewBox="0 0 24 24" fill={i < rev.rating ? '#8B6914' : 'none'} stroke="#8B6914" strokeWidth="1.5">
+                                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                                      </svg>
+                                    ))}
+                                    <span style={{ fontSize: '11px', color: 'rgba(26,18,9,0.45)', marginLeft: '4px', fontFamily: "'Jost',sans-serif" }}>{rev.rating}/5</span>
+                                  </div>
+
+                                  {/* Comment */}
+                                  <p style={{ margin: '0 0 12px 0', fontSize: '13.5px', lineHeight: 1.65, color: 'rgba(26,18,9,0.72)', fontFamily: "'Jost',sans-serif" }}>{rev.comment}</p>
+
+                                  {/* Images */}
+                                  {rev.images && rev.images.length > 0 && (
+                                    <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                                      {rev.images.map((url: string, i: number) => (
+                                        <button
+                                          key={i}
+                                          onClick={() => setLightboxImg(url)}
+                                          className="rev-img-thumb"
+                                          style={{ width: '72px', height: '72px', borderRadius: '8px', overflow: 'hidden', border: '1.5px solid rgba(26,18,9,0.08)', cursor: 'pointer', padding: 0, background: 'none', transition: 'border-color 0.2s, transform 0.2s', flexShrink: 0 }}
+                                        >
+                                          <img src={url} alt={`Review image ${i+1}`} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                                        </button>
+                                      ))}
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+
+                        {/* Pagination */}
+                        {totalPages > 1 && (
+                          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', marginTop: '32px', flexWrap: 'wrap' }}>
+                            <button
+                              onClick={() => setReviewPage(p => Math.max(1, p - 1))}
+                              disabled={reviewPage === 1}
+                              style={{ padding: '9px 18px', borderRadius: '8px', border: '1.5px solid rgba(26,18,9,0.15)', background: reviewPage === 1 ? 'rgba(26,18,9,0.04)' : '#fff', color: reviewPage === 1 ? 'rgba(26,18,9,0.3)' : '#1a1209', cursor: reviewPage === 1 ? 'default' : 'pointer', fontSize: '12px', fontWeight: 600, fontFamily: "'Jost',sans-serif", display: 'flex', alignItems: 'center', gap: '6px', transition: 'all 0.2s' }}
+                            >
+                              ← Prev
+                            </button>
+
+                            {Array.from({ length: totalPages }).map((_, i) => {
+                              const pg = i + 1;
+                              const show = pg === 1 || pg === totalPages || Math.abs(pg - reviewPage) <= 1;
+                              const showDots = !show && (pg === 2 || pg === totalPages - 1);
+                              if (showDots) return <span key={pg} style={{ color: 'rgba(26,18,9,0.3)', fontSize: '12px' }}>…</span>;
+                              if (!show) return null;
+                              return (
+                                <button
+                                  key={pg}
+                                  onClick={() => setReviewPage(pg)}
+                                  style={{ width: '38px', height: '38px', borderRadius: '8px', border: '1.5px solid', borderColor: pg === reviewPage ? '#8B6914' : 'rgba(26,18,9,0.15)', background: pg === reviewPage ? '#8B6914' : '#fff', color: pg === reviewPage ? '#fff' : '#1a1209', cursor: 'pointer', fontSize: '12px', fontWeight: 700, fontFamily: "'Jost',sans-serif", transition: 'all 0.2s' }}
+                                >
+                                  {pg}
+                                </button>
+                              );
+                            })}
+
+                            <button
+                              onClick={() => setReviewPage(p => Math.min(totalPages, p + 1))}
+                              disabled={reviewPage === totalPages}
+                              style={{ padding: '9px 18px', borderRadius: '8px', border: '1.5px solid rgba(26,18,9,0.15)', background: reviewPage === totalPages ? 'rgba(26,18,9,0.04)' : '#fff', color: reviewPage === totalPages ? 'rgba(26,18,9,0.3)' : '#1a1209', cursor: reviewPage === totalPages ? 'default' : 'pointer', fontSize: '12px', fontWeight: 600, fontFamily: "'Jost',sans-serif", display: 'flex', alignItems: 'center', gap: '6px', transition: 'all 0.2s' }}
+                            >
+                              Next →
+                            </button>
+                          </div>
+                        )}
+                      </>
+                    )}
+                  </div>
                 </div>
-              </div>
-            )}
+              );
+            })()}
           </div>
         </div>
+
+        {/* LIGHTBOX */}
+        {lightboxImg && (
+          <div
+            onClick={() => setLightboxImg(null)}
+            style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.88)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', cursor: 'zoom-out', backdropFilter: 'blur(4px)' }}
+          >
+            <button
+              onClick={() => setLightboxImg(null)}
+              style={{ position: 'absolute', top: '20px', right: '24px', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '50%', width: '44px', height: '44px', color: '#fff', fontSize: '22px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10000, lineHeight: 1, transition: 'background 0.2s' }}
+            >✕</button>
+            <img
+              src={lightboxImg}
+              alt="Review photo"
+              onClick={e => e.stopPropagation()}
+              style={{ maxWidth: '90vw', maxHeight: '88vh', objectFit: 'contain', borderRadius: '12px', boxShadow: '0 32px 80px rgba(0,0,0,0.6)', cursor: 'default' }}
+            />
+          </div>
+        )}
 
         {/* FEATURES FOOTER BANNER */}
         <div className="features-footer-banner">

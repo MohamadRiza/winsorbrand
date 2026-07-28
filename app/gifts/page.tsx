@@ -43,6 +43,7 @@ export default function GiftsPage() {
   const [giftCategories, setGiftCategories] = useState<IGiftCategory[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [reviewRatings, setReviewRatings] = useState<Record<string, { averageRating: number; reviewCount: number }>>({});
 
   // Filter states
   const [selectedCategorySlug, setSelectedCategorySlug] = useState<string>('all');
@@ -108,6 +109,16 @@ export default function GiftsPage() {
       }
     }
   }, []);
+
+  // Fetch review ratings once products are loaded
+  useEffect(() => {
+    if (products.length === 0) return;
+    const ids = products.map(p => p._id).filter(Boolean).join(',');
+    fetch(`/api/reviews/ratings?ids=${ids}`)
+      .then(r => r.json())
+      .then(data => { if (data.success) setReviewRatings(data.data || {}); })
+      .catch(() => {});
+  }, [products]);
 
   // Toggle wishlist item
   const toggleWishlist = (productId: string) => {
@@ -738,6 +749,9 @@ export default function GiftsPage() {
                 {filteredProducts.map(product => {
                   const isSoldOut = product.isSoldOut;
                   const isFav = product._id ? wishlist.includes(product._id) : false;
+                  const ratingData = product._id ? reviewRatings[product._id] : undefined;
+                  const avgRating = ratingData?.averageRating || 0;
+                  const reviewCount = ratingData?.reviewCount || 0;
 
                   return (
                     <div key={product._id} className="watch-card-container">
@@ -775,6 +789,42 @@ export default function GiftsPage() {
                             {product.specifications?.Material || 'Stainless Steel'} - {product.specifications?.['Case Size'] || '40mm'}
                           </p>
                         </Link>
+
+                        {/* ⭐ Review Stars */}
+                        {reviewCount > 0 ? (
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '4px', margin: '5px 0 2px' }}>
+                            {[1,2,3,4,5].map(s => {
+                              const filled = avgRating >= s;
+                              const half = !filled && avgRating >= s - 0.5;
+                              return (
+                                <svg key={s} width="11" height="11" viewBox="0 0 24 24" fill={filled ? '#8B6914' : half ? 'url(#half-g)' : 'none'} stroke="#8B6914" strokeWidth="1.5">
+                                  {half && (
+                                    <defs>
+                                      <linearGradient id="half-g">
+                                        <stop offset="50%" stopColor="#8B6914"/>
+                                        <stop offset="50%" stopColor="transparent"/>
+                                      </linearGradient>
+                                    </defs>
+                                  )}
+                                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                                </svg>
+                              );
+                            })}
+                            <span style={{ fontSize: '10px', color: 'rgba(26,18,9,0.45)', fontFamily: "'Jost',sans-serif", fontWeight: 500, marginLeft: '2px' }}>
+                              {avgRating.toFixed(1)} ({reviewCount})
+                            </span>
+                          </div>
+                        ) : (
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '3px', margin: '5px 0 2px' }}>
+                            {[1,2,3,4,5].map(s => (
+                              <svg key={s} width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="rgba(26,18,9,0.18)" strokeWidth="1.5">
+                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                              </svg>
+                            ))}
+                            <span style={{ fontSize: '9.5px', color: 'rgba(26,18,9,0.3)', fontFamily: "'Jost',sans-serif", marginLeft: '2px' }}>No reviews</span>
+                          </div>
+                        )}
+
                         <div className="watch-card-footer">
                           <span className="watch-card-price">{convertPrice(product.price)}</span>
                           <div className="watch-card-actions">
