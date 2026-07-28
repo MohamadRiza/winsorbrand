@@ -300,7 +300,6 @@ export default function AddProductPage() {
     }
     const newVariant: StagedColorVariant = {
       colorName: '',
-      colorHex: '#000000',
       qty: 0,
       inStock: false,
       file: null,
@@ -506,7 +505,7 @@ export default function AddProductPage() {
         video: (finalVideo && finalVideo.url) ? finalVideo : undefined,
         colorVariants: finalVariants.map(v => ({
           colorName: v.colorName,
-          colorHex: v.colorHex,
+          colorHex: v.colorHex || '',
           qty: v.qty,
           inStock: v.qty > 0,
           image: (v.image && v.image.url) ? v.image : undefined
@@ -732,7 +731,7 @@ export default function AddProductPage() {
           <div className="space-y-4">
             {formData.colorVariants.map((variant, idx) => (
               <div key={idx} className="p-4 bg-[#faf7f0] rounded-lg border border-[#1a1209]/10">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   {/* Color Name */}
                   <div>
                     <label className="block text-[11px] font-semibold tracking-[0.2em] uppercase text-[#1a1209]/70 mb-2">Color Name</label>
@@ -740,88 +739,74 @@ export default function AddProductPage() {
                       type="text"
                       value={variant.colorName}
                       onChange={(e) => updateColorVariant(idx, 'colorName', e.target.value)}
-                      placeholder="e.g., Gold"
+                      placeholder="e.g., Rose Gold"
                       className="w-full px-3 py-2 bg-white border border-[#1a1209]/15 rounded text-sm text-[#1a1209] placeholder-[#1a1209]/40"
                     />
                   </div>
-                  
-                  {/* Hex Code */}
+
+                  {/* Swatch Image Upload */}
                   <div>
-                    <label className="block text-[11px] font-semibold tracking-[0.2em] uppercase text-[#1a1209]/70 mb-2">Hex Code</label>
-                    <div className="flex gap-2">
-                      <input
-                        type="color"
-                        value={variant.colorHex}
-                        onChange={(e) => updateColorVariant(idx, 'colorHex', e.target.value)}
-                        className="w-10 h-10 rounded cursor-pointer"
-                      />
-                      <input
-                        type="text"
-                        value={variant.colorHex}
-                        onChange={(e) => updateColorVariant(idx, 'colorHex', e.target.value)}
-                        className="flex-1 px-3 py-2 bg-white border border-[#1a1209]/15 rounded text-sm text-[#1a1209]"
-                      />
+                    <label className="block text-[11px] font-semibold tracking-[0.2em] uppercase text-[#1a1209]/70 mb-2">
+                      Swatch Image <span className="text-[#8B6914]">(Displayed on product page)</span>
+                    </label>
+                    <div className="flex items-center gap-3">
+                      {(variant.previewUrl || variant.image?.url) ? (
+                        <div className="relative w-16 h-16 rounded-lg overflow-hidden border-2 border-[#8B6914]/40 shadow-sm">
+                          <img src={variant.previewUrl || variant.image?.url} alt={variant.colorName} className="w-full h-full object-cover" />
+                          <button
+                            type="button"
+                            onClick={() => removeVariantImage(idx)}
+                            className="absolute top-0.5 right-0.5 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 text-xs font-bold leading-none"
+                          >
+                            ×
+                          </button>
+                        </div>
+                      ) : (
+                        <label className="flex flex-col items-center justify-center w-16 h-16 border-2 border-dashed border-[#8B6914]/40 rounded-lg cursor-pointer hover:border-[#8B6914] hover:bg-[#8B6914]/5 transition-colors bg-white">
+                          <svg className="w-5 h-5 text-[#8B6914]/60 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                          <span className="text-[9px] text-[#8B6914]/80 font-semibold text-center leading-tight">Upload<br/>Swatch</span>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => handleVariantImageSelect(idx, e)}
+                            className="hidden"
+                          />
+                        </label>
+                      )}
+                      {(variant.previewUrl || variant.image?.url) && (
+                        <span className="text-xs text-[#1a1209]/60 leading-snug">
+                          Swatch ready for <strong>{variant.colorName || 'this variant'}</strong>
+                        </span>
+                      )}
+                      {!(variant.previewUrl || variant.image?.url) && (
+                        <span className="text-xs text-[#1a1209]/40 leading-snug">
+                          Upload a color watch photo — shown as a clickable thumbnail on the product page
+                        </span>
+                      )}
                     </div>
                   </div>
-                  
-                  {/* Quantity */}
-                  <div>
-                    <label className="block text-[11px] font-semibold tracking-[0.2em] uppercase text-[#1a1209]/70 mb-2">Quantity</label>
-                    <input
-                      type="number"
-                      value={variant.qty}
-                      onChange={(e) => updateColorVariant(idx, 'qty', Number(e.target.value))}
-                      min="0"
-                      className="w-full px-3 py-2 bg-white border border-[#1a1209]/15 rounded text-sm text-[#1a1209]"
-                    />
-                  </div>
-                  
-                  {/* Remove Button */}
-                  <div className="flex items-end">
-                    <button
-                      type="button"
-                      onClick={() => removeColorVariant(idx)}
-                      className="px-3 py-2 text-red-600 hover:bg-red-50 rounded text-sm transition-colors font-medium"
-                    >
-                      Remove
-                    </button>
-                  </div>
-                </div>
-                
-                {/* Variant Image Upload */}
-                <div className="mt-4 pt-4 border-t border-[#1a1209]/10">
-                  <label className="block text-[11px] font-semibold tracking-[0.2em] uppercase text-[#1a1209]/70 mb-2">
-                    Variant Image
-                  </label>
-                  <div className="flex items-center gap-4">
-                    {(variant.previewUrl || variant.image?.url) ? (
-                      <div className="relative w-20 h-20 rounded-lg overflow-hidden border border-[#1a1209]/10">
-                        <img src={variant.previewUrl || variant.image?.url} alt={variant.colorName} className="w-full h-full object-cover" />
-                        <button
-                          type="button"
-                          onClick={() => removeVariantImage(idx)}
-                          className="absolute top-1 right-1 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 text-xs font-bold"
-                        >
-                          ×
-                        </button>
-                      </div>
-                    ) : (
-                      <label className="flex flex-col items-center justify-center w-20 h-20 border-2 border-dashed border-[#1a1209]/20 rounded-lg cursor-pointer hover:border-[#8B6914] transition-colors bg-white">
-                        <svg className="w-5 h-5 text-[#1a1209]/40 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                        <span className="text-[10px] text-[#1a1209]/60 font-medium">Select Image</span>
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={(e) => handleVariantImageSelect(idx, e)}
-                          className="hidden"
-                        />
-                      </label>
-                    )}
-                    {(variant.previewUrl || variant.image?.url) && (
-                      <span className="text-xs text-[#1a1209]/60">
-                        Image selected for {variant.colorName || 'this variant'}
-                      </span>
-                    )}
+
+                  {/* Quantity + Remove */}
+                  <div className="flex gap-3">
+                    <div className="flex-1">
+                      <label className="block text-[11px] font-semibold tracking-[0.2em] uppercase text-[#1a1209]/70 mb-2">Quantity</label>
+                      <input
+                        type="number"
+                        value={variant.qty}
+                        onChange={(e) => updateColorVariant(idx, 'qty', Number(e.target.value))}
+                        min="0"
+                        className="w-full px-3 py-2 bg-white border border-[#1a1209]/15 rounded text-sm text-[#1a1209]"
+                      />
+                    </div>
+                    <div className="flex items-end">
+                      <button
+                        type="button"
+                        onClick={() => removeColorVariant(idx)}
+                        className="px-3 py-2 text-red-600 hover:bg-red-50 rounded text-sm transition-colors font-medium"
+                      >
+                        Remove
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>

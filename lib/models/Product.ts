@@ -9,10 +9,10 @@ const CloudinaryAssetSchema = new Schema({
 
 const ColorVariantSchema = new Schema({
   colorName: { type: String, required: true },
-  colorHex:  { type: String, required: true, default: '#000000' },
+  colorHex:  { type: String, required: false, default: '' }, // Optional — admin uses swatch image
   qty:       { type: Number, required: true, min: 0, default: 0 },
   inStock:   { type: Boolean, default: true },
-  image:     { type: CloudinaryAssetSchema, required: false }, // ✅ Optional
+  image:     { type: CloudinaryAssetSchema, required: false },
 }, { _id: true });
 
 ColorVariantSchema.pre('save', function () {

@@ -433,34 +433,82 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
         }
         .swatches-row {
           display: flex;
-          gap: 12px;
+          gap: 10px;
+          flex-wrap: wrap;
           margin-bottom: 24px;
+          align-items: flex-start;
+        }
+        .swatch-item {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 5px;
         }
         .swatch-btn {
-          width: 32px;
-          height: 32px;
-          border-radius: 50%;
-          border: 1px solid rgba(26, 18, 9, 0.15);
+          width: 52px;
+          height: 52px;
+          border-radius: 10px;
+          border: 2px solid rgba(26, 18, 9, 0.12);
           padding: 2px;
           background: none;
           cursor: pointer;
-          transition: border-color 0.2s, transform 0.2s;
+          transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
           display: flex;
           align-items: center;
           justify-content: center;
+          overflow: hidden;
+          position: relative;
         }
         .swatch-btn:hover {
-          transform: scale(1.08);
+          border-color: #8B6914;
+          transform: scale(1.05);
+          box-shadow: 0 4px 12px rgba(139, 105, 20, 0.2);
         }
         .swatch-btn.active {
           border-color: #8B6914;
-          transform: scale(1.08);
+          box-shadow: 0 0 0 3px rgba(139, 105, 20, 0.2);
+          transform: scale(1.05);
         }
-        .swatch-fill {
+        .swatch-img {
           width: 100%;
           height: 100%;
-          border-radius: 50%;
-          box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+          object-fit: cover;
+          border-radius: 8px;
+          display: block;
+        }
+        .swatch-fallback {
+          width: 100%;
+          height: 100%;
+          border-radius: 8px;
+          background: linear-gradient(135deg, #d4c5a0, #b8a882);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 9px;
+          font-weight: 600;
+          color: #6b5a30;
+          text-align: center;
+          letter-spacing: 0.02em;
+          padding: 2px;
+          line-height: 1.2;
+        }
+        .swatch-name {
+          font-size: 9px;
+          font-weight: 500;
+          color: rgba(26, 18, 9, 0.55);
+          text-align: center;
+          max-width: 56px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          font-family: 'Jost', sans-serif;
+          letter-spacing: 0.04em;
+          text-transform: uppercase;
+          transition: color 0.2s;
+        }
+        .swatch-item:has(.swatch-btn.active) .swatch-name {
+          color: #8B6914;
+          font-weight: 600;
         }
         
         /* INVENTORY STOCK STATUS */
@@ -1192,18 +1240,30 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
             {product.colorVariants && product.colorVariants.length > 0 && (
               <div>
                 <h3 className="swatch-label">
-                  Variants : {product.colorVariants.length} Size / Color
+                  Variants : {product.colorVariants.length} Colour{product.colorVariants.length > 1 ? 's' : ''}
                 </h3>
                 <div className="swatches-row">
                   {product.colorVariants.map((variant) => (
-                    <button
-                      key={variant.colorName}
-                      className={`swatch-btn ${selectedVariant?.colorName === variant.colorName ? 'active' : ''}`}
-                      onClick={() => handleVariantSelect(variant)}
-                      title={variant.colorName}
-                    >
-                      <div className="swatch-fill" style={{ backgroundColor: variant.colorHex }} />
-                    </button>
+                    <div key={variant.colorName} className="swatch-item">
+                      <button
+                        className={`swatch-btn ${selectedVariant?.colorName === variant.colorName ? 'active' : ''}`}
+                        onClick={() => handleVariantSelect(variant)}
+                        title={variant.colorName}
+                      >
+                        {variant.image?.url ? (
+                          <img
+                            src={variant.image.url}
+                            alt={variant.colorName}
+                            className="swatch-img"
+                          />
+                        ) : (
+                          <div className="swatch-fallback">
+                            {variant.colorName.slice(0, 3).toUpperCase()}
+                          </div>
+                        )}
+                      </button>
+                      <span className="swatch-name">{variant.colorName}</span>
+                    </div>
                   ))}
                 </div>
               </div>

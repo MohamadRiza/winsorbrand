@@ -31,10 +31,10 @@ export interface CloudinaryAsset {
 
 export interface ColorVariant {
   colorName: string;
-  colorHex:  string;
+  colorHex?: string; // Optional — admin uploads swatch image instead
   qty:       number;
   inStock:   boolean;
-  image?:    CloudinaryAsset; // ✅ Optional to prevent validation errors
+  image?:    CloudinaryAsset;
 }
 
 export interface IGiftCategory {
