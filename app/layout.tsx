@@ -14,7 +14,7 @@ if (process.env.NODE_ENV === 'development') {
 
 export const metadata: Metadata = {
   title: 'Winsor — Luxury Timepieces',
-  description: 'Fine watches since 1987',
+  description: 'Fine watches since 2020',
 };
 
 export default function RootLayout({
@@ -31,8 +31,8 @@ export default function RootLayout({
               <LayoutShell>
                 {children}
               </LayoutShell>
-              <Toaster 
-                position="top-right" 
+              <Toaster
+                position="top-right"
                 containerClassName="winsor-toaster"
                 toastOptions={{
                   style: {
@@ -65,4 +65,3 @@ export default function RootLayout({
     </ClerkProvider>
   );
 }
- 
