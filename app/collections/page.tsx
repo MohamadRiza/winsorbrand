@@ -209,6 +209,16 @@ export default function CollectionsPage() {
     return 'Unisex';
   };
 
+  // Scroll smoothly to products section when filter cards/buttons are clicked
+  const scrollToProducts = () => {
+    setTimeout(() => {
+      const element = document.getElementById('featured-products-section');
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 50);
+  };
+
   // Toggle wishlist toggle
   const toggleWishlist = (productId: string) => {
     const isFav = wishlist.includes(productId);
@@ -1407,7 +1417,7 @@ export default function CollectionsPage() {
             <h1 className="hero-banner-title">{SLIDES[currentSlide].title}</h1>
             <div className="hero-banner-desc" style={{ marginBottom: '36px' }}>{SLIDES[currentSlide].desc}</div>
             <div className="hero-banner-actions">
-              <button className="hero-btn-primary" onClick={() => setSelectedSection('all')}>EXPLORE COLLECTION</button>
+              <button className="hero-btn-primary" onClick={() => { setSelectedSection('all'); setSelectedGender('all'); scrollToProducts(); }}>EXPLORE COLLECTION</button>
               <button className="hero-btn-secondary">
                 <span className="play-icon">▶</span> WATCH FILM
               </button>
@@ -1480,8 +1490,12 @@ export default function CollectionsPage() {
           <div className="gender-header-row">
             {/* Card 1: Gents */}
             <div
-              className={`gender-header-card ${selectedGender === 'gents' ? 'active' : ''}`}
-              onClick={() => setSelectedGender(selectedGender === 'gents' ? 'all' : 'gents')}
+              className={`gender-header-card ${selectedGender === 'gents' && selectedSection === 'all' ? 'active' : ''}`}
+              onClick={() => {
+                setSelectedSection('all');
+                setSelectedGender(selectedGender === 'gents' ? 'all' : 'gents');
+                scrollToProducts();
+              }}
             >
               <div className="gender-card-img-wrapper">
                 <Image
@@ -1506,8 +1520,12 @@ export default function CollectionsPage() {
 
             {/* Card 2: Ladies */}
             <div
-              className={`gender-header-card ${selectedGender === 'ladies' ? 'active' : ''}`}
-              onClick={() => setSelectedGender(selectedGender === 'ladies' ? 'all' : 'ladies')}
+              className={`gender-header-card ${selectedGender === 'ladies' && selectedSection === 'all' ? 'active' : ''}`}
+              onClick={() => {
+                setSelectedSection('all');
+                setSelectedGender(selectedGender === 'ladies' ? 'all' : 'ladies');
+                scrollToProducts();
+              }}
             >
               <div className="gender-card-img-wrapper">
                 <Image
@@ -1530,10 +1548,10 @@ export default function CollectionsPage() {
               </div>
             </div>
 
-            {/* Card 3: Gifts */}
-            <div
-              className={`gender-header-card ${selectedGender === 'gifts' ? 'active' : ''}`}
-              onClick={() => setSelectedGender(selectedGender === 'gifts' ? 'all' : 'gifts')}
+            {/* Card 3: Gifts -> Redirects directly to /gifts */}
+            <Link
+              href="/gifts"
+              className="gender-header-card"
             >
               <div className="gender-card-img-wrapper">
                 <Image
@@ -1554,12 +1572,16 @@ export default function CollectionsPage() {
               <div className="gender-header-arrow">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="12" cy="12" r="10" /><path d="M8 12h8M12 8l4 4-4 4" /></svg>
               </div>
-            </div>
+            </Link>
 
             {/* Card 4: Limited Edition */}
             <div
               className={`gender-header-card ${selectedSection === 'limited' ? 'active' : ''}`}
-              onClick={() => setSelectedSection(selectedSection === 'limited' ? 'all' : 'limited')}
+              onClick={() => {
+                setSelectedGender('all');
+                setSelectedSection(selectedSection === 'limited' ? 'all' : 'limited');
+                scrollToProducts();
+              }}
             >
               <div className="gender-card-img-wrapper">
                 <Image
@@ -1667,7 +1689,7 @@ export default function CollectionsPage() {
           </div>
 
           {/* SECTION TITLE & TABS */}
-          <div className="featured-section-header">
+          <div className="featured-section-header" id="featured-products-section">
             <div className="featured-title-block">
               <h2 className="featured-title">FEATURED TIMEPIECES</h2>
               <Link href="/" className="view-all-link">View All Collections <span className="arrow">→</span></Link>
@@ -1681,31 +1703,31 @@ export default function CollectionsPage() {
                 ALL WATCHES
               </button>
               <button
-                onClick={() => setSelectedSection('new')}
+                onClick={() => { setSelectedSection('new'); setSelectedGender('all'); }}
                 className={`capsule-btn ${selectedSection === 'new' ? 'active' : ''}`}
               >
                 NEW ARRIVALS
               </button>
               <button
-                onClick={() => setSelectedSection('bestsellers')}
+                onClick={() => { setSelectedSection('bestsellers'); setSelectedGender('all'); }}
                 className={`capsule-btn ${selectedSection === 'bestsellers' ? 'active' : ''}`}
               >
                 BEST SELLERS
               </button>
               <button
-                onClick={() => setSelectedSection('sports')}
+                onClick={() => { setSelectedSection('sports'); setSelectedGender('all'); }}
                 className={`capsule-btn ${selectedSection === 'sports' ? 'active' : ''}`}
               >
                 SPORTS
               </button>
               <button
-                onClick={() => setSelectedSection('luxury')}
+                onClick={() => { setSelectedSection('luxury'); setSelectedGender('all'); }}
                 className={`capsule-btn ${selectedSection === 'luxury' ? 'active' : ''}`}
               >
                 CLASSIC
               </button>
               <button
-                onClick={() => setSelectedSection('limited')}
+                onClick={() => { setSelectedSection('limited'); setSelectedGender('all'); }}
                 className={`capsule-btn ${selectedSection === 'limited' ? 'active' : ''}`}
               >
                 LIMITED EDITION
