@@ -12,11 +12,11 @@ import Order from '@/lib/models/Order';
 
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await connectDB();
-    const { id } = params;
+    const { id } = await params;
 
     if (!id || id.length !== 24) {
       return NextResponse.json(
