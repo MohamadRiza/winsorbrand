@@ -62,14 +62,14 @@ export default function CareersPage() {
   }, [vacancies, searchQuery, selectedLocation]);
 
   return (
-    <div className="min-h-screen bg-[#faf7f0] text-[#1a1209] flex flex-col" style={{ fontFamily: "'Jost', sans-serif" }}>
+    <div className="min-h-screen bg-[#faf7f0] text-[#1a1209] flex flex-col mt-[72px] lg:mt-[86px]" style={{ fontFamily: "'Jost', sans-serif" }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=Jost:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=Jost:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300&display=swap');
       `}</style>
       <Navbar />
 
       {/* Hero Header */}
-      <section className="careers-hero-banner relative w-full pt-32 lg:pt-40 pb-24 lg:pb-32 flex items-center justify-center overflow-hidden bg-gradient-to-b from-[#0a0a0a] via-[#1a140d] to-[#0a0a0a] text-white">
+      <section className="careers-hero-banner relative w-full pt-16 lg:pt-24 pb-20 lg:pb-28 flex items-center justify-center overflow-hidden bg-gradient-to-b from-[#0a0a0a] via-[#1a140d] to-[#0a0a0a] text-white">
         <Image
           src="/discover-service.jpg"
           alt="Careers at Winsor Atelier"
@@ -148,30 +148,30 @@ export default function CareersPage() {
           )}
         </div>
 
-        {/* 🌟 STATS COUNTER BANNER (100+ Team Members, 50+ Locations, etc.) */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 py-2">
-          <div className="bg-white border border-[#1a1209]/8 rounded-2xl p-6 text-center shadow-sm hover:border-[#8B6914]/40 transition-all">
-            <div className="text-3xl sm:text-4xl font-bold text-[#8B6914] leading-none mb-2" style={{ fontFamily: "'Cormorant Garamond', serif" }}>100+</div>
-            <div className="text-[11px] font-semibold tracking-wider text-[#1a1209]/70 uppercase" style={{ fontFamily: "'Jost', sans-serif" }}>Team Members</div>
-            <div className="text-[10px] text-[#1a1209]/45 mt-1" style={{ fontFamily: "'Jost', sans-serif" }}>Global Artisans & Professionals</div>
+        {/* 🌟 STATS COUNTER BANNER (Compact 4-column single-row layout for mobile & desktop) */}
+        <div className="py-4 sm:py-6 px-1 sm:px-4 border-t border-b border-[#1a1209]/10 my-4 grid grid-cols-4 divide-x divide-[#1a1209]/10">
+          <div className="text-center px-1 sm:px-2 space-y-1">
+            <div className="text-lg sm:text-2xl lg:text-3xl font-light text-[#8B6914] leading-none tracking-wide" style={{ fontFamily: "'Cinzel', serif", fontVariantNumeric: 'lining-nums tabular-nums', fontFeatureSettings: '"lnum" 1, "tnum" 1' }}>100+</div>
+            <div className="text-[9px] sm:text-[10.5px] font-semibold tracking-wider text-[#1a1209] uppercase leading-tight" style={{ fontFamily: "'Jost', sans-serif" }}>Team Members</div>
+            <div className="text-[8px] sm:text-[9.5px] text-[#1a1209]/50 font-light hidden sm:block" style={{ fontFamily: "'Jost', sans-serif" }}>Global Artisans & Professionals</div>
           </div>
 
-          <div className="bg-white border border-[#1a1209]/8 rounded-2xl p-6 text-center shadow-sm hover:border-[#8B6914]/40 transition-all">
-            <div className="text-3xl sm:text-4xl font-bold text-[#8B6914] leading-none mb-2" style={{ fontFamily: "'Cormorant Garamond', serif" }}>50+</div>
-            <div className="text-[11px] font-semibold tracking-wider text-[#1a1209]/70 uppercase" style={{ fontFamily: "'Jost', sans-serif" }}>Locations</div>
-            <div className="text-[10px] text-[#1a1209]/45 mt-1" style={{ fontFamily: "'Jost', sans-serif" }}>Boutiques & Regional Hubs</div>
+          <div className="text-center px-1 sm:px-2 space-y-1">
+            <div className="text-lg sm:text-2xl lg:text-3xl font-light text-[#8B6914] leading-none tracking-wide" style={{ fontFamily: "'Cinzel', serif", fontVariantNumeric: 'lining-nums tabular-nums', fontFeatureSettings: '"lnum" 1, "tnum" 1' }}>50+</div>
+            <div className="text-[9px] sm:text-[10.5px] font-semibold tracking-wider text-[#1a1209] uppercase leading-tight" style={{ fontFamily: "'Jost', sans-serif" }}>Locations</div>
+            <div className="text-[8px] sm:text-[9.5px] text-[#1a1209]/50 font-light hidden sm:block" style={{ fontFamily: "'Jost', sans-serif" }}>Boutiques & Regional Hubs</div>
           </div>
 
-          <div className="bg-white border border-[#1a1209]/8 rounded-2xl p-6 text-center shadow-sm hover:border-[#8B6914]/40 transition-all">
-            <div className="text-3xl sm:text-4xl font-bold text-[#8B6914] leading-none mb-2" style={{ fontFamily: "'Cormorant Garamond', serif" }}>100%</div>
-            <div className="text-[11px] font-semibold tracking-wider text-[#1a1209]/70 uppercase" style={{ fontFamily: "'Jost', sans-serif" }}>Precision Movement</div>
-            <div className="text-[10px] text-[#1a1209]/45 mt-1" style={{ fontFamily: "'Jost', sans-serif" }}>Japanese Precision Engineering</div>
+          <div className="text-center px-1 sm:px-2 space-y-1">
+            <div className="text-lg sm:text-2xl lg:text-3xl font-light text-[#8B6914] leading-none tracking-wide" style={{ fontFamily: "'Cinzel', serif", fontVariantNumeric: 'lining-nums tabular-nums', fontFeatureSettings: '"lnum" 1, "tnum" 1' }}>100%</div>
+            <div className="text-[9px] sm:text-[10.5px] font-semibold tracking-wider text-[#1a1209] uppercase leading-tight" style={{ fontFamily: "'Jost', sans-serif" }}>Precision Movement</div>
+            <div className="text-[8px] sm:text-[9.5px] text-[#1a1209]/50 font-light hidden sm:block" style={{ fontFamily: "'Jost', sans-serif" }}>Japanese Precision Engineering</div>
           </div>
 
-          <div className="bg-white border border-[#1a1209]/8 rounded-2xl p-6 text-center shadow-sm hover:border-[#8B6914]/40 transition-all">
-            <div className="text-3xl sm:text-4xl font-bold text-[#8B6914] leading-none mb-2" style={{ fontFamily: "'Cormorant Garamond', serif" }}>15+</div>
-            <div className="text-[11px] font-semibold tracking-wider text-[#1a1209]/70 uppercase" style={{ fontFamily: "'Jost', sans-serif" }}>Years Excellence</div>
-            <div className="text-[10px] text-[#1a1209]/45 mt-1" style={{ fontFamily: "'Jost', sans-serif" }}>In Luxury Watchmaking</div>
+          <div className="text-center px-1 sm:px-2 space-y-1">
+            <div className="text-lg sm:text-2xl lg:text-3xl font-light text-[#8B6914] leading-none tracking-wide" style={{ fontFamily: "'Cinzel', serif", fontVariantNumeric: 'lining-nums tabular-nums', fontFeatureSettings: '"lnum" 1, "tnum" 1' }}>15+</div>
+            <div className="text-[9px] sm:text-[10.5px] font-semibold tracking-wider text-[#1a1209] uppercase leading-tight" style={{ fontFamily: "'Jost', sans-serif" }}>Years Excellence</div>
+            <div className="text-[8px] sm:text-[9.5px] text-[#1a1209]/50 font-light hidden sm:block" style={{ fontFamily: "'Jost', sans-serif" }}>In Luxury Watchmaking</div>
           </div>
         </div>
 
@@ -308,58 +308,114 @@ export default function CareersPage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             
             {/* Value 1 */}
-            <div className="p-6 bg-[#faf7f0]/60 border border-[#1a1209]/8 rounded-2xl space-y-3 hover:border-[#8B6914]/40 transition-all">
-              <div className="w-10 h-10 bg-[#8B6914]/10 rounded-xl flex items-center justify-center text-[#8B6914]">
-                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            <div className="group bg-[#faf7f0]/60 border border-[#1a1209]/10 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:border-[#8B6914]/40 transition-all duration-300 flex flex-col">
+              <div className="relative h-44 w-full overflow-hidden">
+                <Image
+                  src="/careers/horological_precision.jpg"
+                  alt="Horological Precision"
+                  fill
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+                  className="object-cover group-hover:scale-108 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                <span className="absolute bottom-3 left-3 bg-[#8B6914]/90 backdrop-blur-md text-white text-[9px] font-semibold tracking-widest uppercase px-2.5 py-1 rounded-md" style={{ fontFamily: "'Jost', sans-serif" }}>
+                  PRECISION
+                </span>
               </div>
-              <h3 className="text-xl font-bold text-[#1a1209]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
-                Horological Precision
-              </h3>
-              <p className="text-xs text-[#1a1209]/65 font-light leading-relaxed" style={{ fontFamily: "'Jost', sans-serif" }}>
-                Work alongside master horologists with Japanese precision movements and refined artisan watchmaking heritage.
-              </p>
+              <div className="p-5 lg:p-6 space-y-2 flex-1 flex flex-col justify-between">
+                <div>
+                  <h3 className="text-xl font-bold text-[#1a1209] leading-snug" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+                    Horological Precision
+                  </h3>
+                  <p className="text-xs text-[#1a1209]/70 font-light leading-relaxed mt-2" style={{ fontFamily: "'Jost', sans-serif" }}>
+                    Work alongside master horologists with Japanese precision movements and refined artisan watchmaking heritage.
+                  </p>
+                </div>
+              </div>
             </div>
 
             {/* Value 2 */}
-            <div className="p-6 bg-[#faf7f0]/60 border border-[#1a1209]/8 rounded-2xl space-y-3 hover:border-[#8B6914]/40 transition-all">
-              <div className="w-10 h-10 bg-[#8B6914]/10 rounded-xl flex items-center justify-center text-[#8B6914]">
-                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            <div className="group bg-[#faf7f0]/60 border border-[#1a1209]/10 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:border-[#8B6914]/40 transition-all duration-300 flex flex-col">
+              <div className="relative h-44 w-full overflow-hidden">
+                <Image
+                  src="/careers/global_presence.jpg"
+                  alt="Global Presence"
+                  fill
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+                  className="object-cover group-hover:scale-108 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                <span className="absolute bottom-3 left-3 bg-[#8B6914]/90 backdrop-blur-md text-white text-[9px] font-semibold tracking-widest uppercase px-2.5 py-1 rounded-md" style={{ fontFamily: "'Jost', sans-serif" }}>
+                  GLOBAL
+                </span>
               </div>
-              <h3 className="text-xl font-bold text-[#1a1209]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
-                Global Presence
-              </h3>
-              <p className="text-xs text-[#1a1209]/65 font-light leading-relaxed" style={{ fontFamily: "'Jost', sans-serif" }}>
-                Experience deployment across 50+ luxury boutique locations, with full rotational travel support and housing perks.
-              </p>
+              <div className="p-5 lg:p-6 space-y-2 flex-1 flex flex-col justify-between">
+                <div>
+                  <h3 className="text-xl font-bold text-[#1a1209] leading-snug" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+                    Global Presence
+                  </h3>
+                  <p className="text-xs text-[#1a1209]/70 font-light leading-relaxed mt-2" style={{ fontFamily: "'Jost', sans-serif" }}>
+                    Experience deployment across 50+ luxury boutique locations, with full rotational travel support and housing perks.
+                  </p>
+                </div>
+              </div>
             </div>
 
             {/* Value 3 */}
-            <div className="p-6 bg-[#faf7f0]/60 border border-[#1a1209]/8 rounded-2xl space-y-3 hover:border-[#8B6914]/40 transition-all">
-              <div className="w-10 h-10 bg-[#8B6914]/10 rounded-xl flex items-center justify-center text-[#8B6914]">
-                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+            <div className="group bg-[#faf7f0]/60 border border-[#1a1209]/10 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:border-[#8B6914]/40 transition-all duration-300 flex flex-col">
+              <div className="relative h-44 w-full overflow-hidden">
+                <Image
+                  src="/careers/continuous_advancement.jpg"
+                  alt="Continuous Advancement"
+                  fill
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+                  className="object-cover group-hover:scale-108 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                <span className="absolute bottom-3 left-3 bg-[#8B6914]/90 backdrop-blur-md text-white text-[9px] font-semibold tracking-widest uppercase px-2.5 py-1 rounded-md" style={{ fontFamily: "'Jost', sans-serif" }}>
+                  GROWTH
+                </span>
               </div>
-              <h3 className="text-xl font-bold text-[#1a1209]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
-                Continuous Advancement
-              </h3>
-              <p className="text-xs text-[#1a1209]/65 font-light leading-relaxed" style={{ fontFamily: "'Jost', sans-serif" }}>
-                Structured certification programs, technical development, and clear leadership pathways for driven professionals.
-              </p>
+              <div className="p-5 lg:p-6 space-y-2 flex-1 flex flex-col justify-between">
+                <div>
+                  <h3 className="text-xl font-bold text-[#1a1209] leading-snug" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+                    Continuous Advancement
+                  </h3>
+                  <p className="text-xs text-[#1a1209]/70 font-light leading-relaxed mt-2" style={{ fontFamily: "'Jost', sans-serif" }}>
+                    Structured certification programs, technical development, and clear leadership pathways for driven professionals.
+                  </p>
+                </div>
+              </div>
             </div>
 
             {/* Value 4 */}
-            <div className="p-6 bg-[#faf7f0]/60 border border-[#1a1209]/8 rounded-2xl space-y-3 hover:border-[#8B6914]/40 transition-all">
-              <div className="w-10 h-10 bg-[#8B6914]/10 rounded-xl flex items-center justify-center text-[#8B6914]">
-                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+            <div className="group bg-[#faf7f0]/60 border border-[#1a1209]/10 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:border-[#8B6914]/40 transition-all duration-300 flex flex-col">
+              <div className="relative h-44 w-full overflow-hidden">
+                <Image
+                  src="/careers/artisan_culture.jpg"
+                  alt="Artisan Family Culture"
+                  fill
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+                  className="object-cover group-hover:scale-108 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                <span className="absolute bottom-3 left-3 bg-[#8B6914]/90 backdrop-blur-md text-white text-[9px] font-semibold tracking-widest uppercase px-2.5 py-1 rounded-md" style={{ fontFamily: "'Jost', sans-serif" }}>
+                  CULTURE
+                </span>
               </div>
-              <h3 className="text-xl font-bold text-[#1a1209]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
-                Artisan Family Culture
-              </h3>
-              <p className="text-xs text-[#1a1209]/65 font-light leading-relaxed" style={{ fontFamily: "'Jost', sans-serif" }}>
-                Join a collaborative, supportive workplace where craft dedication and team wellbeing are deeply valued.
-              </p>
+              <div className="p-5 lg:p-6 space-y-2 flex-1 flex flex-col justify-between">
+                <div>
+                  <h3 className="text-xl font-bold text-[#1a1209] leading-snug" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+                    Artisan Family Culture
+                  </h3>
+                  <p className="text-xs text-[#1a1209]/70 font-light leading-relaxed mt-2" style={{ fontFamily: "'Jost', sans-serif" }}>
+                    Join a collaborative, supportive workplace where craft dedication and team wellbeing are deeply valued.
+                  </p>
+                </div>
+              </div>
             </div>
 
           </div>
@@ -387,57 +443,99 @@ export default function CareersPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             
             {/* Award 1 */}
-            <div className="bg-white border border-[#1a1209]/8 rounded-2xl p-7 shadow-sm hover:shadow-xl transition-all duration-300 space-y-4">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-[#8B6914]/10 rounded-2xl flex items-center justify-center text-[#8B6914] border border-[#8B6914]/20 flex-shrink-0">
-                  <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>
-                </div>
-                <div>
-                  <span className="text-[10px] font-bold tracking-widest text-[#8B6914] uppercase block" style={{ fontFamily: "'Jost', sans-serif" }}>2025 Laureate</span>
-                  <h3 className="text-lg font-bold text-[#1a1209] leading-snug" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
-                    Excellence in Horology
-                  </h3>
+            <div className="group bg-white border border-[#1a1209]/10 rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl hover:border-[#8B6914]/40 transition-all duration-300 flex flex-col">
+              <div className="relative h-56 w-full overflow-hidden bg-[#0a0a0a]">
+                <Image
+                  src="/awards/award_1.jpg"
+                  alt="Excellence in Horology Award"
+                  fill
+                  sizes="(max-width: 768px) 100vw, 33vw"
+                  className="object-cover group-hover:scale-108 transition-transform duration-500 opacity-90"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between">
+                  <span className="text-[10px] font-bold tracking-widest text-[#8B6914] uppercase bg-black/60 backdrop-blur-md px-3 py-1 rounded-md border border-[#8B6914]/30" style={{ fontFamily: "'Jost', sans-serif" }}>
+                    2025 LAUREATE
+                  </span>
+                  <div className="w-8 h-8 rounded-full bg-[#8B6914]/20 backdrop-blur-md border border-[#8B6914]/40 flex items-center justify-center text-[#8B6914]">
+                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                  </div>
                 </div>
               </div>
-              <p className="text-xs text-[#1a1209]/65 font-light leading-relaxed" style={{ fontFamily: "'Jost', sans-serif" }}>
-                Awarded for outstanding precision movement assembly and high-grade Japanese watchmaking craftsmanship.
-              </p>
+              <div className="p-6 lg:p-7 space-y-3 flex-1 flex flex-col justify-between">
+                <div>
+                  <h3 className="text-xl font-bold text-[#1a1209] leading-snug" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+                    Excellence in Horology
+                  </h3>
+                  <p className="text-xs text-[#1a1209]/70 font-light leading-relaxed mt-2" style={{ fontFamily: "'Jost', sans-serif" }}>
+                    Awarded for outstanding precision movement assembly and high-grade Japanese watchmaking craftsmanship.
+                  </p>
+                </div>
+              </div>
             </div>
 
             {/* Award 2 */}
-            <div className="bg-white border border-[#1a1209]/8 rounded-2xl p-7 shadow-sm hover:shadow-xl transition-all duration-300 space-y-4">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-[#8B6914]/10 rounded-2xl flex items-center justify-center text-[#8B6914] border border-[#8B6914]/20 flex-shrink-0">
-                  <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/></svg>
-                </div>
-                <div>
-                  <span className="text-[10px] font-bold tracking-widest text-[#8B6914] uppercase block" style={{ fontFamily: "'Jost', sans-serif" }}>Global Recognition</span>
-                  <h3 className="text-lg font-bold text-[#1a1209] leading-snug" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
-                    Luxury Boutique Retailer
-                  </h3>
+            <div className="group bg-white border border-[#1a1209]/10 rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl hover:border-[#8B6914]/40 transition-all duration-300 flex flex-col">
+              <div className="relative h-56 w-full overflow-hidden bg-[#0a0a0a]">
+                <Image
+                  src="/awards/award_2.jpg"
+                  alt="Luxury Boutique Retailer Award"
+                  fill
+                  sizes="(max-width: 768px) 100vw, 33vw"
+                  className="object-cover group-hover:scale-108 transition-transform duration-500 opacity-90"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between">
+                  <span className="text-[10px] font-bold tracking-widest text-[#8B6914] uppercase bg-black/60 backdrop-blur-md px-3 py-1 rounded-md border border-[#8B6914]/30" style={{ fontFamily: "'Jost', sans-serif" }}>
+                    GLOBAL RECOGNITION
+                  </span>
+                  <div className="w-8 h-8 rounded-full bg-[#8B6914]/20 backdrop-blur-md border border-[#8B6914]/40 flex items-center justify-center text-[#8B6914]">
+                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/></svg>
+                  </div>
                 </div>
               </div>
-              <p className="text-xs text-[#1a1209]/65 font-light leading-relaxed" style={{ fontFamily: "'Jost', sans-serif" }}>
-                Honored for exceptional client concierge standards across our expanding network of 50+ locations.
-              </p>
+              <div className="p-6 lg:p-7 space-y-3 flex-1 flex flex-col justify-between">
+                <div>
+                  <h3 className="text-xl font-bold text-[#1a1209] leading-snug" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+                    Luxury Boutique Retailer
+                  </h3>
+                  <p className="text-xs text-[#1a1209]/70 font-light leading-relaxed mt-2" style={{ fontFamily: "'Jost', sans-serif" }}>
+                    Honored for exceptional client concierge standards across our expanding network of 50+ locations.
+                  </p>
+                </div>
+              </div>
             </div>
 
             {/* Award 3 */}
-            <div className="bg-white border border-[#1a1209]/8 rounded-2xl p-7 shadow-sm hover:shadow-xl transition-all duration-300 space-y-4">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-[#8B6914]/10 rounded-2xl flex items-center justify-center text-[#8B6914] border border-[#8B6914]/20 flex-shrink-0">
-                  <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                </div>
-                <div>
-                  <span className="text-[10px] font-bold tracking-widest text-[#8B6914] uppercase block" style={{ fontFamily: "'Jost', sans-serif" }}>Employer Distinction</span>
-                  <h3 className="text-lg font-bold text-[#1a1209] leading-snug" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
-                    Premier Employer Workplace
-                  </h3>
+            <div className="group bg-white border border-[#1a1209]/10 rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl hover:border-[#8B6914]/40 transition-all duration-300 flex flex-col">
+              <div className="relative h-56 w-full overflow-hidden bg-[#0a0a0a]">
+                <Image
+                  src="/awards/award_3.jpg"
+                  alt="Premier Employer Workplace Award"
+                  fill
+                  sizes="(max-width: 768px) 100vw, 33vw"
+                  className="object-cover group-hover:scale-108 transition-transform duration-500 opacity-90"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between">
+                  <span className="text-[10px] font-bold tracking-widest text-[#8B6914] uppercase bg-black/60 backdrop-blur-md px-3 py-1 rounded-md border border-[#8B6914]/30" style={{ fontFamily: "'Jost', sans-serif" }}>
+                    EMPLOYER DISTINCTION
+                  </span>
+                  <div className="w-8 h-8 rounded-full bg-[#8B6914]/20 backdrop-blur-md border border-[#8B6914]/40 flex items-center justify-center text-[#8B6914]">
+                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>
+                  </div>
                 </div>
               </div>
-              <p className="text-xs text-[#1a1209]/65 font-light leading-relaxed" style={{ fontFamily: "'Jost', sans-serif" }}>
-                Recognized for employee wellbeing, rotational branch support, housing facilities, and team growth.
-              </p>
+              <div className="p-6 lg:p-7 space-y-3 flex-1 flex flex-col justify-between">
+                <div>
+                  <h3 className="text-xl font-bold text-[#1a1209] leading-snug" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+                    Premier Employer Workplace
+                  </h3>
+                  <p className="text-xs text-[#1a1209]/70 font-light leading-relaxed mt-2" style={{ fontFamily: "'Jost', sans-serif" }}>
+                    Recognized for employee wellbeing, rotational branch support, housing facilities, and team growth.
+                  </p>
+                </div>
+              </div>
             </div>
 
           </div>

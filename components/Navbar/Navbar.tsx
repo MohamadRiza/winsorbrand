@@ -149,7 +149,7 @@ export default function Navbar() {
   const { totalItemsCount } = useCart();
   const pathname = usePathname();
   const router = useRouter();
-  const isTransparentPage = pathname === '/' || pathname === '/collections' || pathname === '/customer-care' || pathname === '/gifts' || pathname === '/retailers' || pathname === '/careers';
+  const isTransparentPage = pathname === '/' || pathname === '/collections' || pathname === '/customer-care' || pathname === '/gifts' || pathname === '/retailers';
 
   const [isTransparent,      setIsTransparent]      = useState(true);
   const [isVisible,          setIsVisible]          = useState(true);

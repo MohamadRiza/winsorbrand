@@ -423,7 +423,7 @@ export default function FAQPage() {
         <div className="faq-footer">
           <h3>Still Have Questions?</h3>
           <p>Our dedicated customer care concierge is ready to assist you further.</p>
-          <Link href="/contact" className="faq-contact-btn">
+          <Link href="/customer-care" className="faq-contact-btn">
             Get in touch
           </Link>
         </div>

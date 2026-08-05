@@ -15,6 +15,13 @@ if (process.env.NODE_ENV === 'development') {
 export const metadata: Metadata = {
   title: 'Winsor — Luxury Timepieces',
   description: 'Fine watches since 2020',
+  icons: {
+    icon: [
+      { url: '/icon.png', type: 'image/png' },
+      { url: '/favicon.ico', sizes: 'any' },
+    ],
+    apple: '/apple-icon.png',
+  },
 };
 
 export default function RootLayout({

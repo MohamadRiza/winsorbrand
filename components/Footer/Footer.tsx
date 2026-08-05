@@ -84,7 +84,7 @@ const FOOTER_LINKS = {
     { label: 'Shipping & Returns', href: '/shipping' },
     { label: 'Warranty', href: '/warranty' },
     { label: 'FAQ', href: '/faq' },
-    { label: 'Contact Us', href: '/contact' },
+    { label: 'Contact Us', href: '/customer-care' },
   ],
   legal: [
     { label: 'Privacy Policy', href: '/privacy' },

@@ -741,28 +741,29 @@ export default function CollectionsPage() {
         
         /* ── WATCH CARD CONTAINER ── */
         .watch-card-container {
-          background: #fff;
-          border-radius: 12px;
-          border: 1px solid rgba(26,18,9,0.05);
+          background: #faf7f0;
+          border-radius: 16px;
+          border: 1px solid rgba(26,18,9,0.08);
           overflow: hidden;
           display: flex;
           flex-direction: column;
           height: 100%;
-          transition: all 0.4s ease;
-          box-shadow: 0 4px 20px rgba(0,0,0,0.015);
+          transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+          box-shadow: 0 4px 16px rgba(26,18,9,0.02);
           text-decoration: none;
           color: inherit;
           position: relative;
         }
         .watch-card-container:hover {
           transform: translateY(-6px);
-          box-shadow: 0 16px 36px rgba(26,18,9,0.06);
-          border-color: rgba(139,105,20,0.18);
+          box-shadow: 0 16px 36px rgba(26,18,9,0.08);
+          border-color: rgba(139,105,20,0.3);
+          background: #ffffff;
         }
         .watch-img-container {
           position: relative;
           aspect-ratio: 1;
-          background: #fff;
+          background: transparent;
           padding: 24px;
           display: flex;
           align-items: center;
@@ -776,7 +777,7 @@ export default function CollectionsPage() {
           transition: transform 0.6s ease;
         }
         .watch-card-container:hover .watch-card-image {
-          transform: scale(1.04);
+          transform: scale(1.06);
         }
         .watch-card-badge {
           position: absolute;
@@ -786,11 +787,12 @@ export default function CollectionsPage() {
           color: #fff;
           font-size: 9px;
           font-weight: 600;
-          letter-spacing: 0.1em;
+          letter-spacing: 0.12em;
           padding: 4px 10px;
-          border-radius: 3px;
+          border-radius: 4px;
           z-index: 2;
           text-transform: uppercase;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.15);
         }
         .watch-card-info {
           padding: 20px;
@@ -798,7 +800,7 @@ export default function CollectionsPage() {
           display: flex;
           flex-direction: column;
           justify-content: space-between;
-          background: #fff;
+          background: transparent;
         }
         .watch-card-title-link {
           text-decoration: none;

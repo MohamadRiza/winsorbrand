@@ -50,8 +50,11 @@ export default function GiftsPage() {
   const [error, setError] = useState<string | null>(null);
   const [reviewRatings, setReviewRatings] = useState<Record<string, { averageRating: number; reviewCount: number }>>({});
 
-  // Filter states
+  // Filter & Search states
   const [selectedCategorySlug, setSelectedCategorySlug] = useState<string>('all');
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [priceSort, setPriceSort] = useState<'none' | 'low-to-high' | 'high-to-low'>('none');
+  const [showMobileFilters, setShowMobileFilters] = useState<boolean>(false);
   const [wishlist, setWishlist] = useState<string[]>([]);
 
   // Fetch products and active categories on mount
@@ -139,12 +142,38 @@ export default function GiftsPage() {
     localStorage.setItem('winsor_wishlist', JSON.stringify(updated));
   };
 
-  // Filter products: must be active, have gift categories mapped, and match current filter if not 'all'
+  // Reset filters helper
+  const resetFilters = () => {
+    setSelectedCategorySlug('all');
+    setSearchQuery('');
+    setPriceSort('none');
+  };
+
+  // Filter products: must be active, have gift categories mapped, match category, search query & price sort
   const giftingProducts = products.filter(p => p.giftCategories && p.giftCategories.length > 0);
   
-  const filteredProducts = selectedCategorySlug === 'all'
-    ? giftingProducts
-    : giftingProducts.filter(p => p.giftCategories.includes(selectedCategorySlug));
+  let filteredProducts = giftingProducts.filter(p => {
+    // Category filter
+    const catMatch = selectedCategorySlug === 'all' || p.giftCategories.includes(selectedCategorySlug);
+    // Search query filter
+    let searchMatch = true;
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      const titleMatch = p.title?.toLowerCase().includes(q);
+      const modelMatch = p.modelNo?.toLowerCase().includes(q);
+      const descMatch = p.description?.toLowerCase().includes(q);
+      const specMatch = p.specifications && Object.values(p.specifications).some(val => String(val).toLowerCase().includes(q));
+      searchMatch = Boolean(titleMatch || modelMatch || descMatch || specMatch);
+    }
+    return catMatch && searchMatch;
+  });
+
+  // Price sorting
+  if (priceSort === 'low-to-high') {
+    filteredProducts = [...filteredProducts].sort((a, b) => a.price - b.price);
+  } else if (priceSort === 'high-to-low') {
+    filteredProducts = [...filteredProducts].sort((a, b) => b.price - a.price);
+  }
 
   return (
     <>
@@ -378,24 +407,26 @@ export default function GiftsPage() {
           gap: 28px;
         }
         .watch-card-container {
-          background: #fff;
-          border-radius: 12px;
-          border: 1px solid rgba(26, 18, 9, 0.06);
+          background: #faf7f0;
+          border-radius: 16px;
+          border: 1px solid rgba(26, 18, 9, 0.08);
           overflow: hidden;
           display: flex;
           flex-direction: column;
-          transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.4s cubic-bezier(0.25, 1, 0.5, 1), border-color 0.4s ease;
+          transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
           position: relative;
+          box-shadow: 0 4px 16px rgba(26,18,9,0.02);
         }
         .watch-card-container:hover {
           transform: translateY(-6px);
-          box-shadow: 0 16px 36px rgba(26,18,9,0.06);
-          border-color: rgba(139,105,20,0.18);
+          box-shadow: 0 16px 36px rgba(26,18,9,0.08);
+          border-color: rgba(139,105,20,0.3);
+          background: #ffffff;
         }
         .watch-img-container {
           position: relative;
           aspect-ratio: 1;
-          background: #fff;
+          background: transparent;
           padding: 24px;
           display: flex;
           align-items: center;
@@ -410,7 +441,7 @@ export default function GiftsPage() {
           transition: transform 0.6s ease;
         }
         .watch-card-container:hover .watch-card-image {
-          transform: scale(1.04);
+          transform: scale(1.06);
         }
         .watch-card-badge {
           position: absolute;
@@ -420,11 +451,12 @@ export default function GiftsPage() {
           color: #fff;
           font-size: 9px;
           font-weight: 600;
-          letter-spacing: 0.1em;
+          letter-spacing: 0.12em;
           padding: 4px 10px;
-          border-radius: 3px;
+          border-radius: 4px;
           z-index: 2;
           text-transform: uppercase;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.15);
         }
         .watch-card-info {
           padding: 20px;
@@ -432,7 +464,7 @@ export default function GiftsPage() {
           display: flex;
           flex-direction: column;
           justify-content: space-between;
-          background: #fff;
+          background: transparent;
         }
         .watch-card-title-link {
           text-decoration: none;
@@ -515,8 +547,132 @@ export default function GiftsPage() {
           to { transform: rotate(360deg); }
         }
 
+        /* ── BENEFITS BAR ── */
+        .benefits-carousel-wrapper {
+          width: 100%;
+          overflow: visible;
+          margin-bottom: 40px;
+        }
+        .benefits-bar {
+          display: grid;
+          grid-template-columns: repeat(5, 1fr);
+          gap: 20px;
+          background: #fff;
+          padding: 24px 32px;
+          border-radius: 12px;
+          border: 1px solid rgba(26, 18, 9, 0.06);
+          margin: 0 auto;
+          max-width: 1400px;
+          width: 100%;
+        }
+        .benefits-marquee-track {
+          display: contents;
+        }
+        .benefit-item {
+          display: flex;
+          align-items: center;
+          gap: 16px;
+          color: #1a1209;
+        }
+        .benefit-item svg {
+          color: #8b6914;
+          flex-shrink: 0;
+        }
+        .benefit-item h4 {
+          font-size: 13.5px;
+          font-weight: 600;
+          margin: 0;
+          letter-spacing: 0.02em;
+        }
+        .benefit-item span {
+          font-size: 11px;
+          color: rgba(26, 18, 9, 0.5);
+          margin: 0;
+          display: block;
+        }
+
+        /* ── TOOLBAR CONTROLS ── */
+        .col-toolbar {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 16px;
+          align-items: center;
+          margin: 0 auto 36px;
+          padding: 16px 24px;
+          background-color: #fff;
+          border: 1px solid rgba(26, 18, 9, 0.06);
+          border-radius: 12px;
+          max-width: 1400px;
+          width: 100%;
+        }
+        .search-wrapper {
+          position: relative;
+          flex: 1;
+          min-width: 200px;
+          max-width: 320px;
+        }
+        .search-input {
+          width: 100%;
+          background: #faf7f0;
+          border: 1px solid rgba(26, 18, 9, 0.08);
+          border-radius: 6px;
+          padding: 10px 16px 10px 38px;
+          font-size: 12.5px;
+          color: #1a1209;
+          font-family: inherit;
+        }
+        .search-input:focus {
+          outline: none;
+          border-color: #8b6914;
+        }
+        .search-icon {
+          position: absolute;
+          left: 14px;
+          top: 50%;
+          transform: translateY(-50%);
+          color: rgba(26, 18, 9, 0.4);
+          pointer-events: none;
+        }
+        .toolbar-select {
+          background: #faf7f0;
+          border: 1px solid rgba(26, 18, 9, 0.08);
+          border-radius: 6px;
+          padding: 10px 16px;
+          font-size: 12.5px;
+          color: #1a1209;
+          cursor: pointer;
+          font-family: inherit;
+          min-width: 160px;
+        }
+        .toolbar-select:focus {
+          outline: none;
+          border-color: #8b6914;
+        }
+        .toolbar-reset-btn {
+          background: transparent;
+          border: 1px dashed rgba(26,18,9,0.25);
+          color: rgba(26, 18, 9, 0.7);
+          padding: 10px 20px;
+          font-size: 11px;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
+          cursor: pointer;
+          border-radius: 6px;
+          transition: all 0.2s;
+          margin-left: auto;
+        }
+        .toolbar-reset-btn:hover {
+          border-color: #1a1209;
+          color: #1a1209;
+          background: rgba(26,18,9,0.02);
+        }
+
         /* ── RESPONSIVE OVERRIDES ── */
         @media (max-width: 1024px) {
+          .benefits-bar {
+            grid-template-columns: repeat(2, 1fr);
+            padding: 20px;
+          }
           .gifts-hero-banner {
             flex-direction: column;
             justify-content: center;
@@ -600,6 +756,39 @@ export default function GiftsPage() {
           }
         }
 
+        @media (max-width: 768px) {
+          .benefits-bar {
+            display: flex;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            gap: 16px;
+            padding: 16px;
+          }
+          .benefit-item {
+            flex-shrink: 0;
+            scroll-snap-align: start;
+            min-width: 220px;
+          }
+          .col-toolbar {
+            display: none;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 12px;
+            padding: 16px;
+          }
+          .col-toolbar.show {
+            display: flex;
+          }
+          .search-wrapper {
+            max-width: 100%;
+          }
+          .toolbar-reset-btn {
+            margin-left: 0;
+            width: 100%;
+            text-align: center;
+          }
+        }
+
         @media (max-width: 480px) {
           .gifts-category-row {
             grid-template-columns: repeat(2, 1fr);
@@ -668,6 +857,49 @@ export default function GiftsPage() {
         ) : (
           <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
             
+            {/* BENEFITS BAR (MAISON TRUST HIGHLIGHTS) */}
+            <div className="benefits-carousel-wrapper">
+              <div className="benefits-bar">
+                <div className="benefits-marquee-track">
+                  <div className="benefit-item">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="12" cy="12" r="10" /><path d="m12 6-2 4h4l-2 4" /></svg>
+                    <div>
+                      <h4>Japan Movement</h4>
+                      <span>UAE Registered Brand</span>
+                    </div>
+                  </div>
+                  <div className="benefit-item">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>
+                    <div>
+                      <h4>International Warranty</h4>
+                      <span>Sri Lanka & UAE</span>
+                    </div>
+                  </div>
+                  <div className="benefit-item">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="1" y="3" width="15" height="13" rx="2" ry="2" /><line x1="16" y1="8" x2="20" y2="8" /><line x1="16" y1="12" x2="22" y2="12" /></svg>
+                    <div>
+                      <h4>Free Shipping</h4>
+                      <span>UAE & Sri Lanka</span>
+                    </div>
+                  </div>
+                  <div className="benefit-item">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" /><path d="M21 3v5h-5" /></svg>
+                    <div>
+                      <h4>Easy Returns</h4>
+                      <span>Within 7 Days</span>
+                    </div>
+                  </div>
+                  <div className="benefit-item">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
+                    <div>
+                      <h4>Secure Payments</h4>
+                      <span>100% Secure Checkout with payhere.lk</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             {/* GIFT CATEGORIES (SHOW CARDS THAT ADMIN TURNED ON) */}
             {giftCategories.length === 0 ? (
               <div style={{ textAlign: 'center', padding: '60px 20px', border: '1px dashed rgba(26,18,9,0.1)', borderRadius: '12px', backgroundColor: 'rgba(255,255,255,0.45)', marginBottom: '56px' }}>
@@ -734,6 +966,91 @@ export default function GiftsPage() {
                 ))}
               </div>
             )}
+
+            {/* Mobile Filter Toggle Button */}
+            <div className="mobile-filter-toggle-container md:hidden" style={{ margin: '30px auto 16px', maxWidth: '1400px', width: '100%' }}>
+              <button
+                onClick={() => setShowMobileFilters(!showMobileFilters)}
+                className="mobile-filter-toggle-btn"
+                style={{
+                  width: '100%',
+                  background: '#fff',
+                  border: '1px solid rgba(26,18,9,0.08)',
+                  borderRadius: '8px',
+                  padding: '14px 20px',
+                  fontSize: '11px',
+                  fontWeight: 500,
+                  letterSpacing: '0.06em',
+                  textTransform: 'uppercase',
+                  color: '#1a1209',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s'
+                }}
+              >
+                <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" /></svg>
+                  {showMobileFilters ? 'Hide Filters & Search' : 'Show Filters & Search'}
+                </span>
+                <span>{showMobileFilters ? '▲' : '▼'}</span>
+              </button>
+            </div>
+
+            {/* TOOLBAR CONTROLS (SEARCH BAR & FILTERING) */}
+            <div className={`col-toolbar ${showMobileFilters ? 'show' : ''}`} style={{ marginTop: '30px' }}>
+              {/* Search bar */}
+              <div className="search-wrapper">
+                <input
+                  type="text"
+                  placeholder="Search gifting watches..."
+                  value={searchQuery}
+                  onChange={e => setSearchQuery(e.target.value)}
+                  className="search-input"
+                />
+                <svg className="search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" /></svg>
+              </div>
+
+              {/* Gift Occasion Filter */}
+              {giftCategories.length > 0 && (
+                <select
+                  value={selectedCategorySlug}
+                  onChange={e => setSelectedCategorySlug(e.target.value)}
+                  className="toolbar-select"
+                >
+                  <option value="all">All Occasions</option>
+                  {giftCategories.map(cat => (
+                    <option key={cat.slug} value={cat.slug}>
+                      {stripEmojis(cat.label)}
+                    </option>
+                  ))}
+                </select>
+              )}
+
+              {/* Price Sorting */}
+              <select
+                value={priceSort}
+                onChange={e => setPriceSort(e.target.value as any)}
+                className="toolbar-select"
+              >
+                <option value="none">Sort By: Featured</option>
+                <option value="low-to-high">Price: Low to High</option>
+                <option value="high-to-low">Price: High to Low</option>
+              </select>
+
+              {/* Results Count */}
+              <span style={{ fontSize: '12.5px', color: 'rgba(26, 18, 9, 0.45)', marginLeft: '12px' }} className="hidden md:inline">
+                {!loading && `${filteredProducts.length} Timepiece${filteredProducts.length === 1 ? '' : 's'} found`}
+              </span>
+
+              {/* Reset button */}
+              {(selectedCategorySlug !== 'all' || searchQuery || priceSort !== 'none') && (
+                <button onClick={resetFilters} className="toolbar-reset-btn">
+                  Reset Filters
+                </button>
+              )}
+            </div>
 
             {/* PRODUCT GRID SECTION */}
             <h2 className="section-header-title">
