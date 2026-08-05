@@ -42,6 +42,7 @@ export interface IGiftCategory {
   slug:      string;
   label:     string;
   emoji:     string;
+  image?:    string;
   isActive:  boolean;
   sortOrder: number;
   createdAt?: Date;
@@ -85,6 +86,9 @@ export interface ApiResponse<T> {
 }
 
 export type OrderStatus = 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled' | 'cancel_requested';
+
+export type PaymentMethod = 'card' | 'bank_transfer';
+export type PaymentStatus = 'pending' | 'paid' | 'failed';
 
 export interface IOrderItem {
   productId: string;
@@ -130,6 +134,12 @@ export interface IOrder {
   couponDiscountPercent?: number;
   couponDiscountAmount?: number;
   finalTotal?: number | null;
+  // Payment fields
+  paymentMethod?: PaymentMethod;
+  paymentStatus?: PaymentStatus;
+  receiptUrl?: string | null;
+  receiptPublicId?: string | null;
+  payhereOrderId?: string | null;
   createdAt?: Date;
   updatedAt?: Date;
   deliveredAt?: Date | null;

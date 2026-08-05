@@ -149,7 +149,7 @@ export default function Navbar() {
   const { totalItemsCount } = useCart();
   const pathname = usePathname();
   const router = useRouter();
-  const isTransparentPage = pathname === '/' || pathname === '/collections' || pathname === '/customer-care' || pathname === '/gifts' || pathname === '/retailers';
+  const isTransparentPage = pathname === '/' || pathname === '/collections' || pathname === '/customer-care' || pathname === '/gifts' || pathname === '/retailers' || pathname === '/careers';
 
   const [isTransparent,      setIsTransparent]      = useState(true);
   const [isVisible,          setIsVisible]          = useState(true);
@@ -199,7 +199,7 @@ export default function Navbar() {
     if (!isTransparentPage) {
       setIsTransparent(false);
     } else {
-      const hero = document.getElementById('hero') || document.querySelector('.collections-hero-banner') || document.querySelector('.care-hero') || document.querySelector('.gifts-hero-banner') || document.querySelector('.locator-hero-banner');
+      const hero = document.getElementById('hero') || document.querySelector('.collections-hero-banner') || document.querySelector('.care-hero') || document.querySelector('.gifts-hero-banner') || document.querySelector('.locator-hero-banner') || document.querySelector('.careers-hero-banner');
       heroHeight.current = hero ? (hero as HTMLElement).offsetHeight : window.innerHeight;
       setIsTransparent(window.scrollY < heroHeight.current - 80);
     }
@@ -280,9 +280,9 @@ export default function Navbar() {
 
   const isHomepageLightSlide = pathname === '/' && heroActiveSlide !== 2;
   const isWhite = isTransparent && !megaVisible && !isHomepageLightSlide;
-  const tc  = isWhite ? '#ffffff' : '#1a1209';
-  const tca = isWhite ? 'rgba(255,255,255,0.7)' : 'rgba(26,18,9,0.55)';
-  const div = isWhite ? 'rgba(255,255,255,0.2)' : 'rgba(26,18,9,0.1)';
+  const tc  = isWhite ? '#f3eee6' : '#1a1209';
+  const tca = isWhite ? 'rgba(243,238,230,0.85)' : 'rgba(26,18,9,0.65)';
+  const div = isWhite ? 'rgba(243,238,230,0.15)' : 'rgba(26,18,9,0.1)';
   const ibS: React.CSSProperties = { background:'none', border:'none', cursor:'pointer', padding:'4px', display:'flex', alignItems:'center', justifyContent:'center', transition:'opacity 0.2s ease', color: tc };
 
   // ✅ Logo paths (place in /public folder)
@@ -356,11 +356,11 @@ export default function Navbar() {
           transform: isVisible?'translateY(0)':'translateY(-100%)', 
           transition:'transform 0.42s cubic-bezier(0.25,0.46,0.45,0.94), background 0.35s ease, border-color 0.35s ease', 
           background: isTransparent 
-            ? (isHomepageLightSlide ? 'rgba(255, 255, 255, 0.02)' : 'rgba(255, 255, 255, 0.08)') 
+            ? (isHomepageLightSlide ? 'rgba(26, 18, 9, 0.05)' : 'rgba(15, 12, 9, 0.28)') 
             : 'rgba(250,247,240,0.97)', 
-          backdropFilter: isTransparent ? 'blur(8px)' : 'blur(14px)', 
-          WebkitBackdropFilter: isTransparent ? 'blur(8px)' : 'blur(14px)', 
-          borderBottom:`1px solid ${isTransparent ? (isHomepageLightSlide ? 'rgba(26,18,9,0.06)' : 'rgba(255,255,255,0.12)') : 'rgba(26,18,9,0.07)'}` 
+          backdropFilter: isTransparent ? 'blur(12px)' : 'blur(14px)', 
+          WebkitBackdropFilter: isTransparent ? 'blur(12px)' : 'blur(14px)', 
+          borderBottom:`1px solid ${isTransparent ? (isHomepageLightSlide ? 'rgba(26,18,9,0.06)' : 'rgba(243,238,230,0.1)') : 'rgba(26,18,9,0.07)'}` 
         }}
       >
         {/* TOP ROW */}
@@ -434,7 +434,7 @@ export default function Navbar() {
                     style={{ 
                       background:'transparent', 
                       border:'none', 
-                      borderBottom:`1px solid ${isWhite?'rgba(255,255,255,0.4)':'rgba(26,18,9,0.3)'}`, 
+                      borderBottom:`1px solid ${isWhite?'rgba(243,238,230,0.35)':'rgba(26,18,9,0.3)'}`, 
                       outline:'none', 
                       width:'140px', 
                       fontFamily:"'Jost',sans-serif", 

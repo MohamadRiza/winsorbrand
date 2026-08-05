@@ -18,12 +18,12 @@ const FAQ_ITEMS = [
   {
     category: 'brand',
     q: 'Where are Winsor timepieces designed and assembled?',
-    a: 'Winsor timepieces are conceived by our lead designers in Dubai, UAE, and assembled with Swiss precision components. Each timepiece undergoes rigorous hand-finishing and testing to ensure it meets our heritage quality standards.',
+    a: 'Winsor timepieces are conceived by our lead designers in Dubai, UAE, and assembled with Japanese precision components. Each timepiece undergoes rigorous hand-finishing and testing to ensure it meets our heritage quality standards.',
   },
   {
     category: 'brand',
     q: 'What movements are used in Winsor watches?',
-    a: 'We use high-grade Swiss automatic and precision mechanical movements selected for their reliability, accuracy, and detailed decoration. Selected limited editions feature our bespoke in-house Tourbillon movements.',
+    a: 'We use high-grade Japanese automatic and precision mechanical movements selected for their reliability, accuracy, and detailed decoration. Selected limited editions feature our bespoke in-house Tourbillon movements.',
   },
   {
     category: 'brand',

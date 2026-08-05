@@ -190,7 +190,7 @@ export default function CustomerCarePage() {
         .care-hero {
           position: relative;
           height: 480px;
-          background-image: linear-gradient(rgba(26, 18, 9, 0.5), rgba(26, 18, 9, 0.5)), url('/discover-service.jpg');
+          background-image: linear-gradient(rgba(26, 18, 9, 0.5), rgba(26, 18, 9, 0.5)), url('/winsor_contact.jpg');
           background-size: cover;
           background-position: center;
           background-repeat: no-repeat;
@@ -599,7 +599,7 @@ export default function CustomerCarePage() {
             <div className="success-card">
               <div className="success-icon">
                 <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round">
-                  <polyline points="20 6 9 17 4 12"/>
+                  <polyline points="20 6 9 17 4 12" />
                 </svg>
               </div>
               <h2 className="success-title">Message Submitted Successfully</h2>
@@ -614,7 +614,7 @@ export default function CustomerCarePage() {
             <>
               {/* TWO COLUMN GRID */}
               <div className="care-grid">
-                
+
                 {/* Left Column: Brand details */}
                 <div className="care-details-card">
                   <h3 className="details-title">Official Care Boutique</h3>
@@ -625,7 +625,7 @@ export default function CustomerCarePage() {
                   <div className="contact-info-row">
                     <div className="info-icon">
                       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+                        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
                       </svg>
                     </div>
                     <div>
@@ -637,7 +637,7 @@ export default function CustomerCarePage() {
                   <div className="contact-info-row">
                     <div className="info-icon">
                       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                        <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                        <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
                       </svg>
                     </div>
                     <div>
@@ -649,7 +649,7 @@ export default function CustomerCarePage() {
                   <div className="contact-info-row">
                     <div className="info-icon">
                       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>
+                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" /><polyline points="22,6 12,13 2,6" />
                       </svg>
                     </div>
                     <div>
@@ -673,7 +673,7 @@ export default function CustomerCarePage() {
                   <h3 className="details-title">Secure Inquiry Submission</h3>
 
                   <form onSubmit={handleSubmit}>
-                    
+
                     <div className="form-row-grid">
                       {/* Name */}
                       <div className="input-group">
@@ -742,7 +742,7 @@ export default function CustomerCarePage() {
                       />
                       {isSignedIn && (
                         <div className="lock-icon-container" title="Locked to Clerk Account Email">
-                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
                         </div>
                       )}
                     </div>
@@ -817,27 +817,27 @@ export default function CustomerCarePage() {
               <div className="map-section">
                 <h2 className="map-title">Flagship Boutique Location</h2>
                 <p className="map-subtitle">Experience Winsor timepieces in person at our Colombo Pettah showroom.</p>
-                
+
                 <div className="map-container">
-                  <iframe 
+                  <iframe
                     className="map-iframe"
                     src="https://maps.google.com/maps?q=Happy%20Time%20(Pvt)%20Ltd%20-%20Colombo%2011&t=&z=16&ie=UTF8&iwloc=&output=embed"
                     allowFullScreen={true}
-                    loading="lazy" 
+                    loading="lazy"
                     referrerPolicy="no-referrer-when-downgrade"
                   />
                 </div>
 
                 <div className="map-action-row">
-                  <a 
-                    href="https://www.google.com/maps/place/Happy+Time+(Pvt)+Ltd+-+Colombo+11/@6.9368997,79.8485117,17z/data=!3m1!4b1!4m6!3m5!1s0x3ae259261ada6aad:0x64dff49a1c0ccff2!8m2!3d6.9368997!4d79.8510866!16s%2Fg%2F11qp2yyysl?hl=en-US&entry=ttu&g_ep=EgoyMDI2MDYwMS4wIKXMDSoASAFQAw%3D%3D" 
-                    target="_blank" 
+                  <a
+                    href="https://www.google.com/maps/place/Happy+Time+(Pvt)+Ltd+-+Colombo+11/@6.9368997,79.8485117,17z/data=!3m1!4b1!4m6!3m5!1s0x3ae259261ada6aad:0x64dff49a1c0ccff2!8m2!3d6.9368997!4d79.8510866!16s%2Fg%2F11qp2yyysl?hl=en-US&entry=ttu&g_ep=EgoyMDI2MDYwMS4wIKXMDSoASAFQAw%3D%3D"
+                    target="_blank"
                     rel="noopener noreferrer"
                     className="map-link-btn"
                   >
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z"/>
-                      <circle cx="12" cy="10" r="3"/>
+                      <path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z" />
+                      <circle cx="12" cy="10" r="3" />
                     </svg>
                     Open in Google Maps
                   </a>

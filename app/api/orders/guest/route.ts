@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
     await connectDB();
 
     const body = await req.json();
-    const { guestInfo, items, shippingAddress } = body;
+    const { guestInfo, items, shippingAddress, paymentMethod } = body;
 
     // ── 1. Validate guest info ──────────────────────────────────────────────
     if (!guestInfo || typeof guestInfo !== 'object') {
@@ -200,6 +200,9 @@ export async function POST(req: NextRequest) {
       finalTotal: serverSubtotal,
       status: 'pending',
       isGift: false,
+      // Payment
+      paymentMethod: paymentMethod === 'bank_transfer' ? 'bank_transfer' : 'card',
+      paymentStatus: 'pending',
     });
 
     return NextResponse.json({

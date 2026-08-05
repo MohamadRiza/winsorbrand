@@ -1,12 +1,13 @@
 // app/our-story/page.tsx
 // ── Server Component (no "use client") ──────────────────────────────────────
 import Link from "next/link";
+import Image from "next/image";
 import VideoPlayer from "./VideoPlayer"; // ← Client component in same folder
 
 export const metadata = {
   title: "Our Story — Winsor | Ride Your Moment",
   description:
-    "Discover the heritage of Winsor — a luxury timepiece maison crafting fine watches with Swiss precision, founded in Sri Lanka and now present across the UAE and beyond.",
+    "Discover the heritage of Winsor — a luxury timepiece maison crafting fine watches with Japanese precision, founded in Sri Lanka and now present across the UAE and beyond.",
   openGraph: {
     title: "Our Story — Winsor",
     description:
@@ -57,6 +58,73 @@ const STATS = [
   { value: "UAE", label: "Headquartered" },
   { value: "25+", label: "Authorised Retailers" },
   { value: "1",   label: "Maison" },
+];
+
+const AWARDS = [
+  {
+    id: '1',
+    year: '2025',
+    title: 'Grand Horology Excellence Award',
+    category: 'Watchmaking & Assembly Mastery',
+    desc: 'Awarded at the Dubai Haute Horlogerie Summit for outstanding precision assembly and hand-finished movement calibres.',
+    image: '/awards/award_1.jpg'
+  },
+  {
+    id: '2',
+    year: '2024',
+    title: 'International Luxury Design Laureate',
+    category: 'Timepiece Aesthetic & Dial Finishing',
+    desc: 'Honored for classic chronograph & moonphase design distinction, blending heritage elegance with contemporary luxury.',
+    image: '/awards/award_2.jpg'
+  },
+  {
+    id: '3',
+    year: '2024',
+    title: 'Maison Innovation Medal',
+    category: 'Bespoke Tourbillon & Movement Engineering',
+    desc: 'Recognizing Japanese precision integration and technical excellence in tourbillon calibre crafting.',
+    image: '/awards/award_3.jpg'
+  },
+  {
+    id: '4',
+    year: '2023',
+    title: 'Boutique Experience of the Year',
+    category: 'Retail & Client Concierge Distinction',
+    desc: 'Awarded for extraordinary client service standards across our 50+ luxury boutique showrooms globally.',
+    image: '/awards/award_4.jpg'
+  },
+  {
+    id: '5',
+    year: '2023',
+    title: 'Heritage Horology Preservation Award',
+    category: 'Artisan Craftsmanship Traditions',
+    desc: 'Celebrating our founding Sri Lankan watchmaker roots and commitment to hand-finished watchmaking traditions.',
+    image: '/awards/award_1.jpg'
+  },
+  {
+    id: '6',
+    year: '2022',
+    title: 'Chronometric Performance Trophy',
+    category: 'Testing & Regulation Distinction',
+    desc: 'Achieving 99.9% chronometric regulation standards across our automatic & mechanical timepieces.',
+    image: '/awards/award_2.jpg'
+  },
+  {
+    id: '7',
+    year: '2021',
+    title: 'International Watchmaker Guild Accolade',
+    category: 'Artisan Team & Workplace Culture',
+    desc: 'Honoring our dedicated international team of 100+ master craftsmen, watchmakers, and horology professionals.',
+    image: '/awards/award_3.jpg'
+  },
+  {
+    id: '8',
+    year: '2020',
+    title: 'Sustainable Luxury Maison Award',
+    category: 'Ethical Sourcing & Eco Distinction',
+    desc: 'Recognized for responsible material sourcing, recyclable presentation boxes, and sustainable artisan practices.',
+    image: '/awards/award_4.jpg'
+  }
 ];
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
@@ -112,6 +180,16 @@ export default function OurStoryPage() {
           z-index: 2;
           box-shadow: 0 0 0 3px rgba(139,105,20,0.15);
           display: block;
+        }
+
+        /* Award Card Hover Effects */
+        .ws-award-card:hover {
+          transform: translateY(-6px);
+          border-color: rgba(139,105,20,0.4) !important;
+          box-shadow: 0 20px 40px rgba(26,18,9,0.1) !important;
+        }
+        .ws-award-card:hover .ws-award-img {
+          transform: scale(1.06);
         }
 
         /* ── Minimal luxury video player styles (Longines-inspired) ── */
@@ -247,7 +325,7 @@ export default function OurStoryPage() {
           alignItems:"center", 
           justifyContent:"center", 
           overflow:"hidden", 
-          backgroundImage: `linear-gradient(180deg, rgba(10,8,5,0.35) 0%, rgba(10,8,5,0.15) 40%, rgba(10,8,5,0.85) 100%), url('/watch-hero.jpg')`,
+          backgroundImage: `linear-gradient(180deg, rgba(10,8,5,0.72) 0%, rgba(10,8,5,0.60) 40%, rgba(10,8,5,0.92) 100%), url('/r_partners.webp')`,
         }}
       >
         <div className="ws-fade-up ws-pad" style={{ position:"relative", textAlign:"center", color:"#fff", padding:"120px 40px", maxWidth:900 }}>
@@ -289,7 +367,7 @@ export default function OurStoryPage() {
           <div 
             className="ws-parallax-bg" 
             style={{ 
-              backgroundImage: `url('/discover-partners.jpg')`,
+              backgroundImage: `url('/KCC.webp')`,
               height: "560px",
               borderRadius: "4px",
               boxShadow: "0 12px 30px rgba(26,18,9,0.06)",
@@ -323,7 +401,7 @@ export default function OurStoryPage() {
         style={{ 
           position:"relative", 
           padding:"120px 0", 
-          backgroundImage:`linear-gradient(rgba(252,251,248,0.88), rgba(252,251,248,0.88)), url('/watch-card.jpg')`, 
+          backgroundImage:`linear-gradient(rgba(252,251,248,0.88), rgba(252,251,248,0.88)), url('/hmebnr2.webp')`, 
         }}
       >
         <div className="ws-pad" style={{ maxWidth:1200, margin:"0 auto", padding:"0 40px", position:"relative", zIndex:2 }}>
@@ -383,13 +461,77 @@ export default function OurStoryPage() {
         </div>
       </section>
 
+      {/* 🏆 8 AWARDS & RECOGNITION SECTION WITH PHOTOS */}
+      <section style={{ background: "#fff", borderTop: `1px solid ${HAIRLINE}`, borderBottom: `1px solid ${HAIRLINE}`, padding: "120px 0" }}>
+        <div className="ws-pad" style={{ maxWidth: 1400, margin: "0 auto", padding: "0 40px" }}>
+          <div style={{ textAlign: "center", marginBottom: 60 }}>
+            <SectionLabel>Honors & Distinctions</SectionLabel>
+            <h2 className="ws-section-title" style={{ fontFamily: fontSerif, fontSize: "clamp(36px,5vw,56px)", fontWeight: 500, margin: "0 0 16px" }}>
+              8 Accolades of Horological Distinction
+            </h2>
+            <p style={{ fontFamily: fontSerif, fontSize: 18, color: MUTED, fontWeight: 300, maxWidth: 680, margin: "0 auto", lineHeight: 1.7 }}>
+              Recognized internationally for watchmaking mastery, artisan hand-finishing, Japanese precision movements, and luxury boutique experience.
+            </p>
+          </div>
+
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 32 }}>
+            {AWARDS.map((award) => (
+              <div 
+                key={award.id}
+                style={{ 
+                  background: CREAM, 
+                  border: `1px solid ${HAIRLINE}`, 
+                  borderRadius: "16px", 
+                  overflow: "hidden", 
+                  boxShadow: "0 10px 30px rgba(26,18,9,0.04)",
+                  transition: "all 0.35s ease",
+                  display: "flex",
+                  flexDirection: "column"
+                }}
+                className="ws-award-card"
+              >
+                {/* Photo container */}
+                <div style={{ position: "relative", width: "100%", aspectRatio: "1/1", overflow: "hidden", background: "#0a0a0a" }}>
+                  <Image 
+                    src={award.image} 
+                    alt={award.title} 
+                    fill 
+                    sizes="(max-width: 768px) 100vw, 320px"
+                    style={{ objectFit: "cover", transition: "transform 0.5s ease" }}
+                    className="ws-award-img"
+                  />
+                  <div style={{ position: "absolute", top: 14, right: 14, background: "rgba(139,105,20,0.95)", color: "#fff", fontSize: 10, fontWeight: 600, fontFamily: fontSans, padding: "4px 10px", borderRadius: "20px", letterSpacing: "0.1em" }}>
+                    {award.year}
+                  </div>
+                </div>
+
+                {/* Details */}
+                <div style={{ padding: "24px 22px", flex: 1, display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+                  <div>
+                    <div style={{ fontFamily: fontSans, fontSize: 10, letterSpacing: "0.2em", color: GOLD, textTransform: "uppercase", marginBottom: 6, fontWeight: 600 }}>
+                      {award.category}
+                    </div>
+                    <h3 style={{ fontFamily: fontSerif, fontSize: 20, fontWeight: 600, color: INK, margin: "0 0 10px", lineHeight: 1.25 }}>
+                      {award.title}
+                    </h3>
+                    <p style={{ fontFamily: fontSans, fontSize: 12, color: MUTED, margin: 0, lineHeight: 1.6, fontWeight: 400 }}>
+                      {award.desc}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ── CRAFT IMAGE FULL ── */}
       <section 
         className="ws-parallax-bg" 
         style={{ 
           position:"relative",
           height:"540px", 
-          backgroundImage:`linear-gradient(90deg,rgba(10,8,5,0.7) 0%,rgba(10,8,5,0.3) 50%,rgba(10,8,5,0.1) 100%), url('/discover-service.jpg')`,
+          backgroundImage:`linear-gradient(90deg,rgba(10,8,5,0.7) 0%,rgba(10,8,5,0.3) 50%,rgba(10,8,5,0.1) 100%), url('/hmebnr1.webp')`,
         }}
       >
         <div style={{ position:"absolute", inset:0, display:"flex", alignItems:"center" }}>
@@ -448,7 +590,7 @@ export default function OurStoryPage() {
           <div 
             className="ws-parallax-bg" 
             style={{ 
-              backgroundImage: `url('/discover-store.jpg')`,
+              backgroundImage: `url('/discover-partners.jpg')`,
               height: "560px",
               borderRadius: "4px",
               boxShadow: "0 12px 30px rgba(26,18,9,0.06)",

@@ -10,7 +10,7 @@ import toast from 'react-hot-toast';
 import GuestCheckoutModal from '@/components/Checkout/GuestCheckoutModal';
 
 export default function CartPage() {
-  const { isLoaded: userLoaded, isSignedIn } = useUser();
+  const { isLoaded: userLoaded, isSignedIn, user } = useUser();
   const { cartItems, loading: cartLoading, updateQuantity, removeFromCart, clearCart } = useCart();
   const { convertPrice } = useCurrency();
 
@@ -62,6 +62,14 @@ export default function CartPage() {
   // Guest checkout modal
   const [showGuestCheckoutModal, setShowGuestCheckoutModal] = useState(false);
 
+  // ── Payment Method States ──────────────────────────────────────────
+  const [paymentMethod, setPaymentMethod] = useState<'card' | 'bank_transfer'>('card');
+  const [bankReceipt, setBankReceipt] = useState<File | null>(null);
+  const [bankReceiptName, setBankReceiptName] = useState('');
+  const [bankReceiptUploading, setBankReceiptUploading] = useState(false);
+  const [bankTransferConfirmed, setBankTransferConfirmed] = useState(false);
+  const [paymentProcessing, setPaymentProcessing] = useState(false);
+
   // Open Gifting Modal
   const openGiftingModal = (key: string) => {
     const existing = giftDetails[key] || {
@@ -104,6 +112,45 @@ export default function CartPage() {
       return next;
     });
     toast.success('Gifting options removed.');
+  };
+
+  // ── PayHere SDK Loader ────────────────────────────────────────────────────
+  const loadPayhereSDK = (): Promise<void> => {
+    return new Promise((resolve, reject) => {
+      if (typeof (window as any).payhere !== 'undefined') {
+        resolve();
+        return;
+      }
+      const existing = document.querySelector('script[src*="payhere.lk"]');
+      if (existing) {
+        existing.addEventListener('load', () => resolve());
+        existing.addEventListener('error', () => reject(new Error('PayHere SDK failed to load')));
+        return;
+      }
+      const script = document.createElement('script');
+      script.src = 'https://www.payhere.lk/lib/payhere.js';
+      script.async = true;
+      script.onload = () => resolve();
+      script.onerror = () => reject(new Error('Failed to load payment gateway. Please check your connection.'));
+      document.head.appendChild(script);
+    });
+  };
+
+  // ── Bank Receipt File Selector ───────────────────────────────────────────
+  const handleBankReceiptSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const ALLOWED_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'application/pdf'];
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      toast.error('Invalid file. Please upload a PDF, JPG, PNG, or WEBP.');
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error('File too large. Maximum receipt size is 10 MB.');
+      return;
+    }
+    setBankReceipt(file);
+    setBankReceiptName(file.name);
   };
 
   // File Upload Handler (for Gifting Modal) with XHR progress calculation
@@ -337,14 +384,32 @@ export default function CartPage() {
       return;
     }
 
+    // Reset payment state each time modal opens
+    setPaymentMethod('card');
+    setBankReceipt(null);
+    setBankReceiptName('');
+    setBankTransferConfirmed(false);
     setShowConfirmModal(true);
   };
 
-  // Place order mock action
+  // Place Order — handles both Card (PayHere) and Bank Transfer flows
   const handlePlaceOrder = async () => {
+    // ── Pre-flight validation for bank transfer ─────────────────────────────
+    if (paymentMethod === 'bank_transfer') {
+      if (!bankTransferConfirmed) {
+        toast.error('Please confirm you have made the bank transfer.');
+        return;
+      }
+      if (!bankReceipt) {
+        toast.error('Please upload your bank transfer receipt before placing the order.');
+        return;
+      }
+    }
+
+    setPaymentProcessing(true);
     try {
       const ref = `WNS-2026-${Math.floor(100000 + Math.random() * 900000)}`;
-      
+
       const orderItems = selectedItemsList.map(item => {
         const key = `${item.productId}-${item.colorVariant || ''}`;
         const gift = giftDetails[key];
@@ -366,6 +431,7 @@ export default function CartPage() {
 
       const orderHasGifts = orderItems.some(i => i.isGift);
 
+      // ── Step 1: Create the order record ──────────────────────────────────
       const res = await fetch('/api/customer/orders', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -382,9 +448,9 @@ export default function CartPage() {
           },
           subtotal: selectedSubtotal,
           isGift: orderHasGifts,
-          // Coupon — server will verify and compute discount
           couponCode: appliedCoupon?.code || null,
           validationToken: appliedCoupon?.validationToken || null,
+          paymentMethod,
         }),
       });
 
@@ -394,20 +460,105 @@ export default function CartPage() {
       }
 
       setOrderRef(ref);
-      
-      // Clear the items from cart context (mutates DB if signed in)
-      await clearCart();
-      
-      // Clear coupon state
-      setAppliedCoupon(null);
-      setCouponInput('');
-      
-      setOrderSuccess(true);
-      setShowConfirmModal(false);
-      toast.success('Timepiece purchase successful!');
+
+      // ── Step 2a: Card payment via PayHere ────────────────────────────────
+      if (paymentMethod === 'card') {
+        const finalAmount = appliedCoupon
+          ? Math.max(0, selectedSubtotal - Math.round((selectedSubtotal * appliedCoupon.discountPercent) / 100))
+          : selectedSubtotal;
+
+        // Get server-generated hash (secret stays server-side)
+        const hashRes = await fetch('/api/payment/payhere-hash', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ orderRef: ref, amount: finalAmount, currency: 'LKR' }),
+        });
+        const hashData = await hashRes.json();
+        if (!hashData.success) throw new Error('Failed to initialise payment gateway.');
+
+        // Load PayHere SDK dynamically
+        await loadPayhereSDK();
+
+        // Open PayHere payment popup
+        await new Promise<void>((resolve, reject) => {
+          const payhere = (window as any).payhere;
+          payhere.onCompleted = (_id: string) => resolve();
+          payhere.onDismissed = () =>
+            reject(new Error('Payment was cancelled. Your order is saved — retry from your orders page.'));
+          payhere.onError = (error: string) =>
+            reject(new Error(`Payment failed: ${error}`));
+
+          payhere.startPayment({
+            sandbox:     hashData.data.isSandbox,
+            merchant_id: hashData.data.merchantId,
+            return_url:  '',
+            cancel_url:  '',
+            notify_url:  `${window.location.origin}/api/payment/payhere-notify`,
+            order_id:    ref,
+            items:       `Winsor Atelier Timepieces (${selectedCount} item${selectedCount > 1 ? 's' : ''})`,
+            amount:      finalAmount.toFixed(2),
+            currency:    'LKR',
+            first_name:  user?.firstName || 'Valued',
+            last_name:   user?.lastName  || 'Client',
+            email:       user?.emailAddresses?.[0]?.emailAddress || profile?.email || '',
+            phone:       `${profile?.mobileCode || ''}${profile?.mobile || ''}`.replace(/\s/g, ''),
+            address:     profile?.address || '',
+            city:        profile?.city    || '',
+            country:     profile?.country || 'Sri Lanka',
+            hash:        hashData.data.hash,
+          });
+        });
+
+        // Payment successful
+        await clearCart();
+        setAppliedCoupon(null);
+        setCouponInput('');
+        setOrderSuccess(true);
+        setShowConfirmModal(false);
+        toast.success('Payment confirmed! Your timepiece order is placed.');
+
+      // ── Step 2b: Bank transfer receipt upload ────────────────────────────
+      } else {
+        setBankReceiptUploading(true);
+
+        const reader = new FileReader();
+        const fileBase64 = await new Promise<string>((resolve, reject) => {
+          reader.onload = () => resolve(reader.result as string);
+          reader.onerror = () => reject(new Error('Failed to read receipt file.'));
+          reader.readAsDataURL(bankReceipt!);
+        });
+
+        const receiptRes = await fetch('/api/payment/bank-receipt', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            orderRef: ref,
+            fileBase64,
+            fileName: bankReceipt!.name,
+            mimeType: bankReceipt!.type,
+            isGuest: false,
+          }),
+        });
+
+        setBankReceiptUploading(false);
+        const receiptData = await receiptRes.json();
+        if (!receiptData.success) {
+          throw new Error(receiptData.error || 'Failed to upload payment receipt.');
+        }
+
+        await clearCart();
+        setAppliedCoupon(null);
+        setCouponInput('');
+        setOrderSuccess(true);
+        setShowConfirmModal(false);
+        toast.success('Order placed! We will verify your bank transfer within 24 hours.');
+      }
     } catch (err: any) {
-      console.error(err);
+      console.error('[handlePlaceOrder]', err);
+      setBankReceiptUploading(false);
       toast.error(err?.message || 'Order placement failed. Please try again.');
+    } finally {
+      setPaymentProcessing(false);
     }
   };
 

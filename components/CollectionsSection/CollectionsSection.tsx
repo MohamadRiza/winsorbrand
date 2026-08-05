@@ -64,7 +64,7 @@ const formatWatchSpecs = (product: WatchProduct) => {
     if (desc && desc.length < 80) return desc;
   }
 
-  return 'Automatic watch - Premium Swiss Made';
+  return 'Automatic watch - Premium Japan Movement';
 };
 
 // ── Skeleton Card ──────────────────────────────────────────────────────────

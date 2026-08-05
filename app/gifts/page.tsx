@@ -14,7 +14,10 @@ const stripEmojis = (text: string) => {
 };
 
 // Slug to image mapping for active gift categories inside public/gift_categories
-function getGiftCategoryImage(slug: string): string {
+function getGiftCategoryImage(slug: string, dbImage?: string): string {
+  if (dbImage && dbImage.trim() && !dbImage.includes('new_year.avif')) {
+    return dbImage;
+  }
   const mapping: Record<string, string> = {
     'easter-sunday': '/gift_categories/Easter_sunday.png',
     'graduation': '/gift_categories/Graduation.png',
@@ -22,7 +25,9 @@ function getGiftCategoryImage(slug: string): string {
     'esala-perahara': '/gift_categories/esala_perahara.png',
     'fathers-day': '/gift_categories/fathers_day.png',
     'mothers-day': '/gift_categories/mothers_day.png',
-    'new-year': '/gift_categories/new_year.avif',
+    'new-year': '/gift_categories/new_year.webp',
+    'newyear': '/gift_categories/new_year.webp',
+    'new_year': '/gift_categories/new_year.webp',
     'sinhala-tamil-new-year': '/gift_categories/sinhala_tamil_new_year.jpg',
     'taippongal': '/gift_categories/taippongal.png',
     'valentines-day': '/gift_categories/valentines_day.png',
@@ -31,7 +36,7 @@ function getGiftCategoryImage(slug: string): string {
     'christmas': '/gift_categories/xmass.avif',
     'xmas': '/gift_categories/xmass.avif',
   };
-  return mapping[slug] || '/graduation_gift.png'; // Fallback to main gifts highlight image
+  return mapping[slug] || '/gift_categories/new_year.webp';
 }
 
 export default function GiftsPage() {
@@ -708,7 +713,7 @@ export default function GiftsPage() {
                   >
                     <div className="gender-card-img-wrapper">
                       <Image 
-                        src={getGiftCategoryImage(cat.slug)} 
+                        src={getGiftCategoryImage(cat.slug, cat.image)} 
                         alt={cat.label}
                         fill
                         sizes="(max-width: 768px) 50vw, 350px"

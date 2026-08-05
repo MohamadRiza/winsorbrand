@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import Image from 'next/image';
 import toast from 'react-hot-toast';
 
 interface Message {
@@ -14,7 +15,7 @@ export default function AIAssistant() {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
-      content: 'Hello! I am your Winsor Brand Horology Concierge. How may I assist you with our timepieces today?'
+      content: 'Hello! I am Winsi, your personal Winsor Brand Horology Concierge. How may I assist you with our timepieces today?'
     }
   ]);
   const [input, setInput] = useState('');
@@ -47,7 +48,6 @@ export default function AIAssistant() {
       };
 
       rec.onerror = (event: any) => {
-        // Handle specific errors silently to avoid console warnings / red screens
         if (event.error === 'no-speech' || event.error === 'aborted') {
           setIsListening(false);
           return;
@@ -183,12 +183,12 @@ export default function AIAssistant() {
           position: fixed;
           right: 28px;
           bottom: 28px;
-          width: 54px;
-          height: 54px;
+          width: 56px;
+          height: 56px;
           border-radius: 50%;
           background: linear-gradient(135deg, #8b6914 0%, #1a1209 100%);
-          border: 1px solid rgba(255, 255, 255, 0.15);
-          box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+          border: 2px solid #8b6914;
+          box-shadow: 0 8px 30px rgba(0, 0, 0, 0.28);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -199,7 +199,7 @@ export default function AIAssistant() {
         }
         .ai-widget-trigger:hover {
           transform: scale(1.08) translateY(-3px);
-          box-shadow: 0 12px 35px rgba(139, 105, 20, 0.3);
+          box-shadow: 0 12px 35px rgba(139, 105, 20, 0.4);
         }
         .ai-widget-trigger svg {
           transition: transform 0.4s ease;
@@ -216,9 +216,9 @@ export default function AIAssistant() {
           width: 380px;
           height: 580px;
           background: rgba(250, 247, 240, 0.98);
-          border: 1px solid rgba(139, 105, 20, 0.15);
-          border-radius: 16px;
-          box-shadow: 0 16px 48px rgba(26, 18, 9, 0.16);
+          border: 1px solid rgba(139, 105, 20, 0.2);
+          border-radius: 20px;
+          box-shadow: 0 16px 48px rgba(26, 18, 9, 0.18);
           backdrop-filter: blur(20px);
           -webkit-backdrop-filter: blur(20px);
           display: flex;
@@ -246,45 +246,20 @@ export default function AIAssistant() {
         .ai-chat-header {
           background: #1a1209;
           color: #fff;
-          padding: 16px 20px;
+          padding: 14px 18px;
           display: flex;
           align-items: center;
           justify-content: space-between;
-          border-bottom: 1px solid rgba(255,255,255,0.06);
-        }
-        .ai-chat-header-title {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-        }
-        .ai-chat-logo-dot {
-          width: 8px;
-          height: 8px;
-          border-radius: 50%;
-          background: #8b6914;
-          box-shadow: 0 0 10px #8b6914;
-        }
-        .ai-chat-header-title h4 {
-          font-family: 'Jost', sans-serif;
-          font-size: 13.5px;
-          font-weight: 500;
-          letter-spacing: 0.1em;
-          margin: 0;
-          text-transform: uppercase;
-        }
-        .ai-chat-header-title span {
-          font-size: 9px;
-          color: rgba(255,255,255,0.5);
-          letter-spacing: 0.05em;
+          border-bottom: 1px solid rgba(139,105,20,0.25);
         }
 
         .ai-voice-toggle-btn {
           background: transparent;
           border: 1px solid rgba(255,255,255,0.15);
-          border-radius: 4px;
+          border-radius: 6px;
           color: rgba(255,255,255,0.7);
           padding: 4px 8px;
-          font-size: 9px;
+          font-size: 9.5px;
           letter-spacing: 0.05em;
           text-transform: uppercase;
           cursor: pointer;
@@ -294,9 +269,9 @@ export default function AIAssistant() {
           gap: 4px;
         }
         .ai-voice-toggle-btn.active {
-          background: rgba(139,105,20,0.15);
+          background: rgba(139,105,20,0.2);
           border-color: #8b6914;
-          color: #8b6914;
+          color: #c9a14a;
         }
 
         .ai-chat-close-btn {
@@ -332,7 +307,7 @@ export default function AIAssistant() {
           font-family: 'Jost', sans-serif;
           font-size: 13px;
           line-height: 1.5;
-          border-radius: 12px;
+          border-radius: 14px;
           position: relative;
         }
         .ai-msg-bubble.user {
@@ -345,8 +320,9 @@ export default function AIAssistant() {
           align-self: flex-start;
           background: #fff;
           color: #1a1209;
-          border: 1px solid rgba(26,18,9,0.06);
+          border: 1px solid rgba(26,18,9,0.08);
           border-bottom-left-radius: 2px;
+          box-shadow: 0 4px 14px rgba(26,18,9,0.04);
         }
 
         /* Speak Audio controls */
@@ -398,8 +374,8 @@ export default function AIAssistant() {
 
         /* ── FORM INPUT ── */
         .ai-chat-input-form {
-          border-top: 1px solid rgba(26, 18, 9, 0.06);
-          padding: 16px;
+          border-top: 1px solid rgba(26, 18, 9, 0.08);
+          padding: 14px;
           background: #fff;
           display: flex;
           align-items: center;
@@ -408,8 +384,8 @@ export default function AIAssistant() {
         .ai-chat-input {
           flex: 1;
           height: 40px;
-          border: 1px solid rgba(26, 18, 9, 0.1);
-          border-radius: 8px;
+          border: 1px solid rgba(26, 18, 9, 0.12);
+          border-radius: 10px;
           padding: 0 14px;
           font-family: 'Jost', sans-serif;
           font-size: 13px;
@@ -495,8 +471,8 @@ export default function AIAssistant() {
           .ai-widget-trigger {
             right: 20px;
             bottom: 24px;
-            width: 50px;
-            height: 50px;
+            width: 52px;
+            height: 52px;
           }
         }
       `}</style>
@@ -505,7 +481,6 @@ export default function AIAssistant() {
       <button 
         className={`ai-widget-trigger ${isOpen ? 'open' : ''}`}
         onClick={() => {
-          // If closing, cancel speech synthesis
           if (isOpen && currentUtterance) {
             window.speechSynthesis.cancel();
             setCurrentUtterance(null);
@@ -513,7 +488,7 @@ export default function AIAssistant() {
           }
           setIsOpen(!isOpen);
         }}
-        aria-label="Open AI Assistant"
+        aria-label="Open Winsi AI Assistant"
       >
         {isOpen ? (
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
@@ -525,15 +500,28 @@ export default function AIAssistant() {
       {/* CHAT WINDOW */}
       <div className={`ai-chat-window ${isOpen ? 'open' : ''}`}>
         
-        {/* HEADER */}
+        {/* HEADER WITH WINSI ROUND DP */}
         <div className="ai-chat-header">
-          <div className="ai-chat-header-title">
-            <div className="ai-chat-logo-dot" />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div style={{ position: 'relative', width: '38px', height: '38px', borderRadius: '50%', border: '2px solid #8b6914', overflow: 'hidden', flexShrink: 0 }}>
+              <Image 
+                src="/winsi_dp.jpg"
+                alt="Winsi AI"
+                fill
+                sizes="38px"
+                style={{ objectFit: 'cover' }}
+              />
+              <div style={{ position: 'absolute', bottom: '0px', right: '0px', width: '9px', height: '9px', borderRadius: '50%', background: '#10b981', border: '1.5px solid #1a1209' }} />
+            </div>
             <div>
-              <h4>Winsor Concierge</h4>
-              <span>AI Horology Assistant</span>
+              <h4 style={{ margin: 0, fontFamily: "'Jost', sans-serif", fontSize: '14px', fontWeight: 600, letterSpacing: '0.05em', color: '#fff' }}>Winsi</h4>
+              <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.65)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#10b981', display: 'inline-block' }} />
+                Winsor AI Concierge
+              </span>
             </div>
           </div>
+
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <button 
               type="button"
@@ -566,29 +554,55 @@ export default function AIAssistant() {
           </div>
         </div>
 
-        {/* MESSAGES LIST */}
+        {/* MESSAGES LIST WITH WINSI DP AVATARS */}
         <div className="ai-chat-messages">
           {messages.map((msg, idx) => (
-            <div key={idx} className={`ai-msg-bubble ${msg.role}`}>
-              {msg.content}
-              {msg.role === 'assistant' && (
-                <button 
-                  className={`ai-msg-speak-btn ${msg.isAudioPlaying ? 'playing' : ''}`}
-                  onClick={() => speakText(msg.content, idx)}
-                  title="Speak Response"
-                >
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
-                </button>
-              )}
-            </div>
+            msg.role === 'assistant' ? (
+              <div key={idx} style={{ display: 'flex', gap: '8px', alignItems: 'flex-start', maxWidth: '88%', alignSelf: 'flex-start' }}>
+                <div style={{ position: 'relative', width: '28px', height: '28px', borderRadius: '50%', border: '1.5px solid #8b6914', overflow: 'hidden', flexShrink: 0, marginTop: '2px' }}>
+                  <Image 
+                    src="/winsi_dp.jpg"
+                    alt="Winsi"
+                    fill
+                    sizes="28px"
+                    style={{ objectFit: 'cover' }}
+                  />
+                </div>
+                <div className="ai-msg-bubble assistant" style={{ maxWidth: '100%' }}>
+                  {msg.content}
+                  <button 
+                    className={`ai-msg-speak-btn ${msg.isAudioPlaying ? 'playing' : ''}`}
+                    onClick={() => speakText(msg.content, idx)}
+                    title="Speak Response"
+                  >
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div key={idx} className="ai-msg-bubble user">
+                {msg.content}
+              </div>
+            )
           ))}
           
           {loading && (
-            <div className="ai-msg-bubble assistant" style={{ width: '60px' }}>
-              <div className="ai-typing-loader">
-                <div className="ai-typing-dot" />
-                <div className="ai-typing-dot" />
-                <div className="ai-typing-dot" />
+            <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-start', alignSelf: 'flex-start' }}>
+              <div style={{ position: 'relative', width: '28px', height: '28px', borderRadius: '50%', border: '1.5px solid #8b6914', overflow: 'hidden', flexShrink: 0, marginTop: '2px' }}>
+                <Image 
+                  src="/winsi_dp.jpg"
+                  alt="Winsi"
+                  fill
+                  sizes="28px"
+                  style={{ objectFit: 'cover' }}
+                />
+              </div>
+              <div className="ai-msg-bubble assistant" style={{ width: '60px' }}>
+                <div className="ai-typing-loader">
+                  <div className="ai-typing-dot" />
+                  <div className="ai-typing-dot" />
+                  <div className="ai-typing-dot" />
+                </div>
               </div>
             </div>
           )}
@@ -609,7 +623,7 @@ export default function AIAssistant() {
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Ask about Winsor watches..."
+            placeholder="Ask Winsi about watches..."
             className="ai-chat-input"
             disabled={loading}
           />

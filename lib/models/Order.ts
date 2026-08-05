@@ -118,9 +118,37 @@ const OrderSchema = new Schema<IOrderDocument>({
     default: null,
     min: 0,
   },
-  // ── Delivery Tracking ─────────────────────────────────────
+  // ── Delivery Tracking ─────────────────────────────────────────────────
   deliveredAt: {
     type: Date,
+    default: null,
+  },
+  // ── Payment Fields ────────────────────────────────────────────────────
+  paymentMethod: {
+    type: String,
+    enum: ['card', 'bank_transfer'],
+    default: 'card',
+    index: true,
+  },
+  paymentStatus: {
+    type: String,
+    enum: ['pending', 'paid', 'failed'],
+    default: 'pending',
+    index: true,
+  },
+  receiptUrl: {
+    type: String,
+    trim: true,
+    default: null,
+  },
+  receiptPublicId: {
+    type: String,
+    trim: true,
+    default: null,
+  },
+  payhereOrderId: {
+    type: String,
+    trim: true,
     default: null,
   },
 }, { timestamps: true });

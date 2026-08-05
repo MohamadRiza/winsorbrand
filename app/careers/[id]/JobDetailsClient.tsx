@@ -4,7 +4,7 @@ import { useEffect, useState, useMemo, useRef, FormEvent } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { Toaster, toast } from 'react-hot-toast';
+import { toast } from 'react-hot-toast';
 import { Turnstile, type TurnstileInstance } from '@marsidev/react-turnstile';
 import Navbar from '@/components/Navbar/Navbar';
 
@@ -230,7 +230,7 @@ export default function JobDetailsClient({ id }: { id: string }) {
       <div className="min-h-screen bg-[#faf7f0] flex flex-col">
         <Navbar />
         <div className="flex-1 flex items-center justify-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#8B6914]"></div>
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#8B6914]"></div>
         </div>
       </div>
     );
@@ -240,13 +240,13 @@ export default function JobDetailsClient({ id }: { id: string }) {
     return (
       <div className="min-h-screen bg-[#faf7f0] flex flex-col">
         <Navbar />
-        <div className="flex-1 flex flex-col items-center justify-center p-8 font-['Jost']">
-          <div className="text-red-500 text-3xl mb-3">⚠️</div>
+        <div className="flex-1 flex flex-col items-center justify-center p-8 font-['Jost'] text-center">
+          <svg className="w-10 h-10 text-[#8B6914] mb-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
           <h2 className="font-['Cormorant_Garamond'] text-2xl font-bold text-[#1a1209]">Position Unavailable</h2>
-          <p className="text-sm text-[#1a1209]/60 mt-1 max-w-sm text-center">
+          <p className="text-sm text-[#1a1209]/60 mt-1 max-w-sm">
             This job vacancy is either filled, deactivated, or does not exist in our system.
           </p>
-          <Link href="/careers" className="mt-6 px-5 py-2.5 bg-[#1a1209] hover:bg-[#8B6914] text-white text-xs font-semibold uppercase tracking-wider rounded-lg transition-colors">
+          <Link href="/careers" className="mt-6 px-5 py-2.5 bg-[#1a1209] hover:bg-[#8B6914] text-white text-xs font-semibold uppercase tracking-wider rounded-lg transition-colors shadow-sm">
             Back to Careers
           </Link>
         </div>
@@ -264,19 +264,19 @@ export default function JobDetailsClient({ id }: { id: string }) {
       {successData && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1a1209]/70 backdrop-blur-md">
           <div className="bg-white border border-[#8B6914]/35 rounded-2xl p-8 max-w-md w-full text-center shadow-2xl space-y-5 animate-scaleUp">
-            <div className="w-16 h-16 bg-[#8B6914]/10 rounded-full border border-[#8B6914]/30 flex items-center justify-center text-3xl text-[#8B6914] mx-auto animate-bounce">
-              ✓
+            <div className="w-14 h-14 bg-[#8B6914]/10 rounded-full border border-[#8B6914]/30 flex items-center justify-center mx-auto">
+              <svg className="w-7 h-7 text-[#8B6914]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
             </div>
-            <div className="space-y-2">
-              <h2 className="font-['Cormorant_Garamond'] text-3xl font-semibold">Application Received</h2>
+            <div className="space-y-1.5">
+              <h2 className="font-['Cormorant_Garamond'] text-3xl font-semibold text-[#1a1209]">Application Received</h2>
               <p className="text-xs text-[#8B6914] font-medium uppercase tracking-wider">
                 {successData.title}
               </p>
             </div>
-            <p className="text-sm text-[#1a1209]/60 leading-relaxed">
+            <p className="text-xs text-[#1a1209]/60 leading-relaxed">
               Your credentials and resume have been securely received. Our recruitment team will review your application and follow up via email.
             </p>
-            <div className="bg-[#faf7f0] border border-[#1a1209]/10 rounded-xl p-4.5 space-y-1">
+            <div className="bg-[#faf7f0] border border-[#1a1209]/10 rounded-xl p-4 space-y-1">
               <p className="text-[10px] uppercase font-bold tracking-widest text-[#1a1209]/40">Application Reference ID</p>
               <p className="font-mono text-base font-semibold tracking-wider text-[#1a1209] select-all">
                 {successData.referenceId}
@@ -293,51 +293,54 @@ export default function JobDetailsClient({ id }: { id: string }) {
       )}
 
       {/* Main Grid: Info Details (Left) + Form Details (Right) */}
-      <main className="max-w-7xl mx-auto w-full px-6 lg:px-12 py-12 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-10">
+      <main className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-12 py-10 lg:py-14 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
         
         {/* Left Column: Job Description Spec details */}
-        <section className="lg:col-span-5 space-y-8">
+        <section className="lg:col-span-5 space-y-7">
           
           {/* Back Button */}
-          <Link href="/careers" className="inline-flex items-center gap-1.5 text-xs text-[#8B6914] hover:text-[#1a1209] transition-colors font-medium">
-            <span>←</span> <span>Back to Open Positions</span>
+          <Link href="/careers" className="group inline-flex items-center gap-2 text-xs text-[#8B6914] hover:text-[#1a1209] transition-colors font-semibold tracking-wide uppercase">
+            <svg className="w-3.5 h-3.5 transition-transform group-hover:-translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            <span>Back to Open Positions</span>
           </Link>
 
           {/* Heading Card */}
-          <div className="space-y-4">
-            <h1 className="font-['Cormorant_Garamond'] text-3xl lg:text-4xl font-bold leading-tight">
+          <div className="space-y-4 bg-white border border-[#1a1209]/8 rounded-2xl p-6 lg:p-7 shadow-sm">
+            <h1 className="font-['Cormorant_Garamond'] text-3xl lg:text-4xl font-bold leading-tight text-[#1a1209]">
               {vacancy.title}
             </h1>
             
             <div className="flex flex-wrap gap-2 pt-1">
               {vacancy.locations.map(loc => (
-                <span key={loc} className="px-2.5 py-1 bg-white border border-[#1a1209]/10 text-xs font-medium rounded-lg text-[#1a1209]/80 uppercase tracking-wide shadow-sm">
-                  📍 {loc}
+                <span key={loc} className="inline-flex items-center px-3 py-1 bg-[#fbf9f4] border border-[#1a1209]/10 text-xs font-semibold rounded-lg text-[#1a1209]/80 uppercase tracking-wider">
+                  <svg className="w-3 h-3 text-[#8B6914] mr-1.5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                  {loc}
                 </span>
               ))}
             </div>
 
             {vacancy.salary && (
-              <p className="text-base text-[#8B6914] font-semibold">
-                Starting Salary: {vacancy.salary}
-              </p>
+              <div className="pt-2 border-t border-[#1a1209]/6 flex items-center justify-between">
+                <span className="text-xs uppercase font-semibold tracking-wider text-[#1a1209]/50">Starting Compensation</span>
+                <span className="text-sm text-[#8B6914] font-bold tracking-wide">{vacancy.salary}</span>
+              </div>
             )}
           </div>
 
           {/* Maison Special Features (Transport, Accommodation) */}
-          <div className="bg-white border border-[#1a1209]/10 rounded-2xl p-6 shadow-sm space-y-4">
-            <h3 className="font-['Cormorant_Garamond'] text-lg font-bold border-b border-[#1a1209]/5 pb-2">
-              Employment Package Perks
+          <div className="bg-white border border-[#1a1209]/8 rounded-2xl p-6 lg:p-7 shadow-sm space-y-4">
+            <h3 className="font-['Cormorant_Garamond'] text-xl font-bold border-b border-[#1a1209]/6 pb-3 text-[#1a1209]">
+              Employment Package & Benefits
             </h3>
 
             {hasMultipleLocations && (
-              <div className="flex items-start gap-3 text-xs leading-relaxed text-[#1a1209]/75">
-                <span className="text-base">🔄</span>
+              <div className="flex items-start gap-3.5 text-xs leading-relaxed text-[#1a1209]/75 pt-1">
+                <svg className="w-4 h-4 text-[#8B6914] flex-shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
                 <div>
-                  <span className="font-semibold block text-[#8B6914] uppercase tracking-wide text-[9px] mb-0.5">Rotational Branches Policy</span>
+                  <span className="font-bold block text-[#8B6914] uppercase tracking-wider text-[9px] mb-0.5">Rotational Branches Policy</span>
                   As we run multiple branch showrooms, watchmaking staff may undergo scheduled rotations across locations. 
                   {vacancy.transportProvided ? (
-                    <strong className="block text-[#1a1209] mt-1">✓ Company provides full transport expenses reimbursement.</strong>
+                    <strong className="block text-[#1a1209] mt-1 font-semibold">Company provides full transport expenses reimbursement.</strong>
                   ) : (
                     <span className="block text-[#1a1209]/50 mt-1">*Rotational transport expenses covered locally.</span>
                   )}
@@ -345,15 +348,15 @@ export default function JobDetailsClient({ id }: { id: string }) {
               </div>
             )}
 
-            <div className="flex items-start gap-3 text-xs leading-relaxed text-[#1a1209]/75">
-              <span className="text-base">🏨</span>
+            <div className="flex items-start gap-3.5 text-xs leading-relaxed text-[#1a1209]/75 pt-1">
+              <svg className="w-4 h-4 text-[#8B6914] flex-shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 21h18M9 8h1M9 12h1M9 16h1M14 8h1M14 12h1M14 16h1M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16"/></svg>
               <div>
-                <span className="font-semibold block text-[#8B6914] uppercase tracking-wide text-[9px] mb-0.5">Accommodation Facilities</span>
+                <span className="font-bold block text-[#8B6914] uppercase tracking-wider text-[9px] mb-0.5">Accommodation Facilities</span>
                 {vacancy.accommodationProvided ? (
                   <>
-                    <strong className="text-green-700 block mb-1">Accommodation Provided by Maison</strong>
+                    <strong className="text-emerald-700 block mb-1 font-semibold">Accommodation Provided by Maison</strong>
                     {vacancy.accommodationDetails && (
-                      <p className="text-[#1a1209]/70 bg-[#faf7f0] p-2.5 rounded-lg border border-[#1a1209]/5 mt-1 font-light italic">
+                      <p className="text-[#1a1209]/70 bg-[#faf7f0] p-3 rounded-xl border border-[#1a1209]/6 mt-1 font-light italic text-[11px] leading-normal">
                         "{vacancy.accommodationDetails}"
                       </p>
                     )}
@@ -366,12 +369,12 @@ export default function JobDetailsClient({ id }: { id: string }) {
           </div>
 
           {/* Description details content */}
-          <div className="space-y-3">
-            <h3 className="font-['Cormorant_Garamond'] text-xl font-bold">
-              Job Description & Responsibilities
+          <div className="bg-white border border-[#1a1209]/8 rounded-2xl p-6 lg:p-7 shadow-sm space-y-4">
+            <h3 className="font-['Cormorant_Garamond'] text-xl font-bold text-[#1a1209] border-b border-[#1a1209]/6 pb-3">
+              Job Description & Specifications
             </h3>
             <div 
-              className="text-sm text-[#1a1209]/80 leading-relaxed space-y-4 font-light text-justify"
+              className="text-xs sm:text-sm text-[#1a1209]/80 leading-relaxed space-y-3 font-light text-justify"
               dangerouslySetInnerHTML={{ __html: vacancy.description }}
             />
           </div>
@@ -379,16 +382,16 @@ export default function JobDetailsClient({ id }: { id: string }) {
         </section>
 
         {/* Right Column: Application Form */}
-        <section className="lg:col-span-7 bg-white border border-[#1a1209]/10 rounded-3xl p-6 lg:p-10 shadow-xl h-fit">
+        <section className="lg:col-span-7 bg-white border border-[#1a1209]/10 rounded-3xl p-6 sm:p-8 lg:p-10 shadow-xl h-fit">
           <div className="border-b border-[#1a1209]/10 pb-5 mb-7">
-            <h2 className="font-['Cormorant_Garamond'] text-2xl lg:text-3xl font-semibold">Submit Application</h2>
+            <h2 className="font-['Cormorant_Garamond'] text-2xl lg:text-3xl font-semibold text-[#1a1209]">Submit Application</h2>
             <p className="text-xs text-[#1a1209]/50 mt-1">Please fill in your exact details as they appear on official identity credentials.</p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-5">
             
             {/* First & Last Name */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-[10px] font-semibold tracking-wider text-[#1a1209]/60 uppercase mb-2">First Name</label>
                 <input
@@ -396,7 +399,7 @@ export default function JobDetailsClient({ id }: { id: string }) {
                   required
                   value={firstName}
                   onChange={(e) => setFirstName(e.target.value)}
-                  className="w-full px-4 py-2.5 bg-[#fbf9f4] border border-[#1a1209]/15 rounded-xl text-sm focus:outline-none focus:border-[#8B6914] transition"
+                  className="w-full px-4 py-2.5 bg-[#fbf9f4] border border-[#1a1209]/15 rounded-xl text-sm focus:outline-none focus:border-[#8B6914] focus:ring-1 focus:ring-[#8B6914] transition text-[#1a1209]"
                   placeholder="e.g. John"
                 />
               </div>
@@ -407,21 +410,21 @@ export default function JobDetailsClient({ id }: { id: string }) {
                   required
                   value={lastName}
                   onChange={(e) => setLastName(e.target.value)}
-                  className="w-full px-4 py-2.5 bg-[#fbf9f4] border border-[#1a1209]/15 rounded-xl text-sm focus:outline-none focus:border-[#8B6914] transition"
+                  className="w-full px-4 py-2.5 bg-[#fbf9f4] border border-[#1a1209]/15 rounded-xl text-sm focus:outline-none focus:border-[#8B6914] focus:ring-1 focus:ring-[#8B6914] transition text-[#1a1209]"
                   placeholder="e.g. Doe"
                 />
               </div>
             </div>
 
-            {/* Country, City, Address */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Country, City */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-[10px] font-semibold tracking-wider text-[#1a1209]/60 uppercase mb-2">Country</label>
                 <div className="relative">
                   <select
                     value={country}
                     onChange={(e) => handleCountryChange(e.target.value)}
-                    className="w-full px-4 py-2.5 bg-[#fbf9f4] border border-[#1a1209]/15 rounded-xl text-sm focus:outline-none focus:border-[#8B6914] appearance-none cursor-pointer"
+                    className="w-full px-4 py-2.5 bg-[#fbf9f4] border border-[#1a1209]/15 rounded-xl text-sm focus:outline-none focus:border-[#8B6914] appearance-none cursor-pointer text-[#1a1209]"
                   >
                     {COUNTRIES.map((c) => (
                       <option key={c.code} value={c.name}>
@@ -429,7 +432,9 @@ export default function JobDetailsClient({ id }: { id: string }) {
                       </option>
                     ))}
                   </select>
-                  <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none text-[10px]">▼</span>
+                  <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
+                    <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6 9 12 15 18 9"/></svg>
+                  </span>
                 </div>
               </div>
               <div>
@@ -439,7 +444,7 @@ export default function JobDetailsClient({ id }: { id: string }) {
                   required
                   value={city}
                   onChange={(e) => setCity(e.target.value)}
-                  className="w-full px-4 py-2.5 bg-[#fbf9f4] border border-[#1a1209]/15 rounded-xl text-sm focus:outline-none focus:border-[#8B6914] transition"
+                  className="w-full px-4 py-2.5 bg-[#fbf9f4] border border-[#1a1209]/15 rounded-xl text-sm focus:outline-none focus:border-[#8B6914] focus:ring-1 focus:ring-[#8B6914] transition text-[#1a1209]"
                   placeholder="e.g. Colombo"
                 />
               </div>
@@ -452,13 +457,13 @@ export default function JobDetailsClient({ id }: { id: string }) {
                 required
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
-                className="w-full px-4 py-2.5 bg-[#fbf9f4] border border-[#1a1209]/15 rounded-xl text-sm focus:outline-none focus:border-[#8B6914] transition"
+                className="w-full px-4 py-2.5 bg-[#fbf9f4] border border-[#1a1209]/15 rounded-xl text-sm focus:outline-none focus:border-[#8B6914] focus:ring-1 focus:ring-[#8B6914] transition text-[#1a1209]"
                 placeholder="Street address, apartment, suite..."
               />
             </div>
 
             {/* DOB, Age, Gender */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div>
                 <label className="block text-[10px] font-semibold tracking-wider text-[#1a1209]/60 uppercase mb-2">Date of Birth</label>
                 <input
@@ -466,7 +471,7 @@ export default function JobDetailsClient({ id }: { id: string }) {
                   required
                   value={dob}
                   onChange={(e) => setDob(e.target.value)}
-                  className="w-full px-4 py-2.5 bg-[#fbf9f4] border border-[#1a1209]/15 rounded-xl text-sm focus:outline-none focus:border-[#8B6914] transition"
+                  className="w-full px-4 py-2.5 bg-[#fbf9f4] border border-[#1a1209]/15 rounded-xl text-sm focus:outline-none focus:border-[#8B6914] transition text-[#1a1209]"
                 />
               </div>
               <div>
@@ -476,7 +481,7 @@ export default function JobDetailsClient({ id }: { id: string }) {
                   readOnly
                   disabled
                   value={calculatedAge !== null ? `${calculatedAge} years` : 'Enter DOB first'}
-                  className="w-full px-4 py-2.5 bg-gray-50 border border-[#1a1209]/10 rounded-xl text-sm text-[#1a1209]/60 cursor-not-allowed font-medium"
+                  className="w-full px-4 py-2.5 bg-[#1a1209]/5 border border-[#1a1209]/10 rounded-xl text-sm text-[#1a1209]/60 cursor-not-allowed font-medium"
                 />
               </div>
               <div>
@@ -485,33 +490,35 @@ export default function JobDetailsClient({ id }: { id: string }) {
                   <select
                     value={gender}
                     onChange={(e) => setGender(e.target.value as any)}
-                    className="w-full px-4 py-2.5 bg-[#fbf9f4] border border-[#1a1209]/15 rounded-xl text-sm focus:outline-none focus:border-[#8B6914] appearance-none cursor-pointer"
+                    className="w-full px-4 py-2.5 bg-[#fbf9f4] border border-[#1a1209]/15 rounded-xl text-sm focus:outline-none focus:border-[#8B6914] appearance-none cursor-pointer text-[#1a1209]"
                   >
                     <option value="male">Male</option>
                     <option value="female">Female</option>
                     <option value="prefer_not_say">Prefer not to say</option>
                   </select>
-                  <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none text-[10px]">▼</span>
+                  <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
+                    <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6 9 12 15 18 9"/></svg>
+                  </span>
                 </div>
               </div>
             </div>
 
             {/* Experience Toggles */}
-            <div className="bg-[#faf7f0]/40 border border-[#1a1209]/5 rounded-2xl p-4 space-y-4">
+            <div className="bg-[#faf7f0] border border-[#1a1209]/8 rounded-2xl p-4 space-y-3">
               <label className="flex items-center gap-3 cursor-pointer">
                 <input
                   type="checkbox"
                   checked={hasExperience}
                   onChange={(e) => setHasExperience(e.target.checked)}
-                  className="rounded text-[#8B6914] focus:ring-[#8B6914]/20 w-4 h-4 cursor-pointer"
+                  className="rounded text-[#8B6914] focus:ring-[#8B6914]/20 w-4 h-4 cursor-pointer accent-[#8B6914]"
                 />
-                <span className="text-xs font-semibold text-[#1a1209] uppercase tracking-wide">
+                <span className="text-xs font-semibold text-[#1a1209] uppercase tracking-wider">
                   I possess relevant professional experience
                 </span>
               </label>
 
               {hasExperience && (
-                <div className="animate-fadeIn pl-7">
+                <div className="animate-fadeIn pl-7 pt-1">
                   <label className="block text-[10px] font-semibold tracking-wider text-[#1a1209]/60 uppercase mb-1.5">Years of Experience (2 digits)</label>
                   <input
                     type="number"
@@ -520,7 +527,7 @@ export default function JobDetailsClient({ id }: { id: string }) {
                     required
                     value={experienceYears}
                     onChange={(e) => setExperienceYears(e.target.value.slice(0, 2))}
-                    className="w-[120px] px-4 py-2 bg-white border border-[#1a1209]/15 rounded-xl text-sm focus:outline-none focus:border-[#8B6914]"
+                    className="w-[120px] px-4 py-2 bg-white border border-[#1a1209]/15 rounded-xl text-sm focus:outline-none focus:border-[#8B6914] text-[#1a1209]"
                     placeholder="e.g. 5"
                   />
                 </div>
@@ -528,21 +535,21 @@ export default function JobDetailsClient({ id }: { id: string }) {
             </div>
 
             {/* Referral Toggles */}
-            <div className="bg-[#faf7f0]/40 border border-[#1a1209]/5 rounded-2xl p-4 space-y-4">
+            <div className="bg-[#faf7f0] border border-[#1a1209]/8 rounded-2xl p-4 space-y-3">
               <label className="flex items-center gap-3 cursor-pointer">
                 <input
                   type="checkbox"
                   checked={referred}
                   onChange={(e) => setReferred(e.target.checked)}
-                  className="rounded text-[#8B6914] focus:ring-[#8B6914]/20 w-4 h-4 cursor-pointer"
+                  className="rounded text-[#8B6914] focus:ring-[#8B6914]/20 w-4 h-4 cursor-pointer accent-[#8B6914]"
                 />
-                <span className="text-xs font-semibold text-[#1a1209] uppercase tracking-wide">
+                <span className="text-xs font-semibold text-[#1a1209] uppercase tracking-wider">
                   I was referred by an existing Winsor employee
                 </span>
               </label>
 
               {referred && (
-                <div className="animate-fadeIn pl-7 space-y-4">
+                <div className="animate-fadeIn pl-7 space-y-3.5 pt-1">
                   <div>
                     <label className="block text-[10px] font-semibold tracking-wider text-[#1a1209]/60 uppercase mb-1.5">Referee Full Name</label>
                     <input
@@ -550,19 +557,19 @@ export default function JobDetailsClient({ id }: { id: string }) {
                       required
                       value={refereeName}
                       onChange={(e) => setRefereeName(e.target.value)}
-                      className="w-full px-4 py-2 bg-white border border-[#1a1209]/15 rounded-xl text-sm focus:outline-none focus:border-[#8B6914]"
+                      className="w-full px-4 py-2 bg-white border border-[#1a1209]/15 rounded-xl text-sm focus:outline-none focus:border-[#8B6914] text-[#1a1209]"
                       placeholder="e.g. Nimal Perera"
                     />
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-[10px] font-semibold tracking-wider text-[#1a1209]/60 uppercase mb-1.5">Referee Email (Optional)</label>
                       <input
                         type="email"
                         value={refereeEmail}
                         onChange={(e) => setRefereeEmail(e.target.value)}
-                        className="w-full px-4 py-2 bg-white border border-[#1a1209]/15 rounded-xl text-sm focus:outline-none focus:border-[#8B6914]"
+                        className="w-full px-4 py-2 bg-white border border-[#1a1209]/15 rounded-xl text-sm focus:outline-none focus:border-[#8B6914] text-[#1a1209]"
                         placeholder="nimal@winsor.com"
                       />
                     </div>
@@ -572,7 +579,7 @@ export default function JobDetailsClient({ id }: { id: string }) {
                         type="text"
                         value={refereeMobile}
                         onChange={(e) => setRefereeMobile(e.target.value)}
-                        className="w-full px-4 py-2 bg-white border border-[#1a1209]/15 rounded-xl text-sm focus:outline-none focus:border-[#8B6914]"
+                        className="w-full px-4 py-2 bg-white border border-[#1a1209]/15 rounded-xl text-sm focus:outline-none focus:border-[#8B6914] text-[#1a1209]"
                         placeholder="+94 77 123 4567"
                       />
                     </div>
@@ -582,7 +589,7 @@ export default function JobDetailsClient({ id }: { id: string }) {
             </div>
 
             {/* Email & Phone */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-[10px] font-semibold tracking-wider text-[#1a1209]/60 uppercase mb-2">Applicant Email Address</label>
                 <input
@@ -590,7 +597,7 @@ export default function JobDetailsClient({ id }: { id: string }) {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-4 py-2.5 bg-[#fbf9f4] border border-[#1a1209]/15 rounded-xl text-sm focus:outline-none focus:border-[#8B6914] transition"
+                  className="w-full px-4 py-2.5 bg-[#fbf9f4] border border-[#1a1209]/15 rounded-xl text-sm focus:outline-none focus:border-[#8B6914] focus:ring-1 focus:ring-[#8B6914] transition text-[#1a1209]"
                   placeholder="john.doe@example.com"
                 />
               </div>
@@ -602,7 +609,7 @@ export default function JobDetailsClient({ id }: { id: string }) {
                     <select
                       value={dialCode}
                       onChange={(e) => setDialCode(e.target.value)}
-                      className="w-full px-3 py-2.5 bg-[#fbf9f4] border border-[#1a1209]/15 rounded-xl text-sm focus:outline-none focus:border-[#8B6914] appearance-none cursor-pointer"
+                      className="w-full px-3 py-2.5 bg-[#fbf9f4] border border-[#1a1209]/15 rounded-xl text-sm focus:outline-none focus:border-[#8B6914] appearance-none cursor-pointer text-[#1a1209]"
                     >
                       {COUNTRIES.map((c) => (
                         <option key={c.code} value={c.dial}>
@@ -610,14 +617,16 @@ export default function JobDetailsClient({ id }: { id: string }) {
                         </option>
                       ))}
                     </select>
-                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none text-[9px]">▼</span>
+                    <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
+                      <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6 9 12 15 18 9"/></svg>
+                    </span>
                   </div>
                   <input
                     type="tel"
                     required
                     value={phone}
                     onChange={(e) => setPhone(e.target.value.replace(/\D/g, ''))}
-                    className="flex-1 px-4 py-2.5 bg-[#fbf9f4] border border-[#1a1209]/15 rounded-xl text-sm focus:outline-none focus:border-[#8B6914] transition"
+                    className="flex-1 px-4 py-2.5 bg-[#fbf9f4] border border-[#1a1209]/15 rounded-xl text-sm focus:outline-none focus:border-[#8B6914] focus:ring-1 focus:ring-[#8B6914] transition text-[#1a1209]"
                     placeholder="771234567"
                   />
                 </div>
@@ -654,7 +663,7 @@ export default function JobDetailsClient({ id }: { id: string }) {
             <button
               type="submit"
               disabled={Boolean(submitting || !turnstileToken)}
-              className="w-full py-4 bg-gradient-to-r from-[#1a1209] to-[#2a1d10] hover:from-[#2a1d10] hover:to-[#3a2815] text-white text-xs font-semibold tracking-widest uppercase rounded-xl transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full py-4 bg-gradient-to-r from-[#1a1209] via-[#2a1d10] to-[#1a1209] hover:from-[#8B6914] hover:via-[#a37c17] hover:to-[#8B6914] text-white text-xs font-semibold tracking-widest uppercase rounded-xl transition-all duration-300 shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {submitting ? 'Submitting Application…' : 'Submit Application'}
             </button>
