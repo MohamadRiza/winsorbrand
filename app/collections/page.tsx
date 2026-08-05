@@ -167,7 +167,7 @@ export default function CollectionsPage() {
     fetch(`/api/reviews/ratings?ids=${ids}`)
       .then(r => r.json())
       .then(data => { if (data.success) setReviewRatings(data.data || {}); })
-      .catch(() => {});
+      .catch(() => { });
   }, [products]);
 
   // Helper to determine product gender (Gents / Ladies / Unisex)
@@ -1620,7 +1620,7 @@ export default function CollectionsPage() {
                 <div className="benefit-item">
                   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>
                   <div>
-                    <h4>1 Year Warranty</h4>
+                    <h4>International Warranty</h4>
                     <span>Sri Lanka & UAE</span>
                   </div>
                 </div>
@@ -1642,7 +1642,7 @@ export default function CollectionsPage() {
                   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
                   <div>
                     <h4>Secure Payments</h4>
-                    <span>Trusted & Verified</span>
+                    <span>100% Secure Checkout with payhere.lk</span>
                   </div>
                 </div>
               </div>
@@ -1659,7 +1659,7 @@ export default function CollectionsPage() {
                 <div className="benefit-item">
                   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>
                   <div>
-                    <h4>1 Year Warranty</h4>
+                    <h4>1 Year International Warranty</h4>
                     <span>Sri Lanka & UAE</span>
                   </div>
                 </div>
@@ -1681,7 +1681,7 @@ export default function CollectionsPage() {
                   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
                   <div>
                     <h4>Secure Payments</h4>
-                    <span>Trusted & Verified</span>
+                    <span>100% Secure Checkout with payhere.lk</span>
                   </div>
                 </div>
               </div>
@@ -1884,7 +1884,7 @@ export default function CollectionsPage() {
                         {/* ⭐ Review Stars */}
                         {reviewCount > 0 ? (
                           <div style={{ display: 'flex', alignItems: 'center', gap: '4px', margin: '5px 0 2px' }}>
-                            {[1,2,3,4,5].map(s => {
+                            {[1, 2, 3, 4, 5].map(s => {
                               const filled = avgRating >= s;
                               const half = !filled && avgRating >= s - 0.5;
                               return (
@@ -1892,12 +1892,12 @@ export default function CollectionsPage() {
                                   {half && (
                                     <defs>
                                       <linearGradient id="half">
-                                        <stop offset="50%" stopColor="#8B6914"/>
-                                        <stop offset="50%" stopColor="transparent"/>
+                                        <stop offset="50%" stopColor="#8B6914" />
+                                        <stop offset="50%" stopColor="transparent" />
                                       </linearGradient>
                                     </defs>
                                   )}
-                                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
                                 </svg>
                               );
                             })}
@@ -1907,9 +1907,9 @@ export default function CollectionsPage() {
                           </div>
                         ) : (
                           <div style={{ display: 'flex', alignItems: 'center', gap: '3px', margin: '5px 0 2px' }}>
-                            {[1,2,3,4,5].map(s => (
+                            {[1, 2, 3, 4, 5].map(s => (
                               <svg key={s} width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="rgba(26,18,9,0.18)" strokeWidth="1.5">
-                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
                               </svg>
                             ))}
                             <span style={{ fontSize: '9.5px', color: 'rgba(26,18,9,0.3)', fontFamily: "'Jost',sans-serif", marginLeft: '2px' }}>No reviews</span>

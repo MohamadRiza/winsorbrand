@@ -654,7 +654,7 @@ export default function CustomerCarePage() {
                     </div>
                     <div>
                       <div className="info-label">Concierge Email</div>
-                      <div className="info-value">concierge@winsorwatch.com</div>
+                      <div className="info-value">info@winsorbrand.com</div>
                     </div>
                   </div>
 

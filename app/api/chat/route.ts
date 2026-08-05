@@ -20,10 +20,10 @@ export async function POST(req: Request) {
       "Winsor Brand Key Facts:\n" +
       "- Movement: Japan Movement (Japanese precision horology movement).\n" +
       "- Registration: Dubai/UAE Registered Brand.\n" +
-      "- Warranty: 1 Year International Warranty (covers Sri Lanka and UAE).\n" +
-      "- Shipping: Free Shipping within UAE and Sri Lanka.\n" +
-      "- Returns: Easy 7-day returns.\n" +
-      "- Payments: Secure, trusted, and verified payment gateways.\n" +
+      "- Warranty: 1 year international warranty.\n" +
+      "- Returns: Easy return within 7 days.\n" +
+      "- Payments: 100% secure checkout with payhere.lk.\n" +
+      "- Contact Email: info@winsorbrand.com\n" +
       "- Style & Materials: Luxury design, sapphire crystals, water-resistant casings, premium metal and rubber straps.\n" +
       "If the user asks any question that is not related to watches or Winsor Brand, politely decline to answer, " +
       "stating that you are only programmed to assist with watch-related and Winsor Brand inquiries.";

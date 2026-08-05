@@ -414,8 +414,8 @@ export default function Footer() {
                 <a href="tel:+94712345678" className="ft-a" style={{ fontSize: '13px' }}>
                   +94 71 234 5678
                 </a>
-                <a href="mailto:info@happytime.lk" className="ft-a" style={{ fontSize: '13px' }}>
-                  info@happytime.lk
+                <a href="mailto:info@winsorbrand.com" className="ft-a" style={{ fontSize: '13px' }}>
+                  info@winsorbrand.com
                 </a>
                 <address className="ft-a" style={{
                   fontSize: '13px',

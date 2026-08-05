@@ -6,11 +6,11 @@ export default function BenefitsBanner() {
       title: 'Free Worldwide Shipping',
       subtext: 'On all orders over $150',
       icon: (
-        <svg 
-          className="w-5 h-5 text-[#dfb15b]" 
-          fill="none" 
-          stroke="currentColor" 
-          strokeWidth="1.2" 
+        <svg
+          className="w-5 h-5 text-[#dfb15b]"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.2"
           viewBox="0 0 24 24"
         >
           <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 18.75a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0ZM19.5 18.75a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z" />
@@ -19,14 +19,14 @@ export default function BenefitsBanner() {
       ),
     },
     {
-      title: '2 Years Warranty',
-      subtext: 'International warranty',
+      title: 'International Warranty',
+      subtext: '1 year international warranty',
       icon: (
-        <svg 
-          className="w-5 h-5 text-[#dfb15b]" 
-          fill="none" 
-          stroke="currentColor" 
-          strokeWidth="1.2" 
+        <svg
+          className="w-5 h-5 text-[#dfb15b]"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.2"
           viewBox="0 0 24 24"
         >
           <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
@@ -35,13 +35,13 @@ export default function BenefitsBanner() {
     },
     {
       title: 'Easy Returns',
-      subtext: '30-day return policy',
+      subtext: 'Easy return within 7 days',
       icon: (
-        <svg 
-          className="w-5 h-5 text-[#dfb15b]" 
-          fill="none" 
-          stroke="currentColor" 
-          strokeWidth="1.2" 
+        <svg
+          className="w-5 h-5 text-[#dfb15b]"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.2"
           viewBox="0 0 24 24"
         >
           <circle cx="12" cy="12" r="9" />
@@ -52,13 +52,13 @@ export default function BenefitsBanner() {
     },
     {
       title: 'Secure Payments',
-      subtext: '100% secure checkout',
+      subtext: '100% secure checkout with payhere.lk',
       icon: (
-        <svg 
-          className="w-5 h-5 text-[#dfb15b]" 
-          fill="none" 
-          stroke="currentColor" 
-          strokeWidth="1.2" 
+        <svg
+          className="w-5 h-5 text-[#dfb15b]"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.2"
           viewBox="0 0 24 24"
         >
           <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
@@ -91,12 +91,12 @@ export default function BenefitsBanner() {
       `}</style>
 
       <div className="max-w-7xl mx-auto px-6">
-        
+
         {/* Desktop View (Grid Layout) */}
         <div className="hidden sm:grid grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-0">
           {benefits.map((benefit, idx) => (
-            <div 
-              key={idx} 
+            <div
+              key={idx}
               className={`group flex items-center gap-3 px-3 lg:px-6 
                 ${idx < 3 ? 'lg:border-r border-[#8B6914]/15' : ''} 
                 ${idx % 2 === 0 ? 'sm:border-r sm:border-[#8B6914]/15 lg:border-r-0 lg:border-r border-[#8B6914]/15' : ''} 
@@ -110,13 +110,13 @@ export default function BenefitsBanner() {
 
               {/* Text Content */}
               <div className="flex flex-col">
-                <h3 
+                <h3
                   className="text-[#1a1209] text-[10.5px] md:text-[11px] lg:text-[11.5px] font-medium tracking-[0.12em] uppercase transition-colors duration-300 group-hover:text-[#8B6914]"
                   style={{ fontFamily: "'Jost', sans-serif" }}
                 >
                   {benefit.title}
                 </h3>
-                <p 
+                <p
                   className="text-[#666666] text-[9px] md:text-[10px] font-light tracking-[0.05em] mt-0.5"
                   style={{ fontFamily: "'Jost', sans-serif" }}
                 >
@@ -135,8 +135,8 @@ export default function BenefitsBanner() {
 
           <div className="marquee-wrapper">
             {duplicatedBenefits.map((benefit, idx) => (
-              <div 
-                key={idx} 
+              <div
+                key={idx}
                 className="flex items-center gap-3.5 shrink-0"
               >
                 {/* Icon Container */}
@@ -146,13 +146,13 @@ export default function BenefitsBanner() {
 
                 {/* Text Content */}
                 <div className="flex flex-col">
-                  <h3 
+                  <h3
                     className="text-[#1a1209] text-[11px] font-medium tracking-[0.12em] uppercase whitespace-nowrap"
                     style={{ fontFamily: "'Jost', sans-serif" }}
                   >
                     {benefit.title}
                   </h3>
-                  <p 
+                  <p
                     className="text-[#666666] text-[9.5px] font-light tracking-[0.05em] mt-0.5 whitespace-nowrap"
                     style={{ fontFamily: "'Jost', sans-serif" }}
                   >

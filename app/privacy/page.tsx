@@ -259,7 +259,7 @@ export default function PrivacyPolicyPage() {
               <p style={{ background: 'rgba(139,105,20,0.03)', border: '1px solid rgba(139,105,20,0.12)', padding: '16px', borderRadius: '8px', fontStyle: 'italic', fontSize: '13.5px' }}>
                 Winsor Timepiece Maison<br />
                 Attn: Privacy & Data Protection Compliance Office<br />
-                Email: legal@winsorbrand.com<br />
+                Email: info@winsorbrand.com<br />
                 Address: Dubai Design District, Block 4, United Arab Emirates
               </p>
             </section>

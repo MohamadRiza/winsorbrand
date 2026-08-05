@@ -1409,7 +1409,7 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
                 </button>
                 {warrantyOpen && (
                   <div className="accordion-content">
-                    <p>Every Winsor timepiece is accompanied by a 1-Year or 2-Year international warranty, securing your investment against any manufacturing anomalies. Service and repair are provided directly by our master horologists.</p>
+                    <p>Every Winsor timepiece is accompanied by a 1-Year international warranty, securing your investment against any manufacturing anomalies. Service and repair are provided directly by our master horologists.</p>
                   </div>
                 )}
               </div>
@@ -1426,7 +1426,7 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
                 </button>
                 {deliveryOpen && (
                   <div className="accordion-content">
-                    <p>Enjoy free secured worldwide express shipping on all orders. Returns are accepted within 14 days of delivery, provided the item is in pristine, unworn condition with its original packaging intact.</p>
+                    <p>Enjoy free secured worldwide express shipping on all orders. Easy return within 7 days of delivery, provided the item is in pristine, unworn condition with its original packaging intact.</p>
                   </div>
                 )}
               </div>
@@ -1685,7 +1685,7 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
                       <div style={{ display: 'flex', justifyContent: 'center', gap: '4px', margin: '8px 0 6px' }}>
                         {Array.from({ length: 5 }).map((_, i) => (
                           <svg key={i} width="16" height="16" viewBox="0 0 24 24" fill={i < Math.round(reviewsStats.average) ? '#8B6914' : 'none'} stroke="#8B6914" strokeWidth="1.5">
-                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
                           </svg>
                         ))}
                       </div>
@@ -1729,7 +1729,7 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
                               className="rev-img-thumb"
                               style={{ width: '62px', height: '62px', borderRadius: '8px', overflow: 'hidden', border: '1.5px solid rgba(26,18,9,0.08)', cursor: 'pointer', padding: 0, background: 'none', position: 'relative', flexShrink: 0, transition: 'border-color 0.2s, transform 0.2s' }}
                             >
-                              <img src={url} alt={`Review photo ${i+1}`} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                              <img src={url} alt={`Review photo ${i + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                               {i === 8 && allPhotoUrls.length > 9 && (
                                 <div style={{ position: 'absolute', inset: 0, background: 'rgba(26,18,9,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '13px', fontWeight: 700 }}>+{allPhotoUrls.length - 9}</div>
                               )}
@@ -1751,7 +1751,7 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
                     {/* Filter pill row */}
                     <div className="rev-filter-row" style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '24px' }}>
                       {(['all', 'photos', 5, 4, 3, 2, 1] as const).map(f => {
-                        const label = f === 'all' ? `All (${reviews.length})` : f === 'photos' ? `📷 With Photos (${allPhotoUrls.length})` : `${'★'.repeat(f)} ${f} Star (${starDistribution[f as 1|2|3|4|5] || 0})`;
+                        const label = f === 'all' ? `All (${reviews.length})` : f === 'photos' ? `📷 With Photos (${allPhotoUrls.length})` : `${'★'.repeat(f)} ${f} Star (${starDistribution[f as 1 | 2 | 3 | 4 | 5] || 0})`;
                         const isActive = reviewFilter === f;
                         return (
                           <button
@@ -1817,7 +1817,7 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
                                   <div style={{ display: 'flex', gap: '3px', marginBottom: '10px', alignItems: 'center' }}>
                                     {Array.from({ length: 5 }).map((_, i) => (
                                       <svg key={i} width="13" height="13" viewBox="0 0 24 24" fill={i < rev.rating ? '#8B6914' : 'none'} stroke="#8B6914" strokeWidth="1.5">
-                                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
                                       </svg>
                                     ))}
                                     <span style={{ fontSize: '11px', color: 'rgba(26,18,9,0.45)', marginLeft: '4px', fontFamily: "'Jost',sans-serif" }}>{rev.rating}/5</span>
@@ -1836,7 +1836,7 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
                                           className="rev-img-thumb"
                                           style={{ width: '72px', height: '72px', borderRadius: '8px', overflow: 'hidden', border: '1.5px solid rgba(26,18,9,0.08)', cursor: 'pointer', padding: 0, background: 'none', transition: 'border-color 0.2s, transform 0.2s', flexShrink: 0 }}
                                         >
-                                          <img src={url} alt={`Review image ${i+1}`} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                                          <img src={url} alt={`Review image ${i + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                                         </button>
                                       ))}
                                     </div>
@@ -1918,8 +1918,8 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
             <div className="feature-footer-item">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="3" width="15" height="13" /><polygon points="16 8 20 8 23 11 23 16 16 16 16 8" /><circle cx="5.5" cy="18.5" r="2.5" /><circle cx="18.5" cy="18.5" r="2.5" /></svg>
               <div>
-                <h4>Free Shipping</h4>
-                <p>On All Orders</p>
+                <h4>FREE WORLDWIDE SHIPING</h4>
+                <p>On all orders over $150</p>
               </div>
             </div>
 
@@ -1927,7 +1927,7 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67" /></svg>
               <div>
                 <h4>Easy Returns</h4>
-                <p>14-Day Return Policy</p>
+                <p>Easy Return Within 7 Days</p>
               </div>
             </div>
 
@@ -1943,7 +1943,7 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
               <div>
                 <h4>Secure Payments</h4>
-                <p>Protected Checkout</p>
+                <p>100% Secure Checkout with payhere.lk</p>
               </div>
             </div>
           </div>
