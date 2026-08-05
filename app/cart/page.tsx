@@ -1074,14 +1074,15 @@ export default function CartPage() {
           border-radius: 16px;
           width: 100%;
           max-width: 520px;
-          padding: 36px;
-          box-shadow: 0 24px 60px rgba(26, 18, 9, 0.15);
+          padding: 28px 24px;
+          box-shadow: 0 24px 60px rgba(26, 18, 9, 0.18);
           position: relative;
-          border: 1px solid rgba(139, 105, 20, 0.15);
+          border: 1px solid rgba(139, 105, 20, 0.18);
           animation: modal-enter 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-          max-height: 95vh;
+          max-height: min(88vh, 640px);
           display: flex;
           flex-direction: column;
+          overflow: hidden;
         }
         
         @keyframes modal-enter {
@@ -1642,10 +1643,12 @@ export default function CartPage() {
         const item = cartItems.find(i => `${i.productId}-${i.colorVariant || ''}` === activeGiftKey);
         return (
           <div className="modal-overlay" onClick={() => setActiveGiftKey(null)}>
-            <div className="modal-box" onClick={e => e.stopPropagation()} style={{ maxWidth: '540px', padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', borderBottom: '1px solid rgba(139,105,20,0.12)', paddingBottom: '14px' }}>
-                <div style={{ color: '#8b6914', marginBottom: '6px' }}>
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <div className="modal-box" onClick={e => e.stopPropagation()} style={{ maxWidth: '520px', padding: '24px 24px 16px', display: 'flex', flexDirection: 'column', maxHeight: 'min(88vh, 600px)', overflow: 'hidden' }}>
+              
+              {/* Fixed Header */}
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', borderBottom: '1px solid rgba(139,105,20,0.12)', paddingBottom: '12px', flexShrink: 0 }}>
+                <div style={{ color: '#8b6914', marginBottom: '4px' }}>
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M20 12v10H4V12" />
                     <path d="M2 7h20v5H2z" />
                     <path d="M12 22V7" />
@@ -1653,120 +1656,124 @@ export default function CartPage() {
                     <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z" />
                   </svg>
                 </div>
-                <h3 className="modal-title" style={{ margin: 0, fontSize: '24px' }}>Gifting Options</h3>
-                <p style={{ margin: '4px 0 0', fontSize: '12px', color: 'rgba(26,18,9,0.5)', fontFamily: "'Jost', sans-serif" }}>
+                <h3 className="modal-title" style={{ margin: 0, fontSize: '22px' }}>Gifting Options</h3>
+                <p style={{ margin: '2px 0 0', fontSize: '11.5px', color: 'rgba(26,18,9,0.5)', fontFamily: "'Jost', sans-serif" }}>
                   For timepiece: <strong style={{ color: '#1a1209' }}>{item?.product?.title}</strong> {item?.colorVariant ? `(${item.colorVariant})` : ''}
                 </p>
               </div>
 
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', userSelect: 'none' }} onClick={() => setModalIsGift(!modalIsGift)}>
-                <button 
-                  className={`modal-custom-checkbox ${modalIsGift ? 'checked' : ''}`}
-                  type="button"
-                >
-                  {modalIsGift && (
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
-                      <polyline points="20 6 9 17 4 12"/>
-                    </svg>
-                  )}
-                </button>
-                <span style={{ fontSize: '13px', fontWeight: 600, color: '#1a1209', fontFamily: "'Jost', sans-serif" }}>
-                  Enable Complimentary Gift Wrapping & Card
-                </span>
-              </div>
+              {/* Scrollable Middle Body Container */}
+              <div style={{ flex: 1, overflowY: 'auto', paddingRight: '4px', display: 'flex', flexDirection: 'column', gap: '14px', paddingTop: '12px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', userSelect: 'none' }} onClick={() => setModalIsGift(!modalIsGift)}>
+                  <button 
+                    className={`modal-custom-checkbox ${modalIsGift ? 'checked' : ''}`}
+                    type="button"
+                  >
+                    {modalIsGift && (
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="20 6 9 17 4 12"/>
+                      </svg>
+                    )}
+                  </button>
+                  <span style={{ fontSize: '13px', fontWeight: 600, color: '#1a1209', fontFamily: "'Jost', sans-serif" }}>
+                    Enable Complimentary Gift Wrapping & Card
+                  </span>
+                </div>
 
-              {modalIsGift && (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', borderTop: '1px dashed rgba(139,105,20,0.15)', paddingTop: '16px' }}>
-                  <div className="gifting-input-group">
-                    <label className="gifting-label">Personal Greeting Note (Free)</label>
-                    <textarea 
-                      value={modalGiftNote}
-                      onChange={e => setModalGiftNote(e.target.value)}
-                      placeholder="Write a greeting note wishing your recipient the best..."
-                      className="gifting-textarea"
-                      maxLength={300}
-                      style={{ minHeight: '75px' }}
-                    />
-                    <span style={{ fontSize: '10.5px', color: 'rgba(26,18,9,0.4)', textAlign: 'right', marginTop: '2px' }}>
-                      {modalGiftNote.length} / 300 characters
-                    </span>
-                  </div>
+                {modalIsGift && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', borderTop: '1px dashed rgba(139,105,20,0.15)', paddingTop: '14px' }}>
+                    <div className="gifting-input-group">
+                      <label className="gifting-label">Personal Greeting Note (Free)</label>
+                      <textarea 
+                        value={modalGiftNote}
+                        onChange={e => setModalGiftNote(e.target.value)}
+                        placeholder="Write a greeting note wishing your recipient the best..."
+                        className="gifting-textarea"
+                        maxLength={300}
+                        style={{ minHeight: '60px' }}
+                      />
+                      <span style={{ fontSize: '10.5px', color: 'rgba(26,18,9,0.4)', textAlign: 'right', marginTop: '2px' }}>
+                        {modalGiftNote.length} / 300 characters
+                      </span>
+                    </div>
 
-                  <div className="gifting-input-group">
-                    <label className="gifting-label">Canva Card Design Link (Optional)</label>
-                    <input 
-                      type="text"
-                      value={modalCanvaLink}
-                      onChange={e => setModalCanvaLink(e.target.value)}
-                      placeholder="Paste your Canva card view link (https://canva.com/...)"
-                      className="gifting-text-input"
-                    />
-                  </div>
+                    <div className="gifting-input-group">
+                      <label className="gifting-label">Canva Card Design Link (Optional)</label>
+                      <input 
+                        type="text"
+                        value={modalCanvaLink}
+                        onChange={e => setModalCanvaLink(e.target.value)}
+                        placeholder="Paste your Canva card view link (https://canva.com/...)"
+                        className="gifting-text-input"
+                      />
+                    </div>
 
-                  <div className="gifting-input-group">
-                    <label className="gifting-label">Upload Wishes Card / Image (PDF, JPG, PNG, Max 5MB, Optional)</label>
-                    {modalUploadingFile ? (
-                      <div className="file-upload-zone" style={{ padding: '18px 14px' }}>
-                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
-                          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8b6914" strokeWidth="2.5" style={{ animation: 'spin 1.2s linear infinite' }}>
-                            <circle cx="12" cy="12" r="10" stroke="rgba(139,105,20,0.15)" strokeWidth="2.5" />
-                            <path d="M12 2a10 10 0 0 1 10 10" stroke="#8b6914" strokeWidth="2.5" strokeLinecap="round" />
-                          </svg>
-                          <span style={{ fontSize: '12px', color: '#1a1209', fontWeight: 650 }}>
-                            Uploading Wishes Card: {uploadProgress}%
-                          </span>
-                          <div style={{ width: '80%', height: '4px', background: 'rgba(139,105,20,0.12)', borderRadius: '2px', overflow: 'hidden', marginTop: '4px' }}>
-                            <div style={{ width: `${uploadProgress}%`, height: '100%', background: '#8b6914', transition: 'width 0.15s ease-out' }} />
+                    <div className="gifting-input-group">
+                      <label className="gifting-label">Upload Wishes Card / Image (PDF, JPG, PNG, Max 5MB, Optional)</label>
+                      {modalUploadingFile ? (
+                        <div className="file-upload-zone" style={{ padding: '14px' }}>
+                          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }}>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8b6914" strokeWidth="2.5" style={{ animation: 'spin 1.2s linear infinite' }}>
+                              <circle cx="12" cy="12" r="10" stroke="rgba(139,105,20,0.15)" strokeWidth="2.5" />
+                              <path d="M12 2a10 10 0 0 1 10 10" stroke="#8b6914" strokeWidth="2.5" strokeLinecap="round" />
+                            </svg>
+                            <span style={{ fontSize: '11.5px', color: '#1a1209', fontWeight: 650 }}>
+                              Uploading Wishes Card: {uploadProgress}%
+                            </span>
+                            <div style={{ width: '80%', height: '4px', background: 'rgba(139,105,20,0.12)', borderRadius: '2px', overflow: 'hidden', marginTop: '2px' }}>
+                              <div style={{ width: `${uploadProgress}%`, height: '100%', background: '#8b6914', transition: 'width 0.15s ease-out' }} />
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    ) : modalAttachmentUrl ? (
-                      <div className="file-preview-box" style={{ background: 'rgba(139, 105, 20, 0.04)', border: '1px solid rgba(139, 105, 20, 0.15)', borderRadius: '8px', padding: '10px 14px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#8B6914', fontWeight: 500, fontSize: '12px' }}>
-                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                            <polyline points="14 2 14 8 20 8"/>
-                          </svg>
-                          <span style={{ textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap', maxWidth: '280px' }}>
-                            {modalAttachmentName}
-                          </span>
+                      ) : modalAttachmentUrl ? (
+                        <div className="file-preview-box" style={{ background: 'rgba(139, 105, 20, 0.04)', border: '1px solid rgba(139, 105, 20, 0.15)', borderRadius: '8px', padding: '10px 14px' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#8B6914', fontWeight: 500, fontSize: '12px' }}>
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                              <polyline points="14 2 14 8 20 8"/>
+                            </svg>
+                            <span style={{ textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap', maxWidth: '280px' }}>
+                              {modalAttachmentName}
+                            </span>
+                          </div>
+                          <button 
+                            type="button"
+                            onClick={() => { setModalAttachmentUrl(''); setModalAttachmentName(''); }}
+                            style={{ background: 'none', border: 'none', color: '#c62828', fontSize: '11px', fontWeight: 600, cursor: 'pointer', fontFamily: "'Jost', sans-serif" }}
+                          >
+                            Remove
+                          </button>
                         </div>
-                        <button 
-                          type="button"
-                          onClick={() => { setModalAttachmentUrl(''); setModalAttachmentName(''); }}
-                          style={{ background: 'none', border: 'none', color: '#c62828', fontSize: '11px', fontWeight: 600, cursor: 'pointer', fontFamily: "'Jost', sans-serif" }}
-                        >
-                          Remove
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="file-upload-zone" style={{ padding: '14px' }}>
-                        <input 
-                          type="file" 
-                          accept="image/*,application/pdf" 
-                          onChange={handleFileUpload}
-                          disabled={modalUploadingFile}
-                        />
-                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
-                          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(139,105,20,0.5)" strokeWidth="2" style={{ marginBottom: '2px' }}>
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                            <polyline points="17 8 12 3 7 8"/>
-                            <line x1="12" y1="3" x2="12" y2="15"/>
-                          </svg>
-                          <span style={{ fontSize: '12px', color: '#1a1209', fontStyle: 'normal', fontWeight: 500 }}>
-                            Choose file to upload wishes card
-                          </span>
-                          <span style={{ fontSize: '10px', color: 'rgba(26,18,9,0.38)' }}>
-                            PDF, PNG, JPG (Max 5MB)
-                          </span>
+                      ) : (
+                        <div className="file-upload-zone" style={{ padding: '12px' }}>
+                          <input 
+                            type="file" 
+                            accept="image/*,application/pdf" 
+                            onChange={handleFileUpload}
+                            disabled={modalUploadingFile}
+                          />
+                          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3px' }}>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(139,105,20,0.5)" strokeWidth="2" style={{ marginBottom: '2px' }}>
+                              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                              <polyline points="17 8 12 3 7 8"/>
+                              <line x1="12" y1="3" x2="12" y2="15"/>
+                            </svg>
+                            <span style={{ fontSize: '11.5px', color: '#1a1209', fontStyle: 'normal', fontWeight: 500 }}>
+                              Choose file to upload wishes card
+                            </span>
+                            <span style={{ fontSize: '9.5px', color: 'rgba(26,18,9,0.38)' }}>
+                              PDF, PNG, JPG (Max 5MB)
+                            </span>
+                          </div>
                         </div>
-                      </div>
-                    )}
+                      )}
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
+              </div>
 
-              <div className="modal-actions" style={{ marginTop: '12px' }}>
+              {/* Pinned Action Buttons Footer */}
+              <div className="modal-actions" style={{ marginTop: '10px', paddingTop: '10px', borderTop: '1px solid rgba(26,18,9,0.06)', flexShrink: 0 }}>
                 <button className="modal-btn cancel" onClick={() => setActiveGiftKey(null)} type="button">
                   Cancel
                 </button>

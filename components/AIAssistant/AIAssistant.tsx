@@ -211,13 +211,14 @@ export default function AIAssistant() {
         /* ── CHAT PANEL WINDOW ── */
         .ai-chat-window {
           position: fixed;
-          right: 28px;
-          bottom: 28px;
-          width: 380px;
-          height: 580px;
+          right: 20px;
+          bottom: 20px;
+          width: 350px;
+          max-width: calc(100vw - 32px);
+          height: min(490px, 72vh);
           background: rgba(250, 247, 240, 0.98);
           border: 1px solid rgba(139, 105, 20, 0.2);
-          border-radius: 20px;
+          border-radius: 18px;
           box-shadow: 0 16px 48px rgba(26, 18, 9, 0.18);
           backdrop-filter: blur(20px);
           -webkit-backdrop-filter: blur(20px);
@@ -531,7 +532,11 @@ export default function AIAssistant() {
                 toast.success(`Voice response mode ${!voiceEnabled ? 'Enabled' : 'Disabled'}`);
               }}
             >
-              🔊 Voice Auto
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07" />
+              </svg>
+              Voice Auto
             </button>
             <button
               type="button"
