@@ -1336,7 +1336,7 @@ export default function StoreLocatorPage() {
         )}
       </div>
 
-      {/* GPS Confirmation Popup Modal */}
+      {/* GPSs Confirmation Popup Modall */}
       {showGPSModal && (
         <div className="gps-modal-overlay">
           <div className="gps-modal-box">
