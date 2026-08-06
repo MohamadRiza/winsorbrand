@@ -11,6 +11,8 @@ import CountryFlag from '@/components/CountryFlag';
 
 const TOP_LEFT_LINKS = [
   { label: 'Collections', href: '/collections' },
+  { label: 'Gents', href: '/mens' },
+  { label: 'Ladies', href: '/womens' },
   { label: 'Our Story', href: '/our-story' },
   { label: 'Customer Care', href: '/customer-care' },
 ];
@@ -27,17 +29,17 @@ const COLLECTIONS = [
     ]
   },
   {
-    key: 'gents', label: 'GENTS', href: '/collections?gender=men', items: [
-      { label: "Gents Collection", href: '/collections?gender=men' },
-      { label: "Men's Chronograph", href: '/collections?gender=men' },
-      { label: "Executive Timepieces", href: '/collections?gender=men' },
+    key: 'gents', label: 'GENTS', href: '/mens', items: [
+      { label: "Gents Collection", href: '/mens' },
+      { label: "Men's Chronograph", href: '/mens?section=sports' },
+      { label: "Executive Timepieces", href: '/mens?section=luxury' },
     ]
   },
   {
-    key: 'ladies', label: 'LADIES', href: '/collections?gender=women', items: [
-      { label: "Ladies Collection", href: '/collections?gender=women' },
-      { label: "Women's Elegance", href: '/collections?gender=women' },
-      { label: "Petite Diamonds & Gold", href: '/collections?gender=women' },
+    key: 'ladies', label: 'LADIES', href: '/womens', items: [
+      { label: "Ladies Collection", href: '/womens' },
+      { label: "Women's Elegance", href: '/womens?section=luxury' },
+      { label: "Petite Diamonds & Gold", href: '/womens?section=limited' },
     ]
   },
   {

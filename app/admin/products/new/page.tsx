@@ -54,6 +54,7 @@ export default function AddProductPage() {
     asset: EMPTY_ASSET,
   });
 
+  const [targetGender, setTargetGender] = useState<'Gents' | 'Ladies' | 'Unisex'>('Gents');
   const [formData, setFormData] = useState({
     title: '',
     brand: 'Winsor' as const,
@@ -500,6 +501,10 @@ export default function AddProductPage() {
       // 3. Submit payload to API
       const payload = {
         ...formData,
+        specifications: {
+          ...formData.specifications,
+          Gender: targetGender,
+        },
         thumbnail: finalThumbnail,
         images: finalGallery.filter(img => img && img.url),
         video: (finalVideo && finalVideo.url) ? finalVideo : undefined,
@@ -834,7 +839,67 @@ export default function AddProductPage() {
 
         {/* Categories & Sections */}
         <div className="bg-white rounded-xl border border-[#1a1209]/10 p-6">
-          <h3 className="font-['Jost'] font-semibold text-[#1a1209] mb-4">Categories & Sections</h3>
+          <h3 className="font-['Jost'] font-semibold text-[#1a1209] mb-4">Categories & Classification</h3>
+          
+          {/* Target Watch Audience / Gender Selection */}
+          <div className="mb-6 pb-6 border-b border-[#1a1209]/10">
+            <label className="block text-[11px] font-semibold tracking-[0.2em] uppercase text-[#1a1209]/70 mb-2">
+              Watch Classification / Target Gender *
+            </label>
+            <p className="text-xs text-[#1a1209]/50 mb-3 font-['Jost']">
+              Select whether this watch is designed for Men (Gents), Women (Ladies), or Both (Unisex). This powers customer filtering on the website.
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <label className={`flex items-center gap-3 p-3.5 rounded-lg border cursor-pointer transition-all ${
+                targetGender === 'Gents' 
+                  ? 'bg-[#8B6914]/10 border-[#8B6914] text-[#8B6914] font-semibold shadow-sm' 
+                  : 'bg-[#faf7f0] border-[#1a1209]/15 text-[#1a1209]/70 hover:border-[#8B6914]/40'
+              }`}>
+                <input 
+                  type="radio" 
+                  name="targetGender" 
+                  value="Gents" 
+                  checked={targetGender === 'Gents'} 
+                  onChange={() => setTargetGender('Gents')} 
+                  className="w-4 h-4 text-[#8B6914] border-[#1a1209]/20 focus:ring-[#8B6914]" 
+                />
+                <span className="text-sm font-['Jost'] font-medium">👨 Men's Watch (Gents)</span>
+              </label>
+
+              <label className={`flex items-center gap-3 p-3.5 rounded-lg border cursor-pointer transition-all ${
+                targetGender === 'Ladies' 
+                  ? 'bg-[#8B6914]/10 border-[#8B6914] text-[#8B6914] font-semibold shadow-sm' 
+                  : 'bg-[#faf7f0] border-[#1a1209]/15 text-[#1a1209]/70 hover:border-[#8B6914]/40'
+              }`}>
+                <input 
+                  type="radio" 
+                  name="targetGender" 
+                  value="Ladies" 
+                  checked={targetGender === 'Ladies'} 
+                  onChange={() => setTargetGender('Ladies')} 
+                  className="w-4 h-4 text-[#8B6914] border-[#1a1209]/20 focus:ring-[#8B6914]" 
+                />
+                <span className="text-sm font-['Jost'] font-medium">👩 Women's Watch (Ladies)</span>
+              </label>
+
+              <label className={`flex items-center gap-3 p-3.5 rounded-lg border cursor-pointer transition-all ${
+                targetGender === 'Unisex' 
+                  ? 'bg-[#8B6914]/10 border-[#8B6914] text-[#8B6914] font-semibold shadow-sm' 
+                  : 'bg-[#faf7f0] border-[#1a1209]/15 text-[#1a1209]/70 hover:border-[#8B6914]/40'
+              }`}>
+                <input 
+                  type="radio" 
+                  name="targetGender" 
+                  value="Unisex" 
+                  checked={targetGender === 'Unisex'} 
+                  onChange={() => setTargetGender('Unisex')} 
+                  className="w-4 h-4 text-[#8B6914] border-[#1a1209]/20 focus:ring-[#8B6914]" 
+                />
+                <span className="text-sm font-['Jost'] font-medium">👫 Unisex Watch (Both)</span>
+              </label>
+            </div>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-[11px] font-semibold tracking-[0.2em] uppercase text-[#1a1209]/70 mb-3">Collection Sections</label>

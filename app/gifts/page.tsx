@@ -32,9 +32,9 @@ function getGiftCategoryImage(slug: string, dbImage?: string): string {
     'taippongal': '/gift_categories/taippongal.png',
     'valentines-day': '/gift_categories/valentines_day.png',
     'womens-day': '/gift_categories/womens_day.avif',
-    'xmass': '/gift_categories/xmass.avif',
-    'christmas': '/gift_categories/xmass.avif',
-    'xmas': '/gift_categories/xmass.avif',
+    'xmass': '/gift_categories/xmass1.jpg',
+    'christmas': '/gift_categories/xmass1.jpg',
+    'xmas': '/gift_categories/xmass1.jpg',
   };
   return mapping[slug] || '/gift_categories/new_year.webp';
 }

@@ -812,6 +812,8 @@ export default function CollectionsPage() {
           margin: 0 0 6px;
           color: #1a1209;
           letter-spacing: 0.01em;
+          font-variant-numeric: lining-nums;
+          font-feature-settings: "lnum" 1;
         }
         .watch-card-specs {
           font-size: 12px;
@@ -1797,6 +1799,17 @@ export default function CollectionsPage() {
                 ))}
               </select>
             )}
+
+            {/* Target Audience / Gender Filter */}
+            <select
+              value={selectedGender}
+              onChange={e => setSelectedGender(e.target.value as any)}
+              className="toolbar-select"
+            >
+              <option value="all">All Watches (Men & Women)</option>
+              <option value="gents">👨 Gents / Men's Watches</option>
+              <option value="ladies">👩 Ladies / Women's Watches</option>
+            </select>
 
             {/* Price Sorting */}
             <select

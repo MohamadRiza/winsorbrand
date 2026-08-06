@@ -41,7 +41,7 @@ const OCCASION_BACKGROUNDS: Record<string, string> = {
   'eid': '/gift_categories/eid.png',
   'new-year': '/gift_categories/new_year.webp',
   'valentines-day': "/gift_categories/valentines_day.png",
-  'christmas': '/gift_categories/xmass.avif',
+  'christmas': '/gift_categories/xmass1.jpg',
   'graduation': '/gift_categories/Graduation.png',
   'womens-day': '/gift_categories/womens_day.avif',
   'easter-sunday': '/gift_categories/Easter_sunday.png',

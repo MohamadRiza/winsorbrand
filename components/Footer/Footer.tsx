@@ -65,11 +65,12 @@ const LinkedInIcon = () => (
 // ─────────────────────────────────────────────────────────────
 const FOOTER_LINKS = {
   collections: [
-    { label: 'Classic Collection', href: '/collections/classic' },
-    { label: 'Sport Collection', href: '/collections/sport' },
-    { label: 'Heritage Series', href: '/collections/heritage' },
-    { label: 'Tourbillon', href: '/collections/tourbillon' },
-    { label: 'Limited Editions', href: '/collections/limited' },
+    { label: "Gents Timepieces", href: '/mens' },
+    { label: "Ladies Timepieces", href: '/womens' },
+    { label: 'New Arrivals', href: '/collections?section=new' },
+    { label: 'Sport Collection', href: '/collections?section=sports' },
+    { label: 'Classic Luxury', href: '/collections?section=luxury' },
+    { label: 'Limited Editions', href: '/collections?section=limited' },
   ],
   company: [
     { label: 'Our Story', href: '/our-story' },
