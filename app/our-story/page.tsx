@@ -274,7 +274,7 @@ export default function OurStoryPage() {
             font-size:36px !important; 
           }
           .ws-grid-2 { grid-template-columns: 1fr !important; gap: 40px !important; }
-          .ws-hero-title { font-size: clamp(46px,12vw,80px) !important; }
+          .ws-hero-title { font-size: clamp(38px,8vw,64px) !important; }
           .ws-section-title { font-size: clamp(32px,8vw,48px) !important; }
           .ws-pad { padding-left:22px !important; padding-right:22px !important; }
           .ws-stats { grid-template-columns: repeat(2,1fr) !important; }
@@ -289,7 +289,7 @@ export default function OurStoryPage() {
         className="ws-parallax-bg"
         style={{ 
           position:"relative", 
-          minHeight:"min(86vh,760px)", 
+          minHeight:"min(80vh,680px)", 
           display:"flex", 
           alignItems:"center", 
           justifyContent:"center", 
@@ -297,14 +297,14 @@ export default function OurStoryPage() {
           backgroundImage: `linear-gradient(180deg, rgba(10,8,5,0.72) 0%, rgba(10,8,5,0.60) 40%, rgba(10,8,5,0.92) 100%), url('/r_partners.webp')`,
         }}
       >
-        <div className="ws-fade-up ws-pad" style={{ position:"relative", textAlign:"center", color:"#fff", padding:"120px 40px", maxWidth:900 }}>
-          <div style={{ fontFamily:fontSans, fontSize:12, letterSpacing:"0.4em", color:"#dfb15b", marginBottom:22, textTransform:"uppercase", fontWeight: 600 }}>
+        <div className="ws-fade-up ws-pad" style={{ position:"relative", textAlign:"center", color:"#fff", padding:"100px 40px", maxWidth:840 }}>
+          <div style={{ fontFamily:fontSans, fontSize:10.5, letterSpacing:"0.35em", color:"#dfb15b", marginBottom:18, textTransform:"uppercase", fontWeight: 600 }}>
             DUBAI-REGISTERED WATCH BRAND
           </div>
-          <h1 className="ws-hero-title" style={{ fontFamily:fontSerif, fontWeight:500, fontSize:"clamp(56px,8vw,100px)", lineHeight:1.02, letterSpacing:"0.01em", margin:0 }}>
+          <h1 className="ws-hero-title" style={{ fontFamily:fontSerif, fontWeight:500, fontSize:"clamp(44px,5.5vw,72px)", lineHeight:1.06, letterSpacing:"0.02em", margin:0 }}>
             Ride Your Moment
           </h1>
-          <p style={{ fontFamily:fontSerif, fontStyle:"italic", fontSize:"clamp(16px,2vw,22px)", lineHeight:1.7, maxWidth:680, margin:"28px auto 0", color:"rgba(255,255,255,0.92)", fontWeight:300 }}>
+          <p style={{ fontFamily:fontSerif, fontStyle:"italic", fontSize:"clamp(15px,1.5vw,19px)", lineHeight:1.68, maxWidth:620, margin:"22px auto 0", color:"rgba(255,255,255,0.90)", fontWeight:300 }}>
             A Dubai-registered watch brand established in 2023 with one simple vision — to make genuine, stylish, and high-quality watches accessible to everyone.
           </p>
         </div>

@@ -1694,7 +1694,7 @@ export default function CollectionsPage() {
           <div className="featured-section-header" id="featured-products-section">
             <div className="featured-title-block">
               <h2 className="featured-title">FEATURED TIMEPIECES</h2>
-              <Link href="/" className="view-all-link">View All Collections <span className="arrow">→</span></Link>
+              <Link href="#" className="view-all-link">View All Collections <span className="arrow">→</span></Link>
             </div>
 
             <div className="capsule-filter-row">

@@ -125,7 +125,7 @@ export default function GiftsPage() {
     fetch(`/api/reviews/ratings?ids=${ids}`)
       .then(r => r.json())
       .then(data => { if (data.success) setReviewRatings(data.data || {}); })
-      .catch(() => {});
+      .catch(() => { });
   }, [products]);
 
   // Toggle wishlist item
@@ -151,7 +151,7 @@ export default function GiftsPage() {
 
   // Filter products: must be active, have gift categories mapped, match category, search query & price sort
   const giftingProducts = products.filter(p => p.giftCategories && p.giftCategories.length > 0);
-  
+
   let filteredProducts = giftingProducts.filter(p => {
     // Category filter
     const catMatch = selectedCategorySlug === 'all' || p.giftCategories.includes(selectedCategorySlug);
@@ -909,7 +909,7 @@ export default function GiftsPage() {
           </div>
         ) : (
           <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
-            
+
             {/* BENEFITS BAR (MAISON TRUST HIGHLIGHTS) */}
             <div className="benefits-carousel-wrapper">
               <div className="benefits-bar">
@@ -925,8 +925,8 @@ export default function GiftsPage() {
                   <div className="benefit-item">
                     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>
                     <div>
-                      <h4>1 Year International Warranty</h4>
-                      <span>Official Coverage</span>
+                      <h4>International Warranty</h4>
+                      <span>Sri Lanka & UAE</span>
                     </div>
                   </div>
                   <div className="benefit-item">
@@ -1004,13 +1004,13 @@ export default function GiftsPage() {
             ) : (
               <div className="gifts-category-row">
                 {/* Reset Option card */}
-                <div 
+                <div
                   className={`gender-header-card ${selectedCategorySlug === 'all' ? 'active' : ''}`}
                   onClick={() => setSelectedCategorySlug('all')}
                 >
                   <div className="gender-card-img-wrapper">
-                    <Image 
-                      src="/graduation_gift.png" 
+                    <Image
+                      src="/graduation_gift.png"
                       alt="All Gifts"
                       fill
                       sizes="(max-width: 768px) 50vw, 350px"
@@ -1025,20 +1025,20 @@ export default function GiftsPage() {
                     <span>View all gifting watches</span>
                   </div>
                   <div className="gender-header-arrow">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="12" cy="12" r="10"/><path d="M8 12h8M12 8l4 4-4 4"/></svg>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="12" cy="12" r="10" /><path d="M8 12h8M12 8l4 4-4 4" /></svg>
                   </div>
                 </div>
 
                 {/* Categories cards dynamically mapped */}
                 {giftCategories.map(cat => (
-                  <div 
+                  <div
                     key={cat._id}
                     className={`gender-header-card ${selectedCategorySlug === cat.slug ? 'active' : ''}`}
                     onClick={() => setSelectedCategorySlug(cat.slug)}
                   >
                     <div className="gender-card-img-wrapper">
-                      <Image 
-                        src={getGiftCategoryImage(cat.slug, cat.image)} 
+                      <Image
+                        src={getGiftCategoryImage(cat.slug, cat.image)}
                         alt={cat.label}
                         fill
                         sizes="(max-width: 768px) 50vw, 350px"
@@ -1053,7 +1053,7 @@ export default function GiftsPage() {
                       <span>Explore this curated collection</span>
                     </div>
                     <div className="gender-header-arrow">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="12" cy="12" r="10"/><path d="M8 12h8M12 8l4 4-4 4"/></svg>
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="12" cy="12" r="10" /><path d="M8 12h8M12 8l4 4-4 4" /></svg>
                     </div>
                   </div>
                 ))}
@@ -1147,8 +1147,8 @@ export default function GiftsPage() {
 
             {/* PRODUCT GRID SECTION */}
             <h2 className="section-header-title">
-              {selectedCategorySlug === 'all' 
-                ? 'All Curated Gifts' 
+              {selectedCategorySlug === 'all'
+                ? 'All Curated Gifts'
                 : `${stripEmojis(giftCategories.find(c => c.slug === selectedCategorySlug)?.label || 'Curated')} Selection`}
             </h2>
 
@@ -1208,7 +1208,7 @@ export default function GiftsPage() {
                         {/* ⭐ Review Stars */}
                         {reviewCount > 0 ? (
                           <div style={{ display: 'flex', alignItems: 'center', gap: '4px', margin: '5px 0 2px' }}>
-                            {[1,2,3,4,5].map(s => {
+                            {[1, 2, 3, 4, 5].map(s => {
                               const filled = avgRating >= s;
                               const half = !filled && avgRating >= s - 0.5;
                               return (
@@ -1216,12 +1216,12 @@ export default function GiftsPage() {
                                   {half && (
                                     <defs>
                                       <linearGradient id="half-g">
-                                        <stop offset="50%" stopColor="#8B6914"/>
-                                        <stop offset="50%" stopColor="transparent"/>
+                                        <stop offset="50%" stopColor="#8B6914" />
+                                        <stop offset="50%" stopColor="transparent" />
                                       </linearGradient>
                                     </defs>
                                   )}
-                                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
                                 </svg>
                               );
                             })}
@@ -1231,9 +1231,9 @@ export default function GiftsPage() {
                           </div>
                         ) : (
                           <div style={{ display: 'flex', alignItems: 'center', gap: '3px', margin: '5px 0 2px' }}>
-                            {[1,2,3,4,5].map(s => (
+                            {[1, 2, 3, 4, 5].map(s => (
                               <svg key={s} width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="rgba(26,18,9,0.18)" strokeWidth="1.5">
-                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
                               </svg>
                             ))}
                             <span style={{ fontSize: '9.5px', color: 'rgba(26,18,9,0.3)', fontFamily: "'Jost',sans-serif", marginLeft: '2px' }}>No reviews</span>
@@ -1243,17 +1243,17 @@ export default function GiftsPage() {
                         <div className="watch-card-footer">
                           <span className="watch-card-price">{convertPrice(product.price)}</span>
                           <div className="watch-card-actions">
-                            <button 
+                            <button
                               onClick={() => product._id && toggleWishlist(product._id)}
                               className={`card-action-btn ${isFav ? 'active' : ''}`}
                               aria-label="Toggle Wishlist"
                             >
                               <svg width="14" height="14" viewBox="0 0 24 24" fill={isFav ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.8">
-                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
                               </svg>
                             </button>
                             {!isSoldOut && (
-                              <button 
+                              <button
                                 onClick={() => {
                                   product._id && addToCart(product._id, 1, undefined, product);
                                 }}
@@ -1261,9 +1261,9 @@ export default function GiftsPage() {
                                 aria-label="Add to cart"
                               >
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-                                  <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
-                                  <line x1="3" y1="6" x2="21" y2="6"/>
-                                  <path d="M16 10a4 4 0 0 1-8 0"/>
+                                  <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+                                  <line x1="3" y1="6" x2="21" y2="6" />
+                                  <path d="M16 10a4 4 0 0 1-8 0" />
                                 </svg>
                               </button>
                             )}
