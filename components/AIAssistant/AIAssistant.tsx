@@ -71,6 +71,41 @@ export default function AIAssistant() {
     }
   }, []);
 
+  // Helper to select high-quality female/lady voice for Winsi AI
+  const selectLadyVoice = (voices: SpeechSynthesisVoice[]): SpeechSynthesisVoice | null => {
+    if (!voices || voices.length === 0) return null;
+    const enVoices = voices.filter(v => v.lang.startsWith('en'));
+    const candidatePool = enVoices.length > 0 ? enVoices : voices;
+
+    const femalePriorityKeywords = [
+      'jenny', 'zira', 'samantha', 'aria', 'victoria', 'karen', 'sonia', 'fiona',
+      'veena', 'moira', 'hazel', 'susan', 'catherine', 'female', 'google us english female',
+      'google uk english female', 'microsoft jenny', 'microsoft zira'
+    ];
+
+    // 1. Check for Neural / Natural / Premium female voices
+    for (const kw of femalePriorityKeywords) {
+      const found = candidatePool.find(v => {
+        const name = v.name.toLowerCase();
+        return name.includes(kw) && (name.includes('natural') || name.includes('online') || name.includes('neural') || name.includes('google'));
+      });
+      if (found) return found;
+    }
+
+    // 2. Check for any known female voice name (e.g. Zira, Samantha, Jenny, Karen, Victoria)
+    for (const kw of femalePriorityKeywords) {
+      const found = candidatePool.find(v => v.name.toLowerCase().includes(kw));
+      if (found) return found;
+    }
+
+    // 3. Fallback to any voice with 'female' in name
+    const fallbackFemale = candidatePool.find(v => v.name.toLowerCase().includes('female'));
+    if (fallbackFemale) return fallbackFemale;
+
+    // 4. Default to first English voice
+    return candidatePool[0] || null;
+  };
+
   // Handle Speech Output (Text-To-Speech)
   const speakText = (text: string, messageIndex: number) => {
     if (!('speechSynthesis' in window)) {
@@ -89,15 +124,15 @@ export default function AIAssistant() {
     // Create new speech utterance
     const utterance = new SpeechSynthesisUtterance(text);
     
-    // Choose a high-quality English voice if available
+    // Select high-quality Female / Lady Voice for Winsi AI
     const voices = window.speechSynthesis.getVoices();
-    const premiumVoice = voices.find(v => v.lang.startsWith('en') && (v.name.includes('Google') || v.name.includes('Natural') || v.name.includes('Premium')));
-    if (premiumVoice) {
-      utterance.voice = premiumVoice;
+    const ladyVoice = selectLadyVoice(voices);
+    if (ladyVoice) {
+      utterance.voice = ladyVoice;
     }
     
     utterance.rate = 1.0;
-    utterance.pitch = 1.0;
+    utterance.pitch = 1.15; // Elegant, warm pitch for Winsi AI female voice
 
     utterance.onend = () => {
       setMessages(prev => prev.map((msg, i) => i === messageIndex ? { ...msg, isAudioPlaying: false } : msg));
