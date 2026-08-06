@@ -1501,7 +1501,7 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
               <p className="store-banner-p">
                 Visit our exclusive stores and explore premium timepieces crafted for every moment.
               </p>
-              <Link href="/customer-care" className="store-banner-btn">
+              <Link href="/retailers" className="store-banner-btn">
                 FIND A STORE
               </Link>
             </div>
@@ -1524,7 +1524,7 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
               <p className="brand-banner-p">
                 Winsor represents more than time – it represents you. Every second is a step towards your next adventure.
               </p>
-              <Link href="/customer-care" className="brand-banner-btn">
+              <Link href="/our-story" className="brand-banner-btn">
                 DISCOVER OUR STORY
               </Link>
             </div>

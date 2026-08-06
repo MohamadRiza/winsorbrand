@@ -54,6 +54,26 @@ const DIAL_CODES = [
   { code: '+82', label: 'KR (+82)' },
 ];
 
+const getWatchImageUrl = (p: any): string => {
+  if (!p) return '/mens-watch-highlight.png';
+  if (p.thumbnail?.url) return p.thumbnail.url;
+  if (typeof p.thumbnail === 'string' && p.thumbnail) return p.thumbnail;
+  if (Array.isArray(p.images) && p.images.length > 0) {
+    const img0 = p.images[0];
+    if (typeof img0 === 'string' && img0) return img0;
+    if (img0?.url) return img0.url;
+  }
+  if (Array.isArray(p.colorVariants) && p.colorVariants.length > 0) {
+    const v0 = p.colorVariants[0];
+    if (Array.isArray(v0.images) && v0.images.length > 0) {
+      const vImg0 = v0.images[0];
+      if (typeof vImg0 === 'string' && vImg0) return vImg0;
+      if (vImg0?.url) return vImg0.url;
+    }
+  }
+  return '/mens-watch-highlight.png';
+};
+
 export default function ProfilePage() {
   const { isLoaded, isSignedIn, user } = useUser();
   const { openUserProfile, signOut } = useClerk();
@@ -1830,7 +1850,7 @@ export default function ProfilePage() {
                     {wishlistedProducts.map((p, idx) => (
                       <div key={idx} style={{ border: '1px solid rgba(26,18,9,0.08)', borderRadius: '8px', padding: '14px', background: '#ffffff', display: 'flex', flexDirection: 'column', gap: '10px' }}>
                         <div style={{ width: '100%', height: '140px', background: '#faf7f0', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '10px' }}>
-                          <img src={p.images?.[0] || '/mens-watch-highlight.png'} alt={p.title} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', margin: '0 auto' }} />
+                          <img src={getWatchImageUrl(p)} alt={p.title} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', margin: '0 auto' }} />
                         </div>
                         <div style={{ flex: 1 }}>
                           <h4 style={{ fontSize: '13.5px', fontWeight: 600, color: '#1a1209', margin: 0 }}>{p.title}</h4>
