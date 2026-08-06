@@ -1545,22 +1545,22 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
             </p>
 
             <div className="pairings-grid">
-              {/* Card 1: Collections */}
-              <Link href="/collections" className="pairing-card">
+              {/* Card 1: New Arrivals */}
+              <Link href="/collections?section=new" className="pairing-card">
                 <div className="pairing-img-container">
-                  <Image src="/Home1.webp" alt="Collections" fill sizes="(max-width: 768px) 50vw, 25vw" style={{ objectFit: 'cover' }} className="pairing-img" />
+                  <Image src="/category_HomeS/new_arrivals_bg.webp" alt="New Arrivals" fill sizes="(max-width: 768px) 50vw, 25vw" style={{ objectFit: 'cover' }} className="pairing-img" />
                 </div>
                 <div className="pairing-info">
-                  <h4 className="pairing-card-title">Collections</h4>
-                  <p className="pairing-card-desc">Explore Our Premium Collection</p>
+                  <h4 className="pairing-card-title">New Arrivals</h4>
+                  <p className="pairing-card-desc">Explore Our Latest Additions</p>
                   <span className="pairing-card-link">VIEW ALL</span>
                 </div>
               </Link>
 
               {/* Card 2: Classic */}
-              <Link href="/collections?type=classic" className="pairing-card">
+              <Link href="/collections?section=classic" className="pairing-card">
                 <div className="pairing-img-container">
-                  <Image src="/mens-watch-highlight.png" alt="Classic" fill sizes="(max-width: 768px) 50vw, 25vw" style={{ objectFit: 'cover' }} className="pairing-img" />
+                  <Image src="/category_HomeS/classic_bg.webp" alt="Classic" fill sizes="(max-width: 768px) 50vw, 25vw" style={{ objectFit: 'cover' }} className="pairing-img" />
                 </div>
                 <div className="pairing-info">
                   <h4 className="pairing-card-title">Classic</h4>
@@ -1570,9 +1570,9 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
               </Link>
 
               {/* Card 3: Sport */}
-              <Link href="/collections?type=sports" className="pairing-card">
+              <Link href="/collections?section=sports" className="pairing-card">
                 <div className="pairing-img-container">
-                  <Image src="/watch-gmt.jpg" alt="Sport" fill sizes="(max-width: 768px) 50vw, 25vw" style={{ objectFit: 'cover' }} className="pairing-img" />
+                  <Image src="/category_HomeS/sport_bg.webp" alt="Sport" fill sizes="(max-width: 768px) 50vw, 25vw" style={{ objectFit: 'cover' }} className="pairing-img" />
                 </div>
                 <div className="pairing-info">
                   <h4 className="pairing-card-title">Sport</h4>
@@ -1582,9 +1582,9 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
               </Link>
 
               {/* Card 4: Limited Edition */}
-              <Link href="/collections?type=limited" className="pairing-card">
+              <Link href="/collections?section=limited" className="pairing-card">
                 <div className="pairing-img-container">
-                  <Image src="/gifts-highlight.png" alt="Limited Edition" fill sizes="(max-width: 768px) 50vw, 25vw" style={{ objectFit: 'cover' }} className="pairing-img" />
+                  <Image src="/category_HomeS/limitted_bg.webp" alt="Limited Edition" fill sizes="(max-width: 768px) 50vw, 25vw" style={{ objectFit: 'cover' }} className="pairing-img" />
                 </div>
                 <div className="pairing-info">
                   <h4 className="pairing-card-title">Limited Edition</h4>
