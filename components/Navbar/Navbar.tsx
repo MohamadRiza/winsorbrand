@@ -182,6 +182,7 @@ export default function Navbar() {
   const [megaVisible, setMegaVisible] = useState(false);
   const [mobileCurrencyOpen, setMobileCurrencyOpen] = useState(false);
   const [heroActiveSlide, setHeroActiveSlide] = useState(0);
+  const [isNavbarHovered, setIsNavbarHovered] = useState(false);
 
   const searchContainerRef = useRef<HTMLDivElement>(null);
 
@@ -285,7 +286,10 @@ export default function Navbar() {
   }, []);
 
   const isHomepageLightSlide = pathname === '/' && heroActiveSlide !== 2;
-  const isWhite = isTransparent && !megaVisible && !isHomepageLightSlide;
+  // A transparent navbar stays legible on the hero, then becomes a solid surface
+  // whenever it is being used (hovered or displaying an interactive panel).
+  const useSolidSurface = !isTransparent || isNavbarHovered || megaVisible || searchOpen;
+  const isWhite = !useSolidSurface && !isHomepageLightSlide;
   const tc = isWhite ? '#f3eee6' : '#1a1209';
   const tca = isWhite ? 'rgba(243,238,230,0.85)' : 'rgba(26,18,9,0.65)';
   const div = isWhite ? 'rgba(243,238,230,0.15)' : 'rgba(26,18,9,0.1)';
@@ -352,7 +356,11 @@ export default function Navbar() {
       `}</style>
 
       <header
-        onMouseLeave={scheduleClose}
+        onMouseEnter={() => setIsNavbarHovered(true)}
+        onMouseLeave={() => {
+          setIsNavbarHovered(false);
+          scheduleClose();
+        }}
         style={{
           position: 'fixed',
           top: 0,
@@ -361,12 +369,12 @@ export default function Navbar() {
           zIndex: 50,
           transform: isVisible ? 'translateY(0)' : 'translateY(-100%)',
           transition: 'transform 0.42s cubic-bezier(0.25,0.46,0.45,0.94), background 0.35s ease, border-color 0.35s ease',
-          background: isTransparent
-            ? (isHomepageLightSlide ? 'rgba(26, 18, 9, 0.05)' : 'rgba(15, 12, 9, 0.28)')
-            : 'rgba(250,247,240,0.97)',
-          backdropFilter: isTransparent ? 'blur(12px)' : 'blur(14px)',
-          WebkitBackdropFilter: isTransparent ? 'blur(12px)' : 'blur(14px)',
-          borderBottom: `1px solid ${isTransparent ? (isHomepageLightSlide ? 'rgba(26,18,9,0.06)' : 'rgba(243,238,230,0.1)') : 'rgba(26,18,9,0.07)'}`
+          background: useSolidSurface
+            ? 'rgba(255,255,255,0.98)'
+            : (isHomepageLightSlide ? 'rgba(26, 18, 9, 0.05)' : 'rgba(15, 12, 9, 0.28)'),
+          backdropFilter: useSolidSurface ? 'blur(14px)' : 'blur(12px)',
+          WebkitBackdropFilter: useSolidSurface ? 'blur(14px)' : 'blur(12px)',
+          borderBottom: `1px solid ${useSolidSurface ? 'rgba(26,18,9,0.09)' : (isHomepageLightSlide ? 'rgba(26,18,9,0.06)' : 'rgba(243,238,230,0.1)')}`
         }}
       >
         {/* TOP ROW */}
