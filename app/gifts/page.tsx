@@ -176,7 +176,7 @@ export default function GiftsPage() {
   }
 
   return (
-    <>
+    <div style={{ backgroundColor: '#faf7f0', minHeight: '100vh', width: '100%' }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300&family=Jost:wght@300;400;500;600&display=swap');
 
@@ -191,7 +191,8 @@ export default function GiftsPage() {
           overflow: hidden;
           padding: 130px 6% 60px;
           min-height: 520px;
-          margin-bottom: 56px;
+          margin-bottom: 0;
+          border-bottom: 1.5px solid rgba(139,105,20,0.15);
         }
         .hero-banner-content {
           max-width: 48%;
@@ -548,9 +549,17 @@ export default function GiftsPage() {
         }
 
         /* ── BENEFITS BAR ── */
+        @keyframes benefits-marquee {
+          0% {
+            transform: translate3d(0, 0, 0);
+          }
+          100% {
+            transform: translate3d(-100%, 0, 0);
+          }
+        }
         .benefits-carousel-wrapper {
           width: 100%;
-          overflow: visible;
+          overflow: hidden;
           margin-bottom: 40px;
         }
         .benefits-bar {
@@ -567,6 +576,9 @@ export default function GiftsPage() {
         }
         .benefits-marquee-track {
           display: contents;
+        }
+        .benefits-marquee-track[aria-hidden="true"] {
+          display: none;
         }
         .benefit-item {
           display: flex;
@@ -589,6 +601,47 @@ export default function GiftsPage() {
           color: rgba(26, 18, 9, 0.5);
           margin: 0;
           display: block;
+        }
+
+        @media (max-width: 1024px) {
+          .benefits-carousel-wrapper {
+            margin-bottom: 32px;
+            overflow: hidden;
+            width: 100vw;
+            margin-left: calc(-50vw + 50%);
+            padding: 0 0 10px;
+          }
+          .benefits-bar {
+            display: flex;
+            flex-wrap: nowrap;
+            width: max-content;
+            border: none;
+            background: transparent;
+            padding: 0;
+            margin: 0;
+            gap: 0;
+          }
+          .benefits-marquee-track {
+            display: flex !important;
+            align-items: center;
+            gap: 16px;
+            animation: benefits-marquee 25s linear infinite;
+            flex-shrink: 0;
+            padding-right: 16px;
+          }
+          .benefits-marquee-track[aria-hidden="true"] {
+            display: flex !important;
+          }
+          .benefit-item {
+            flex: 0 0 280px;
+            width: 280px;
+            box-sizing: border-box;
+            background: #fff;
+            border-radius: 12px;
+            padding: 16px 20px;
+            border: 1px solid rgba(26, 18, 9, 0.05);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.015);
+          }
         }
 
         /* ── TOOLBAR CONTROLS ── */
@@ -860,6 +913,7 @@ export default function GiftsPage() {
             {/* BENEFITS BAR (MAISON TRUST HIGHLIGHTS) */}
             <div className="benefits-carousel-wrapper">
               <div className="benefits-bar">
+                {/* Track 1 */}
                 <div className="benefits-marquee-track">
                   <div className="benefit-item">
                     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="12" cy="12" r="10" /><path d="m12 6-2 4h4l-2 4" /></svg>
@@ -871,15 +925,54 @@ export default function GiftsPage() {
                   <div className="benefit-item">
                     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>
                     <div>
-                      <h4>International Warranty</h4>
-                      <span>Sri Lanka & UAE</span>
+                      <h4>1 Year International Warranty</h4>
+                      <span>Official Coverage</span>
                     </div>
                   </div>
                   <div className="benefit-item">
                     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="1" y="3" width="15" height="13" rx="2" ry="2" /><line x1="16" y1="8" x2="20" y2="8" /><line x1="16" y1="12" x2="22" y2="12" /></svg>
                     <div>
                       <h4>Free Shipping</h4>
-                      <span>UAE & Sri Lanka</span>
+                      <span>Island-wide in Sri Lanka</span>
+                    </div>
+                  </div>
+                  <div className="benefit-item">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" /><path d="M21 3v5h-5" /></svg>
+                    <div>
+                      <h4>Easy Returns</h4>
+                      <span>Within 7 Days</span>
+                    </div>
+                  </div>
+                  <div className="benefit-item">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
+                    <div>
+                      <h4>Secure Payments</h4>
+                      <span>100% Secure Checkout with payhere.lk</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Track 2 (Duplicate for Seamless Infinite Loop) */}
+                <div className="benefits-marquee-track" aria-hidden="true">
+                  <div className="benefit-item">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="12" cy="12" r="10" /><path d="m12 6-2 4h4l-2 4" /></svg>
+                    <div>
+                      <h4>Japan Movement</h4>
+                      <span>UAE Registered Brand</span>
+                    </div>
+                  </div>
+                  <div className="benefit-item">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>
+                    <div>
+                      <h4>1 Year International Warranty</h4>
+                      <span>Official Coverage</span>
+                    </div>
+                  </div>
+                  <div className="benefit-item">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="1" y="3" width="15" height="13" rx="2" ry="2" /><line x1="16" y1="8" x2="20" y2="8" /><line x1="16" y1="12" x2="22" y2="12" /></svg>
+                    <div>
+                      <h4>Free Shipping</h4>
+                      <span>Island-wide in Sri Lanka</span>
                     </div>
                   </div>
                   <div className="benefit-item">
@@ -1185,6 +1278,6 @@ export default function GiftsPage() {
           </div>
         )}
       </div>
-    </>
+    </div>
   );
 }

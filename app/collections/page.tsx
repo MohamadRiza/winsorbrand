@@ -1630,7 +1630,7 @@ export default function CollectionsPage() {
                   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="1" y="3" width="15" height="13" rx="2" ry="2" /><line x1="16" y1="8" x2="20" y2="8" /><line x1="16" y1="12" x2="22" y2="12" /></svg>
                   <div>
                     <h4>Free Shipping</h4>
-                    <span>UAE & Sri Lanka</span>
+                    <span>Island-wide in Sri Lanka</span>
                   </div>
                 </div>
                 <div className="benefit-item">
@@ -1662,14 +1662,14 @@ export default function CollectionsPage() {
                   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>
                   <div>
                     <h4>1 Year International Warranty</h4>
-                    <span>Sri Lanka & UAE</span>
+                    <span>Official Coverage</span>
                   </div>
                 </div>
                 <div className="benefit-item">
                   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="1" y="3" width="15" height="13" rx="2" ry="2" /><line x1="16" y1="8" x2="20" y2="8" /><line x1="16" y1="12" x2="22" y2="12" /></svg>
                   <div>
                     <h4>Free Shipping</h4>
-                    <span>UAE & Sri Lanka</span>
+                    <span>Island-wide in Sri Lanka</span>
                   </div>
                 </div>
                 <div className="benefit-item">
@@ -1792,7 +1792,7 @@ export default function CollectionsPage() {
                 <option value="all">All Occasions</option>
                 {giftCategories.map(cat => (
                   <option key={cat.slug} value={cat.slug}>
-                    {cat.emoji} {cat.label}
+                    {cat.label}
                   </option>
                 ))}
               </select>

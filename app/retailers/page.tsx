@@ -340,6 +340,7 @@ export default function StoreLocatorPage() {
           background: linear-gradient(rgba(26,18,9,0.35), rgba(26,18,9,0.6)), url('/KCC.webp');
           background-size: cover;
           background-position: center 35%;
+          background-attachment: fixed;
           display: flex;
           flex-direction: column;
           align-items: center;

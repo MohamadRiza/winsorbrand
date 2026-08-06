@@ -1426,7 +1426,7 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
                 </button>
                 {deliveryOpen && (
                   <div className="accordion-content">
-                    <p>Enjoy free secured worldwide express shipping on all orders. Easy return within 7 days of delivery, provided the item is in pristine, unworn condition with its original packaging intact.</p>
+                    <p>Enjoy free island-wide delivery in Sri Lanka on all orders. International orders delivery fee applicable. Easy return within 7 days of delivery, provided the item is in pristine, unworn condition with its original packaging intact.</p>
                   </div>
                 )}
               </div>
@@ -1918,8 +1918,8 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
             <div className="feature-footer-item">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="3" width="15" height="13" /><polygon points="16 8 20 8 23 11 23 16 16 16 16 8" /><circle cx="5.5" cy="18.5" r="2.5" /><circle cx="18.5" cy="18.5" r="2.5" /></svg>
               <div>
-                <h4>FREE WORLDWIDE SHIPING</h4>
-                <p>On all orders over $150</p>
+                <h4>FREE ISLAND-WIDE SHIPPING</h4>
+                <p>Island-wide free delivery in Sri Lanka</p>
               </div>
             </div>
 

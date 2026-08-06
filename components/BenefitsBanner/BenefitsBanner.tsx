@@ -3,8 +3,8 @@
 export default function BenefitsBanner() {
   const benefits = [
     {
-      title: 'Free Worldwide Shipping',
-      subtext: 'On all orders over $150',
+      title: 'Free Shipping',
+      subtext: 'Island-wide in Sri Lanka',
       icon: (
         <svg
           className="w-5 h-5 text-[#dfb15b]"

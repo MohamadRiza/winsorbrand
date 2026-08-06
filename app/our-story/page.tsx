@@ -7,11 +7,11 @@ import VideoPlayer from "./VideoPlayer"; // ← Client component in same folder
 export const metadata = {
   title: "Our Story — Winsor | Ride Your Moment",
   description:
-    "Discover the heritage of Winsor — a luxury timepiece maison crafting fine watches with Japanese precision, founded in Sri Lanka and now present across the UAE and beyond.",
+    "Discover the story of WINSOR — a Dubai-registered watch brand committed to making genuine, stylish, and high-quality watches accessible to everyone. Ride Your Moment.",
   openGraph: {
-    title: "Our Story — Winsor",
+    title: "Our Story — Winsor | Ride Your Moment",
     description:
-      "From a small atelier in Sri Lanka to a globally celebrated maison headquartered in Dubai — the Winsor journey of time, craft and character.",
+      "Registered in Dubai in 2023, WINSOR is Sri Lanka's fastest-growing watch brand, bringing original timepieces, nationwide fixed MRP, and 1-year international warranty.",
     type: "website",
   },
 };
@@ -22,107 +22,76 @@ const CREAM    = "#fcfbf8";
 const MUTED    = "rgba(26,18,9,0.62)";
 const HAIRLINE = "rgba(26,18,9,0.12)";
 
-const fontSerif = "'Cormorant Garamond', Georgia, serif";
-const fontSans  = "'Jost', system-ui, sans-serif";
+const fontSerif  = "'Cormorant Garamond', Georgia, serif";
+const fontCinzel = "'Cinzel', Georgia, serif";
+const fontSans   = "'Jost', system-ui, sans-serif";
 
 const TIMELINE: { year: string; title: string; text: string }[] = [
   {
-    year: "2000",
-    title: "A Maison is Born",
-    text: "Winsor was founded in Sri Lanka by a circle of master watchmakers driven by a single conviction — that time deserves to be worn beautifully. The island's craftsmanship tradition gave the maison its soul.",
+    year: "2023",
+    title: "Registered in Dubai & Brand Creation",
+    text: "WINSOR was registered in Dubai in 2023 with one simple vision: to make genuine, stylish, and high-quality watches accessible to everyone — bridging the gap between inexpensive imitation watches and overpriced luxury brands.",
   },
   {
-    year: "2008",
-    title: "First In-House Movement",
-    text: "The first in-house chronograph movement is unveiled, setting a standard for precision that still defines the maison today — each component finished and regulated entirely by hand.",
+    year: "2024",
+    title: "Nationwide Retail Expansion",
+    text: "WINSOR rapidly expanded across Sri Lanka, establishing an extensive network of leading authorized retailers and introducing a strict nationwide fixed MRP (Maximum Retail Price) for complete price transparency.",
   },
   {
-    year: "2014",
-    title: "A New Home in Dubai",
-    text: "Winsor relocates its headquarters to Dubai, UAE — a city that shares the maison's appetite for refinement and ambition. The Gulf becomes the beating heart of our global operations.",
+    year: "2025",
+    title: "Industry Recognition & Excellence",
+    text: "Honored with the Crown of Precision Award – Sri Lanka and Excellence in New Business of the Year Award – Sri Lanka, recognizing WINSOR's commitment to quality craftsmanship, dependable performance, and rapid market growth.",
   },
   {
-    year: "2019",
-    title: "Heritage Reimagined",
-    text: "The Heritage collection launches to international acclaim, blending the warmth of Sri Lankan craft with the precision expected of the world's finest timepiece houses.",
+    year: "2026",
+    title: "Most Trusted Emerging Watch Brand",
+    text: "Awarded Most Trusted Emerging Watch Brand of the Year while expanding beyond watches into premium lifestyle accessories including perfumes, wallets, belts, and bags.",
   },
   {
     year: "Today",
     title: "Ride Your Moment",
-    text: "With over 25 authorised retailers across the region and beyond, Winsor continues to honour its founding promise — fine watchmaking, made to be lived in.",
+    text: "With a strong network of leading retailers across Sri Lanka, a 1-Year International Warranty, and official presentation gift packaging, WINSOR continues to celebrate every milestone, achievement, and unforgettable moment.",
   },
 ];
 
 const STATS = [
-  { value: "26+", label: "Years of Craft" },
-  { value: "UAE", label: "Headquartered" },
-  { value: "25+", label: "Authorised Retailers" },
-  { value: "1",   label: "Maison" },
+  { value: "2023", label: "Registered in Dubai" },
+  { value: "1 YEAR", label: "International Warranty" },
+  { value: "FIXED MRP", label: "Nationwide Sri Lanka" },
+  { value: "100%", label: "Genuine Quality" },
 ];
 
 const AWARDS = [
   {
     id: '1',
-    year: '2025',
-    title: 'Grand Horology Excellence Award',
-    category: 'Watchmaking & Assembly Mastery',
-    desc: 'Awarded at the Dubai Haute Horlogerie Summit for outstanding precision assembly and hand-finished movement calibres.',
+    year: '2026',
+    title: 'Most Trusted Emerging Watch Brand of the Year',
+    category: 'Consumer Trust & Brand Distinction',
+    desc: 'Awarded for price transparency, nationwide fixed MRP, 1-year international warranty, and client trust across Sri Lanka.',
     image: '/awards/award_1.jpg'
   },
   {
     id: '2',
-    year: '2024',
-    title: 'International Luxury Design Laureate',
-    category: 'Timepiece Aesthetic & Dial Finishing',
-    desc: 'Honored for classic chronograph & moonphase design distinction, blending heritage elegance with contemporary luxury.',
+    year: '2025',
+    title: 'Crown of Precision Award – Sri Lanka',
+    category: 'Watchmaking & Performance Excellence',
+    desc: 'Recognizing WINSOR for chronometric precision, dependable performance, and genuine quality standards.',
     image: '/awards/award_2.jpg'
   },
   {
     id: '3',
-    year: '2024',
-    title: 'Maison Innovation Medal',
-    category: 'Bespoke Tourbillon & Movement Engineering',
-    desc: 'Recognizing Japanese precision integration and technical excellence in tourbillon calibre crafting.',
+    year: '2025',
+    title: 'Excellence in New Business of the Year Award – Sri Lanka',
+    category: 'Business Growth & Retail Network',
+    desc: 'Celebrating WINSOR as Sri Lanka’s fastest-growing watch brand with an extensive authorized retailer network.',
     image: '/awards/award_3.jpg'
   },
   {
     id: '4',
     year: '2023',
-    title: 'Boutique Experience of the Year',
-    category: 'Retail & Client Concierge Distinction',
-    desc: 'Awarded for extraordinary client service standards across our 50+ luxury boutique showrooms globally.',
-    image: '/awards/award_4.jpg'
-  },
-  {
-    id: '5',
-    year: '2023',
-    title: 'Heritage Horology Preservation Award',
-    category: 'Artisan Craftsmanship Traditions',
-    desc: 'Celebrating our founding Sri Lankan watchmaker roots and commitment to hand-finished watchmaking traditions.',
-    image: '/awards/award_1.jpg'
-  },
-  {
-    id: '6',
-    year: '2022',
-    title: 'Chronometric Performance Trophy',
-    category: 'Testing & Regulation Distinction',
-    desc: 'Achieving 99.9% chronometric regulation standards across our automatic & mechanical timepieces.',
-    image: '/awards/award_2.jpg'
-  },
-  {
-    id: '7',
-    year: '2021',
-    title: 'International Watchmaker Guild Accolade',
-    category: 'Artisan Team & Workplace Culture',
-    desc: 'Honoring our dedicated international team of 100+ master craftsmen, watchmakers, and horology professionals.',
-    image: '/awards/award_3.jpg'
-  },
-  {
-    id: '8',
-    year: '2020',
-    title: 'Sustainable Luxury Maison Award',
-    category: 'Ethical Sourcing & Eco Distinction',
-    desc: 'Recognized for responsible material sourcing, recyclable presentation boxes, and sustainable artisan practices.',
+    title: 'Dubai Trademark Registration & Brand Debut',
+    category: 'Maison Heritage & Original Curation',
+    desc: 'Marking WINSOR’s official trademark registration in Dubai, establishing the foundation for accessible premium horology.',
     image: '/awards/award_4.jpg'
   }
 ];
@@ -143,7 +112,7 @@ export default function OurStoryPage() {
   return (
     <div style={{ background:CREAM, color:INK, fontFamily:fontSans, minHeight:"100vh" }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=Jost:wght@300;400;500;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Cormorant+Garamond:wght@300;400;500;600;700&family=Jost:wght@300;400;500;600&display=swap');
 
         .ws-fade-up { animation: wsFadeUp .9s ease both; }
         @keyframes wsFadeUp { from { opacity:0; transform:translateY(18px);} to { opacity:1; transform:none;} }
@@ -302,7 +271,7 @@ export default function OurStoryPage() {
             padding: 30px 0 !important;
           }
           .ws-timeline-row .ws-tl-year { 
-            font-size:42px !important; 
+            font-size:36px !important; 
           }
           .ws-grid-2 { grid-template-columns: 1fr !important; gap: 40px !important; }
           .ws-hero-title { font-size: clamp(46px,12vw,80px) !important; }
@@ -315,7 +284,7 @@ export default function OurStoryPage() {
         }
       `}</style>
 
-      {/* ── HERO ── */}
+      {/* ── HERO BANNER ── */}
       <section 
         className="ws-parallax-bg"
         style={{ 
@@ -329,15 +298,14 @@ export default function OurStoryPage() {
         }}
       >
         <div className="ws-fade-up ws-pad" style={{ position:"relative", textAlign:"center", color:"#fff", padding:"120px 40px", maxWidth:900 }}>
-          <div style={{ fontFamily:fontSans, fontSize:12, letterSpacing:"0.4em", color:"rgba(255,255,255,0.75)", marginBottom:22, textTransform:"uppercase" }}>
-            The Winsor Maison
+          <div style={{ fontFamily:fontSans, fontSize:12, letterSpacing:"0.4em", color:"#dfb15b", marginBottom:22, textTransform:"uppercase", fontWeight: 600 }}>
+            DUBAI-REGISTERED WATCH BRAND
           </div>
-          <h1 className="ws-hero-title" style={{ fontFamily:fontSerif, fontWeight:500, fontSize:"clamp(56px,8vw,110px)", lineHeight:1.02, letterSpacing:"0.01em", margin:0 }}>
-            Our Story
+          <h1 className="ws-hero-title" style={{ fontFamily:fontSerif, fontWeight:500, fontSize:"clamp(56px,8vw,100px)", lineHeight:1.02, letterSpacing:"0.01em", margin:0 }}>
+            Ride Your Moment
           </h1>
-          <p style={{ fontFamily:fontSerif, fontStyle:"italic", fontSize:"clamp(16px,2vw,22px)", lineHeight:1.7, maxWidth:640, margin:"28px auto 0", color:"rgba(255,255,255,0.88)", fontWeight:300 }}>
-            A maison born in Sri Lanka, refined in Dubai — built on the belief
-            that time, when worn well, becomes something more than a measure.
+          <p style={{ fontFamily:fontSerif, fontStyle:"italic", fontSize:"clamp(16px,2vw,22px)", lineHeight:1.7, maxWidth:680, margin:"28px auto 0", color:"rgba(255,255,255,0.92)", fontWeight:300 }}>
+            A Dubai-registered watch brand established in 2023 with one simple vision — to make genuine, stylish, and high-quality watches accessible to everyone.
           </p>
         </div>
         <div style={{ position:"absolute", bottom:26, left:"50%", transform:"translateX(-50%)", color:"rgba(255,255,255,0.7)", fontFamily:fontSans, fontSize:10, letterSpacing:"0.3em" }}>
@@ -348,20 +316,16 @@ export default function OurStoryPage() {
       {/* ── INTRO ── */}
       <section className="ws-pad" style={{ padding:"120px 40px 80px", maxWidth:920, margin:"0 auto", textAlign:"center" }}>
         <SectionLabel>The Beginning</SectionLabel>
-        <h2 className="ws-section-title" style={{ fontFamily:fontSerif, fontSize:"clamp(38px,5vw,58px)", fontWeight:500, lineHeight:1.1, margin:"0 0 28px", letterSpacing:"0.005em" }}>
-          Born in Sri Lanka. Refined in Dubai. Built for the world.
+        <h2 className="ws-section-title" style={{ fontFamily:fontSerif, fontSize:"clamp(38px,5vw,56px)", fontWeight:500, lineHeight:1.1, margin:"0 0 28px", letterSpacing:"0.005em" }}>
+          Born from a vision. Registered in Dubai. Trusted across Sri Lanka.
         </h2>
         <p style={{ fontFamily:fontSerif, fontSize:19, lineHeight:1.85, color:MUTED, fontWeight:300, margin:0 }}>
-          Winsor was founded in 2000 in Sri Lanka, where a small circle of master watchmakers shared
-          one quiet ambition — to build a timepiece worthy of being passed down. From those first
-          hand-finished calibres to a global headquarters in Dubai, our compass has never changed:
-          craft, patience, and the unhurried elegance of a moment lived fully. Today, over 25
-          authorised retailers carry the Winsor name, each one a custodian of that original promise.
+          The inspiration behind WINSOR came from a simple observation. The Sri Lankan market was largely divided between inexpensive imitation watches and premium international brands that were beyond the reach of many consumers. We believed there should be a better alternative — a brand offering genuine craftsmanship, elegant design, dependable performance, and exceptional value. Registered in Dubai in 2023, WINSOR has rapidly grown into one of Sri Lanka’s fastest-growing watch brands, available through leading retail stores nationwide.
         </p>
         <div style={{ height: 60, width: 1, background: GOLD, opacity: 0.35, margin: "48px auto 0" }} />
       </section>
 
-      {/* ── HISTORY SPLIT ── */}
+      {/* ── HISTORY & PHILOSOPHY SPLIT ── */}
       <section style={{ background:"#fff", borderTop:`1px solid ${HAIRLINE}`, borderBottom:`1px solid ${HAIRLINE}` }}>
         <div className="ws-pad ws-grid-2" style={{ maxWidth:1400, margin:"0 auto", padding:"100px 40px", display:"grid", gridTemplateColumns:"1.05fr 1fr", gap:80, alignItems:"center" }}>
           <div 
@@ -375,21 +339,18 @@ export default function OurStoryPage() {
             }} 
           />
           <div>
-            <div style={{ fontFamily:fontSans, fontSize:11, letterSpacing:"0.32em", color:GOLD, textTransform:"uppercase", marginBottom:18 }}>Our Heritage</div>
+            <div style={{ fontFamily:fontSans, fontSize:11, letterSpacing:"0.32em", color:GOLD, textTransform:"uppercase", marginBottom:18 }}>Our Philosophy</div>
             <h3 className="ws-section-title" style={{ fontFamily:fontSerif, fontSize:"clamp(34px,4vw,52px)", fontWeight:500, lineHeight:1.1, margin:"0 0 26px" }}>
-              26 years of unhurried craft.
+              Premium quality without an unaffordable price tag.
             </h3>
             <p style={{ fontFamily:fontSerif, fontSize:18, lineHeight:1.85, color:MUTED, margin:"0 0 20px", fontWeight:300 }}>
-              Every Winsor timepiece begins as a sketch, becomes a calibre, and ends as an heirloom.
-              Our movements are assembled by hand, regulated to chronometric standards, and tested for
-              the kind of wear a lifetime invites.
+              Every WINSOR watch combines modern design, dependable performance, and exceptional value, allowing customers to own an original timepiece with complete confidence.
             </p>
             <p style={{ fontFamily:fontSerif, fontSize:18, lineHeight:1.85, color:MUTED, margin:"0 0 36px", fontWeight:300 }}>
-              We measure ourselves not in production figures, but in the quiet hours our watchmakers
-              give to each piece — and in the generations that wear them.
+              One of our strongest commitments is price transparency. Every WINSOR watch carries the exact same Maximum Retail Price (MRP) throughout Sri Lanka, ensuring every customer enjoys fair and consistent pricing regardless of where they purchase their watch.
             </p>
             <Link href="/collections" className="ws-btn" style={{ display:"inline-block", padding:"14px 32px", border:`1px solid ${INK}`, color:INK, fontFamily:fontSans, fontSize:11, letterSpacing:"0.28em", textDecoration:"none", textTransform:"uppercase" }}>
-              Discover the Craft
+              Explore Collections
             </Link>
           </div>
         </div>
@@ -405,15 +366,15 @@ export default function OurStoryPage() {
         }}
       >
         <div className="ws-pad" style={{ maxWidth:1200, margin:"0 auto", padding:"0 40px", position:"relative", zIndex:2 }}>
-          <SectionLabel>Around the World</SectionLabel>
+          <SectionLabel>Trust & Excellence</SectionLabel>
           <h2 className="ws-section-title" style={{ fontFamily:fontSerif, fontSize:"clamp(36px,5vw,56px)", fontWeight:500, lineHeight:1.12, margin:"0 0 60px", textAlign:"center" }}>
-            A maison present wherever moments matter.
+            Every WINSOR timepiece comes complete.
           </h2>
           <div className="ws-stats" style={{ display:"flex", justifyContent:"space-around", gap:30, flexWrap: "wrap" }}>
             {STATS.map((s) => (
               <div key={s.label} style={{ padding:"30px 24px", borderTop:`1px solid ${HAIRLINE}`, borderBottom:`1px solid ${HAIRLINE}`, textAlign:"center", flex: 1, maxWidth: "240px" }}>
-                <div style={{ fontFamily:fontSerif, fontSize:"clamp(36px,4vw,56px)", fontWeight:500, color:GOLD, lineHeight:1 }}>{s.value}</div>
-                <div style={{ marginTop:14, fontFamily:fontSans, fontSize:11, letterSpacing:"0.28em", color:MUTED, textTransform:"uppercase" }}>{s.label}</div>
+                <div style={{ fontFamily:fontCinzel, fontSize:"clamp(24px, 3vw, 36px)", fontWeight:600, color:GOLD, lineHeight:1.1, letterSpacing:"0.06em" }}>{s.value}</div>
+                <div style={{ marginTop:14, fontFamily:fontSans, fontSize:10.5, letterSpacing:"0.28em", color:MUTED, textTransform:"uppercase", fontWeight:500 }}>{s.label}</div>
               </div>
             ))}
           </div>
@@ -425,7 +386,7 @@ export default function OurStoryPage() {
         <div style={{ textAlign:"center", marginBottom:70 }}>
           <SectionLabel>The Journey</SectionLabel>
           <h2 className="ws-section-title" style={{ fontFamily:fontSerif, fontSize:"clamp(36px,5vw,56px)", fontWeight:500, margin:0 }}>
-            Moments that shaped the maison.
+            Milestones that shaped WINSOR.
           </h2>
         </div>
         <div style={{ position: "relative" }}>
@@ -448,7 +409,7 @@ export default function OurStoryPage() {
             >
               {/* Year & Circle Dot Marker */}
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                <span className="ws-tl-year" style={{ fontFamily:fontSerif, fontSize:58, fontWeight:500, color:GOLD, lineHeight:1, letterSpacing:"0.01em" }}>{m.year}</span>
+                <span className="ws-tl-year" style={{ fontFamily:fontCinzel, fontSize:44, fontWeight:600, color:GOLD, lineHeight:1, letterSpacing:"0.04em" }}>{m.year}</span>
                 <div className="ws-timeline-marker" style={{ top: "34px" }} />
               </div>
               
@@ -461,16 +422,16 @@ export default function OurStoryPage() {
         </div>
       </section>
 
-      {/* 🏆 8 AWARDS & RECOGNITION SECTION WITH PHOTOS */}
+      {/* 🏆 INDUSTRY RECOGNITION & AWARDS SECTION */}
       <section style={{ background: "#fff", borderTop: `1px solid ${HAIRLINE}`, borderBottom: `1px solid ${HAIRLINE}`, padding: "120px 0" }}>
         <div className="ws-pad" style={{ maxWidth: 1400, margin: "0 auto", padding: "0 40px" }}>
           <div style={{ textAlign: "center", marginBottom: 60 }}>
-            <SectionLabel>Honors & Distinctions</SectionLabel>
-            <h2 className="ws-section-title" style={{ fontFamily: fontSerif, fontSize: "clamp(36px,5vw,56px)", fontWeight: 500, margin: "0 0 16px" }}>
-              8 Accolades of Horological Distinction
+            <SectionLabel>Honors & Recognition</SectionLabel>
+            <h2 className="ws-section-title" style={{ fontFamily: fontSerif, fontSize: "clamp(36px,5vw,56px)", fontStyle: "italic", fontWeight: 400, margin: "0 0 16px" }}>
+              Recognized Industry Distinction
             </h2>
             <p style={{ fontFamily: fontSerif, fontSize: 18, color: MUTED, fontWeight: 300, maxWidth: 680, margin: "0 auto", lineHeight: 1.7 }}>
-              Recognized internationally for watchmaking mastery, artisan hand-finishing, Japanese precision movements, and luxury boutique experience.
+              Our commitment to quality, innovation, price transparency, and customer satisfaction has been recognized by respected industry organizations.
             </p>
           </div>
 
@@ -525,24 +486,25 @@ export default function OurStoryPage() {
         </div>
       </section>
 
-      {/* ── CRAFT IMAGE FULL ── */}
+      {/* ── EXPANSION INTO LIFESTYLE ── */}
       <section 
         className="ws-parallax-bg" 
         style={{ 
           position:"relative",
           height:"540px", 
-          backgroundImage:`linear-gradient(90deg,rgba(10,8,5,0.7) 0%,rgba(10,8,5,0.3) 50%,rgba(10,8,5,0.1) 100%), url('/hmebnr1.webp')`,
+          backgroundImage:`linear-gradient(90deg,rgba(10,8,5,0.78) 0%,rgba(10,8,5,0.4) 50%,rgba(10,8,5,0.15) 100%), url('/hmebnr1.webp')`,
         }}
       >
         <div style={{ position:"absolute", inset:0, display:"flex", alignItems:"center" }}>
-          <div className="ws-pad" style={{ maxWidth:640, padding:"0 60px", color:"#fff" }}>
-            <div style={{ fontFamily:fontSans, fontSize:11, letterSpacing:"0.32em", color:"rgba(255,255,255,0.8)", marginBottom:18, textTransform:"uppercase" }}>The Craft</div>
-            <h2 style={{ fontFamily:fontSerif, fontSize:"clamp(34px,5vw,56px)", fontWeight:500, lineHeight:1.1, margin:"0 0 22px" }}>
-              Patience is our finest material.
+          <div className="ws-pad" style={{ maxWidth:680, padding:"0 60px", color:"#fff" }}>
+            <div style={{ fontFamily:fontSans, fontSize:11, letterSpacing:"0.32em", color:"#dfb15b", marginBottom:18, textTransform:"uppercase", fontWeight: 600 }}>
+              Expanding Lifestyle Vision
+            </div>
+            <h2 style={{ fontFamily:fontSerif, fontSize:"clamp(34px,5vw,54px)", fontWeight:500, lineHeight:1.1, margin:"0 0 22px" }}>
+              Beyond Timepieces.
             </h2>
-            <p style={{ fontFamily:fontSerif, fontSize:19, lineHeight:1.8, color:"rgba(255,255,255,0.9)", fontWeight:300, margin:0 }}>
-              Each ruby is set by hand. Each balance wheel, regulated by ear.
-              Winsor watches are built slowly, because the time they keep is meant to last.
+            <p style={{ fontFamily:fontSerif, fontSize:19, lineHeight:1.8, color:"rgba(255,255,255,0.92)", fontWeight:300, margin:0 }}>
+              As WINSOR continues to grow, our vision extends beyond watches. We are expanding into premium lifestyle accessories — including perfumes, wallets, belts, bags, and other carefully designed products that reflect our commitment to quality, affordability, and timeless style.
             </p>
           </div>
         </div>
@@ -551,9 +513,9 @@ export default function OurStoryPage() {
       {/* ── VIDEO — Client Component ── */}
       <section className="ws-pad" style={{ padding:"120px 40px", maxWidth:1200, margin:"0 auto" }}>
         <div style={{ textAlign:"center", marginBottom:50 }}>
-          <SectionLabel>Inside the Maison</SectionLabel>
+          <SectionLabel>Inside WINSOR</SectionLabel>
           <h2 className="ws-section-title" style={{ fontFamily:fontSerif, fontSize:"clamp(36px,5vw,56px)", fontWeight:500, margin:0 }}>
-            A film of quiet hours.
+            Craftsmanship & Value.
           </h2>
         </div>
 
@@ -561,29 +523,30 @@ export default function OurStoryPage() {
         <VideoPlayer />
 
         <p style={{ textAlign:"center", marginTop:26, fontFamily:fontSerif, fontStyle:"italic", color:MUTED, fontSize:16 }}>
-          Step inside the Winsor atelier — where time is built by hand.
+          Explore the world of WINSOR — where modern style meets genuine performance.
         </p>
       </section>
 
-      {/* ── AMBASSADOR ── */}
+      {/* ── AUTHORIZED DEALER & PROMISE SPLIT ── */}
       <section style={{ background:"#fff", borderTop:`1px solid ${HAIRLINE}`, borderBottom:`1px solid ${HAIRLINE}` }}>
         <div className="ws-pad ws-grid-2" style={{ maxWidth:1400, margin:"0 auto", padding:"100px 40px", display:"grid", gridTemplateColumns:"1fr 1.05fr", gap:80, alignItems:"center" }}>
           <div>
-            <div style={{ fontFamily:fontSans, fontSize:11, letterSpacing:"0.32em", color:GOLD, textTransform:"uppercase", marginBottom:18 }}>Our Promise</div>
+            <div style={{ fontFamily:fontSans, fontSize:11, letterSpacing:"0.32em", color:GOLD, textTransform:"uppercase", marginBottom:18 }}>Become an Authorized Dealer</div>
             <h3 className="ws-section-title" style={{ fontFamily:fontSerif, fontSize:"clamp(34px,4vw,52px)", fontWeight:500, lineHeight:1.1, margin:"0 0 26px" }}>
-              Ride your moment — wherever it takes you.
+              Interested in selling WINSOR watches?
             </h3>
+            <p style={{ fontFamily:fontSerif, fontSize:18, lineHeight:1.85, color:MUTED, margin:"0 0 20px", fontWeight:300 }}>
+              We are the exclusive supplier of WINSOR watches in Sri Lanka. Retail businesses can become Authorized WINSOR Dealers by registering with us.
+            </p>
             <p style={{ fontFamily:fontSerif, fontSize:18, lineHeight:1.85, color:MUTED, margin:"0 0 32px", fontWeight:300 }}>
-              From the boardroom to the coastline, a Winsor is built to keep pace with a life lived
-              deliberately. It is not jewellery, nor a tool. It is a companion — quiet, precise, and
-              entirely yours.
+              Approved dealers receive wholesale pricing, access to our latest collections, and continuous business support while maintaining our nationwide fixed MRP policy. Apply today and become part of the growing WINSOR retail network.
             </p>
             <div style={{ display:"flex", gap:14, flexWrap:"wrap" }}>
-              <Link href="/collections" className="ws-btn" style={{ padding:"14px 32px", border:`1px solid ${INK}`, color:INK, fontFamily:fontSans, fontSize:11, letterSpacing:"0.28em", textDecoration:"none", textTransform:"uppercase" }}>
-                Explore Collections
-              </Link>
-              <Link href="/retailers" className="ws-btn" style={{ padding:"14px 32px", border:`1px solid ${HAIRLINE}`, color:MUTED, fontFamily:fontSans, fontSize:11, letterSpacing:"0.28em", textDecoration:"none", textTransform:"uppercase" }}>
+              <Link href="/retailers" className="ws-btn" style={{ padding:"14px 32px", border:`1px solid ${INK}`, color:INK, fontFamily:fontSans, fontSize:11, letterSpacing:"0.28em", textDecoration:"none", textTransform:"uppercase" }}>
                 Find a Retailer
+              </Link>
+              <Link href="/customer-care" className="ws-btn" style={{ padding:"14px 32px", border:`1px solid ${HAIRLINE}`, color:MUTED, fontFamily:fontSans, fontSize:11, letterSpacing:"0.28em", textDecoration:"none", textTransform:"uppercase" }}>
+                Dealer Inquiries
               </Link>
             </div>
           </div>
@@ -603,11 +566,10 @@ export default function OurStoryPage() {
       {/* ── CLOSING QUOTE ── */}
       <section className="ws-pad" style={{ padding:"130px 40px", textAlign:"center", maxWidth:880, margin:"0 auto" }}>
         <div style={{ fontFamily:fontSerif, fontStyle:"italic", fontSize:"clamp(26px,3.6vw,40px)", lineHeight:1.4, color:INK, fontWeight:400 }}>
-          "We do not make watches for the wrist. <br />
-          We make them for the years ahead of it."
+          "At WINSOR, we don't simply sell watches — we create products that celebrate every milestone, achievement, and unforgettable moment."
         </div>
-        <div style={{ marginTop:28, fontFamily:fontSans, fontSize:11, letterSpacing:"0.32em", color:GOLD, textTransform:"uppercase" }}>
-          — The Winsor Maison
+        <div style={{ marginTop:28, fontFamily:fontSans, fontSize:12, letterSpacing:"0.36em", color:GOLD, textTransform:"uppercase", fontWeight: 600 }}>
+          RIDE YOUR MOMENT
         </div>
       </section>
     </div>
