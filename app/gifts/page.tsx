@@ -5,8 +5,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useCurrency } from '@/app/context/CurrencyContext';
 import { useCart } from '@/app/context/CartContext';
-import toast from 'react-hot-toast';
 import { IGiftCategory, IProduct } from '@/types';
+import NewsletterCard from '@/components/NewsletterCard';
 
 const stripEmojis = (text: string) => {
   if (!text) return '';
@@ -1277,6 +1277,9 @@ export default function GiftsPage() {
             )}
           </div>
         )}
+
+        {/* Black Moving Marquee Ribbon & VIP Newsletter Card */}
+        <NewsletterCard imageSrc="/graduation_gift.png" badgeText="WINSOR GIFTS CONCIERGE" />
       </div>
     </div>
   );

@@ -11,8 +11,6 @@ import CountryFlag from '@/components/CountryFlag';
 
 const TOP_LEFT_LINKS = [
   { label: 'Collections', href: '/collections' },
-  { label: 'Gents', href: '/mens' },
-  { label: 'Ladies', href: '/womens' },
   { label: 'Our Story', href: '/our-story' },
   { label: 'Customer Care', href: '/customer-care' },
 ];
@@ -157,7 +155,7 @@ export default function Navbar() {
   const { totalItemsCount } = useCart();
   const pathname = usePathname();
   const router = useRouter();
-  const isTransparentPage = pathname === '/' || pathname === '/collections' || pathname === '/customer-care' || pathname === '/gifts' || pathname === '/retailers';
+  const isTransparentPage = pathname === '/' || pathname === '/collections' || pathname === '/customer-care' || pathname === '/gifts' || pathname === '/retailers' || pathname === '/mens' || pathname === '/womens' || pathname === '/women';
 
   const [isTransparent, setIsTransparent] = useState(true);
   const [isVisible, setIsVisible] = useState(true);

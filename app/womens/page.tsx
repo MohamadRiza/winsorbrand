@@ -8,6 +8,7 @@ import { useCurrency } from '@/app/context/CurrencyContext';
 import { useCart } from '@/app/context/CartContext';
 import { toast } from 'react-hot-toast';
 import { IProduct, IGiftCategory, CollectionSection } from '@/types';
+import NewsletterCard from '@/components/NewsletterCard';
 
 // Helper to determine product gender
 const getProductGender = (product: IProduct): 'Gents' | 'Ladies' | 'Unisex' => {
@@ -353,17 +354,17 @@ function WomensCollectionContent() {
         <div className="womens-hero-grid">
           {/* Left Column: Text & Badge */}
           <div style={{ textAlign: 'left' }} className="womens-hero-text-block">
-            <div style={{ fontSize: '11px', letterSpacing: '0.35em', color: '#dfb15b', textTransform: 'uppercase', fontWeight: 600, marginBottom: '16px' }}>
+            <div style={{ fontSize: '10px', letterSpacing: '0.28em', color: '#dfb15b', textTransform: 'uppercase', fontWeight: 600, marginBottom: '12px' }}>
               ELEGANCE & REFINED GRACE
             </div>
-            <h1 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 'clamp(36px, 5.2vw, 68px)', fontWeight: 500, lineHeight: 1.06, margin: '0 0 18px', letterSpacing: '0.01em', color: '#fff' }}>
+            <h1 style={{ fontFamily: "'Cinzel', 'Cormorant Garamond', Georgia, serif", fontSize: 'clamp(26px, 3.4vw, 44px)', fontWeight: 600, lineHeight: 1.15, margin: '0 0 14px', letterSpacing: '0.02em', color: '#fff' }}>
               Women's Timepiece Collection
             </h1>
-            <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontStyle: 'italic', fontSize: 'clamp(15px, 1.6vw, 20px)', lineHeight: 1.65, color: 'rgba(255,255,255,0.88)', maxWidth: '580px', margin: '0 0 28px', fontWeight: 300 }}>
+            <p style={{ fontFamily: "'Jost', sans-serif", fontSize: 'clamp(13px, 1.1vw, 15px)', lineHeight: 1.6, color: 'rgba(255,255,255,0.82)', maxWidth: '480px', margin: '0 0 22px', fontWeight: 300 }}>
               Timeless beauty designed to complement every moment. Explore delicate dials, gold accents, and Japanese movement reliability.
             </p>
             <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap', alignItems: 'center' }}>
-              <div style={{ padding: '12px 24px', background: 'rgba(139,105,20,0.22)', border: '1px solid #8b6914', borderRadius: '4px', fontSize: '11px', letterSpacing: '0.2em', textTransform: 'uppercase', fontWeight: 600, color: '#dfb15b' }}>
+              <div style={{ padding: '8px 18px', background: 'rgba(139,105,20,0.2)', border: '1px solid rgba(223,177,91,0.45)', borderRadius: '20px', fontSize: '10px', letterSpacing: '0.18em', textTransform: 'uppercase', fontWeight: 600, color: '#dfb15b' }}>
                 {filteredProducts.length} WOMEN'S TIMEPIECES AVAILABLE
               </div>
             </div>
@@ -588,6 +589,9 @@ function WomensCollectionContent() {
             })}
           </div>
         )}
+
+        {/* Black Moving Marquee Ribbon & VIP Newsletter Card */}
+        <NewsletterCard imageSrc="/winsor_girl_G.png" badgeText="WINSOR LADIES CONCIERGE" />
       </div>
     </div>
   );
