@@ -401,7 +401,7 @@ export default function StoreLocatorPage() {
           display: flex;
           align-items: center;
           gap: 16px;
-          z-index: 99;
+          z-index: 15;
           position: relative;
         }
         .locator-search-container {
@@ -991,8 +991,20 @@ export default function StoreLocatorPage() {
             padding: 24px;
           }
           .highlight-info-grid {
-            grid-template-columns: 1fr;
-            gap: 10px;
+            grid-template-columns: repeat(3, 1fr) !important;
+            gap: 8px !important;
+          }
+          .info-card-block {
+            padding: 12px 6px !important;
+            border-radius: 10px !important;
+            min-height: 72px !important;
+          }
+          .info-card-val {
+            font-size: 11px !important;
+            line-height: 1.25 !important;
+          }
+          .info-card-label {
+            font-size: 8.5px !important;
           }
           .highlight-actions-row {
             flex-direction: column;
@@ -1002,11 +1014,29 @@ export default function StoreLocatorPage() {
             width: 100%;
           }
           .locator-features-banner {
-            grid-template-columns: 1fr;
-            gap: 20px;
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 12px 10px !important;
+            padding: 18px 14px !important;
           }
           .feature-block-item {
-            padding-right: 0;
+            padding-right: 0 !important;
+            border-right: none !important;
+            gap: 10px !important;
+            align-items: center !important;
+          }
+          .feature-item-icon {
+            width: 36px !important;
+            height: 36px !important;
+            flex-shrink: 0 !important;
+          }
+          .feature-item-details h5 {
+            font-size: 10px !important;
+            margin: 0 !important;
+            line-height: 1.2 !important;
+            letter-spacing: 0.04em !important;
+          }
+          .feature-item-details p {
+            display: none !important;
           }
         }
       `}</style>

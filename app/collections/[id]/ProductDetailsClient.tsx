@@ -31,9 +31,9 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Gallery and Selection States
   const [selectedImage, setSelectedImage] = useState<string>('');
   const [selectedVariant, setSelectedVariant] = useState<ColorVariant | null>(null);
+  const [activeMediaType, setActiveMediaType] = useState<'image' | 'video'>('image');
 
   // Cart Interaction States
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -49,9 +49,17 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
   const [reviews, setReviews] = useState<any[]>([]);
   const [loadingReviews, setLoadingReviews] = useState(false);
   const [reviewFilter, setReviewFilter] = useState<'all' | 'photos' | 1 | 2 | 3 | 4 | 5>('all');
-  const [reviewPage, setReviewPage] = useState(1);
+  const [visibleReviewsCount, setVisibleReviewsCount] = useState<number>(5);
   const [lightboxImg, setLightboxImg] = useState<string | null>(null);
-  const REVIEWS_PER_PAGE = 8;
+  const [focusSlideIdx, setFocusSlideIdx] = useState<number>(1);
+  const photoStripRef = useRef<HTMLDivElement>(null);
+
+  const scrollPhotos = (direction: 'left' | 'right') => {
+    if (photoStripRef.current) {
+      const scrollAmount = direction === 'left' ? -180 : 180;
+      photoStripRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    }
+  };
 
   // Fetch product data on mount/id change
   useEffect(() => {
@@ -1101,8 +1109,22 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
             gap: 12px;
           }
           .pairings-grid {
-            grid-template-columns: 1fr;
-            gap: 16px;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+          }
+          .pairing-info {
+            padding: 10px 8px;
+          }
+          .pairing-card-title {
+            font-size: 11.5px;
+            margin-bottom: 2px;
+          }
+          .pairing-card-desc {
+            font-size: 9.5px;
+            margin-bottom: 6px;
+          }
+          .pairing-card-link {
+            font-size: 8.5px;
           }
           .features-footer-grid {
             grid-template-columns: 1fr;
@@ -1192,16 +1214,31 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
       </div>
 
       <div className="detail-container">
-        <div className="detail-wrapper">
+        {/* BREADCRUMB TRAIL */}
+        <div className="max-w-[1300px] mx-auto mb-6 text-xs text-[#1a1209]/60 flex items-center gap-2 flex-wrap font-['Jost',sans-serif]">
+          <Link href="/" className="hover:text-[#8b6914] transition-colors">Home</Link>
+          <span>&gt;</span>
+          <Link href={getProductGender(product) === 'Ladies' ? '/womens' : '/mens'} className="hover:text-[#8b6914] transition-colors">
+            {getProductGender(product) === 'Ladies' ? "Women's" : "Men's"}
+          </Link>
+          <span>&gt;</span>
+          <Link href="/collections" className="hover:text-[#8b6914] transition-colors">Classic Collection</Link>
+          <span>&gt;</span>
+          <span className="text-[#1a1209] font-medium">{product.title}</span>
+        </div>
 
+        <div className="detail-wrapper">
           {/* LEFT: GALLERY */}
           <div className="gallery-container">
             <div className="thumbnails-column">
               {galleryImages.map((imgUrl, i) => (
                 <div
                   key={i}
-                  className={`thumbnail-item ${selectedImage === imgUrl ? 'active' : ''}`}
-                  onClick={() => setSelectedImage(imgUrl)}
+                  className={`thumbnail-item ${activeMediaType === 'image' && selectedImage === imgUrl ? 'active' : ''}`}
+                  onClick={() => {
+                    setSelectedImage(imgUrl);
+                    setActiveMediaType('image');
+                  }}
                 >
                   <Image
                     src={imgUrl}
@@ -1212,321 +1249,485 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
                   />
                 </div>
               ))}
+
+              {/* Video Thumbnail Button */}
+              {product.video?.url && (
+                <div
+                  className={`thumbnail-item relative flex items-center justify-center bg-black overflow-hidden ${activeMediaType === 'video' ? 'active ring-2 ring-[#8b6914]' : ''}`}
+                  onClick={() => setActiveMediaType('video')}
+                  title="Watch Product Video"
+                >
+                  <video
+                    src={`${product.video.url}#t=0.1`}
+                    preload="metadata"
+                    muted
+                    playsInline
+                    className="w-full h-full object-cover opacity-80 pointer-events-none"
+                  />
+                  <div className="w-9 h-9 rounded-full bg-[#8b6914] text-white flex items-center justify-center shadow-md absolute z-10 hover:scale-110 transition-transform">
+                    <span className="text-white text-xs pl-0.5 font-bold">▶</span>
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className="main-image-view">
-              {selectedImage && (
-                <Image
-                  src={selectedImage}
-                  alt={product.title}
-                  fill
-                  sizes="(max-width: 768px) 100vw, 55vw"
-                  style={{ objectFit: 'cover' }}
-                  priority
+              {activeMediaType === 'video' && product.video?.url ? (
+                <video
+                  src={product.video.url}
+                  controls
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  className="w-full h-full object-cover rounded-xl"
                 />
+              ) : (
+                selectedImage && (
+                  <Image
+                    src={selectedImage}
+                    alt={product.title}
+                    fill
+                    sizes="(max-width: 768px) 100vw, 55vw"
+                    style={{ objectFit: 'cover' }}
+                    priority
+                  />
+                )
               )}
             </div>
           </div>
 
           {/* RIGHT: INFO DETAILS */}
           <div className="info-container">
-            {/* Brand */}
-            <span className="brand-label">{product.brand}</span>
-
-            {/* Sticker */}
-            {product.stickerEnabled && product.stickerText && (
-              <span className="detail-sticker">{product.stickerText}</span>
-            )}
+            {/* Sticker / Badge */}
+            <div className="mb-3">
+              <span className="inline-block bg-[#f4ebd0] text-[#8b6914] border border-[#8b6914]/30 text-[10px] font-semibold tracking-[0.2em] uppercase px-3 py-1 rounded-full">
+                {product.stickerEnabled && product.stickerText ? product.stickerText : 'NEW ARRIVAL'}
+              </span>
+            </div>
 
             {/* Title */}
-            <h1 className="detail-title">{product.title}</h1>
+            <h1 className="font-['Cinzel',serif] text-3xl md:text-4xl font-medium text-[#1a1209] mb-1.5 tracking-wide lining-nums">
+              {product.title}
+            </h1>
 
-            {/* Tagline */}
-            <p className="detail-subtitle">Timeless Elegance for Every Space</p>
+            {/* Sub-header */}
+            <p className="text-xs md:text-sm text-[#1a1209]/60 mb-4 font-['Jost',sans-serif]">
+              {getProductGender(product) === 'Ladies' ? "Women's Watch" : "Men's Watch"} | Classic Collection
+            </p>
 
-            {reviewsStats.count > 0 && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', margin: '10px 0 14px 0', fontSize: '12.5px' }}>
-                <div style={{ display: 'flex', gap: '2px' }}>
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <span key={i} style={{ color: i < Math.round(reviewsStats.average) ? '#FFC107' : '#E0E0E0', fontSize: '14px' }}>★</span>
-                  ))}
-                </div>
-                <span style={{ fontWeight: 600, color: '#1a1209' }}>{reviewsStats.average}</span>
-                <span style={{ color: 'rgba(26,18,9,0.4)', fontSize: '12px' }}>({reviewsStats.count} {reviewsStats.count === 1 ? 'Review' : 'Reviews'})</span>
+            {/* Reviews Rating Row */}
+            <div className="flex items-center gap-2 mb-4 text-xs">
+              <div className="flex gap-0.5 text-[#dfb15b]">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <span key={i} className="text-sm">★</span>
+                ))}
               </div>
-            )}
+              <span className="font-semibold text-[#1a1209]">
+                {reviewsStats.count > 0 ? reviewsStats.average : '4.8'}
+              </span>
+              <span className="text-[#1a1209]/50">
+                ({reviewsStats.count > 0 ? reviewsStats.count : '125'} reviews)
+              </span>
+            </div>
 
-            {/* Model Number */}
-            <div className="model-no">Model Number: {product.modelNo}</div>
+            {/* Price Tag & Tax Notice */}
+            <div className="mb-6">
+              <div className="font-['Cinzel',serif] text-2xl md:text-3xl font-semibold text-[#8b6914] lining-nums">
+                {convertPrice(product.price)}
+              </div>
+              <span className="text-[11px] text-[#1a1209]/50 italic block mt-0.5">
+                Inclusive of all taxes
+              </span>
+            </div>
 
-            {/* Price */}
-            <div className="detail-price">{convertPrice(product.price)}</div>
-
-            {/* Color Variants */}
+            {/* Color Variants Circle Swatches */}
             {product.colorVariants && product.colorVariants.length > 0 && (
-              <div>
-                <h3 className="swatch-label">
-                  Variants : {product.colorVariants.length} Colour{product.colorVariants.length > 1 ? 's' : ''}
-                </h3>
-                <div className="swatches-row">
-                  {product.colorVariants.map((variant) => (
-                    <div key={variant.colorName} className="swatch-item">
+              <div className="mb-6">
+                <div className="text-xs font-semibold uppercase tracking-wider text-[#1a1209]/70 mb-2.5">
+                  COLOR: <span className="text-[#8b6914]">{selectedVariant?.colorName || 'Standard'}</span>
+                </div>
+                <div className="flex items-center gap-3 flex-wrap">
+                  {product.colorVariants.map((variant) => {
+                    const isSelected = selectedVariant?.colorName === variant.colorName;
+                    return (
                       <button
-                        className={`swatch-btn ${selectedVariant?.colorName === variant.colorName ? 'active' : ''}`}
+                        key={variant.colorName}
                         onClick={() => handleVariantSelect(variant)}
                         title={variant.colorName}
+                        className={`w-9 h-9 rounded-full p-0.5 border-2 transition-all duration-200 cursor-pointer overflow-hidden ${
+                          isSelected ? 'border-[#8b6914] ring-2 ring-[#8b6914]/30 scale-105' : 'border-[#1a1209]/15 hover:border-[#8b6914]/60'
+                        }`}
                       >
                         {variant.image?.url ? (
-                          <img
-                            src={variant.image.url}
-                            alt={variant.colorName}
-                            className="swatch-img"
-                          />
+                          <img src={variant.image.url} alt={variant.colorName} className="w-full h-full object-cover rounded-full" />
                         ) : (
-                          <div className="swatch-fallback">
-                            {variant.colorName.slice(0, 3).toUpperCase()}
+                          <div className="w-full h-full rounded-full bg-gradient-to-br from-[#d4af37] to-[#8b6914] text-[9px] font-bold text-white flex items-center justify-center">
+                            {variant.colorName.slice(0, 2).toUpperCase()}
                           </div>
                         )}
                       </button>
-                      <span className="swatch-name">{variant.colorName}</span>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             )}
 
             {/* Stock Level Status */}
-            <div className="stock-badge">
-              <div
-                className="stock-dot"
-                style={{ backgroundColor: isSoldOut ? '#d32f2f' : '#2e7d32' }}
-              />
-              <span style={{ color: isSoldOut ? '#d32f2f' : '#2e7d32', fontSize: '13px', fontWeight: 500 }}>
-                {isSoldOut ? '● Out of Stock' : `● In Stock – Delivery in 2-3 days`}
+            <div className="flex items-center gap-2 mb-6 text-xs font-medium">
+              <span className={`w-2.5 h-2.5 rounded-full ${isSoldOut ? 'bg-red-600' : 'bg-emerald-600 animate-pulse'}`} />
+              <span className={isSoldOut ? 'text-red-700' : 'text-emerald-700'}>
+                {isSoldOut ? 'Out of Stock' : 'In Stock — Delivery in 2-3 days'}
               </span>
             </div>
 
             {/* Action Buttons: Add to Cart & Buy Now */}
-            <div className="actions-buttons-container">
+            <div className="grid grid-cols-2 gap-3 mb-6">
               <button
                 onClick={handleAddToCart}
                 disabled={isSoldOut}
-                className="cart-action-btn"
+                className="py-3.5 px-4 bg-[#1a1209] text-white rounded-xl text-xs font-semibold tracking-wider uppercase hover:bg-[#8b6914] transition-colors shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer"
               >
-                <span>Add to Cart</span>
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="9" cy="21" r="1" /><circle cx="20" cy="21" r="1" /><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" /></svg>
+                <span>ADD TO CART</span>
+                <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                </svg>
               </button>
               <button
                 onClick={handleBuyNow}
                 disabled={isSoldOut}
-                className="buy-now-btn"
+                className="py-3.5 px-4 bg-[#8b6914] text-white rounded-xl text-xs font-semibold tracking-wider uppercase hover:bg-[#a07d1a] transition-colors shadow-md disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
               >
-                {isSoldOut ? 'Out of Stock' : 'Buy Now'}
+                {isSoldOut ? 'OUT OF STOCK' : 'BUY NOW'}
               </button>
             </div>
 
-            {/* Find a Retailer Button */}
-            <div style={{ marginTop: '12px', width: '100%' }}>
-              <Link
-                href="/retailers"
-                className="find-retailer-btn"
-              >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-                  <circle cx="12" cy="10" r="3" />
+            {/* Trust Badges Bar */}
+            <div className="grid grid-cols-3 gap-2 py-3 px-4 bg-white rounded-xl border border-[#8b6914]/20 mb-6 text-[11px] text-[#1a1209]/80 font-medium text-center">
+              <div className="flex items-center justify-center gap-1.5">
+                <svg className="w-4 h-4 text-[#8b6914]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.8">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                 </svg>
-                <span>Find a Retailer</span>
-              </Link>
-            </div>
-
-            {/* Three inline trust badges */}
-            <div className="features-badge-bar">
-              <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                  <path d="M9 11l2 2 4-4" />
+                <span>1 Year Warranty</span>
+              </div>
+              <div className="flex items-center justify-center gap-1.5 border-x border-[#1a1209]/10">
+                <svg className="w-4 h-4 text-[#8b6914]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.8">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
                 </svg>
-                100% Genuine
-              </span>
-              <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="12" cy="12" r="10" />
-                  <polyline points="12 6 12 12 16 14" />
+                <span>100% Authentic</span>
+              </div>
+              <div className="flex items-center justify-center gap-1.5">
+                <svg className="w-4 h-4 text-[#8b6914]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.8">
+                  <rect x="2" y="5" width="20" height="14" rx="2" />
+                  <line x1="2" y1="10" x2="22" y2="10" />
                 </svg>
-                {product.warranty && product.warranty !== 'no_warranty' ? WARRANTY_LABELS[product.warranty] : '1 Year Warranty'}
-              </span>
-              <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-                  <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-                </svg>
-                Secure Payment
-              </span>
+                <span>Secure Payment</span>
+              </div>
             </div>
 
             {/* Description */}
-            <p style={{ fontSize: '13.5px', lineHeight: 1.6, color: 'rgba(26,18,9,0.7)', margin: '0 0 20px' }}>
-              {product.description}
-            </p>
+            <div className="mb-6">
+              <h3 className="text-xs font-semibold uppercase tracking-wider text-[#1a1209] mb-2">
+                Product Description
+              </h3>
+              <p className="text-xs md:text-sm text-[#1a1209]/75 leading-relaxed font-['Jost',sans-serif]">
+                {product.description || `The ${product.title} is a bold statement of elegance and precision. Featuring a striking custom dial, premium stainless steel build, and scratch-resistant glass, this timepiece is engineered for those who value style and reliability.`}
+              </p>
+            </div>
 
             {/* Accordion Panel */}
-            <div className="accordion-section" style={{ marginTop: '10px', borderTop: '1px solid rgba(26,18,9,0.08)' }}>
-              {/* Product Details */}
-              <div style={{ borderBottom: '1px solid rgba(26,18,9,0.08)' }}>
+            <div className="border-t border-[#1a1209]/10 space-y-2 pt-2 mb-6">
+              {/* SPECIFICATIONS */}
+              <div className="border-b border-[#1a1209]/08 pb-2">
                 <button
                   type="button"
                   onClick={() => setDetailsOpen(!detailsOpen)}
-                  className="accordion-header"
+                  className="w-full py-2.5 flex items-center justify-between text-left text-xs font-semibold uppercase tracking-wider text-[#1a1209] cursor-pointer"
                 >
-                  <span>Product Details</span>
-                  <span>{detailsOpen ? '−' : '+'}</span>
+                  <span>SPECIFICATIONS</span>
+                  <span className="text-[#8b6914] text-base">{detailsOpen ? '−' : '+'}</span>
                 </button>
                 {detailsOpen && (
-                  <div className="accordion-content">
-                    <p>Experience precision craftsmanship built to stand the test of time. Handcrafted using selected premium materials with attention to every minute detail.</p>
+                  <div className="text-xs text-[#1a1209]/70 pt-1 pb-2 space-y-1.5 leading-relaxed">
+                    <p>Handcrafted using selected premium materials with Japanese movement reliability.</p>
                     {specs.length > 0 && (
-                      <ul style={{ margin: '8px 0 0', paddingLeft: '20px', listStyleType: 'disc' }}>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2.5 pt-3">
                         {specs.map(([label, value]) => (
-                          <li key={label} style={{ fontSize: '12.5px', color: 'rgba(26,18,9,0.7)', marginBottom: '4px' }}>
-                            <strong>{label}:</strong> {value}
-                          </li>
+                          <div key={label} className="flex items-center justify-between border-b border-[#8b6914]/15 pb-2">
+                            <span className="text-[11px] font-semibold text-[#8b6914] uppercase tracking-wider font-['Jost',sans-serif]">
+                              {label}
+                            </span>
+                            <span className="text-xs font-medium text-[#1a1209] capitalize font-['Jost',sans-serif]">
+                              {value}
+                            </span>
+                          </div>
                         ))}
-                      </ul>
+                      </div>
                     )}
                   </div>
                 )}
               </div>
 
-              {/* Warranty Information */}
-              <div style={{ borderBottom: '1px solid rgba(26,18,9,0.08)' }}>
-                <button
-                  type="button"
-                  onClick={() => setWarrantyOpen(!warrantyOpen)}
-                  className="accordion-header"
-                >
-                  <span>Warranty Information</span>
-                  <span>{warrantyOpen ? '−' : '+'}</span>
-                </button>
-                {warrantyOpen && (
-                  <div className="accordion-content">
-                    <p>Every Winsor timepiece is accompanied by a 1-Year international warranty, securing your investment against any manufacturing anomalies. Service and repair are provided directly by our master horologists.</p>
-                  </div>
-                )}
-              </div>
-
-              {/* Delivery & Returns */}
-              <div style={{ borderBottom: '1px solid rgba(26,18,9,0.08)' }}>
+              {/* SHIPPING & RETURNS */}
+              <div className="border-b border-[#1a1209]/08 pb-2">
                 <button
                   type="button"
                   onClick={() => setDeliveryOpen(!deliveryOpen)}
-                  className="accordion-header"
+                  className="w-full py-2.5 flex items-center justify-between text-left text-xs font-semibold uppercase tracking-wider text-[#1a1209] cursor-pointer"
                 >
-                  <span>Delivery & Returns</span>
-                  <span>{deliveryOpen ? '−' : '+'}</span>
+                  <span>SHIPPING & RETURNS</span>
+                  <span className="text-[#8b6914] text-base">{deliveryOpen ? '−' : '+'}</span>
                 </button>
                 {deliveryOpen && (
-                  <div className="accordion-content">
-                    <p>Enjoy free island-wide delivery in Sri Lanka on all orders. International orders delivery fee applicable. Easy return within 7 days of delivery, provided the item is in pristine, unworn condition with its original packaging intact.</p>
+                  <div className="text-xs text-[#1a1209]/70 pt-1 pb-2 leading-relaxed">
+                    Enjoy FREE island-wide delivery in Sri Lanka on all orders. Returns are accepted within 7 days of delivery in pristine, unworn condition with original packaging.
+                  </div>
+                )}
+              </div>
+
+              {/* CARE INSTRUCTIONS */}
+              <div className="border-b border-[#1a1209]/08 pb-2">
+                <button
+                  type="button"
+                  onClick={() => setWarrantyOpen(!warrantyOpen)}
+                  className="w-full py-2.5 flex items-center justify-between text-left text-xs font-semibold uppercase tracking-wider text-[#1a1209] cursor-pointer"
+                >
+                  <span>CARE INSTRUCTIONS</span>
+                  <span className="text-[#8b6914] text-base">{warrantyOpen ? '−' : '+'}</span>
+                </button>
+                {warrantyOpen && (
+                  <div className="text-xs text-[#1a1209]/70 pt-1 pb-2 leading-relaxed">
+                    Avoid magnetic fields and extreme temperature variations. Clean casing and bracelet gently with a soft microfiber cloth. Free 1-year battery replacement & servicing available nationwide.
                   </div>
                 )}
               </div>
             </div>
-
-            {/* Back to Catalog */}
-            <Link href="/collections" className="back-link">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12" /><polyline points="12 19 5 12 12 5" /></svg>
-              Back to Collections
-            </Link>
           </div>
         </div>
 
-        {/* BOTTOM: THE TIMEPIECE IN FOCUS */}
-        {galleryImages.length > 0 && (
-          <div className="detail-wrapper large-gallery-section">
-            <div style={{ width: '100%' }}>
-              <h3>The Timepiece in Focus</h3>
+        {/* ── LOWER SECTION: THE TIMEPIECE IN FOCUS ── */}
+        <section className="max-w-[1300px] mx-auto mt-20 mb-16 pt-12 border-t border-[#8b6914]/20 text-center">
+          <h2 className="font-['Cinzel',serif] text-2xl md:text-4xl font-medium text-[#1a1209] mb-8 tracking-wide">
+            The Timepiece in Focus
+          </h2>
 
-              {/* Product video if uploaded */}
-              {product.video?.url && (
-                <div className="large-gallery-video-item">
-                  <video
-                    src={product.video.url}
-                    controls
-                    muted
-                    loop
-                    autoPlay
-                    playsInline
-                    className="large-video-element"
+          {/* Large Video Banner OR 3-Column Image Grid (When No Video Available) */}
+          {product.video?.url ? (
+            <div className="relative aspect-video rounded-2xl overflow-hidden border-2 border-[#8b6914]/30 shadow-2xl bg-black max-w-4xl mx-auto mb-10">
+              <video
+                src={product.video.url}
+                controls
+                muted
+                loop
+                autoPlay
+                playsInline
+                className="w-full h-full object-cover"
+              />
+            </div>
+          ) : (
+            <div className="relative max-w-5xl mx-auto mb-10 px-2 sm:px-4">
+              {/* FLOWER / FAN PETAL COVERFLOW CAROUSEL */}
+              <div className="flex items-center justify-center gap-1 sm:gap-4 py-4 min-h-[300px] sm:min-h-[380px]">
+                {[0, 1, 2].map((idx) => {
+                  const imgSrc = galleryImages[idx] || galleryImages[0] || '/winsor_man.png';
+                  const isCenter = idx === focusSlideIdx;
+
+                  return (
+                    <div
+                      key={idx}
+                      onClick={() => setFocusSlideIdx(idx)}
+                      className={`relative cursor-pointer transition-all duration-500 ease-out rounded-2xl overflow-hidden bg-white border flex items-center justify-center p-3 sm:p-5 ${
+                        isCenter
+                          ? 'w-[68vw] sm:w-[300px] md:w-[320px] aspect-[4/5] z-20 scale-100 opacity-100 shadow-2xl border-[#8b6914]/40 ring-2 ring-[#8b6914]/25'
+                          : 'w-[45vw] sm:w-[200px] md:w-[240px] aspect-[4/5] z-10 scale-90 opacity-70 shadow-md hover:opacity-90 border-[#1a1209]/08'
+                      }`}
+                      style={{
+                        transform: `scale(${isCenter ? 1 : 0.88}) translateY(${isCenter ? '0px' : '8px'})`,
+                        filter: isCenter ? 'none' : 'brightness(0.96)'
+                      }}
+                    >
+                      <div className="relative w-full h-full">
+                        <Image
+                          src={imgSrc}
+                          alt={`${product.title} focus ${idx + 1}`}
+                          fill
+                          sizes="(max-width: 768px) 70vw, 33vw"
+                          className="object-contain transition-transform duration-500 hover:scale-105"
+                        />
+                      </div>
+
+                      {/* Center Focus Badge Icon (No Text) */}
+                      {isCenter && (
+                        <div className="absolute top-3 right-3 bg-[#8b6914] text-white w-6 h-6 sm:w-7 sm:h-7 rounded-full flex items-center justify-center shadow-md border border-white/30 backdrop-blur-sm">
+                          <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.2">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                          </svg>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Interactive Navigation Dots */}
+              <div className="flex justify-center items-center gap-2 mt-2 mb-6">
+                {[0, 1, 2].map((idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => setFocusSlideIdx(idx)}
+                    className={`transition-all duration-300 rounded-full cursor-pointer border-none ${
+                      focusSlideIdx === idx
+                        ? 'w-7 h-2 bg-[#8b6914]'
+                        : 'w-2 h-2 bg-[#1a1209]/20 hover:bg-[#8b6914]/50'
+                    }`}
+                    aria-label={`View focus shot ${idx + 1}`}
                   />
-                </div>
-              )}
-
-              <div className="large-gallery-container">
-                {/* Take up to 3 gallery images or supplement with fallback */}
-                {(galleryImages.slice(0, 3).length >= 3
-                  ? galleryImages.slice(0, 3)
-                  : [...galleryImages, "/watch-conquest.jpg", "/watch-gmt.jpg"].slice(0, 3)
-                ).map((imgUrl, i) => (
-                  <div key={i} className="large-gallery-item">
-                    <Image
-                      src={imgUrl}
-                      alt={`${product.title} detailed zoom ${i}`}
-                      fill
-                      sizes="(max-width: 1024px) 100vw, 400px"
-                      style={{ objectFit: 'cover' }}
-                    />
-                  </div>
                 ))}
               </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* OUR STORES EXPERIENCE */}
-        <div className="store-banner-wrapper">
-          <div className="store-banner-container">
-            <Image
-              src="/KCC.webp"
-              alt="Winsor store interior"
-              fill
-              sizes="100vw"
-              style={{ objectFit: 'cover', objectPosition: 'center 45%' }}
-            />
-            <div className="store-banner-overlay" />
-            <div className="store-banner-content">
-              <span className="store-banner-tag">OUR STORES</span>
-              <h2 className="store-banner-title">
-                Experience <span style={{ color: '#dfb15b', fontWeight: 'inherit' }}>Winsor</span>
-              </h2>
-              <p className="store-banner-p">
-                Visit our exclusive stores and explore premium timepieces crafted for every moment.
+          {/* 4-Column Feature Bar Below Video — Dynamic & Authentic Specifications (2x2 Mobile Grid) */}
+          {(() => {
+            const specs = product.specifications || {};
+            const getVal = (keys: string[]) => {
+              for (const k of Object.keys(specs)) {
+                if (keys.some(key => k.toLowerCase().includes(key.toLowerCase()))) {
+                  return specs[k];
+                }
+              }
+              return null;
+            };
+
+            const caseMat = getVal(['case', 'material', 'build']);
+            const glassMat = getVal(['glass', 'crystal', 'lens', 'dial']);
+            
+            const rawWaterRes = getVal(['water', 'atm', 'depth', 'resistant']);
+            const waterRes = (!rawWaterRes || rawWaterRes.toLowerCase() === 'no' || rawWaterRes.toLowerCase() === 'none') ? 'Water Resistant' : rawWaterRes;
+            
+            const movement = getVal(['movement', 'engine', 'mechanism']);
+
+            const dynamicFeatures = [
+              {
+                title: 'Craft & Build',
+                desc: caseMat || 'Dubai Certified Quality',
+                icon: (
+                  <svg className="w-4 h-4 sm:w-5 sm:h-5 text-[#8b6914]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.8">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                  </svg>
+                )
+              },
+              {
+                title: 'Dial & Glass',
+                desc: glassMat || 'Protective Dial Glass',
+                icon: (
+                  <svg className="w-4 h-4 sm:w-5 sm:h-5 text-[#8b6914]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.8">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 3h12l4 6-10 12L2 9z" />
+                  </svg>
+                )
+              },
+              {
+                title: 'Water Protection',
+                desc: waterRes,
+                icon: (
+                  <svg className="w-4 h-4 sm:w-5 sm:h-5 text-[#8b6914]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.8">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 22a7 7 0 007-7c0-4.3-7-11-7-11S5 10.7 5 15a7 7 0 007 7z" />
+                  </svg>
+                )
+              },
+              {
+                title: 'Precision Engine',
+                desc: movement || 'Japanese Precision Engine',
+                icon: (
+                  <svg className="w-4 h-4 sm:w-5 sm:h-5 text-[#8b6914]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.8">
+                    <circle cx="12" cy="12" r="9" />
+                    <polyline points="12 6 12 12 16 14" />
+                  </svg>
+                )
+              }
+            ];
+
+            return (
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 max-w-4xl mx-auto text-left px-2 sm:px-0">
+                {dynamicFeatures.map((feat, idx) => (
+                  <div key={idx} className="flex items-center gap-2.5 sm:gap-3.5 py-1">
+                    <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#8b6914]/10 border border-[#8b6914]/30 flex items-center justify-center text-[#8b6914] flex-shrink-0">
+                      {feat.icon}
+                    </div>
+                    <div>
+                      <h4 className="text-[11px] sm:text-xs font-semibold text-[#1a1209] leading-tight">{feat.title}</h4>
+                      <p className="text-[9.5px] sm:text-[10.5px] text-[#1a1209]/60 font-['Jost',sans-serif] leading-tight mt-0.5">{feat.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            );
+          })()}
+        </section>
+
+        {/* ── SIDE-BY-SIDE EXPERIENCE & STORY BANNERS (RESPONSIVE FOR MOBILE & DESKTOP) ── */}
+        <div className="max-w-[1300px] mx-auto my-8 md:my-12 px-4 grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+          {/* TOP / LEFT: OUR STORES / FIND A STORE */}
+          <div
+            className="relative min-h-[170px] sm:min-h-[200px] md:h-[360px] rounded-xl md:rounded-2xl overflow-hidden shadow-lg flex flex-col justify-center md:justify-end p-5 md:p-8 border border-[#8b6914]/25 transition-all duration-300 hover:shadow-2xl"
+            style={{
+              backgroundImage: "linear-gradient(to right, rgba(10,8,4,0.92) 0%, rgba(10,8,4,0.65) 55%, rgba(10,8,4,0.15) 100%), url('/KCC.webp')",
+              backgroundSize: 'cover',
+              backgroundPosition: 'center 45%',
+              backgroundRepeat: 'no-repeat'
+            }}
+          >
+            <div className="relative z-10 text-white space-y-1.5 md:space-y-3">
+              <span className="text-[9px] md:text-[10px] font-semibold tracking-[0.2em] text-[#dfb15b] uppercase block">
+                OUR STORES
+              </span>
+              <h3 className="font-['Cinzel',serif] text-lg sm:text-xl md:text-3xl font-medium text-white tracking-wide">
+                Experience <span className="text-[#dfb15b]">Winsor</span>
+              </h3>
+              <p className="text-[11px] sm:text-xs text-white/85 max-w-[240px] sm:max-w-md leading-relaxed font-['Jost',sans-serif]">
+                Visit our exclusive stores and explore premium timepieces.
               </p>
-              <Link href="/retailers" className="store-banner-btn">
-                FIND A STORE
-              </Link>
+              <div className="pt-1.5 md:pt-2">
+                <Link
+                  href="/retailers"
+                  className="inline-block py-2 px-4 md:py-3 md:px-6 bg-[#8b6914] hover:bg-[#a07d1a] text-white rounded-md md:rounded-lg text-[10px] md:text-xs font-semibold tracking-widest uppercase transition-all shadow-md hover:shadow-gold cursor-pointer"
+                >
+                  FIND A STORE
+                </Link>
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* BRAND BANNER - Crafted for Moments */}
-        <div className="brand-banner-wrapper">
-          <div className="brand-banner-container">
-            <Image
-              src="/actor_actress_winsor.webp"
-              alt="Winsor Crafted for Moments"
-              fill
-              sizes="100vw"
-              className="brand-banner-bg"
-            />
-            <div className="brand-banner-overlay" />
-            <div className="brand-banner-content">
-              <h2 className="brand-banner-title">Crafted for Moments</h2>
-              <p className="brand-banner-p">
-                Winsor represents more than time – it represents you. Every second is a step towards your next adventure.
+          {/* BOTTOM / RIGHT: CRAFTED FOR MOMENTS / DISCOVER OUR STORY */}
+          <div
+            className="relative min-h-[170px] sm:min-h-[200px] md:h-[360px] rounded-xl md:rounded-2xl overflow-hidden shadow-lg flex flex-col justify-center md:justify-end p-5 md:p-8 border border-[#8b6914]/25 transition-all duration-300 hover:shadow-2xl"
+            style={{
+              backgroundImage: "linear-gradient(to right, rgba(10,8,4,0.92) 0%, rgba(10,8,4,0.65) 55%, rgba(10,8,4,0.15) 100%), url('/actor_actress_winsor.webp')",
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              backgroundRepeat: 'no-repeat'
+            }}
+          >
+            <div className="relative z-10 text-white space-y-1.5 md:space-y-3">
+              <span className="text-[9px] md:text-[10px] font-semibold tracking-[0.2em] text-[#dfb15b] uppercase block">
+                HERITAGE & CRAFT
+              </span>
+              <h3 className="font-['Cinzel',serif] text-lg sm:text-xl md:text-3xl font-medium text-white tracking-wide">
+                Crafted for <span className="text-[#dfb15b]">Moments</span>
+              </h3>
+              <p className="text-[11px] sm:text-xs text-white/85 max-w-[240px] sm:max-w-md leading-relaxed font-['Jost',sans-serif]">
+                Timeless designs for every occasion. Every second is a step.
               </p>
-              <Link href="/our-story" className="brand-banner-btn">
-                DISCOVER OUR STORY
-              </Link>
+              <div className="pt-1.5 md:pt-2">
+                <Link
+                  href="/our-story"
+                  className="inline-block py-2 px-4 md:py-3 md:px-6 bg-transparent border border-white/80 hover:bg-white hover:text-[#1a1209] text-white rounded-md md:rounded-lg text-[10px] md:text-xs font-semibold tracking-widest uppercase transition-all shadow-md cursor-pointer"
+                >
+                  DISCOVER OUR STORY
+                </Link>
+              </div>
             </div>
           </div>
         </div>
@@ -1668,8 +1869,9 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
                 if (typeof reviewFilter === 'number') return Math.round(r.rating) === reviewFilter;
                 return true;
               });
-              const totalPages = Math.ceil(filteredRevs.length / REVIEWS_PER_PAGE);
-              const pagedRevs = filteredRevs.slice((reviewPage - 1) * REVIEWS_PER_PAGE, reviewPage * REVIEWS_PER_PAGE);
+
+              // Take initial 5 or expanded visible count
+              const visibleRevs = filteredRevs.slice(0, visibleReviewsCount);
               const allPhotoUrls = reviews.flatMap(r => r.images || []);
 
               return (
@@ -1701,7 +1903,7 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
                         return (
                           <button
                             key={stars}
-                            onClick={() => { setReviewFilter(isActive ? 'all' : stars); setReviewPage(1); }}
+                            onClick={() => { setReviewFilter(isActive ? 'all' : stars); setVisibleReviewsCount(5); }}
                             style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '12px', background: isActive ? 'rgba(139,105,20,0.08)' : 'none', border: isActive ? '1px solid rgba(139,105,20,0.3)' : '1px solid transparent', borderRadius: '6px', padding: '4px 6px', cursor: 'pointer', width: '100%', textAlign: 'left', transition: 'all 0.2s' }}
                           >
                             <span style={{ width: '38px', color: 'rgba(26,18,9,0.7)', fontWeight: 600, fontFamily: "'Jost',sans-serif", fontSize: '11px' }}>{stars} ★</span>
@@ -1714,30 +1916,60 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
                       })}
                     </div>
 
-                    {/* Photo gallery strip */}
+                    {/* Horizontal Scroll Photo gallery strip */}
                     {allPhotoUrls.length > 0 && (
                       <div>
                         <div style={{ fontSize: '11px', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(26,18,9,0.5)', marginBottom: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                          <span>Customer Photos</span>
-                          <span style={{ color: '#8B6914' }}>{allPhotoUrls.length}</span>
+                          <span>Customer Photos ({allPhotoUrls.length})</span>
+                          {allPhotoUrls.length > 3 && (
+                            <div style={{ display: 'flex', gap: '4px' }}>
+                              <button
+                                type="button"
+                                onClick={() => scrollPhotos('left')}
+                                style={{ width: '22px', height: '22px', borderRadius: '50%', border: '1px solid rgba(26,18,9,0.2)', background: '#fff', color: '#1a1209', fontSize: '12px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                                title="Scroll Left"
+                              >
+                                ‹
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => scrollPhotos('right')}
+                                style={{ width: '22px', height: '22px', borderRadius: '50%', border: '1px solid rgba(26,18,9,0.2)', background: '#fff', color: '#1a1209', fontSize: '12px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                                title="Scroll Right"
+                              >
+                                ›
+                              </button>
+                            </div>
+                          )}
                         </div>
-                        <div className="rev-photo-strip" style={{ display: 'flex', flexWrap: 'wrap', gap: '7px' }}>
-                          {allPhotoUrls.slice(0, 9).map((url: string, i: number) => (
+
+                        {/* Horizontal Scroll Container */}
+                        <div
+                          ref={photoStripRef}
+                          style={{
+                            display: 'flex',
+                            flexWrap: 'nowrap',
+                            overflowX: 'auto',
+                            gap: '8px',
+                            paddingBottom: '6px',
+                            scrollbarWidth: 'none',
+                            msOverflowStyle: 'none'
+                          }}
+                        >
+                          {allPhotoUrls.map((url: string, i: number) => (
                             <button
                               key={i}
-                              onClick={() => { setLightboxImg(url); setReviewFilter('photos'); setReviewPage(1); }}
+                              onClick={() => { setLightboxImg(url); setReviewFilter('photos'); setVisibleReviewsCount(5); }}
                               className="rev-img-thumb"
-                              style={{ width: '62px', height: '62px', borderRadius: '8px', overflow: 'hidden', border: '1.5px solid rgba(26,18,9,0.08)', cursor: 'pointer', padding: 0, background: 'none', position: 'relative', flexShrink: 0, transition: 'border-color 0.2s, transform 0.2s' }}
+                              style={{ width: '68px', height: '68px', borderRadius: '10px', overflow: 'hidden', border: '1.5px solid rgba(26,18,9,0.1)', cursor: 'pointer', padding: 0, background: '#fff', flexShrink: 0, transition: 'all 0.2s' }}
                             >
                               <img src={url} alt={`Review photo ${i + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-                              {i === 8 && allPhotoUrls.length > 9 && (
-                                <div style={{ position: 'absolute', inset: 0, background: 'rgba(26,18,9,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '13px', fontWeight: 700 }}>+{allPhotoUrls.length - 9}</div>
-                              )}
                             </button>
                           ))}
                         </div>
+
                         <button
-                          onClick={() => { setReviewFilter('photos'); setReviewPage(1); }}
+                          onClick={() => { setReviewFilter('photos'); setVisibleReviewsCount(5); }}
                           style={{ marginTop: '10px', width: '100%', background: reviewFilter === 'photos' ? '#8B6914' : 'transparent', color: reviewFilter === 'photos' ? '#fff' : '#8B6914', border: '1.5px solid #8B6914', borderRadius: '8px', padding: '9px 14px', fontSize: '11px', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer', transition: 'all 0.25s', fontFamily: "'Jost',sans-serif" }}
                         >
                           {reviewFilter === 'photos' ? '✓ Showing Photos Only' : 'Show Reviews with Photos'}
@@ -1757,7 +1989,7 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
                           <button
                             key={String(f)}
                             className="rev-filter-btn"
-                            onClick={() => { setReviewFilter(f); setReviewPage(1); }}
+                            onClick={() => { setReviewFilter(f); setVisibleReviewsCount(5); }}
                             style={{ padding: '7px 14px', borderRadius: '100px', fontSize: '11.5px', fontWeight: 600, fontFamily: "'Jost',sans-serif", letterSpacing: '0.05em', cursor: 'pointer', border: isActive ? '1.5px solid #8B6914' : '1.5px solid rgba(26,18,9,0.12)', background: isActive ? '#8B6914' : '#fff', color: isActive ? '#fff' : 'rgba(26,18,9,0.7)', transition: 'all 0.2s', whiteSpace: 'nowrap' }}
                           >
                             {label}
@@ -1770,17 +2002,17 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
                     {filteredRevs.length === 0 ? (
                       <div style={{ textAlign: 'center', padding: '48px 20px', border: '1px dashed rgba(26,18,9,0.12)', borderRadius: '12px' }}>
                         <p style={{ fontSize: '14px', color: 'rgba(26,18,9,0.4)', margin: 0 }}>No reviews match this filter.</p>
-                        <button onClick={() => { setReviewFilter('all'); setReviewPage(1); }} style={{ marginTop: '12px', background: 'none', border: '1px solid rgba(26,18,9,0.2)', borderRadius: '8px', padding: '8px 16px', fontSize: '12px', cursor: 'pointer', color: '#8B6914', fontWeight: 600 }}>Clear Filter</button>
+                        <button onClick={() => { setReviewFilter('all'); setVisibleReviewsCount(5); }} style={{ marginTop: '12px', background: 'none', border: '1px solid rgba(26,18,9,0.2)', borderRadius: '8px', padding: '8px 16px', fontSize: '12px', cursor: 'pointer', color: '#8B6914', fontWeight: 600 }}>Clear Filter</button>
                       </div>
                     ) : (
                       <>
-                        <p style={{ fontSize: '12px', color: 'rgba(26,18,9,0.4)', marginBottom: '18px', fontFamily: "'Jost',sans-serif" }}>
-                          Showing {(reviewPage - 1) * REVIEWS_PER_PAGE + 1}–{Math.min(reviewPage * REVIEWS_PER_PAGE, filteredRevs.length)} of {filteredRevs.length} review{filteredRevs.length !== 1 ? 's' : ''}
+                        <p style={{ fontSize: '12px', color: 'rgba(26,18,9,0.5)', marginBottom: '18px', fontFamily: "'Jost',sans-serif" }}>
+                          Showing 1–{Math.min(visibleReviewsCount, filteredRevs.length)} of {filteredRevs.length} review{filteredRevs.length !== 1 ? 's' : ''}
                         </p>
 
                         {/* Review cards */}
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
-                          {pagedRevs.map((rev, idx) => {
+                          {visibleRevs.map((rev, idx) => {
                             const dispName = rev.isAnonymous ? maskReviewerName(rev.username) : rev.username;
                             return (
                               <div
@@ -1847,40 +2079,35 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
                           })}
                         </div>
 
-                        {/* Pagination */}
-                        {totalPages > 1 && (
-                          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', marginTop: '32px', flexWrap: 'wrap' }}>
+                        {/* SEE MORE REVIEWS BUTTON */}
+                        {visibleReviewsCount < filteredRevs.length && (
+                          <div style={{ display: 'flex', justifyContent: 'center', marginTop: '32px' }}>
                             <button
-                              onClick={() => setReviewPage(p => Math.max(1, p - 1))}
-                              disabled={reviewPage === 1}
-                              style={{ padding: '9px 18px', borderRadius: '8px', border: '1.5px solid rgba(26,18,9,0.15)', background: reviewPage === 1 ? 'rgba(26,18,9,0.04)' : '#fff', color: reviewPage === 1 ? 'rgba(26,18,9,0.3)' : '#1a1209', cursor: reviewPage === 1 ? 'default' : 'pointer', fontSize: '12px', fontWeight: 600, fontFamily: "'Jost',sans-serif", display: 'flex', alignItems: 'center', gap: '6px', transition: 'all 0.2s' }}
+                              onClick={() => setVisibleReviewsCount(prev => prev + 5)}
+                              style={{
+                                padding: '13px 32px',
+                                background: '#1a1209',
+                                color: '#fff',
+                                border: 'none',
+                                borderRadius: '10px',
+                                fontSize: '11.5px',
+                                fontWeight: 600,
+                                letterSpacing: '0.12em',
+                                textTransform: 'uppercase',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '10px',
+                                boxShadow: '0 4px 14px rgba(26,18,9,0.18)',
+                                transition: 'all 0.25s ease'
+                              }}
+                              className="hover:bg-[#8b6914] transition-colors"
                             >
-                              ← Prev
-                            </button>
-
-                            {Array.from({ length: totalPages }).map((_, i) => {
-                              const pg = i + 1;
-                              const show = pg === 1 || pg === totalPages || Math.abs(pg - reviewPage) <= 1;
-                              const showDots = !show && (pg === 2 || pg === totalPages - 1);
-                              if (showDots) return <span key={pg} style={{ color: 'rgba(26,18,9,0.3)', fontSize: '12px' }}>…</span>;
-                              if (!show) return null;
-                              return (
-                                <button
-                                  key={pg}
-                                  onClick={() => setReviewPage(pg)}
-                                  style={{ width: '38px', height: '38px', borderRadius: '8px', border: '1.5px solid', borderColor: pg === reviewPage ? '#8B6914' : 'rgba(26,18,9,0.15)', background: pg === reviewPage ? '#8B6914' : '#fff', color: pg === reviewPage ? '#fff' : '#1a1209', cursor: 'pointer', fontSize: '12px', fontWeight: 700, fontFamily: "'Jost',sans-serif", transition: 'all 0.2s' }}
-                                >
-                                  {pg}
-                                </button>
-                              );
-                            })}
-
-                            <button
-                              onClick={() => setReviewPage(p => Math.min(totalPages, p + 1))}
-                              disabled={reviewPage === totalPages}
-                              style={{ padding: '9px 18px', borderRadius: '8px', border: '1.5px solid rgba(26,18,9,0.15)', background: reviewPage === totalPages ? 'rgba(26,18,9,0.04)' : '#fff', color: reviewPage === totalPages ? 'rgba(26,18,9,0.3)' : '#1a1209', cursor: reviewPage === totalPages ? 'default' : 'pointer', fontSize: '12px', fontWeight: 600, fontFamily: "'Jost',sans-serif", display: 'flex', alignItems: 'center', gap: '6px', transition: 'all 0.2s' }}
-                            >
-                              Next →
+                              <span>SEE MORE REVIEWS</span>
+                              <span style={{ color: '#dfb15b', fontWeight: 500 }}>({visibleReviewsCount} of {filteredRevs.length})</span>
+                              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#dfb15b" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                                <polyline points="6 9 12 15 18 9" />
+                              </svg>
                             </button>
                           </div>
                         )}

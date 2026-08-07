@@ -67,10 +67,10 @@ const FOOTER_LINKS = {
   collections: [
     { label: "Gents Timepieces", href: '/mens' },
     { label: "Ladies Timepieces", href: '/womens' },
-    { label: 'New Arrivals', href: '/collections?section=new' },
-    { label: 'Sport Collection', href: '/collections?section=sports' },
+    { label: 'New Arrivals', href: '/new-arrivals' },
+    { label: 'Sport Collection', href: '/sports' },
     { label: 'Classic Luxury', href: '/collections?section=luxury' },
-    { label: 'Limited Editions', href: '/collections?section=limited' },
+    { label: 'Limited Editions', href: '/limited-edition' },
   ],
   company: [
     { label: 'Our Story', href: '/our-story' },
@@ -288,6 +288,11 @@ export default function Footer() {
           outline: none;
         }
 
+        /* ── DESKTOP & TABLET: ft-links-wrapper uses contents to maintain grid ── */
+        .ft-links-wrapper {
+          display: contents !important;
+        }
+
         /* ── DESKTOP (≥ 1025px): 5-column grid ── */
         @media (min-width: 1025px) {
           .ft-main-grid {
@@ -296,8 +301,8 @@ export default function Footer() {
             gap: 40px !important;
             align-items: start !important;
           }
-          .ft-mobile-only  { display: none !important; }
           .ft-desktop-only { display: flex !important; }
+          .ft-mobile-only  { display: none !important; }
           .ft-bottom-bar {
             flex-direction: row !important;
             align-items: center !important;
@@ -336,12 +341,18 @@ export default function Footer() {
           }
         }
 
-        /* ── MOBILE (≤ 640px): single column ── */
+        /* ── MOBILE (≤ 640px): 2-column side-by-side link grid ── */
         @media (max-width: 640px) {
           .ft-main-grid {
             display: flex !important;
             flex-direction: column !important;
             gap: 32px !important;
+          }
+          .ft-links-wrapper {
+            display: grid !important;
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 28px 16px !important;
+            width: 100% !important;
           }
           .ft-desktop-only { display: none !important; }
           .ft-mobile-only  { display: flex !important; }
@@ -468,85 +479,88 @@ export default function Footer() {
               </div>
             </div>
 
-            {/* ── COL 2: COLLECTIONS ── */}
-            <div>
-              <h3 style={{
-                fontFamily: "'Jost',sans-serif",
-                fontSize: '11px',
-                letterSpacing: '0.2em',
-                color: '#8B6914',
-                fontWeight: 600,
-                margin: '0 0 24px 0',
-                textTransform: 'uppercase'
-              }}>
-                Collections
-              </h3>
-              <nav style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                {FOOTER_LINKS.collections.map(link => (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    className="ft-a"
-                    style={{ fontSize: '13px', lineHeight: 1.5 }}
-                  >
-                    {link.label}
-                  </Link>
-                ))}
-              </nav>
-            </div>
+            {/* ── NAV LINK COLUMNS (RESPONSIVE 2-COLUMN GRID ON MOBILE) ── */}
+            <div className="ft-links-wrapper">
+              {/* COL 2: COLLECTIONS */}
+              <div>
+                <h3 style={{
+                  fontFamily: "'Jost',sans-serif",
+                  fontSize: '11px',
+                  letterSpacing: '0.2em',
+                  color: '#8B6914',
+                  fontWeight: 600,
+                  margin: '0 0 20px 0',
+                  textTransform: 'uppercase'
+                }}>
+                  Collections
+                </h3>
+                <nav style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  {FOOTER_LINKS.collections.map(link => (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      className="ft-a"
+                      style={{ fontSize: '13px', lineHeight: 1.5 }}
+                    >
+                      {link.label}
+                    </Link>
+                  ))}
+                </nav>
+              </div>
 
-            {/* ── COL 3: COMPANY ── */}
-            <div>
-              <h3 style={{
-                fontFamily: "'Jost',sans-serif",
-                fontSize: '11px',
-                letterSpacing: '0.2em',
-                color: '#8B6914',
-                fontWeight: 600,
-                margin: '0 0 24px 0',
-                textTransform: 'uppercase'
-              }}>
-                Company
-              </h3>
-              <nav style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                {FOOTER_LINKS.company.map(link => (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    className="ft-a"
-                    style={{ fontSize: '13px', lineHeight: 1.5 }}
-                  >
-                    {link.label}
-                  </Link>
-                ))}
-              </nav>
-            </div>
+              {/* COL 3: COMPANY */}
+              <div>
+                <h3 style={{
+                  fontFamily: "'Jost',sans-serif",
+                  fontSize: '11px',
+                  letterSpacing: '0.2em',
+                  color: '#8B6914',
+                  fontWeight: 600,
+                  margin: '0 0 20px 0',
+                  textTransform: 'uppercase'
+                }}>
+                  Company
+                </h3>
+                <nav style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  {FOOTER_LINKS.company.map(link => (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      className="ft-a"
+                      style={{ fontSize: '13px', lineHeight: 1.5 }}
+                    >
+                      {link.label}
+                    </Link>
+                  ))}
+                </nav>
+              </div>
 
-            {/* ── COL 4: SUPPORT ── */}
-            <div>
-              <h3 style={{
-                fontFamily: "'Jost',sans-serif",
-                fontSize: '11px',
-                letterSpacing: '0.2em',
-                color: '#8B6914',
-                fontWeight: 600,
-                margin: '0 0 24px 0',
-                textTransform: 'uppercase'
-              }}>
-                Support
-              </h3>
-              <nav style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                {FOOTER_LINKS.support.map(link => (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    className="ft-a"
-                    style={{ fontSize: '13px', lineHeight: 1.5 }}
-                  >
-                    {link.label}
-                  </Link>
-                ))}
-              </nav>
+              {/* COL 4: SUPPORT */}
+              <div>
+                <h3 style={{
+                  fontFamily: "'Jost',sans-serif",
+                  fontSize: '11px',
+                  letterSpacing: '0.2em',
+                  color: '#8B6914',
+                  fontWeight: 600,
+                  margin: '0 0 20px 0',
+                  textTransform: 'uppercase'
+                }}>
+                  Support
+                </h3>
+                <nav style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  {FOOTER_LINKS.support.map(link => (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      className="ft-a"
+                      style={{ fontSize: '13px', lineHeight: 1.5 }}
+                    >
+                      {link.label}
+                    </Link>
+                  ))}
+                </nav>
+              </div>
             </div>
 
             {/* ── COL 5: NEWSLETTER ── */}

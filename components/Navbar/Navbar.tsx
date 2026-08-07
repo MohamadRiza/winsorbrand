@@ -20,16 +20,16 @@ const TOP_RIGHT_LINKS = [
 ];
 const COLLECTIONS = [
   {
-    key: 'new', label: 'NEW', href: '/collections?section=new', items: [
-      { label: 'New Arrivals 2026', href: '/collections?section=new' },
-      { label: 'Latest Timepiece Additions', href: '/collections?section=new' },
+    key: 'new', label: 'NEW', href: '/new-arrivals', items: [
+      { label: 'New Arrivals 2026', href: '/new-arrivals' },
+      { label: 'Latest Timepiece Additions', href: '/new-arrivals' },
       { label: 'Bestseller Collection', href: '/collections?section=bestsellers' },
     ]
   },
   {
     key: 'gents', label: 'GENTS', href: '/mens', items: [
       { label: "Gents Collection", href: '/mens' },
-      { label: "Men's Chronograph", href: '/mens?section=sports' },
+      { label: "Men's Chronograph", href: '/sports' },
       { label: "Executive Timepieces", href: '/mens?section=luxury' },
     ]
   },
@@ -37,21 +37,21 @@ const COLLECTIONS = [
     key: 'ladies', label: 'LADIES', href: '/womens', items: [
       { label: "Ladies Collection", href: '/womens' },
       { label: "Women's Elegance", href: '/womens?section=luxury' },
-      { label: "Petite Diamonds & Gold", href: '/womens?section=limited' },
+      { label: "Petite Diamonds & Gold", href: '/limited-edition' },
     ]
   },
   {
-    key: 'sport', label: 'SPORTS', href: '/collections?section=sports', items: [
-      { label: 'Sport Pro Series', href: '/collections?section=sports' },
-      { label: 'Sport Diver', href: '/collections?section=sports' },
-      { label: 'Sport Automatic', href: '/collections?section=sports' },
+    key: 'sport', label: 'SPORTS', href: '/sports', items: [
+      { label: 'Sport Pro Series', href: '/sports' },
+      { label: 'Sport Diver', href: '/sports' },
+      { label: 'Sport Automatic', href: '/sports' },
     ]
   },
   {
-    key: 'limited', label: 'LIMITED', href: '/collections?section=limited', items: [
-      { label: 'Anniversary Edition', href: '/collections?section=limited' },
-      { label: "Founder's Reserve", href: '/collections?section=limited' },
-      { label: "Collector's Piece", href: '/collections?section=limited' },
+    key: 'limited', label: 'LIMITED', href: '/limited-edition', items: [
+      { label: 'Anniversary Edition', href: '/limited-edition' },
+      { label: "Founder's Reserve", href: '/limited-edition' },
+      { label: "Collector's Piece", href: '/limited-edition' },
     ]
   },
 ];
@@ -155,7 +155,7 @@ export default function Navbar() {
   const { totalItemsCount } = useCart();
   const pathname = usePathname();
   const router = useRouter();
-  const isTransparentPage = pathname === '/' || pathname === '/collections' || pathname === '/customer-care' || pathname === '/gifts' || pathname === '/retailers' || pathname === '/mens' || pathname === '/womens' || pathname === '/women';
+  const isTransparentPage = pathname === '/' || pathname === '/collections' || pathname === '/customer-care' || pathname === '/gifts' || pathname === '/retailers' || pathname === '/mens' || pathname === '/womens' || pathname === '/women' || pathname === '/sports' || pathname === '/limited-edition' || pathname === '/limited' || pathname === '/new-arrivals' || pathname === '/new';
 
   const [isTransparent, setIsTransparent] = useState(true);
   const [isVisible, setIsVisible] = useState(true);
@@ -366,11 +366,11 @@ export default function Navbar() {
           top: 0,
           left: 0,
           right: 0,
-          zIndex: 50,
+          zIndex: 9990,
           transform: isVisible ? 'translateY(0)' : 'translateY(-100%)',
           transition: 'transform 0.42s cubic-bezier(0.25,0.46,0.45,0.94), background 0.35s ease, border-color 0.35s ease',
           background: useSolidSurface
-            ? 'rgba(255,255,255,0.98)'
+            ? 'rgba(250, 247, 240, 0.98)'
             : (isHomepageLightSlide ? 'rgba(26, 18, 9, 0.05)' : 'rgba(15, 12, 9, 0.28)'),
           backdropFilter: useSolidSurface ? 'blur(14px)' : 'blur(12px)',
           WebkitBackdropFilter: useSolidSurface ? 'blur(14px)' : 'blur(12px)',
@@ -651,7 +651,7 @@ export default function Navbar() {
         style={{
           position: 'fixed',
           inset: 0,
-          zIndex: 40,
+          zIndex: 9998,
           background: 'rgba(26,18,9,0.5)',
           opacity: mobileOpen ? 1 : 0,
           pointerEvents: mobileOpen ? 'auto' : 'none',
@@ -667,7 +667,7 @@ export default function Navbar() {
           right: 0,
           bottom: 0,
           width: '320px',
-          zIndex: 50,
+          zIndex: 9999,
           background: '#faf7f0',
           transform: mobileOpen ? 'translateX(0)' : 'translateX(100%)',
           transition: 'transform 0.4s cubic-bezier(0.25,0.46,0.45,0.94)',
@@ -687,7 +687,7 @@ export default function Navbar() {
           background: '#faf7f0',
           position: 'sticky',
           top: 0,
-          zIndex: 55
+          zIndex: 10000
         }}>
           {/* Drawer Logo - Larger version for menu header */}
           <Link href="/" className="wn-logo-link" style={{ flex: 1, justifyContent: 'center' }}>
