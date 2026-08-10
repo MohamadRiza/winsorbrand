@@ -464,14 +464,7 @@ function LimitedEditionContent() {
                       <div style={{ display: 'flex', gap: '6px' }}>
                         <button
                           onClick={() => {
-                            addToCart({
-                              _id: p._id,
-                              title: p.title,
-                              price: p.price,
-                              thumbnail: p.thumbnail,
-                              selectedColor: p.colorVariants?.[0]?.colorName || 'Standard'
-                            });
-                            toast.success('Added to bag!');
+                            if (p._id) addToCart(p._id, 1, p.colorVariants?.[0]?.colorName, p);
                           }}
                           style={{
                             flex: 1,

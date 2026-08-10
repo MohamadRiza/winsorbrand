@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { orderRef, items, shippingAddress, subtotal, isGift, couponCode, validationToken, paymentMethod } = body;
+    const { orderRef, items, shippingAddress, subtotal, isGift, couponCode, validationToken, paymentMethod, paymentStatus, payhereOrderId } = body;
 
     if (!orderRef || !items || !shippingAddress || !subtotal) {
       return NextResponse.json(
@@ -184,13 +184,14 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const isPaid = paymentStatus === 'paid' || (paymentMethod === 'card' && paymentStatus === 'paid');
     const newOrder = await Order.create({
       clerkId: userId,
       orderRef,
       items,
       shippingAddress,
       subtotal,
-      status: 'pending',
+      status: isPaid ? 'processing' : 'pending',
       isGift: !!isGift || (Array.isArray(items) && items.some((i: any) => i.isGift)),
       // Coupon data (all computed server-side)
       couponCode: appliedCouponCode,
@@ -199,7 +200,8 @@ export async function POST(req: NextRequest) {
       finalTotal: appliedCouponCode ? finalTotal : subtotal,
       // Payment
       paymentMethod: paymentMethod === 'bank_transfer' ? 'bank_transfer' : 'card',
-      paymentStatus: 'pending',
+      paymentStatus: isPaid ? 'paid' : 'pending',
+      payhereOrderId: payhereOrderId || null,
     });
 
     return NextResponse.json({ success: true, data: newOrder });

@@ -568,15 +568,7 @@ function WomensCollectionContent() {
                       <button 
                         disabled={isOut}
                         onClick={() => {
-                          addToCart({
-                            productId: product._id,
-                            title: product.title,
-                            price: product.price,
-                            colorVariant: product.colorVariants?.[0]?.colorName || 'Default',
-                            strapType: 'Standard',
-                            thumbnail: getWatchImageUrl(product),
-                          });
-                          toast.success('Added to Cart');
+                          if (product._id) addToCart(product._id, 1, product.colorVariants?.[0]?.colorName, product);
                         }}
                         style={{ width: '100%', padding: '12px 0', background: isOut ? '#ccc' : '#1a1209', color: '#fff', border: 'none', borderRadius: '6px', fontSize: '11px', letterSpacing: '0.15em', textTransform: 'uppercase', fontWeight: 500, cursor: isOut ? 'not-allowed' : 'pointer', transition: 'background 0.2s ease' }}
                       >

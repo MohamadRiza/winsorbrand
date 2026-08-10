@@ -229,7 +229,7 @@ export default function AIAssistant() {
           justify-content: center;
           color: #fff;
           cursor: pointer;
-          z-index: 9999;
+          z-index: 9990;
           transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         .ai-widget-trigger:hover {
@@ -260,7 +260,7 @@ export default function AIAssistant() {
           display: flex;
           flex-direction: column;
           overflow: hidden;
-          z-index: 9998;
+          z-index: 9995;
           opacity: 0;
           transform: scale(0.95) translateY(20px);
           pointer-events: none;
@@ -269,7 +269,17 @@ export default function AIAssistant() {
         .ai-chat-window.open {
           opacity: 1;
           transform: scale(1) translateY(0);
-          pointer-events: all;
+          pointer-events: auto;
+        }
+
+        /* ── HIDE AI WIDGET BEHIND MOBILE SIDEBAR DRAWER WHEN OPEN ── */
+        body.wn-mobile-menu-open .ai-widget-trigger,
+        body.wn-mobile-menu-open .ai-chat-window {
+          z-index: 100 !important;
+          opacity: 0 !important;
+          pointer-events: none !important;
+          transform: translateY(20px) scale(0.9) !important;
+          transition: opacity 0.3s ease, transform 0.3s ease, z-index 0.3s ease !important;
         }
 
         .ai-widget-trigger.open {

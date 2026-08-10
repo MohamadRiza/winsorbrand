@@ -192,7 +192,7 @@ function NewArrivalsContent() {
       >
         {/* Background Video */}
         <video 
-          src="/video-slider.webm" 
+          src="/new_arr_vid.webm" 
           autoPlay 
           muted 
           loop 
@@ -228,7 +228,7 @@ function NewArrivalsContent() {
           {/* Right Column: Hero Image Card */}
           <div className="new-hero-img-card">
             <Image
-              src="/KCC.webp"
+              src="/new_arr_img.webp"
               alt="Winsor New Arrival Watch"
               fill
               priority
@@ -455,14 +455,7 @@ function NewArrivalsContent() {
                       <div style={{ display: 'flex', gap: '6px' }}>
                         <button
                           onClick={() => {
-                            addToCart({
-                              _id: p._id,
-                              title: p.title,
-                              price: p.price,
-                              thumbnail: p.thumbnail,
-                              selectedColor: p.colorVariants?.[0]?.colorName || 'Standard'
-                            });
-                            toast.success('Added to bag!');
+                            if (p._id) addToCart(p._id, 1, p.colorVariants?.[0]?.colorName, p);
                           }}
                           style={{
                             flex: 1,

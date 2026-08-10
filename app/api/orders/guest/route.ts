@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
     await connectDB();
 
     const body = await req.json();
-    const { guestInfo, items, shippingAddress, paymentMethod } = body;
+    const { guestInfo, items, shippingAddress, paymentMethod, customOrderRef, paymentStatus, payhereOrderId } = body;
 
     // ── 1. Validate guest info ──────────────────────────────────────────────
     if (!guestInfo || typeof guestInfo !== 'object') {
@@ -149,7 +149,7 @@ export async function POST(req: NextRequest) {
 
     // ── 5. Generate cryptographically safe order reference ──────────────────
     const uid = crypto.randomUUID().replace(/-/g, '').slice(0, 8).toUpperCase();
-    const orderRef = `WG-${uid}`;  // WG prefix = Winsor Guest
+    const orderRef = customOrderRef && typeof customOrderRef === 'string' ? customOrderRef : `WG-${uid}`;
 
     // ── 6. Atomically decrement stock ───────────────────────────────────────
     for (const item of validatedItems) {
@@ -187,6 +187,7 @@ export async function POST(req: NextRequest) {
     };
 
     // ── 8. Create guest order in DB ─────────────────────────────────────────
+    const isPaid = paymentStatus === 'paid' || (paymentMethod === 'card' && paymentStatus === 'paid');
     const newOrder = await Order.create({
       clerkId: null,
       isGuestOrder: true,
@@ -198,11 +199,12 @@ export async function POST(req: NextRequest) {
       shippingAddress: safeAddress,
       subtotal: serverSubtotal,
       finalTotal: serverSubtotal,
-      status: 'pending',
+      status: isPaid ? 'processing' : 'pending',
       isGift: false,
       // Payment
       paymentMethod: paymentMethod === 'bank_transfer' ? 'bank_transfer' : 'card',
-      paymentStatus: 'pending',
+      paymentStatus: isPaid ? 'paid' : 'pending',
+      payhereOrderId: payhereOrderId || null,
     });
 
     return NextResponse.json({

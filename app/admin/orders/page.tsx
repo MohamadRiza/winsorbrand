@@ -297,6 +297,7 @@ export default function AdminOrdersPage() {
                 <th className="px-6 py-3.5 text-[11px] font-semibold tracking-[0.15em] uppercase text-[#1a1209]/70">Destination</th>
                 <th className="px-6 py-3.5 text-[11px] font-semibold tracking-[0.15em] uppercase text-[#1a1209]/70">Items</th>
                 <th className="px-6 py-3.5 text-[11px] font-semibold tracking-[0.15em] uppercase text-[#1a1209]/70">Subtotal</th>
+                <th className="px-6 py-3.5 text-[11px] font-semibold tracking-[0.15em] uppercase text-[#1a1209]/70">Payment</th>
                 <th className="px-6 py-3.5 text-[11px] font-semibold tracking-[0.15em] uppercase text-[#1a1209]/70">Status</th>
                 <th className="px-6 py-3.5 text-right text-[11px] font-semibold tracking-[0.15em] uppercase text-[#1a1209]/70">Action</th>
               </tr>
@@ -346,6 +347,34 @@ export default function AdminOrdersPage() {
                     </td>
                     <td className="px-6 py-4 font-bold text-[#8B6914] text-sm font-mono tabular-nums">
                       LKR {(order.subtotal || 0).toLocaleString()}
+                    </td>
+                    {/* Payment Method & Status Column */}
+                    <td className="px-6 py-4">
+                      <div className="flex flex-col gap-1.5">
+                        {/* Payment Method Badge */}
+                        {order.paymentMethod === 'bank_transfer' ? (
+                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
+                            🏦 Bank Transfer
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-sky-50 text-sky-700 border border-sky-200">
+                            💳 PayHere
+                          </span>
+                        )}
+                        {/* Payment Status Badge */}
+                        <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold border ${
+                          order.paymentStatus === 'paid'
+                            ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                            : order.paymentStatus === 'failed'
+                            ? 'bg-rose-50 text-rose-700 border-rose-200'
+                            : 'bg-amber-50 text-amber-700 border-amber-200'
+                        }`}>
+                          <span className={`w-1.5 h-1.5 rounded-full ${
+                            order.paymentStatus === 'paid' ? 'bg-emerald-500' : order.paymentStatus === 'failed' ? 'bg-rose-500' : 'bg-amber-500'
+                          }`} />
+                          {order.paymentStatus === 'paid' ? 'Paid' : order.paymentStatus === 'failed' ? 'Failed' : 'Pending'}
+                        </span>
+                      </div>
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-1.5">
@@ -616,6 +645,107 @@ export default function AdminOrdersPage() {
                   </div>
                 </div>
               </div>
+
+              {/* ── Payment Information ──────────────────────────────── */}
+              {selectedOrder && (
+                <div>
+                  <h3 className="text-xs font-semibold text-[#1a1209]/70 uppercase tracking-wider mb-3">Payment Information</h3>
+                  <div className="bg-[#fbf9f4] border border-[#1a1209]/10 rounded-2xl p-4 text-xs space-y-3 font-['Jost']">
+                    {/* Method Row */}
+                    <div className="flex justify-between items-center border-b border-[#1a1209]/5 pb-3">
+                      <span className="text-[#1a1209]/60 font-medium">Payment Method</span>
+                      {selectedOrder.paymentMethod === 'bank_transfer' ? (
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
+                          🏦 Bank Transfer
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-sky-50 text-sky-700 border border-sky-200">
+                          💳 PayHere (Card)
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Payment Status Row */}
+                    <div className="flex justify-between items-center border-b border-[#1a1209]/5 pb-3">
+                      <span className="text-[#1a1209]/60 font-medium">Payment Status</span>
+                      <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border ${
+                        selectedOrder.paymentStatus === 'paid'
+                          ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                          : selectedOrder.paymentStatus === 'failed'
+                          ? 'bg-rose-50 text-rose-700 border-rose-200'
+                          : 'bg-amber-50 text-amber-700 border-amber-200'
+                      }`}>
+                        <span className={`w-1.5 h-1.5 rounded-full ${
+                          selectedOrder.paymentStatus === 'paid' ? 'bg-emerald-500' : selectedOrder.paymentStatus === 'failed' ? 'bg-rose-500' : 'bg-amber-500'
+                        }`} />
+                        {selectedOrder.paymentStatus === 'paid' ? '✓ Paid' : selectedOrder.paymentStatus === 'failed' ? '✗ Failed' : '⏳ Pending'}
+                      </span>
+                    </div>
+
+                    {/* PayHere Order ID */}
+                    {selectedOrder.paymentMethod !== 'bank_transfer' && selectedOrder.payhereOrderId && (
+                      <div className="flex justify-between items-center border-b border-[#1a1209]/5 pb-3">
+                        <span className="text-[#1a1209]/60 font-medium">PayHere Order ID</span>
+                        <span className="font-mono text-[#1a1209] font-semibold text-[11px] bg-white px-2 py-1 rounded border border-[#1a1209]/10">{selectedOrder.payhereOrderId}</span>
+                      </div>
+                    )}
+
+                    {/* Bank Transfer Receipt */}
+                    {selectedOrder.paymentMethod === 'bank_transfer' && (
+                      <div className="space-y-3 pt-1">
+                        <p className="text-[#1a1209]/60 font-medium">Bank Transfer Receipt</p>
+                        {selectedOrder.receiptUrl ? (
+                          <div className="space-y-2.5">
+                            {/* Preview for image receipts */}
+                            {/\.(jpe?g|png|gif|webp)$/i.test(selectedOrder.receiptUrl) ? (
+                              <div className="rounded-xl overflow-hidden border border-[#1a1209]/15 bg-white shadow-sm">
+                                <img
+                                  src={selectedOrder.receiptUrl}
+                                  alt="Bank Transfer Receipt"
+                                  className="w-full object-contain max-h-60"
+                                />
+                              </div>
+                            ) : (
+                              /* PDF icon preview */
+                              <div className="flex items-center gap-3 p-3 bg-white rounded-xl border border-[#1a1209]/10">
+                                <div className="w-10 h-10 bg-rose-50 border border-rose-200 rounded-lg flex items-center justify-center flex-shrink-0">
+                                  <svg className="w-5 h-5 text-rose-600" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zm-1 1.5L18.5 9H13V3.5zM8 12h8v1H8v-1zm0 2.5h8v1H8v-1zm0 2.5h5v1H8v-1z"/>
+                                  </svg>
+                                </div>
+                                <div className="min-w-0">
+                                  <p className="font-semibold text-[#1a1209] text-sm truncate">Bank Transfer Receipt</p>
+                                  <p className="text-[#1a1209]/50 text-[10px] font-mono">PDF Document</p>
+                                </div>
+                              </div>
+                            )}
+                            {/* View / Download Button */}
+                            <a
+                              href={selectedOrder.receiptUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center justify-center gap-2 w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-xl transition-all shadow-sm"
+                            >
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                              </svg>
+                              View / Download Receipt
+                            </a>
+                          </div>
+                        ) : (
+                          <div className="flex items-center gap-2.5 p-3 bg-amber-50 border border-amber-200 rounded-xl">
+                            <span className="text-lg">⏳</span>
+                            <div>
+                              <p className="font-semibold text-amber-800 text-xs">Receipt Not Yet Uploaded</p>
+                              <p className="text-amber-700 text-[10px] mt-0.5">Customer has not uploaded a bank receipt yet.</p>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
 
               {/* Shipping Address */}
               <div>

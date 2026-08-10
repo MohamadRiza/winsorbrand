@@ -181,6 +181,7 @@ export default function Navbar() {
   const [showCurrency, setShowCurrency] = useState(false);
   const [megaVisible, setMegaVisible] = useState(false);
   const [mobileCurrencyOpen, setMobileCurrencyOpen] = useState(false);
+  const [expandedMobileCol, setExpandedMobileCol] = useState<string | null>(null);
   const [heroActiveSlide, setHeroActiveSlide] = useState(0);
   const [isNavbarHovered, setIsNavbarHovered] = useState(false);
 
@@ -229,8 +230,17 @@ export default function Navbar() {
   }, [isTransparentPage]);
 
   useEffect(() => {
-    document.body.style.overflow = mobileOpen ? 'hidden' : '';
-    return () => { document.body.style.overflow = ''; };
+    if (mobileOpen) {
+      document.body.style.overflow = 'hidden';
+      document.body.classList.add('wn-mobile-menu-open');
+    } else {
+      document.body.style.overflow = '';
+      document.body.classList.remove('wn-mobile-menu-open');
+    }
+    return () => {
+      document.body.style.overflow = '';
+      document.body.classList.remove('wn-mobile-menu-open');
+    };
   }, [mobileOpen]);
 
   // Fetch all active products once search is opened to support fast client-side filtering
@@ -312,13 +322,6 @@ export default function Navbar() {
     objectFit: 'contain',
     height: 'auto',
     maxWidth: '130px',
-    width: '100%',
-  };
-
-  const mobileDrawerLogoStyle: React.CSSProperties = {
-    objectFit: 'contain',
-    height: 'auto',
-    maxWidth: '170px',
     width: '100%',
   };
 
@@ -645,68 +648,80 @@ export default function Navbar() {
         </div>
       </header>
 
-      {/* MOBILE OVERLAY */}
+      {/* ── MOBILE OVERLAY (GLASS BACKDROP) ── */}
       <div
         onClick={() => setMobileOpen(false)}
         style={{
           position: 'fixed',
           inset: 0,
           zIndex: 9998,
-          background: 'rgba(26,18,9,0.5)',
+          background: 'rgba(15, 10, 5, 0.35)',
+          backdropFilter: 'blur(10px)',
+          WebkitBackdropFilter: 'blur(10px)',
           opacity: mobileOpen ? 1 : 0,
           pointerEvents: mobileOpen ? 'auto' : 'none',
           transition: 'opacity 0.35s ease'
         }}
       />
 
-      {/* MOBILE DRAWER */}
+      {/* ── MOBILE DRAWER (PURE CRYSTAL GLASSMORPHISM) ── */}
       <div
         style={{
           position: 'fixed',
           top: 0,
           right: 0,
           bottom: 0,
-          width: '320px',
+          width: 'min(340px, 86vw)',
           zIndex: 9999,
-          background: '#faf7f0',
+          background: 'rgba(250, 247, 240, 0.65)',
+          backdropFilter: 'blur(32px) saturate(220%)',
+          WebkitBackdropFilter: 'blur(32px) saturate(220%)',
+          borderLeft: '1px solid rgba(255, 255, 255, 0.75)',
+          boxShadow: '-16px 0 48px rgba(26, 18, 9, 0.18), inset 1px 0 0 rgba(255, 255, 255, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.9)',
           transform: mobileOpen ? 'translateX(0)' : 'translateX(100%)',
-          transition: 'transform 0.4s cubic-bezier(0.25,0.46,0.45,0.94)',
+          transition: 'transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
           display: 'flex',
           flexDirection: 'column',
           overflowY: 'auto',
-          boxShadow: '-4px 0 24px rgba(26,18,9,0.12)'
+          color: '#1a1209'
         }}
       >
-        {/* Mobile Header with Larger Logo */}
+        {/* Mobile Header with Glass Logo & Close Button */}
         <div style={{
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
           padding: '18px 24px',
-          borderBottom: '1px solid rgba(26,18,9,0.08)',
-          background: '#faf7f0',
+          borderBottom: '1px solid rgba(139, 105, 20, 0.15)',
+          background: 'rgba(250, 247, 240, 0.75)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
           position: 'sticky',
           top: 0,
           zIndex: 10000
         }}>
-          {/* Drawer Logo - Larger version for menu header */}
-          <Link href="/" className="wn-logo-link" style={{ flex: 1, justifyContent: 'center' }}>
+          <Link href="/" className="wn-logo-link" style={{ flex: 1, justifyContent: 'flex-start' }} onClick={() => setMobileOpen(false)}>
             <Image
               src={LOGO_SOLID}
               alt="Winsor Logo"
-              width={170}
-              height={58}
-              style={mobileDrawerLogoStyle}
+              width={145}
+              height={48}
+              style={{ objectFit: 'contain', height: 'auto', maxWidth: '145px' }}
               priority
             />
           </Link>
           <button
             style={{
-              ...ibS,
-              color: '#1a1209',
+              background: 'rgba(139, 105, 20, 0.1)',
+              border: '1px solid rgba(139, 105, 20, 0.28)',
+              color: '#8B6914',
               padding: '8px',
               borderRadius: '50%',
-              background: 'rgba(26,18,9,0.04)'
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              transition: 'all 0.2s ease'
             }}
             onClick={() => setMobileOpen(false)}
           >
@@ -714,8 +729,8 @@ export default function Navbar() {
           </button>
         </div>
 
-        {/* Mobile Currency Selector */}
-        <div style={{ padding: '14px 24px', borderBottom: '1px solid rgba(26,18,9,0.06)' }}>
+        {/* Mobile Currency Selector (Glass Pill) */}
+        <div style={{ padding: '14px 24px', borderBottom: '1px solid rgba(139, 105, 20, 0.1)' }}>
           <button
             onClick={() => setMobileCurrencyOpen(v => !v)}
             style={{
@@ -723,21 +738,21 @@ export default function Navbar() {
               alignItems: 'center',
               gap: '10px',
               width: '100%',
-              background: 'none',
-              border: '1px solid rgba(26,18,9,0.1)',
-              borderRadius: '6px',
+              background: 'rgba(255, 255, 255, 0.65)',
+              border: '1px solid rgba(139, 105, 20, 0.25)',
+              boxShadow: '0 2px 10px rgba(139, 105, 20, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.8)',
+              borderRadius: '8px',
               padding: '10px 14px',
               cursor: 'pointer',
               justifyContent: 'space-between',
-              transition: 'background 0.2s ease'
+              color: '#8B6914',
+              transition: 'all 0.2s ease'
             }}
-            onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(139,105,20,0.04)'}
-            onMouseLeave={(e) => e.currentTarget.style.background = 'none'}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <GlobeIcon />
               <CountryFlag iso={selected.iso} width={18} height={13} />
-              <span style={{ fontFamily: "'Jost',sans-serif", fontSize: '12px', color: '#1a1209' }}>
+              <span style={{ fontFamily: "'Jost',sans-serif", fontSize: '12px', color: '#1a1209', fontWeight: 500 }}>
                 {selected.code} — {selected.label}
               </span>
             </div>
@@ -747,11 +762,15 @@ export default function Navbar() {
           {mobileCurrencyOpen && (
             <div style={{
               marginTop: '10px',
-              maxHeight: '280px',
+              maxHeight: '260px',
               overflowY: 'auto',
-              padding: '8px 0',
-              border: '1px solid rgba(26,18,9,0.06)',
-              borderRadius: '6px'
+              padding: '6px 0',
+              background: 'rgba(250, 247, 240, 0.95)',
+              backdropFilter: 'blur(20px)',
+              WebkitBackdropFilter: 'blur(20px)',
+              border: '1px solid rgba(139, 105, 20, 0.2)',
+              borderRadius: '8px',
+              boxShadow: '0 12px 32px rgba(26, 18, 9, 0.15)'
             }}>
               {CURRENCIES.map((c: CurrencyOption) => (
                 <button
@@ -763,21 +782,19 @@ export default function Navbar() {
                     gap: '12px',
                     width: '100%',
                     padding: '10px 14px',
-                    background: 'none',
+                    background: selected.code === c.code ? 'rgba(139, 105, 20, 0.12)' : 'none',
                     border: 'none',
-                    borderBottom: '1px solid rgba(26,18,9,0.04)',
+                    borderBottom: '1px solid rgba(26, 18, 9, 0.05)',
                     cursor: 'pointer',
-                    color: selected.code === c.code ? '#8B6914' : 'rgba(26,18,9,0.7)',
+                    color: selected.code === c.code ? '#8B6914' : 'rgba(26, 18, 9, 0.75)',
                     transition: 'background 0.15s ease'
                   }}
-                  onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(139,105,20,0.03)'}
-                  onMouseLeave={(e) => e.currentTarget.style.background = 'none'}
                 >
                   <CountryFlag iso={c.iso} width={20} height={14} />
                   <span style={{ fontFamily: "'Jost',sans-serif", fontSize: '13px', fontWeight: selected.code === c.code ? 600 : 400 }}>
                     {c.code}
                   </span>
-                  <span style={{ fontFamily: "'Jost',sans-serif", fontSize: '12px', color: 'rgba(26,18,9,0.4)', marginLeft: 'auto' }}>
+                  <span style={{ fontFamily: "'Jost',sans-serif", fontSize: '11px', color: 'rgba(26, 18, 9, 0.45)', marginLeft: 'auto' }}>
                     {c.label}
                   </span>
                 </button>
@@ -786,78 +803,170 @@ export default function Navbar() {
           )}
         </div>
 
-        {/* Mobile Navigation Links */}
-        <nav style={{ flex: 1, padding: '18px 24px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
-          <p style={{ fontFamily: "'Jost',sans-serif", fontSize: '9px', letterSpacing: '0.28em', color: '#8B6914', marginBottom: '10px', fontWeight: 600 }}>
-            COLLECTIONS
-          </p>
-          {COLLECTIONS.map(col => (
-            <Link
-              key={col.key}
-              href={col.href}
-              onClick={() => setMobileOpen(false)}
-              style={{
-                fontFamily: "'Jost',sans-serif",
-                fontSize: '13.5px',
-                letterSpacing: '0.14em',
-                color: '#1a1209',
-                padding: '12px 0',
-                borderBottom: '1px solid rgba(26,18,9,0.05)',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                textDecoration: 'none',
-                transition: 'color 0.15s ease'
-              }}
-              onMouseEnter={(e) => e.currentTarget.style.color = '#8B6914'}
-              onMouseLeave={(e) => e.currentTarget.style.color = '#1a1209'}
-            >
-              {col.label}
-              <span style={{ color: '#8B6914', fontSize: '14px' }}>→</span>
-            </Link>
-          ))}
+        {/* Mobile Navigation Links (Interactive Glass Accordions) */}
+        <nav style={{ flex: 1, padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
+            <span style={{ fontFamily: "'Jost',sans-serif", fontSize: '9px', letterSpacing: '0.28em', color: '#8B6914', fontWeight: 600, textTransform: 'uppercase' }}>
+              HAUTE HORLOGERIE
+            </span>
+            <span style={{ fontFamily: "'Jost',sans-serif", fontSize: '9px', letterSpacing: '0.15em', color: 'rgba(26, 18, 9, 0.4)', textTransform: 'uppercase' }}>COLLECTIONS</span>
+          </div>
 
-          <p style={{ fontFamily: "'Jost',sans-serif", fontSize: '9px', letterSpacing: '0.28em', color: '#8B6914', marginTop: '24px', marginBottom: '10px', fontWeight: 600 }}>
-            EXPLORE
-          </p>
+          {COLLECTIONS.map(col => {
+            const isExpanded = expandedMobileCol === col.key;
+            return (
+              <div 
+                key={col.key} 
+                style={{ 
+                  borderRadius: '12px', 
+                  background: isExpanded ? 'rgba(255, 255, 255, 0.85)' : 'rgba(255, 255, 255, 0.5)', 
+                  border: isExpanded ? '1px solid rgba(139, 105, 20, 0.35)' : '1px solid rgba(255, 255, 255, 0.75)', 
+                  boxShadow: isExpanded ? '0 8px 24px rgba(139, 105, 20, 0.08)' : '0 4px 16px rgba(26, 18, 9, 0.03), inset 0 1px 0 rgba(255, 255, 255, 0.8)',
+                  overflow: 'hidden', 
+                  transition: 'all 0.25s ease' 
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 14px' }}>
+                  <Link
+                    href={col.href}
+                    onClick={() => setMobileOpen(false)}
+                    style={{
+                      fontFamily: "'Cormorant Garamond', serif",
+                      fontSize: '18px',
+                      letterSpacing: '0.06em',
+                      fontWeight: 600,
+                      color: isExpanded ? '#8B6914' : '#1a1209',
+                      textDecoration: 'none',
+                      flex: 1
+                    }}
+                  >
+                    {col.label}
+                  </Link>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setExpandedMobileCol(isExpanded ? null : col.key);
+                    }}
+                    style={{
+                      background: 'rgba(139, 105, 20, 0.1)',
+                      border: '1px solid rgba(139, 105, 20, 0.28)',
+                      color: '#8B6914',
+                      borderRadius: '50%',
+                      width: '26px',
+                      height: '26px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '13px',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease'
+                    }}
+                    title="Toggle Sub-Categories"
+                  >
+                    {isExpanded ? '−' : '+'}
+                  </button>
+                </div>
+
+                {/* Sub-Items Expandable Container */}
+                {isExpanded && (
+                  <div style={{ background: 'rgba(250, 247, 240, 0.45)', padding: '10px 14px 14px', borderTop: '1px solid rgba(139, 105, 20, 0.1)', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    {col.items.map(sub => (
+                      <Link
+                        key={sub.label}
+                        href={sub.href}
+                        onClick={() => setMobileOpen(false)}
+                        style={{
+                          fontFamily: "'Jost', sans-serif",
+                          fontSize: '12px',
+                          letterSpacing: '0.08em',
+                          color: 'rgba(26, 18, 9, 0.85)',
+                          textDecoration: 'none',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          padding: '6px 0',
+                          borderBottom: '1px solid rgba(26, 18, 9, 0.05)'
+                        }}
+                      >
+                        <span>• {sub.label}</span>
+                        <span style={{ color: '#8B6914', fontSize: '11px' }}>→</span>
+                      </Link>
+                    ))}
+                    <Link
+                      href={col.href}
+                      onClick={() => setMobileOpen(false)}
+                      style={{
+                        fontFamily: "'Jost', sans-serif",
+                        fontSize: '10px',
+                        letterSpacing: '0.18em',
+                        color: '#8B6914',
+                        textTransform: 'uppercase',
+                        fontWeight: 600,
+                        textDecoration: 'none',
+                        marginTop: '4px',
+                        display: 'block'
+                      }}
+                    >
+                      EXPLORE ALL {col.label} →
+                    </Link>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+
+          {/* EXPLORE SECTION */}
+          <div style={{ marginTop: '20px', marginBottom: '6px' }}>
+            <span style={{ fontFamily: "'Jost',sans-serif", fontSize: '9px', letterSpacing: '0.28em', color: '#8B6914', fontWeight: 600, textTransform: 'uppercase' }}>
+              EXPLORE MAISON
+            </span>
+          </div>
+
           {isSignedIn && (
-            <>
+            <div style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
               <Link
                 href="/profile"
                 onClick={() => setMobileOpen(false)}
                 style={{
-                  fontFamily: "'Jost',sans-serif",
-                  fontSize: '12.5px',
-                  letterSpacing: '0.09em',
+                  flex: 1,
+                  padding: '10px 12px',
+                  background: 'rgba(139, 105, 20, 0.1)',
+                  border: '1px solid rgba(139, 105, 20, 0.28)',
+                  borderRadius: '8px',
                   color: '#8B6914',
-                  padding: '10px 0',
-                  borderBottom: '1px solid rgba(26,18,9,0.04)',
+                  fontFamily: "'Jost',sans-serif",
+                  fontSize: '11px',
+                  letterSpacing: '0.08em',
                   textDecoration: 'none',
-                  fontWeight: 500,
-                  display: 'block'
+                  textAlign: 'center',
+                  fontWeight: 600
                 }}
               >
-                My Profile Details
+                My Profile
               </Link>
               <Link
                 href="/orders"
                 onClick={() => setMobileOpen(false)}
                 style={{
-                  fontFamily: "'Jost',sans-serif",
-                  fontSize: '12.5px',
-                  letterSpacing: '0.09em',
+                  flex: 1,
+                  padding: '10px 12px',
+                  background: 'rgba(139, 105, 20, 0.1)',
+                  border: '1px solid rgba(139, 105, 20, 0.28)',
+                  borderRadius: '8px',
                   color: '#8B6914',
-                  padding: '10px 0',
-                  borderBottom: '1px solid rgba(26,18,9,0.04)',
+                  fontFamily: "'Jost',sans-serif",
+                  fontSize: '11px',
+                  letterSpacing: '0.08em',
                   textDecoration: 'none',
-                  fontWeight: 500,
-                  display: 'block'
+                  textAlign: 'center',
+                  fontWeight: 600
                 }}
               >
                 My Orders
               </Link>
-            </>
+            </div>
           )}
+
           {[...TOP_LEFT_LINKS, ...TOP_RIGHT_LINKS].map(l => (
             <Link
               key={l.href}
@@ -867,34 +976,41 @@ export default function Navbar() {
                 fontFamily: "'Jost',sans-serif",
                 fontSize: '12.5px',
                 letterSpacing: '0.09em',
-                color: 'rgba(26,18,9,0.65)',
-                padding: '10px 0',
-                borderBottom: '1px solid rgba(26,18,9,0.04)',
+                color: '#1a1209',
+                padding: '10px 14px',
+                borderRadius: '8px',
                 textDecoration: 'none',
-                transition: 'color 0.15s ease'
+                transition: 'all 0.15s ease',
+                background: 'rgba(255, 255, 255, 0.5)',
+                border: '1px solid rgba(255, 255, 255, 0.75)',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.02)',
+                display: 'block'
               }}
-              onMouseEnter={(e) => e.currentTarget.style.color = '#1a1209'}
-              onMouseLeave={(e) => e.currentTarget.style.color = 'rgba(26,18,9,0.65)'}
             >
               {l.label}
             </Link>
           ))}
         </nav>
 
-        {/* Mobile Footer Actions */}
+        {/* Mobile Footer Actions (Glass Bar) */}
         <div style={{
           padding: '18px 24px',
-          borderTop: '1px solid rgba(26,18,9,0.08)',
+          borderTop: '1px solid rgba(139, 105, 20, 0.15)',
           display: 'flex',
-          gap: '24px',
+          justifyContent: 'space-between',
           alignItems: 'center',
-          background: '#faf7f0'
+          background: 'rgba(250, 247, 240, 0.75)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+          position: 'sticky',
+          bottom: 0,
+          zIndex: 10000
         }}>
           {!isSignedIn ? (
             <SignInButton mode="modal">
-              <button style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', color: '#1a1209', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <button style={{ background: 'rgba(255, 255, 255, 0.65)', border: '1px solid rgba(139, 105, 20, 0.25)', padding: '8px 14px', borderRadius: '8px', cursor: 'pointer', color: '#1a1209', display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <UserIcon />
-                <span style={{ fontFamily: "'Jost',sans-serif", fontSize: '12px', color: '#1a1209' }}>Account</span>
+                <span style={{ fontFamily: "'Jost',sans-serif", fontSize: '12px', color: '#8B6914', fontWeight: 500 }}>Sign In / Account</span>
               </button>
             </SignInButton>
           ) : (
@@ -903,9 +1019,9 @@ export default function Navbar() {
                 appearance={{
                   elements: {
                     avatarBox: {
-                      width: '20px',
-                      height: '20px',
-                      border: '1px solid rgba(139,105,20,0.3)',
+                      width: '22px',
+                      height: '22px',
+                      border: '1px solid rgba(139, 105, 20, 0.5)',
                     }
                   }
                 }}
@@ -923,13 +1039,14 @@ export default function Navbar() {
                   />
                 </UserButton.MenuItems>
               </UserButton>
-              <span style={{ fontFamily: "'Jost',sans-serif", fontSize: '12px', color: '#1a1209' }}>Account</span>
+              <span style={{ fontFamily: "'Jost',sans-serif", fontSize: '12px', color: '#1a1209', fontWeight: 500 }}>Account</span>
             </div>
           )}
-          <Link href="/cart" style={{ color: '#1a1209', position: 'relative', display: 'flex', alignItems: 'center', gap: '8px' }}>
+
+          <Link href="/cart" onClick={() => setMobileOpen(false)} style={{ color: '#1a1209', position: 'relative', display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(139, 105, 20, 0.12)', border: '1px solid rgba(139, 105, 20, 0.35)', padding: '8px 14px', borderRadius: '8px', textDecoration: 'none' }}>
             <BagIcon />
-            <span style={{ fontFamily: "'Jost',sans-serif", fontSize: '12px', color: '#1a1209' }}>Cart</span>
-            <span style={{ position: 'absolute', top: '-4px', right: '-8px', width: '16px', height: '16px', borderRadius: '50%', background: '#8B6914', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '9px', fontFamily: "'Jost',sans-serif", fontWeight: 500 }}>
+            <span style={{ fontFamily: "'Jost',sans-serif", fontSize: '12px', color: '#8B6914', fontWeight: 600 }}>Cart</span>
+            <span style={{ position: 'absolute', top: '-6px', right: '-6px', width: '18px', height: '18px', borderRadius: '50%', background: '#8B6914', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '9px', fontFamily: "'Jost',sans-serif", fontWeight: 700, border: '1px solid #ffffff' }}>
               {totalItemsCount > 9 ? '9+' : totalItemsCount}
             </span>
           </Link>

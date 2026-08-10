@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
@@ -119,27 +119,6 @@ export default function BuyNowModal({
     setSubmitting(true);
     try {
       const ref = `WN-${Math.random().toString(36).slice(2, 10).toUpperCase()}`;
-
-      const res = await fetch('/api/customer/orders', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          orderRef: ref,
-          items: [{
-            productId: item.productId, productTitle: item.productTitle,
-            productModelNo: item.productModelNo, productThumbnail: item.productThumbnail,
-            colorVariant: item.colorVariant || '', quantity: item.quantity, price: item.price,
-            isGift: false, giftNote: '', canvaLink: '', giftAttachmentUrl: '', giftAttachmentName: '',
-          }],
-          shippingAddress: {
-            address: profile!.address, city: profile!.city, postalCode: profile!.postalCode,
-            country: profile!.country, mobile: profile!.mobile, mobileCode: profile!.mobileCode,
-          },
-          subtotal, isGift: false, couponCode: null, validationToken: null, paymentMethod: payMethod,
-        }),
-      });
-      const data = await res.json();
-      if (!res.ok || !data.success) throw new Error(data.error || 'Failed to place order.');
       setOrderRef(ref);
 
       if (payMethod === 'payhere') {
@@ -150,11 +129,13 @@ export default function BuyNowModal({
         });
         const hashData = await hashRes.json();
         if (!hashData.success) throw new Error('Failed to initialise payment gateway.');
+
         await loadPayhereSDK();
-        await new Promise<void>((resolve, reject) => {
+
+        const payherePaymentId = await new Promise<string>((resolve, reject) => {
           const payhere = (window as any).payhere;
-          payhere.onCompleted = (_id: string) => resolve();
-          payhere.onDismissed = () => reject(new Error('Payment was cancelled. Your order is saved — retry from your orders page.'));
+          payhere.onCompleted = (pId: string) => resolve(pId || ref);
+          payhere.onDismissed = () => reject(new Error('Payment was cancelled. No order was created and no charges were made.'));
           payhere.onError = (error: string) => reject(new Error(`Payment failed: ${error}`));
           payhere.startPayment({
             sandbox: hashData.data.isSandbox, merchant_id: hashData.data.merchantId,
@@ -169,10 +150,60 @@ export default function BuyNowModal({
             country: profile?.country || 'Sri Lanka', hash: hashData.data.hash,
           });
         });
+
+        // ── Order is created ONLY after payment is confirmed by PayHere ────────
+        const res = await fetch('/api/customer/orders', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            orderRef: ref,
+            items: [{
+              productId: item.productId, productTitle: item.productTitle,
+              productModelNo: item.productModelNo, productThumbnail: item.productThumbnail,
+              colorVariant: item.colorVariant || '', quantity: item.quantity, price: item.price,
+              isGift: false, giftNote: '', canvaLink: '', giftAttachmentUrl: '', giftAttachmentName: '',
+            }],
+            shippingAddress: {
+              address: profile!.address, city: profile!.city, postalCode: profile!.postalCode,
+              country: profile!.country, mobile: profile!.mobile, mobileCode: profile!.mobileCode,
+            },
+            subtotal, isGift: false, couponCode: null, validationToken: null,
+            paymentMethod: 'card',
+            paymentStatus: 'paid',
+            payhereOrderId: payherePaymentId,
+          }),
+        });
+        const data = await res.json();
+        if (!res.ok || !data.success) throw new Error(data.error || 'Failed to record timepiece purchase.');
+
         if (onOrderSuccess) onOrderSuccess(ref);
         setStep('success');
         toast.success('Payment confirmed! Your timepiece order is placed.');
       } else {
+        // ── Bank Transfer Order Creation ──────────────────────────────────────
+        const res = await fetch('/api/customer/orders', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            orderRef: ref,
+            items: [{
+              productId: item.productId, productTitle: item.productTitle,
+              productModelNo: item.productModelNo, productThumbnail: item.productThumbnail,
+              colorVariant: item.colorVariant || '', quantity: item.quantity, price: item.price,
+              isGift: false, giftNote: '', canvaLink: '', giftAttachmentUrl: '', giftAttachmentName: '',
+            }],
+            shippingAddress: {
+              address: profile!.address, city: profile!.city, postalCode: profile!.postalCode,
+              country: profile!.country, mobile: profile!.mobile, mobileCode: profile!.mobileCode,
+            },
+            subtotal, isGift: false, couponCode: null, validationToken: null,
+            paymentMethod: 'bank_transfer',
+            paymentStatus: 'pending',
+          }),
+        });
+        const data = await res.json();
+        if (!res.ok || !data.success) throw new Error(data.error || 'Failed to place order.');
+
         setBankReceiptUploading(true);
         const fileBase64 = await new Promise<string>((resolve, reject) => {
           const reader = new FileReader();

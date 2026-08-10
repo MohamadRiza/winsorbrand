@@ -30,37 +30,31 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // ── 2. Ownership verification ─────────────────────────────────────────────
-    await connectDB();
-
-    let order;
+    // ── 2. Authorization verification ─────────────────────────────────────────
     if (!isGuest) {
       // Signed-in user: verify via Clerk session
       const { userId } = getAuth(req);
       if (!userId) {
         return NextResponse.json({ success: false, error: 'Unauthorized. Please sign in.' }, { status: 401 });
       }
-      order = await Order.findOne({ orderRef, clerkId: userId });
+      await connectDB();
+      const existingOrder = await Order.findOne({ orderRef });
+      if (existingOrder && existingOrder.clerkId !== userId) {
+        return NextResponse.json({ success: false, error: 'Forbidden' }, { status: 403 });
+      }
     } else {
-      // Guest user: verify via guestEmail (case-insensitive)
+      // Guest user: verify guest email format
       if (!guestEmail || typeof guestEmail !== 'string') {
         return NextResponse.json(
           { success: false, error: 'guestEmail is required for guest payment.' },
           { status: 400 }
         );
       }
-      order = await Order.findOne({
-        orderRef,
-        isGuestOrder: true,
-        guestEmail: guestEmail.trim().toLowerCase(),
-      });
-    }
-
-    if (!order) {
-      return NextResponse.json(
-        { success: false, error: 'Order not found or you are not authorised to pay for this order.' },
-        { status: 404 }
-      );
+      await connectDB();
+      const existingOrder = await Order.findOne({ orderRef });
+      if (existingOrder && existingOrder.guestEmail !== guestEmail.trim().toLowerCase()) {
+        return NextResponse.json({ success: false, error: 'Forbidden' }, { status: 403 });
+      }
     }
 
     // ── 3. Load PayHere credentials from environment ──────────────────────────

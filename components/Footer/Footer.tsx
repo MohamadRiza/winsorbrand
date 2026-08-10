@@ -551,7 +551,7 @@ export default function Footer() {
                 <nav style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                   {FOOTER_LINKS.support.map(link => (
                     <Link
-                      key={link.href}
+                      key={link.label}
                       href={link.href}
                       className="ft-a"
                       style={{ fontSize: '13px', lineHeight: 1.5 }}

@@ -153,49 +153,14 @@ export default function GuestCheckoutModal({
     setBankReceipt(file); setBankReceiptName(file.name);
   };
 
-  // ── Step 1: Create guest order → go to payment step ─────────────────────
+  // ── Step 1: Validate guest info → go to payment step ─────────────────────
   const handlePlaceOrder = async () => {
     setErrorMsg('');
-    setSubmitting(true);
-    try {
-      const res = await fetch('/api/orders/guest', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          guestInfo: {
-            name: form.name.trim(),
-            email: form.email.trim().toLowerCase(),
-            mobile: `${form.mobileCode} ${form.mobile.trim()}`,
-          },
-          items: items.map(i => ({
-            productId: i.productId,
-            colorVariant: i.colorVariant,
-            quantity: i.quantity,
-          })),
-          shippingAddress: {
-            address: form.address.trim(),
-            city: form.city.trim(),
-            postalCode: form.postalCode.trim(),
-            country: form.country,
-            mobile: form.mobile.trim(),
-            mobileCode: form.mobileCode,
-          },
-          paymentMethod: payMethod,
-        }),
-      });
-      const data = await res.json();
-      if (data.success) {
-        setOrderRef(data.data.orderRef);
-        setGuestEmail(form.email.trim().toLowerCase());
-        setStep('payment');
-      } else {
-        setErrorMsg(data.error || 'Failed to place order. Please try again.');
-      }
-    } catch (err) {
-      setErrorMsg('Network error. Please check your connection and try again.');
-    } finally {
-      setSubmitting(false);
-    }
+    const email = form.email.trim().toLowerCase();
+    setGuestEmail(email);
+    const ref = orderRef || `WG-${Math.random().toString(36).slice(2, 10).toUpperCase()}`;
+    setOrderRef(ref);
+    setStep('payment');
   };
 
   // ── Step 2: Execute payment (PayHere or bank transfer) ───────────────────
@@ -207,26 +172,31 @@ export default function GuestCheckoutModal({
     }
     setSubmitting(true);
     try {
+      const ref = orderRef || `WG-${Math.random().toString(36).slice(2, 10).toUpperCase()}`;
+      setOrderRef(ref);
+
       if (payMethod === 'payhere') {
         const hashRes = await fetch('/api/payment/payhere-hash', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ orderRef, amount: subtotal, currency: 'LKR', isGuest: true, guestEmail }),
+          body: JSON.stringify({ orderRef: ref, amount: subtotal, currency: 'LKR', isGuest: true, guestEmail }),
         });
         const hashData = await hashRes.json();
         if (!hashData.success) throw new Error('Failed to initialise payment gateway.');
+
         await loadPayhereSDK();
-        await new Promise<void>((resolve, reject) => {
+
+        const payherePaymentId = await new Promise<string>((resolve, reject) => {
           const payhere = (window as any).payhere;
-          payhere.onCompleted = (_id: string) => resolve();
-          payhere.onDismissed = () => reject(new Error('Payment cancelled. Your order is saved — use your reference code to retry.'));
+          payhere.onCompleted = (pId: string) => resolve(pId || ref);
+          payhere.onDismissed = () => reject(new Error('Payment was cancelled. No order was created and no charges were made.'));
           payhere.onError = (error: string) => reject(new Error(`Payment failed: ${error}`));
           payhere.startPayment({
             sandbox: hashData.data.isSandbox,
             merchant_id: hashData.data.merchantId,
             return_url: '', cancel_url: '',
             notify_url: `${window.location.origin}/api/payment/payhere-notify`,
-            order_id: orderRef,
+            order_id: ref,
             items: items.map(i => i.productTitle).join(', ').slice(0, 100),
             amount: subtotal.toFixed(2), currency: 'LKR',
             first_name: form.name.trim().split(' ')[0] || 'Guest',
@@ -238,10 +208,74 @@ export default function GuestCheckoutModal({
             hash: hashData.data.hash,
           });
         });
-        if (onOrderSuccess) onOrderSuccess(orderRef, form.name.trim());
+
+        // ── Guest Order is created ONLY after payment is confirmed by PayHere ────
+        const res = await fetch('/api/orders/guest', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            guestInfo: {
+              name: form.name.trim(),
+              email: form.email.trim().toLowerCase(),
+              mobile: `${form.mobileCode} ${form.mobile.trim()}`,
+            },
+            items: items.map(i => ({
+              productId: i.productId,
+              colorVariant: i.colorVariant,
+              quantity: i.quantity,
+            })),
+            shippingAddress: {
+              address: form.address.trim(),
+              city: form.city.trim(),
+              postalCode: form.postalCode.trim(),
+              country: form.country,
+              mobile: form.mobile.trim(),
+              mobileCode: form.mobileCode,
+            },
+            paymentMethod: 'card',
+            paymentStatus: 'paid',
+            payhereOrderId: payherePaymentId,
+            customOrderRef: ref,
+          }),
+        });
+        const data = await res.json();
+        if (!data.success) throw new Error(data.error || 'Failed to place guest order.');
+
+        if (onOrderSuccess) onOrderSuccess(ref, form.name.trim());
         setStep('success');
         toast.success('Payment confirmed! Your timepiece order is placed.');
       } else {
+        // ── Bank Transfer Guest Order Creation ─────────────────────────────────
+        const res = await fetch('/api/orders/guest', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            guestInfo: {
+              name: form.name.trim(),
+              email: form.email.trim().toLowerCase(),
+              mobile: `${form.mobileCode} ${form.mobile.trim()}`,
+            },
+            items: items.map(i => ({
+              productId: i.productId,
+              colorVariant: i.colorVariant,
+              quantity: i.quantity,
+            })),
+            shippingAddress: {
+              address: form.address.trim(),
+              city: form.city.trim(),
+              postalCode: form.postalCode.trim(),
+              country: form.country,
+              mobile: form.mobile.trim(),
+              mobileCode: form.mobileCode,
+            },
+            paymentMethod: 'bank_transfer',
+            paymentStatus: 'pending',
+            customOrderRef: ref,
+          }),
+        });
+        const data = await res.json();
+        if (!data.success) throw new Error(data.error || 'Failed to place guest order.');
+
         setBankReceiptUploading(true);
         const fileBase64 = await new Promise<string>((resolve, reject) => {
           const reader = new FileReader();
@@ -250,9 +284,8 @@ export default function GuestCheckoutModal({
           reader.readAsDataURL(bankReceipt!);
         });
         const receiptRes = await fetch('/api/payment/bank-receipt', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ orderRef, fileBase64, fileName: bankReceipt!.name, mimeType: bankReceipt!.type, isGuest: true, guestEmail }),
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ orderRef: ref, fileBase64, fileName: bankReceipt!.name, mimeType: bankReceipt!.type, isGuest: true, guestEmail }),
         });
         setBankReceiptUploading(false);
         const receiptData = await receiptRes.json();
