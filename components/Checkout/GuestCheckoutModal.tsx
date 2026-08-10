@@ -46,7 +46,7 @@ const COUNTRIES = [
   { code: 'MV', name: 'Maldives', dial: '+960' },
 ];
 
-type Step = 'choice' | 'form' | 'summary' | 'success';
+type Step = 'choice' | 'form' | 'summary' | 'payment' | 'success';
 
 export default function GuestCheckoutModal({
   isOpen,
@@ -62,6 +62,14 @@ export default function GuestCheckoutModal({
   const [orderRef, setOrderRef] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [copiedRef, setCopiedRef] = useState(false);
+
+  // Payment state
+  const [payMethod, setPayMethod] = useState<'payhere' | 'bank_transfer'>('payhere');
+  const [bankReceipt, setBankReceipt] = useState<File | null>(null);
+  const [bankReceiptName, setBankReceiptName] = useState('');
+  const [bankTransferConfirmed, setBankTransferConfirmed] = useState(false);
+  const [bankReceiptUploading, setBankReceiptUploading] = useState(false);
+  const [guestEmail, setGuestEmail] = useState('');
 
   // Guest form state
   const [form, setForm] = useState({
@@ -84,6 +92,11 @@ export default function GuestCheckoutModal({
       setErrorMsg('');
       setOrderRef('');
       setFormErrors({});
+      setPayMethod('payhere');
+      setBankReceipt(null);
+      setBankReceiptName('');
+      setBankTransferConfirmed(false);
+      setGuestEmail('');
     }
   }, [isOpen]);
 
@@ -115,7 +128,32 @@ export default function GuestCheckoutModal({
     return Object.keys(errs).length === 0;
   };
 
-  // ── Place guest order ───────────────────────────────────────────────────
+  // ── Load PayHere SDK ────────────────────────────────────────────────────
+  const loadPayhereSDK = (): Promise<void> => {
+    return new Promise((resolve, reject) => {
+      if (typeof (window as any).payhere !== 'undefined') { resolve(); return; }
+      const existing = document.querySelector('script[src*="payhere.lk"]');
+      if (existing) { existing.addEventListener('load', () => resolve()); existing.addEventListener('error', () => reject(new Error('SDK load failed'))); return; }
+      const script = document.createElement('script');
+      script.src = 'https://www.payhere.lk/lib/payhere.js';
+      script.async = true;
+      script.onload = () => resolve();
+      script.onerror = () => reject(new Error('Failed to load payment gateway.'));
+      document.head.appendChild(script);
+    });
+  };
+
+  // ── Receipt file select ─────────────────────────────────────────────────
+  const handleReceiptSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const allowed = ['image/jpeg','image/jpg','image/png','image/webp','application/pdf'];
+    if (!allowed.includes(file.type)) { toast.error('Invalid file. Please upload a PDF, JPG, PNG, or WEBP.'); return; }
+    if (file.size > 10 * 1024 * 1024) { toast.error('File too large. Maximum receipt size is 10 MB.'); return; }
+    setBankReceipt(file); setBankReceiptName(file.name);
+  };
+
+  // ── Step 1: Create guest order → go to payment step ─────────────────────
   const handlePlaceOrder = async () => {
     setErrorMsg('');
     setSubmitting(true);
@@ -142,19 +180,91 @@ export default function GuestCheckoutModal({
             mobile: form.mobile.trim(),
             mobileCode: form.mobileCode,
           },
+          paymentMethod: payMethod,
         }),
       });
-
       const data = await res.json();
       if (data.success) {
         setOrderRef(data.data.orderRef);
-        setStep('success');
-        if (onOrderSuccess) onOrderSuccess(data.data.orderRef, form.name.trim());
+        setGuestEmail(form.email.trim().toLowerCase());
+        setStep('payment');
       } else {
         setErrorMsg(data.error || 'Failed to place order. Please try again.');
       }
     } catch (err) {
       setErrorMsg('Network error. Please check your connection and try again.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  // ── Step 2: Execute payment (PayHere or bank transfer) ───────────────────
+  const handlePay = async () => {
+    setErrorMsg('');
+    if (payMethod === 'bank_transfer') {
+      if (!bankTransferConfirmed) { toast.error('Please confirm you have made the bank transfer.'); return; }
+      if (!bankReceipt) { toast.error('Please upload your bank transfer receipt.'); return; }
+    }
+    setSubmitting(true);
+    try {
+      if (payMethod === 'payhere') {
+        const hashRes = await fetch('/api/payment/payhere-hash', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ orderRef, amount: subtotal, currency: 'LKR', isGuest: true, guestEmail }),
+        });
+        const hashData = await hashRes.json();
+        if (!hashData.success) throw new Error('Failed to initialise payment gateway.');
+        await loadPayhereSDK();
+        await new Promise<void>((resolve, reject) => {
+          const payhere = (window as any).payhere;
+          payhere.onCompleted = (_id: string) => resolve();
+          payhere.onDismissed = () => reject(new Error('Payment cancelled. Your order is saved — use your reference code to retry.'));
+          payhere.onError = (error: string) => reject(new Error(`Payment failed: ${error}`));
+          payhere.startPayment({
+            sandbox: hashData.data.isSandbox,
+            merchant_id: hashData.data.merchantId,
+            return_url: '', cancel_url: '',
+            notify_url: `${window.location.origin}/api/payment/payhere-notify`,
+            order_id: orderRef,
+            items: items.map(i => i.productTitle).join(', ').slice(0, 100),
+            amount: subtotal.toFixed(2), currency: 'LKR',
+            first_name: form.name.trim().split(' ')[0] || 'Guest',
+            last_name: form.name.trim().split(' ').slice(1).join(' ') || 'Customer',
+            email: guestEmail,
+            phone: `${form.mobileCode}${form.mobile.trim()}`.replace(/\s/g, ''),
+            address: form.address.trim(), city: form.city.trim(),
+            country: COUNTRIES.find(c => c.code === form.country)?.name || form.country,
+            hash: hashData.data.hash,
+          });
+        });
+        if (onOrderSuccess) onOrderSuccess(orderRef, form.name.trim());
+        setStep('success');
+        toast.success('Payment confirmed! Your timepiece order is placed.');
+      } else {
+        setBankReceiptUploading(true);
+        const fileBase64 = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result as string);
+          reader.onerror = () => reject(new Error('Failed to read receipt file.'));
+          reader.readAsDataURL(bankReceipt!);
+        });
+        const receiptRes = await fetch('/api/payment/bank-receipt', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ orderRef, fileBase64, fileName: bankReceipt!.name, mimeType: bankReceipt!.type, isGuest: true, guestEmail }),
+        });
+        setBankReceiptUploading(false);
+        const receiptData = await receiptRes.json();
+        if (!receiptData.success) throw new Error(receiptData.error || 'Failed to upload receipt.');
+        if (onOrderSuccess) onOrderSuccess(orderRef, form.name.trim());
+        setStep('success');
+        toast.success('Order placed! We will verify your bank transfer within 24 hours.');
+      }
+    } catch (err: any) {
+      console.error('[GuestCheckout handlePay]', err);
+      setBankReceiptUploading(false);
+      setErrorMsg(err?.message || 'Payment failed. Please try again.');
     } finally {
       setSubmitting(false);
     }
@@ -350,12 +460,14 @@ export default function GuestCheckoutModal({
                 {step === 'choice' && 'Complete Your Purchase'}
                 {step === 'form' && 'Delivery Information'}
                 {step === 'summary' && 'Order Summary'}
+                {step === 'payment' && 'Select Payment'}
                 {step === 'success' && 'Order Confirmed'}
               </h2>
               <p className="gcm-header-sub">
                 {step === 'choice' && 'Sign in or continue as guest'}
                 {step === 'form' && 'Where shall we deliver your timepiece?'}
                 {step === 'summary' && 'Review your order before confirming'}
+                {step === 'payment' && 'Choose how you would like to pay'}
                 {step === 'success' && 'Your timepiece is on its way'}
               </p>
             </div>
@@ -366,8 +478,9 @@ export default function GuestCheckoutModal({
             {/* ── Step indicators ────────────────────────────────────────── */}
             {step !== 'choice' && step !== 'success' && (
               <div className="gcm-step-indicator">
-                <div className={`gcm-step-dot ${step === 'form' || step === 'summary' ? 'active' : ''}`} />
-                <div className={`gcm-step-dot ${step === 'summary' ? 'active' : ''}`} />
+                <div className={`gcm-step-dot ${step === 'form' || step === 'summary' || step === 'payment' ? 'active' : ''}`} />
+                <div className={`gcm-step-dot ${step === 'summary' || step === 'payment' ? 'active' : ''}`} />
+                <div className={`gcm-step-dot ${step === 'payment' ? 'active' : ''}`} />
               </div>
             )}
 
@@ -630,7 +743,7 @@ export default function GuestCheckoutModal({
 
                 <div style={{ display: 'flex', gap: 10 }}>
                   <button className="gcm-btn-outline" onClick={() => setStep('form')} style={{ flex: 0, padding: '13px 20px', width: 'auto' }}>
-                    ← Back
+                    &#8592; Back
                   </button>
                   <button
                     className="gcm-btn-primary"
@@ -640,19 +753,125 @@ export default function GuestCheckoutModal({
                   >
                     {submitting ? (
                       <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ animation: 'spin 1s linear infinite' }}>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ animation: 'gcm-spin 1s linear infinite' }}>
                           <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
                         </svg>
-                        Placing Order...
+                        Creating Order...
                       </span>
-                    ) : '✓ Confirm & Place Order'}
+                    ) : 'Continue to Payment →'}
                   </button>
                 </div>
-                <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+                <style>{`@keyframes gcm-spin { to { transform: rotate(360deg); } }`}</style>
               </div>
             )}
 
-            {/* ═══════════════════════ STEP 4: SUCCESS ════════════════════ */}
+            {/* ═══════════════════════ STEP 4: PAYMENT ════════════════════ */}
+            {step === 'payment' && (
+              <div>
+                {/* Total bar */}
+                <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', padding:'10px 14px', background:'#fff', border:'1px solid rgba(139,105,20,0.15)', borderRadius:10, marginBottom:16 }}>
+                  <span style={{ fontSize:'12px', color:'rgba(26,18,9,0.55)', fontWeight:600, textTransform:'uppercase', letterSpacing:'0.08em' }}>Order Total</span>
+                  <span style={{ fontSize:'20px', fontWeight:700, color:'#8b6914', fontFamily:'monospace' }}>LKR {subtotal.toLocaleString()}</span>
+                </div>
+
+                <div style={{ fontSize:'10px', fontWeight:700, color:'rgba(26,18,9,0.45)', textTransform:'uppercase', letterSpacing:'0.1em', marginBottom:10 }}>Payment Method</div>
+
+                {/* PayHere option */}
+                <button type="button" onClick={() => setPayMethod('payhere')}
+                  style={{ border:`2px solid ${payMethod === 'payhere' ? '#8b6914' : 'rgba(139,105,20,0.2)'}`, borderRadius:12, padding:'14px 16px', cursor:'pointer', transition:'all 0.2s ease', background: payMethod === 'payhere' ? 'rgba(139,105,20,0.04)' : '#fff', display:'flex', alignItems:'center', gap:12, width:'100%', boxSizing:'border-box' as const, marginBottom:10, textAlign:'left' as const, boxShadow: payMethod === 'payhere' ? '0 0 0 3px rgba(139,105,20,0.08)' : 'none' }}>
+                  <div style={{ width:18, height:18, borderRadius:'50%', border:`2px solid ${payMethod === 'payhere' ? '#8b6914' : 'rgba(139,105,20,0.35)'}`, background: payMethod === 'payhere' ? '#8b6914' : 'transparent', flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center' }}>
+                    {payMethod === 'payhere' && <div style={{ width:6, height:6, background:'#fff', borderRadius:'50%' }} />}
+                  </div>
+                  <div style={{ flex:1 }}>
+                    <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8b6914" strokeWidth="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                      <span style={{ fontWeight:700, fontSize:'13.5px', color:'#1a1209' }}>Pay via PayHere</span>
+                      <span style={{ fontSize:'9.5px', fontWeight:700, color:'#2e7d32', background:'rgba(46,125,50,0.1)', border:'1px solid rgba(46,125,50,0.25)', borderRadius:4, padding:'2px 8px', textTransform:'uppercase', letterSpacing:'0.06em' }}>Secure</span>
+                    </div>
+                    <div style={{ fontSize:'11px', color:'rgba(26,18,9,0.5)', marginTop:3 }}>Visa · Mastercard · Amex · eWallet · Bank · USSD</div>
+                  </div>
+                </button>
+
+                {/* Bank Transfer option */}
+                <button type="button" onClick={() => setPayMethod('bank_transfer')}
+                  style={{ border:`2px solid ${payMethod === 'bank_transfer' ? '#8b6914' : 'rgba(139,105,20,0.2)'}`, borderRadius:12, padding:'14px 16px', cursor:'pointer', transition:'all 0.2s ease', background: payMethod === 'bank_transfer' ? 'rgba(139,105,20,0.04)' : '#fff', display:'flex', alignItems:'center', gap:12, width:'100%', boxSizing:'border-box' as const, marginBottom:10, textAlign:'left' as const, boxShadow: payMethod === 'bank_transfer' ? '0 0 0 3px rgba(139,105,20,0.08)' : 'none' }}>
+                  <div style={{ width:18, height:18, borderRadius:'50%', border:`2px solid ${payMethod === 'bank_transfer' ? '#8b6914' : 'rgba(139,105,20,0.35)'}`, background: payMethod === 'bank_transfer' ? '#8b6914' : 'transparent', flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center' }}>
+                    {payMethod === 'bank_transfer' && <div style={{ width:6, height:6, background:'#fff', borderRadius:'50%' }} />}
+                  </div>
+                  <div>
+                    <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8b6914" strokeWidth="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                      <span style={{ fontWeight:700, fontSize:'13.5px', color:'#1a1209' }}>Direct Bank Transfer</span>
+                    </div>
+                    <div style={{ fontSize:'11px', color:'rgba(26,18,9,0.5)', marginTop:3 }}>Transfer and upload receipt — verified within 24 hrs</div>
+                  </div>
+                </button>
+
+                {payMethod === 'bank_transfer' && (
+                  <>
+                    <div style={{ background:'rgba(139,105,20,0.05)', border:'1px solid rgba(139,105,20,0.18)', borderRadius:10, padding:'12px 14px', marginBottom:12 }}>
+                      <div style={{ fontSize:'9.5px', fontWeight:700, color:'rgba(26,18,9,0.45)', textTransform:'uppercase', letterSpacing:'0.1em', marginBottom:8 }}>Bank Transfer Details</div>
+                      {[['Bank','Bank of Ceylon'],['Account No.','1234567890'],['Branch','Main Branch'],['Amount',`LKR ${subtotal.toLocaleString()}`]].map(([label,value],i) => (
+                        <div key={i} style={{ display:'flex', justifyContent:'space-between', fontSize:'12.5px', borderTop: i > 0 ? '1px solid rgba(139,105,20,0.1)' : undefined, marginTop: i > 0 ? 6 : 0, paddingTop: i > 0 ? 6 : 0, color:'#1a1209' }}>
+                          <span style={{ color:'rgba(26,18,9,0.5)', fontSize:'11px' }}>{label}</span>
+                          <span style={{ fontWeight: label === 'Amount' ? 700 : 600, color: label === 'Amount' ? '#8b6914' : '#1a1209', fontFamily: label === 'Account No.' ? 'monospace' : undefined }}>{value}</span>
+                        </div>
+                      ))}
+                    </div>
+
+                    <label style={{ display:'block', fontSize:'9.5px', fontWeight:700, color:'rgba(26,18,9,0.55)', textTransform:'uppercase', letterSpacing:'0.1em', marginBottom:6 }}>Upload Transfer Receipt</label>
+                    <div style={{ border:'2px dashed rgba(139,105,20,0.3)', borderRadius:10, padding:14, textAlign:'center', cursor:'pointer', position:'relative', overflow:'hidden', marginBottom:12 }}>
+                      <input type="file" accept=".jpg,.jpeg,.png,.webp,.pdf" onChange={handleReceiptSelect} style={{ position:'absolute', inset:0, opacity:0, cursor:'pointer', width:'100%', height:'100%' }} />
+                      {bankReceiptName ? (
+                        <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:8 }}>
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2e7d32" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                          <span style={{ fontSize:'13px', color:'#2e7d32', fontWeight:600 }}>{bankReceiptName}</span>
+                        </div>
+                      ) : (
+                        <>
+                          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="rgba(139,105,20,0.5)" strokeWidth="1.5" style={{ marginBottom:6 }}><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
+                          <div style={{ fontSize:'12.5px', color:'rgba(26,18,9,0.6)', fontWeight:500 }}>Click to upload receipt</div>
+                          <div style={{ fontSize:'10.5px', color:'rgba(26,18,9,0.35)', marginTop:3 }}>PDF, JPG, PNG, WEBP · Max 10 MB</div>
+                        </>
+                      )}
+                    </div>
+
+                    <div onClick={() => setBankTransferConfirmed(v => !v)} style={{ display:'flex', alignItems:'flex-start', gap:10, padding:'10px 0', cursor:'pointer', marginBottom:14 }}>
+                      <div style={{ width:18, height:18, border:`2px solid ${bankTransferConfirmed ? '#8b6914' : 'rgba(139,105,20,0.35)'}`, borderRadius:4, background: bankTransferConfirmed ? '#8b6914' : 'transparent', flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center', marginTop:1, transition:'all 0.2s ease' }}>
+                        {bankTransferConfirmed && <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>}
+                      </div>
+                      <span style={{ fontSize:'12.5px', color:'rgba(26,18,9,0.7)', lineHeight:1.5 }}>
+                        I confirm I have transferred <strong>LKR {subtotal.toLocaleString()}</strong> to the account above.
+                      </span>
+                    </div>
+                  </>
+                )}
+
+                {errorMsg && (
+                  <div style={{ background:'rgba(198,40,40,0.06)', border:'1px solid rgba(198,40,40,0.2)', borderRadius:10, padding:'12px 14px', marginBottom:14, fontSize:'12.5px', color:'#c62828' }}>
+                    {errorMsg}
+                  </div>
+                )}
+
+                <button
+                  className="gcm-btn-primary"
+                  style={{ marginTop:0, display:'flex', alignItems:'center', justifyContent:'center', gap:8 }}
+                  onClick={handlePay}
+                  disabled={submitting || bankReceiptUploading || (payMethod === 'bank_transfer' && (!bankTransferConfirmed || !bankReceipt))}
+                >
+                  {(submitting || bankReceiptUploading) ? (
+                    <>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ animation:'gcm-spin 1s linear infinite' }}><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+                      {bankReceiptUploading ? 'Uploading Receipt...' : 'Processing...'}
+                    </>
+                  ) : (
+                    payMethod === 'payhere' ? 'Pay Now via PayHere' : 'Place Order — Bank Transfer'
+                  )}
+                </button>
+              </div>
+            )}
+
+            {/* ═══════════════════════ STEP 5: SUCCESS ════════════════════ */}
             {step === 'success' && (
               <div style={{ textAlign: 'center', padding: '10px 0 4px' }}>
                 {/* Success icon */}
@@ -672,9 +891,15 @@ export default function GuestCheckoutModal({
                 <h3 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '26px', color: '#1a1209', fontWeight: 600, margin: '0 0 6px' }}>
                   Order Confirmed!
                 </h3>
-                <p style={{ fontSize: '13px', color: 'rgba(26,18,9,0.6)', lineHeight: 1.6, margin: '0 0 20px' }}>
-                  Thank you, <strong style={{ color: '#1a1209' }}>{form.name}</strong>! Your timepiece order has been placed.
+                <p style={{ fontSize: '13px', color: 'rgba(26,18,9,0.6)', lineHeight: 1.6, margin: '0 0 10px' }}>
+                  Thank you, <strong style={{ color: '#1a1209' }}>{form.name}</strong>!{' '}
+                  {payMethod === 'payhere' ? 'Payment successful. Your timepiece order has been placed.' : 'Your order is placed. We will verify your bank transfer within 24 hours.'}
                 </p>
+                {payMethod === 'bank_transfer' && (
+                  <div style={{ fontSize:'11.5px', color:'rgba(26,18,9,0.5)', background:'rgba(139,105,20,0.06)', border:'1px solid rgba(139,105,20,0.15)', borderRadius:8, padding:'8px 12px', marginBottom:12, textAlign:'left' }}>
+                    Receipt uploaded. Our team will verify and update your order status within 24 hours.
+                  </div>
+                )}
 
                 {/* Order reference box with Copy icon */}
                 <div style={{

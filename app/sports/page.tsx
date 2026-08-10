@@ -226,6 +226,9 @@ function SportsCollectionContent() {
         .benefits-marquee-track {
           display: contents;
         }
+        .benefits-marquee-track[aria-hidden="true"] {
+          display: none;
+        }
         .benefit-item {
           display: flex;
           align-items: center;
@@ -304,7 +307,7 @@ function SportsCollectionContent() {
       >
         {/* Background Video */}
         <video 
-          src="/video-slider.webm" 
+          src="/Sport_Watch_Actor_Video.webm" 
           autoPlay 
           muted 
           loop 
@@ -340,14 +343,14 @@ function SportsCollectionContent() {
           {/* Right Column: Featured Image Card */}
           <div className="sports-hero-img-card">
             <Image 
-              src="/winsor_man.png" 
+              src="/Sport_Watch_Actor_img.png" 
               alt="Winsor Sport Collection" 
               fill 
               sizes="(max-width: 900px) 100vw, 500px" 
-              style={{ objectFit: 'cover', objectPosition: 'center top' }}
+              style={{ objectFit: 'cover', objectPosition: 'center top', filter: 'brightness(0.82) contrast(1.05)' }}
               priority
             />
-            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(10,8,5,0.85) 0%, transparent 60%)' }} />
+            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(10,8,5,0.35) 0%, rgba(10,8,5,0.45) 50%, rgba(10,8,5,0.92) 100%)' }} />
             <div style={{ position: 'absolute', bottom: '20px', left: '20px', right: '20px', zIndex: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
               <div>
                 <span style={{ fontSize: '9px', letterSpacing: '0.25em', color: '#dfb15b', textTransform: 'uppercase', fontWeight: 600, display: 'block' }}>SPORT PRO COLLECTION</span>

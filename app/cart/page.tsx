@@ -1789,14 +1789,14 @@ export default function CartPage() {
       {/* CONFIRMATION PURCHASE MODAL */}
       {showConfirmModal && (
         <div className="modal-overlay" onClick={() => setShowConfirmModal(false)}>
-          <div className="modal-box" onClick={e => e.stopPropagation()}>
+          <div className="modal-box" onClick={e => e.stopPropagation()} style={{ maxWidth: 520 }}>
             <h3 className="modal-title">Confirm Purchase</h3>
             <p className="modal-subtitle">
-              Verify your dispatch address and the selected timepieces before completing checkout.
+              Review your delivery details and select your payment method.
             </p>
 
             {/* Scrollable Content Wrapper */}
-            <div style={{ maxHeight: 'calc(95vh - 260px)', overflowY: 'auto', paddingRight: '6px', margin: '0 -6px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <div style={{ maxHeight: 'calc(90vh - 320px)', overflowY: 'auto', paddingRight: '4px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
               <div className="modal-block" style={{ margin: 0 }}>
                 <div className="modal-block-header">Contact Patron</div>
                 <p style={{ margin: 0, color: '#1a1209' }}>
@@ -1829,7 +1829,7 @@ export default function CartPage() {
                       <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '4px', borderBottom: idx < selectedItemsList.length - 1 ? '1px dashed rgba(139,105,20,0.1)' : 'none', paddingBottom: idx < selectedItemsList.length - 1 ? '8px' : '0' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', gap: '8px' }}>
                           <span style={{ color: 'rgba(26, 18, 9, 0.7)', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
-                            {item.product?.title} {item.colorVariant ? `(${item.colorVariant})` : ''} × {item.quantity}
+                            {item.product?.title} {item.colorVariant ? `(${item.colorVariant})` : ''} &times; {item.quantity}
                           </span>
                           <span style={{ fontWeight: 600, color: '#8B6914', flexShrink: 0 }}>
                             {convertPrice((item.product?.price || 0) * item.quantity)}
@@ -1838,10 +1838,10 @@ export default function CartPage() {
                         {gift?.isGift && (
                           <div style={{ fontSize: '11px', color: '#8b6914', background: 'rgba(139,105,20,0.03)', padding: '6px 10px', borderRadius: '4px', marginTop: '2px', lineHeight: 1.45, wordBreak: 'break-word', overflowWrap: 'break-word' }}>
                             <strong>Gifting Options:</strong><br />
-                            {gift.giftNote && <span style={{ fontStyle: 'italic', display: 'block', margin: '2px 0', wordBreak: 'break-word', overflowWrap: 'break-word' }}>"{gift.giftNote}"</span>}
+                            {gift.giftNote && <span style={{ fontStyle: 'italic', display: 'block', margin: '2px 0' }}>&quot;{gift.giftNote}&quot;</span>}
                             {gift.canvaLink && <span style={{ display: 'block', wordBreak: 'break-all' }}>Canva Link: {gift.canvaLink}</span>}
                             {gift.giftAttachmentName && <span style={{ display: 'block', wordBreak: 'break-all' }}>Wishing Card: {gift.giftAttachmentName}</span>}
-                            {!gift.giftNote && !gift.canvaLink && !gift.giftAttachmentName && <span>Gift Wrap & Empty Card</span>}
+                            {!gift.giftNote && !gift.canvaLink && !gift.giftAttachmentName && <span>Gift Wrap &amp; Empty Card</span>}
                           </div>
                         )}
                       </div>
@@ -1849,9 +1849,95 @@ export default function CartPage() {
                   })}
                 </div>
               </div>
+
+              {/* ── Payment Method Selector ── */}
+              <div className="modal-block" style={{ margin: 0 }}>
+                <div className="modal-block-header">Payment Method</div>
+
+                {/* PayHere option */}
+                <button type="button" onClick={() => { setPaymentMethod('card'); setBankReceipt(null); setBankReceiptName(''); setBankTransferConfirmed(false); }}
+                  style={{ border: `2px solid ${paymentMethod === 'card' ? '#8b6914' : 'rgba(139,105,20,0.2)'}`, borderRadius: 10, padding: '12px 14px', cursor: 'pointer', transition: 'all 0.2s ease', background: paymentMethod === 'card' ? 'rgba(139,105,20,0.04)' : '#fff', display: 'flex', alignItems: 'center', gap: 10, width: '100%', boxSizing: 'border-box' as const, marginBottom: 8, textAlign: 'left' as const, boxShadow: paymentMethod === 'card' ? '0 0 0 3px rgba(139,105,20,0.08)' : 'none' }}>
+                  <div style={{ width: 16, height: 16, borderRadius: '50%', border: `2px solid ${paymentMethod === 'card' ? '#8b6914' : 'rgba(139,105,20,0.35)'}`, background: paymentMethod === 'card' ? '#8b6914' : 'transparent', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    {paymentMethod === 'card' && <div style={{ width: 5, height: 5, background: '#fff', borderRadius: '50%' }} />}
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8b6914" strokeWidth="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                      <span style={{ fontWeight: 700, fontSize: '13px', color: '#1a1209' }}>Pay via PayHere</span>
+                      <span style={{ fontSize: '9px', fontWeight: 700, color: '#2e7d32', background: 'rgba(46,125,50,0.1)', border: '1px solid rgba(46,125,50,0.25)', borderRadius: 3, padding: '1px 6px', textTransform: 'uppercase' as const, letterSpacing: '0.06em' }}>Secure</span>
+                    </div>
+                    <div style={{ fontSize: '11px', color: 'rgba(26,18,9,0.5)', marginTop: 2 }}>Visa &middot; Mastercard &middot; Amex &middot; eWallet &middot; Bank &middot; USSD</div>
+                  </div>
+                </button>
+
+                {/* Bank Transfer option */}
+                <button type="button" onClick={() => setPaymentMethod('bank_transfer')}
+                  style={{ border: `2px solid ${paymentMethod === 'bank_transfer' ? '#8b6914' : 'rgba(139,105,20,0.2)'}`, borderRadius: 10, padding: '12px 14px', cursor: 'pointer', transition: 'all 0.2s ease', background: paymentMethod === 'bank_transfer' ? 'rgba(139,105,20,0.04)' : '#fff', display: 'flex', alignItems: 'center', gap: 10, width: '100%', boxSizing: 'border-box' as const, marginBottom: 0, textAlign: 'left' as const, boxShadow: paymentMethod === 'bank_transfer' ? '0 0 0 3px rgba(139,105,20,0.08)' : 'none' }}>
+                  <div style={{ width: 16, height: 16, borderRadius: '50%', border: `2px solid ${paymentMethod === 'bank_transfer' ? '#8b6914' : 'rgba(139,105,20,0.35)'}`, background: paymentMethod === 'bank_transfer' ? '#8b6914' : 'transparent', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    {paymentMethod === 'bank_transfer' && <div style={{ width: 5, height: 5, background: '#fff', borderRadius: '50%' }} />}
+                  </div>
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8b6914" strokeWidth="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                      <span style={{ fontWeight: 700, fontSize: '13px', color: '#1a1209' }}>Direct Bank Transfer</span>
+                    </div>
+                    <div style={{ fontSize: '11px', color: 'rgba(26,18,9,0.5)', marginTop: 2 }}>Transfer and upload receipt &mdash; verified within 24 hrs</div>
+                  </div>
+                </button>
+
+                {/* Bank Transfer Details (conditional) */}
+                {paymentMethod === 'bank_transfer' && (
+                  <div style={{ marginTop: 12 }}>
+                    <div style={{ background: 'rgba(139,105,20,0.05)', border: '1px solid rgba(139,105,20,0.18)', borderRadius: 8, padding: '10px 12px', marginBottom: 10 }}>
+                      <div style={{ fontSize: '9px', fontWeight: 700, color: 'rgba(26,18,9,0.45)', textTransform: 'uppercase' as const, letterSpacing: '0.1em', marginBottom: 6 }}>Bank Transfer Details</div>
+                      {[['Bank','Bank of Ceylon'],['Account No.','1234567890'],['Branch','Main Branch'],['Amount', appliedCoupon ? `LKR ${Math.max(0,selectedSubtotal-Math.round(selectedSubtotal*appliedCoupon.discountPercent/100)).toLocaleString()}` : `LKR ${selectedSubtotal.toLocaleString()}`]].map(([label,value],i) => (
+                        <div key={i} style={{ display:'flex', justifyContent:'space-between', fontSize:'12px', borderTop: i>0 ? '1px solid rgba(139,105,20,0.1)' : undefined, marginTop: i>0 ? 5 : 0, paddingTop: i>0 ? 5 : 0, color:'#1a1209' }}>
+                          <span style={{ color:'rgba(26,18,9,0.5)', fontSize:'10.5px' }}>{label}</span>
+                          <span style={{ fontWeight: label==='Amount' ? 700 : 600, color: label==='Amount' ? '#8b6914' : '#1a1209', fontFamily: label==='Account No.' ? 'monospace' : undefined }}>{value}</span>
+                        </div>
+                      ))}
+                    </div>
+
+                    <label style={{ display:'block', fontSize:'9px', fontWeight:700, color:'rgba(26,18,9,0.55)', textTransform:'uppercase' as const, letterSpacing:'0.1em', marginBottom:5 }}>Upload Transfer Receipt</label>
+                    <div style={{ border:'2px dashed rgba(139,105,20,0.3)', borderRadius:8, padding:'12px', textAlign:'center', cursor:'pointer', position:'relative', overflow:'hidden', marginBottom:10 }}>
+                      <input type="file" accept=".jpg,.jpeg,.png,.webp,.pdf" onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        const allowed = ['image/jpeg','image/jpg','image/png','image/webp','application/pdf'];
+                        if (!allowed.includes(file.type)) { toast.error('Invalid file. Please upload a PDF, JPG, PNG, or WEBP.'); return; }
+                        if (file.size > 10*1024*1024) { toast.error('File too large. Maximum 10 MB.'); return; }
+                        setBankReceipt(file); setBankReceiptName(file.name);
+                      }} style={{ position:'absolute', inset:0, opacity:0, cursor:'pointer', width:'100%', height:'100%' }} />
+                      {bankReceiptName ? (
+                        <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:6 }}>
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2e7d32" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                          <span style={{ fontSize:'12px', color:'#2e7d32', fontWeight:600 }}>{bankReceiptName}</span>
+                        </div>
+                      ) : (
+                        <div>
+                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(139,105,20,0.5)" strokeWidth="1.5" style={{ marginBottom:4 }}><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
+                          <div style={{ fontSize:'12px', color:'rgba(26,18,9,0.6)', fontWeight:500 }}>Click to upload receipt</div>
+                          <div style={{ fontSize:'10px', color:'rgba(26,18,9,0.35)', marginTop:2 }}>PDF, JPG, PNG, WEBP &middot; Max 10 MB</div>
+                        </div>
+                      )}
+                    </div>
+
+                    <div onClick={() => setBankTransferConfirmed(v => !v)} style={{ display:'flex', alignItems:'flex-start', gap:8, cursor:'pointer' }}>
+                      <div style={{ width:16, height:16, border:`2px solid ${bankTransferConfirmed ? '#8b6914' : 'rgba(139,105,20,0.35)'}`, borderRadius:3, background: bankTransferConfirmed ? '#8b6914' : 'transparent', flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center', marginTop:1, transition:'all 0.2s ease' }}>
+                        {bankTransferConfirmed && <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>}
+                      </div>
+                      <span style={{ fontSize:'12px', color:'rgba(26,18,9,0.7)', lineHeight:1.5 }}>
+                        I confirm I have transferred{' '}
+                        <strong>{appliedCoupon ? `LKR ${Math.max(0,selectedSubtotal-Math.round(selectedSubtotal*appliedCoupon.discountPercent/100)).toLocaleString()}` : `LKR ${selectedSubtotal.toLocaleString()}`}</strong>{' '}
+                        to the account above.
+                      </span>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
 
-            <div style={{ padding: '0 4px', margin: '20px 0 28px' }}>
+            <div style={{ padding: '0 4px', margin: '16px 0 20px' }}>
               {appliedCoupon ? (
                 <>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
@@ -1885,8 +1971,20 @@ export default function CartPage() {
               <button className="modal-btn cancel" onClick={() => setShowConfirmModal(false)}>
                 Cancel
               </button>
-              <button className="modal-btn confirm" onClick={handlePlaceOrder}>
-                Place Order
+              <button
+                className="modal-btn confirm"
+                onClick={handlePlaceOrder}
+                disabled={paymentProcessing || bankReceiptUploading || (paymentMethod === 'bank_transfer' && (!bankTransferConfirmed || !bankReceipt))}
+                style={{ opacity: (paymentProcessing || bankReceiptUploading || (paymentMethod === 'bank_transfer' && (!bankTransferConfirmed || !bankReceipt))) ? 0.6 : 1, cursor: (paymentProcessing || bankReceiptUploading || (paymentMethod === 'bank_transfer' && (!bankTransferConfirmed || !bankReceipt))) ? 'not-allowed' : 'pointer' }}
+              >
+                {(paymentProcessing || bankReceiptUploading) ? (
+                  <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ animation: 'spin 1s linear infinite' }}><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+                    {bankReceiptUploading ? 'Uploading...' : 'Processing...'}
+                  </span>
+                ) : (
+                  paymentMethod === 'card' ? 'Pay via PayHere' : 'Place Order — Bank Transfer'
+                )}
               </button>
             </div>
           </div>

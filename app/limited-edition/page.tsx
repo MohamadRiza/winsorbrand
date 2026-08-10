@@ -524,7 +524,7 @@ function LimitedEditionContent() {
       </main>
 
       {/* ── NEWSLETTER FOOTER CARD ── */}
-      <NewsletterCard />
+      <NewsletterCard imageSrc="/Home1.webp" />
     </div>
   );
 }
