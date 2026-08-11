@@ -703,8 +703,8 @@ function MensCollectionContent() {
                 convertPrice={convertPrice}
                 addToCart={addToCart}
                 toggleWishlist={toggleWishlist}
-                isWishlisted={wishlist.includes(product._id)}
-                ratingData={reviewRatings[product._id]}
+                isWishlisted={Boolean(product._id && wishlist.includes(product._id))}
+                ratingData={product._id ? reviewRatings[product._id] : undefined}
               />
             ))}
           </div>

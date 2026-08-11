@@ -556,8 +556,8 @@ function NewArrivalsContent() {
                 convertPrice={convertPrice}
                 addToCart={addToCart}
                 toggleWishlist={toggleWishlist}
-                isWishlisted={wishlist.includes(p._id)}
-                ratingData={reviewRatings[p._id]}
+                isWishlisted={Boolean(p._id && wishlist.includes(p._id))}
+                ratingData={p._id ? reviewRatings[p._id] : undefined}
               />
             ))}
           </div>
