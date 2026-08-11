@@ -307,6 +307,17 @@ export default function CustomerCarePage() {
           font-weight: 500;
         }
 
+        .contact-link {
+          color: #8B6914;
+          text-decoration: none;
+          font-weight: 500;
+          transition: all 0.2s ease;
+        }
+        .contact-link:hover {
+          color: #1a1209;
+          text-decoration: underline;
+        }
+
         /* RIGHT COLUMN - SUPPORT FORM */
         .care-form-card {
           background-color: #ffffff;
@@ -630,7 +641,9 @@ export default function CustomerCarePage() {
                     </div>
                     <div>
                       <div className="info-label">Direct Concierge</div>
-                      <div className="info-value">+94 (11) 234-5678</div>
+                      <div className="info-value">
+                        <a href="tel:+94112345678" className="contact-link">+94 (11) 234-5678</a>
+                      </div>
                     </div>
                   </div>
 
@@ -654,16 +667,27 @@ export default function CustomerCarePage() {
                     </div>
                     <div>
                       <div className="info-label">Concierge Email</div>
-                      <div className="info-value">info@winsorbrand.com</div>
+                      <div className="info-value">
+                        <a href="mailto:support@winsorbrand.com" className="contact-link">support@winsorbrand.com</a>
+                      </div>
                     </div>
                   </div>
 
                   <div style={{ borderTop: '1px solid rgba(26,18,9,0.08)', paddingTop: '20px', marginTop: '28px' }}>
                     <div className="info-label" style={{ marginBottom: '8px' }}>Global Headquarters & Showroom</div>
-                    <p style={{ margin: 0, fontSize: '13px', color: 'rgba(26,18,9,0.5)', lineHeight: 1.45 }}>
-                      Winsor Brand Horology<br />
+                    <p style={{ margin: 0, fontSize: '13px', color: 'rgba(26,18,9,0.6)', lineHeight: 1.6 }}>
+                      <strong style={{ color: '#1a1209' }}>Winsor Brand Horology</strong><br />
                       Happy Time (Pvt) Ltd,<br />
-                      Colombo 11, Sri Lanka
+                      49A Keyzer Street, Pettah, Colombo 11, Sri Lanka<br />
+                      <span style={{ display: 'block', marginTop: '8px' }}>
+                        <span style={{ color: 'rgba(26,18,9,0.5)' }}>Mobile / Phone:</span>{' '}
+                        <a href="tel:+94112345678" className="contact-link">+94 (11) 234-5678</a>,{' '}
+                        <a href="tel:+94771234567" className="contact-link">+94 77 123 4567</a>
+                      </span>
+                      <span style={{ display: 'block', marginTop: '4px' }}>
+                        <span style={{ color: 'rgba(26,18,9,0.5)' }}>Email:</span>{' '}
+                        <a href="mailto:support@winsorbrand.com" className="contact-link">support@winsorbrand.com</a>
+                      </span>
                     </p>
                   </div>
                 </div>

@@ -511,7 +511,7 @@ export default function GuestOrderTrackingPage() {
 
                   <div style={{ background: '#faf7f0', border: '1px solid rgba(139,105,20,0.12)', borderRadius: 12, padding: '14px' }}>
                     <div style={{ fontSize: '9px', fontWeight: 700, color: 'rgba(26,18,9,0.4)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 4 }}>Client Name</div>
-                    <div style={{ fontSize: '12.5px', color: '#1a1209', fontWeight: 500, truncate: true }}>{order.guestName || 'Valued Client'}</div>
+                    <div style={{ fontSize: '12.5px', color: '#1a1209', fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{order.guestName || 'Valued Client'}</div>
                   </div>
 
                   <div style={{ background: '#faf7f0', border: '1px solid rgba(139,105,20,0.12)', borderRadius: 12, padding: '14px' }}>

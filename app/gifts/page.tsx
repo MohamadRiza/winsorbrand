@@ -7,6 +7,7 @@ import { useCurrency } from '@/app/context/CurrencyContext';
 import { useCart } from '@/app/context/CartContext';
 import { IGiftCategory, IProduct } from '@/types';
 import NewsletterCard from '@/components/NewsletterCard';
+import { toast } from 'react-hot-toast';
 
 const stripEmojis = (text: string) => {
   if (!text) return '';

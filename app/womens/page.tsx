@@ -53,15 +53,16 @@ const getWatchImageUrl = (p: IProduct): string => {
   if (!p) return '/womens-watch-highlight.png';
   if (p.thumbnail?.url) return p.thumbnail.url;
   if (typeof p.thumbnail === 'string' && p.thumbnail) return p.thumbnail;
-  if (Array.isArray(p.images) && p.images.length > 0) {
-    const img0 = p.images[0];
+  if (Array.isArray((p as any).images) && (p as any).images.length > 0) {
+    const img0 = (p as any).images[0];
     if (typeof img0 === 'string' && img0) return img0;
     if (img0?.url) return img0.url;
   }
   if (Array.isArray(p.colorVariants) && p.colorVariants.length > 0) {
-    const v0 = p.colorVariants[0];
-    if (Array.isArray(v0.images) && v0.images.length > 0) {
-      const vImg0 = v0.images[0];
+    const v0 = p.colorVariants[0] as any;
+    const vImgs = v0.images || v0.image;
+    if (Array.isArray(vImgs) && vImgs.length > 0) {
+      const vImg0 = vImgs[0];
       if (typeof vImg0 === 'string' && vImg0) return vImg0;
       if (vImg0?.url) return vImg0.url;
     }

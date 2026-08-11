@@ -297,10 +297,10 @@ export default function BuyNowModal({
           {/* Header */}
           <div className="bnm-header">
             <div>
-              <h2 style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:20, fontWeight:600, color:'#f3e3b8', margin:0, letterSpacing:'0.03em' }}>
+              <h2 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 20, fontWeight: 600, color: '#f3e3b8', margin: 0, letterSpacing: '0.03em' }}>
                 {step === 'confirm' ? 'Review Purchase' : step === 'payment' ? 'Select Payment' : 'Order Confirmed'}
               </h2>
-              <p style={{ fontSize:'10.5px', color:'rgba(212,175,55,0.7)', margin:'3px 0 0', letterSpacing:'0.08em', textTransform:'uppercase' }}>
+              <p style={{ fontSize: '10.5px', color: 'rgba(212,175,55,0.7)', margin: '3px 0 0', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
                 {step === 'confirm' ? 'Verify your delivery details' : step === 'payment' ? 'Choose how you would like to pay' : 'Your timepiece order is placed'}
               </p>
             </div>
@@ -312,9 +312,9 @@ export default function BuyNowModal({
             {step !== 'success' && (
               <div className="bnm-step-nav">
                 <div className={`bnm-step-dot ${step === 'confirm' ? 'active' : ''}`} />
-                <div style={{ flex:1, height:'1px', background:'rgba(139,105,20,0.15)' }} />
+                <div style={{ flex: 1, height: '1px', background: 'rgba(139,105,20,0.15)' }} />
                 <div className={`bnm-step-dot ${step === 'payment' ? 'active' : ''}`} />
-                <div style={{ flex:1, height:'1px', background:'rgba(139,105,20,0.15)' }} />
+                <div style={{ flex: 1, height: '1px', background: 'rgba(139,105,20,0.15)' }} />
                 <div className="bnm-step-dot" />
               </div>
             )}
@@ -324,15 +324,15 @@ export default function BuyNowModal({
               <>
                 <div className="bnm-section">
                   <div className="bnm-section-label">Timepiece</div>
-                  <div style={{ display:'flex', gap:12, alignItems:'center' }}>
+                  <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
                     <img src={item.productThumbnail || '/mens-watch-highlight.png'} alt={item.productTitle}
-                      style={{ width:56, height:56, objectFit:'contain', borderRadius:8, background:'#faf7f0', flexShrink:0 }} />
-                    <div style={{ flex:1, minWidth:0 }}>
-                      <div style={{ fontSize:'14px', fontWeight:600, color:'#1a1209' }}>{item.productTitle}</div>
-                      <div style={{ fontSize:'11px', color:'rgba(26,18,9,0.5)', marginTop:2 }}>
+                      style={{ width: 56, height: 56, objectFit: 'contain', borderRadius: 8, background: '#faf7f0', flexShrink: 0 }} />
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: '14px', fontWeight: 600, color: '#1a1209' }}>{item.productTitle}</div>
+                      <div style={{ fontSize: '11px', color: 'rgba(26,18,9,0.5)', marginTop: 2 }}>
                         Model: {item.productModelNo}{item.colorVariant && ` · ${item.colorVariant}`} · Qty: {item.quantity}
                       </div>
-                      <div style={{ fontSize:'17px', fontWeight:700, color:'#8b6914', fontFamily:'monospace', marginTop:6 }}>
+                      <div style={{ fontSize: '17px', fontWeight: 700, color: '#8b6914', fontFamily: 'monospace', marginTop: 6 }}>
                         LKR {subtotal.toLocaleString()}
                       </div>
                     </div>
@@ -342,31 +342,31 @@ export default function BuyNowModal({
                 {isProfileComplete ? (
                   <div className="bnm-section">
                     <div className="bnm-section-label">Delivering To</div>
-                    <div style={{ fontSize:'13px', color:'#1a1209', lineHeight:1.7 }}>
+                    <div style={{ fontSize: '13px', color: '#1a1209', lineHeight: 1.7 }}>
                       {profile?.address}, {profile?.city}, {profile?.postalCode}<br />
                       {profile?.country}<br />
-                      <span style={{ color:'rgba(26,18,9,0.6)', fontSize:'12px' }}>{profile?.mobileCode} {profile?.mobile}</span>
+                      <span style={{ color: 'rgba(26,18,9,0.6)', fontSize: '12px' }}>{profile?.mobileCode} {profile?.mobile}</span>
                     </div>
-                    <div style={{ fontSize:'10.5px', color:'rgba(26,18,9,0.4)', marginTop:8 }}>
+                    <div style={{ fontSize: '10.5px', color: 'rgba(26,18,9,0.4)', marginTop: 8 }}>
                       To change your address, visit{' '}
-                      <a href="/profile" style={{ color:'#8b6914', fontWeight:600 }}>Profile settings</a>.
+                      <a href="/profile" style={{ color: '#8b6914', fontWeight: 600 }}>Profile settings</a>.
                     </div>
                   </div>
                 ) : (
-                  <div style={{ background:'rgba(198,40,40,0.05)', border:'1px solid rgba(198,40,40,0.2)', borderRadius:10, padding:'14px 16px', marginBottom:14 }}>
-                    <div style={{ fontSize:'12.5px', color:'#c62828', fontWeight:600, marginBottom:4 }}>
+                  <div style={{ background: 'rgba(198,40,40,0.05)', border: '1px solid rgba(198,40,40,0.2)', borderRadius: 10, padding: '14px 16px', marginBottom: 14 }}>
+                    <div style={{ fontSize: '12.5px', color: '#c62828', fontWeight: 600, marginBottom: 4 }}>
                       Shipping address incomplete
                     </div>
-                    <div style={{ fontSize:'11.5px', color:'rgba(26,18,9,0.6)' }}>
+                    <div style={{ fontSize: '11.5px', color: 'rgba(26,18,9,0.6)' }}>
                       Please complete your address in{' '}
-                      <a href="/profile" style={{ color:'#8b6914', fontWeight:600 }}>Profile &#8594; Profile Details</a>{' '}
+                      <a href="/profile" style={{ color: '#8b6914', fontWeight: 600 }}>Profile &#8594; Profile Details</a>{' '}
                       before purchasing.
                     </div>
                   </div>
                 )}
 
                 {errorMsg && (
-                  <div style={{ background:'rgba(198,40,40,0.06)', border:'1px solid rgba(198,40,40,0.2)', borderRadius:10, padding:'12px 14px', marginBottom:14, fontSize:'12.5px', color:'#c62828' }}>
+                  <div style={{ background: 'rgba(198,40,40,0.06)', border: '1px solid rgba(198,40,40,0.2)', borderRadius: 10, padding: '12px 14px', marginBottom: 14, fontSize: '12.5px', color: '#c62828' }}>
                     {errorMsg}
                   </div>
                 )}
@@ -381,25 +381,25 @@ export default function BuyNowModal({
             {step === 'payment' && (
               <>
                 {/* Total bar */}
-                <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', padding:'10px 14px', background:'#fff', border:'1px solid rgba(139,105,20,0.15)', borderRadius:10, marginBottom:16 }}>
-                  <span style={{ fontSize:'12px', color:'rgba(26,18,9,0.55)', fontWeight:600, textTransform:'uppercase', letterSpacing:'0.08em' }}>Order Total</span>
-                  <span style={{ fontSize:'20px', fontWeight:700, color:'#8b6914', fontFamily:'monospace' }}>LKR {subtotal.toLocaleString()}</span>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 14px', background: '#fff', border: '1px solid rgba(139,105,20,0.15)', borderRadius: 10, marginBottom: 16 }}>
+                  <span style={{ fontSize: '12px', color: 'rgba(26,18,9,0.55)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Order Total</span>
+                  <span style={{ fontSize: '20px', fontWeight: 700, color: '#8b6914', fontFamily: 'monospace' }}>LKR {subtotal.toLocaleString()}</span>
                 </div>
 
-                <div style={{ fontSize:'10px', fontWeight:700, color:'rgba(26,18,9,0.45)', textTransform:'uppercase', letterSpacing:'0.1em', marginBottom:10 }}>Payment Method</div>
+                <div style={{ fontSize: '10px', fontWeight: 700, color: 'rgba(26,18,9,0.45)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 10 }}>Payment Method</div>
 
                 {/* PayHere */}
                 <button type="button" className={`bnm-pay-option ${payMethod === 'payhere' ? 'active' : ''}`} onClick={() => setPayMethod('payhere')}>
                   <div className={`bnm-radio ${payMethod === 'payhere' ? 'active' : ''}`} />
-                  <div style={{ flex:1 }}>
-                    <div style={{ display:'flex', alignItems:'center', gap:8 }}>
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8b6914" strokeWidth="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-                      <span style={{ fontWeight:700, fontSize:'13.5px', color:'#1a1209' }}>Pay via PayHere</span>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8b6914" strokeWidth="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2" /><line x1="1" y1="10" x2="23" y2="10" /></svg>
+                      <span style={{ fontWeight: 700, fontSize: '13.5px', color: '#1a1209' }}>Pay via PayHere</span>
                     </div>
-                    <div style={{ fontSize:'11px', color:'rgba(26,18,9,0.5)', marginTop:3 }}>Visa · Mastercard · Amex · eWallet · Bank · USSD</div>
+                    <div style={{ fontSize: '11px', color: 'rgba(26,18,9,0.5)', marginTop: 3 }}>Visa · Mastercard · Amex · eWallet · Bank · USSD</div>
                   </div>
                   {payMethod === 'payhere' && (
-                    <span style={{ fontSize:'9.5px', fontWeight:700, color:'#2e7d32', background:'rgba(46,125,50,0.1)', border:'1px solid rgba(46,125,50,0.25)', borderRadius:4, padding:'2px 8px', letterSpacing:'0.06em', textTransform:'uppercase', whiteSpace:'nowrap' }}>Secure</span>
+                    <span style={{ fontSize: '9.5px', fontWeight: 700, color: '#2e7d32', background: 'rgba(46,125,50,0.1)', border: '1px solid rgba(46,125,50,0.25)', borderRadius: 4, padding: '2px 8px', letterSpacing: '0.06em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>Secure</span>
                   )}
                 </button>
 
@@ -407,46 +407,46 @@ export default function BuyNowModal({
                 <button type="button" className={`bnm-pay-option ${payMethod === 'bank_transfer' ? 'active' : ''}`} onClick={() => setPayMethod('bank_transfer')}>
                   <div className={`bnm-radio ${payMethod === 'bank_transfer' ? 'active' : ''}`} />
                   <div>
-                    <div style={{ display:'flex', alignItems:'center', gap:8 }}>
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8b6914" strokeWidth="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-                      <span style={{ fontWeight:700, fontSize:'13.5px', color:'#1a1209' }}>Direct Bank Transfer</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8b6914" strokeWidth="2"><line x1="12" y1="1" x2="12" y2="23" /><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" /></svg>
+                      <span style={{ fontWeight: 700, fontSize: '13.5px', color: '#1a1209' }}>Direct Bank Transfer</span>
                     </div>
-                    <div style={{ fontSize:'11px', color:'rgba(26,18,9,0.5)', marginTop:3 }}>Transfer and upload receipt — verified within 24 hrs</div>
+                    <div style={{ fontSize: '11px', color: 'rgba(26,18,9,0.5)', marginTop: 3 }}>Transfer and upload receipt — verified within 24 hrs</div>
                   </div>
                 </button>
 
                 {payMethod === 'bank_transfer' && (
                   <>
                     <div className="bnm-bank-details">
-                      <div style={{ fontSize:'9.5px', fontWeight:700, color:'rgba(26,18,9,0.45)', textTransform:'uppercase', letterSpacing:'0.1em', marginBottom:8 }}>Bank Transfer Details</div>
-                      <div className="bnm-bank-row"><span style={{ color:'rgba(26,18,9,0.5)', fontSize:'11px' }}>Bank</span><span style={{ fontWeight:600 }}>Bank of Ceylon</span></div>
-                      <div className="bnm-bank-row"><span style={{ color:'rgba(26,18,9,0.5)', fontSize:'11px' }}>Account No.</span><span style={{ fontWeight:600, fontFamily:'monospace' }}>1234567890</span></div>
-                      <div className="bnm-bank-row"><span style={{ color:'rgba(26,18,9,0.5)', fontSize:'11px' }}>Branch</span><span style={{ fontWeight:600 }}>Main Branch</span></div>
-                      <div className="bnm-bank-row"><span style={{ color:'rgba(26,18,9,0.5)', fontSize:'11px' }}>Amount</span><span style={{ fontWeight:700, color:'#8b6914' }}>LKR {subtotal.toLocaleString()}</span></div>
+                      <div style={{ fontSize: '9.5px', fontWeight: 700, color: 'rgba(26,18,9,0.45)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 8 }}>Bank Transfer Details</div>
+                      <div className="bnm-bank-row"><span style={{ color: 'rgba(26,18,9,0.5)', fontSize: '11px' }}>Bank</span><span style={{ fontWeight: 600 }}>NATIONS TRUST BANK</span></div>
+                      <div className="bnm-bank-row"><span style={{ color: 'rgba(26,18,9,0.5)', fontSize: '11px' }}>Account No.</span><span style={{ fontWeight: 600, fontFamily: 'monospace' }}>100460045365</span></div>
+                      <div className="bnm-bank-row"><span style={{ color: 'rgba(26,18,9,0.5)', fontSize: '11px' }}>Branch</span><span style={{ fontWeight: 600 }}>Bankshall Street (PETTAH)</span></div>
+                      <div className="bnm-bank-row"><span style={{ color: 'rgba(26,18,9,0.5)', fontSize: '11px' }}>Amount</span><span style={{ fontWeight: 700, color: '#8b6914' }}>LKR {subtotal.toLocaleString()}</span></div>
                     </div>
 
-                    <label style={{ display:'block', fontSize:'9.5px', fontWeight:700, color:'rgba(26,18,9,0.55)', textTransform:'uppercase', letterSpacing:'0.1em', marginBottom:6 }}>Upload Transfer Receipt</label>
+                    <label style={{ display: 'block', fontSize: '9.5px', fontWeight: 700, color: 'rgba(26,18,9,0.55)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>Upload Transfer Receipt</label>
                     <div className="bnm-receipt-upload">
                       <input type="file" accept=".jpg,.jpeg,.png,.webp,.pdf" onChange={handleReceiptSelect} />
                       {bankReceiptName ? (
-                        <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:8 }}>
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2e7d32" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                          <span style={{ fontSize:'13px', color:'#2e7d32', fontWeight:600 }}>{bankReceiptName}</span>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2e7d32" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg>
+                          <span style={{ fontSize: '13px', color: '#2e7d32', fontWeight: 600 }}>{bankReceiptName}</span>
                         </div>
                       ) : (
                         <>
-                          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="rgba(139,105,20,0.5)" strokeWidth="1.5" style={{ marginBottom:6 }}><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
-                          <div style={{ fontSize:'12.5px', color:'rgba(26,18,9,0.6)', fontWeight:500 }}>Click to upload receipt</div>
-                          <div style={{ fontSize:'10.5px', color:'rgba(26,18,9,0.35)', marginTop:3 }}>PDF, JPG, PNG, WEBP · Max 10 MB</div>
+                          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="rgba(139,105,20,0.5)" strokeWidth="1.5" style={{ marginBottom: 6 }}><polyline points="16 16 12 12 8 16" /><line x1="12" y1="12" x2="12" y2="21" /><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3" /></svg>
+                          <div style={{ fontSize: '12.5px', color: 'rgba(26,18,9,0.6)', fontWeight: 500 }}>Click to upload receipt</div>
+                          <div style={{ fontSize: '10.5px', color: 'rgba(26,18,9,0.35)', marginTop: 3 }}>PDF, JPG, PNG, WEBP · Max 10 MB</div>
                         </>
                       )}
                     </div>
 
                     <div className="bnm-checkbox-row" onClick={() => setBankTransferConfirmed(v => !v)}>
                       <div className={`bnm-checkbox ${bankTransferConfirmed ? 'checked' : ''}`}>
-                        {bankTransferConfirmed && <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>}
+                        {bankTransferConfirmed && <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3"><polyline points="20 6 9 17 4 12" /></svg>}
                       </div>
-                      <span style={{ fontSize:'12.5px', color:'rgba(26,18,9,0.7)', lineHeight:1.5 }}>
+                      <span style={{ fontSize: '12.5px', color: 'rgba(26,18,9,0.7)', lineHeight: 1.5 }}>
                         I confirm I have transferred <strong>LKR {subtotal.toLocaleString()}</strong> to the account above.
                       </span>
                     </div>
@@ -454,7 +454,7 @@ export default function BuyNowModal({
                 )}
 
                 {errorMsg && (
-                  <div style={{ background:'rgba(198,40,40,0.06)', border:'1px solid rgba(198,40,40,0.2)', borderRadius:10, padding:'12px 14px', marginBottom:14, fontSize:'12.5px', color:'#c62828' }}>
+                  <div style={{ background: 'rgba(198,40,40,0.06)', border: '1px solid rgba(198,40,40,0.2)', borderRadius: 10, padding: '12px 14px', marginBottom: 14, fontSize: '12.5px', color: '#c62828' }}>
                     {errorMsg}
                   </div>
                 )}
@@ -466,7 +466,7 @@ export default function BuyNowModal({
                 >
                   {(submitting || bankReceiptUploading) ? (
                     <>
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ animation:'bnm-spin 1s linear infinite' }}><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ animation: 'bnm-spin 1s linear infinite' }}><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" /></svg>
                       {bankReceiptUploading ? 'Uploading Receipt...' : 'Processing...'}
                     </>
                   ) : (
@@ -479,34 +479,34 @@ export default function BuyNowModal({
 
             {/* ── STEP 3: Success ── */}
             {step === 'success' && (
-              <div style={{ textAlign:'center', padding:'10px 0 6px' }}>
-                <div style={{ width:72, height:72, borderRadius:'50%', background:'linear-gradient(135deg,rgba(46,125,50,0.12),rgba(46,125,50,0.06))', border:'2px solid rgba(46,125,50,0.35)', display:'flex', alignItems:'center', justifyContent:'center', margin:'0 auto 16px', boxShadow:'0 8px 20px rgba(46,125,50,0.15)' }}>
-                  <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#2e7d32" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              <div style={{ textAlign: 'center', padding: '10px 0 6px' }}>
+                <div style={{ width: 72, height: 72, borderRadius: '50%', background: 'linear-gradient(135deg,rgba(46,125,50,0.12),rgba(46,125,50,0.06))', border: '2px solid rgba(46,125,50,0.35)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', boxShadow: '0 8px 20px rgba(46,125,50,0.15)' }}>
+                  <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#2e7d32" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg>
                 </div>
-                <h3 style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:'26px', color:'#1a1209', fontWeight:600, margin:'0 0 6px' }}>Order Confirmed!</h3>
-                <p style={{ fontSize:'13px', color:'rgba(26,18,9,0.6)', lineHeight:1.6, margin:'0 0 16px' }}>
+                <h3 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: '26px', color: '#1a1209', fontWeight: 600, margin: '0 0 6px' }}>Order Confirmed!</h3>
+                <p style={{ fontSize: '13px', color: 'rgba(26,18,9,0.6)', lineHeight: 1.6, margin: '0 0 16px' }}>
                   {payMethod === 'payhere' ? 'Payment successful! Your timepiece order has been placed.' : 'Your order is placed. We will verify your bank transfer within 24 hours.'}
                 </p>
                 {payMethod === 'bank_transfer' && (
-                  <div style={{ fontSize:'11.5px', color:'rgba(26,18,9,0.5)', background:'rgba(139,105,20,0.06)', border:'1px solid rgba(139,105,20,0.15)', borderRadius:8, padding:'8px 12px', marginBottom:16, textAlign:'left' }}>
+                  <div style={{ fontSize: '11.5px', color: 'rgba(26,18,9,0.5)', background: 'rgba(139,105,20,0.06)', border: '1px solid rgba(139,105,20,0.15)', borderRadius: 8, padding: '8px 12px', marginBottom: 16, textAlign: 'left' }}>
                     Receipt uploaded successfully. Our team will verify and update your order status within 24 hours.
                   </div>
                 )}
-                <div style={{ background:'linear-gradient(135deg,#1a1209,#2d1f0a)', border:'1px solid rgba(212,175,55,0.35)', borderRadius:'16px', padding:'18px 22px', marginBottom:16, boxShadow:'0 12px 30px rgba(0,0,0,0.2)' }}>
-                  <div style={{ fontSize:'9.5px', fontWeight:700, color:'rgba(212,175,55,0.75)', textTransform:'uppercase', letterSpacing:'0.15em', marginBottom:10 }}>Order Reference Code</div>
-                  <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:10 }}>
-                    <span style={{ fontSize:'22px', fontFamily:'Jost,monospace', color:'#d4af37', fontWeight:700, letterSpacing:'0.08em' }}>{orderRef}</span>
-                    <button type="button" onClick={handleCopyRef} style={{ background: copiedRef ? 'rgba(46,125,50,0.25)' : 'rgba(212,175,55,0.15)', border:`1px solid ${copiedRef ? '#2e7d32' : '#d4af37'}`, color: copiedRef ? '#81c784' : '#f3e3b8', borderRadius:'8px', padding:'6px 10px', cursor:'pointer', display:'inline-flex', alignItems:'center', gap:6, fontSize:'11px', fontWeight:600, fontFamily:'Jost,sans-serif', transition:'all 0.2s ease' }}>
+                <div style={{ background: 'linear-gradient(135deg,#1a1209,#2d1f0a)', border: '1px solid rgba(212,175,55,0.35)', borderRadius: '16px', padding: '18px 22px', marginBottom: 16, boxShadow: '0 12px 30px rgba(0,0,0,0.2)' }}>
+                  <div style={{ fontSize: '9.5px', fontWeight: 700, color: 'rgba(212,175,55,0.75)', textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: 10 }}>Order Reference Code</div>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10 }}>
+                    <span style={{ fontSize: '22px', fontFamily: 'Jost,monospace', color: '#d4af37', fontWeight: 700, letterSpacing: '0.08em' }}>{orderRef}</span>
+                    <button type="button" onClick={handleCopyRef} style={{ background: copiedRef ? 'rgba(46,125,50,0.25)' : 'rgba(212,175,55,0.15)', border: `1px solid ${copiedRef ? '#2e7d32' : '#d4af37'}`, color: copiedRef ? '#81c784' : '#f3e3b8', borderRadius: '8px', padding: '6px 10px', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: '11px', fontWeight: 600, fontFamily: 'Jost,sans-serif', transition: 'all 0.2s ease' }}>
                       {copiedRef ? (
-                        <><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>Copied!</>
+                        <><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg>Copied!</>
                       ) : (
-                        <><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copy Code</>
+                        <><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg>Copy Code</>
                       )}
                     </button>
                   </div>
                 </div>
-                <button type="button" onClick={handleDownloadReceipt} style={{ width:'100%', padding:'13px', background:'linear-gradient(135deg,#8b6914 0%,#a67c1e 100%)', color:'#ffffff', border:'none', borderRadius:'10px', cursor:'pointer', fontFamily:'Jost,sans-serif', fontSize:'12px', fontWeight:700, letterSpacing:'0.1em', textTransform:'uppercase', marginBottom:10, display:'flex', alignItems:'center', justifyContent:'center', gap:8, boxShadow:'0 4px 16px rgba(139,105,20,0.25)', transition:'all 0.2s ease' }}>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                <button type="button" onClick={handleDownloadReceipt} style={{ width: '100%', padding: '13px', background: 'linear-gradient(135deg,#8b6914 0%,#a67c1e 100%)', color: '#ffffff', border: 'none', borderRadius: '10px', cursor: 'pointer', fontFamily: 'Jost,sans-serif', fontSize: '12px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, boxShadow: '0 4px 16px rgba(139,105,20,0.25)', transition: 'all 0.2s ease' }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" /></svg>
                   Download Receipt (PDF)
                 </button>
                 <button className="bnm-btn-primary" onClick={onClose}>Done</button>

@@ -53,15 +53,16 @@ const getWatchImageUrl = (p: IProduct): string => {
   if (!p) return '/mens-watch-highlight.png';
   if (p.thumbnail?.url) return p.thumbnail.url;
   if (typeof p.thumbnail === 'string' && p.thumbnail) return p.thumbnail;
-  if (Array.isArray(p.images) && p.images.length > 0) {
-    const img0 = p.images[0];
+  if (Array.isArray((p as any).images) && (p as any).images.length > 0) {
+    const img0 = (p as any).images[0];
     if (typeof img0 === 'string' && img0) return img0;
     if (img0?.url) return img0.url;
   }
   if (Array.isArray(p.colorVariants) && p.colorVariants.length > 0) {
-    const v0 = p.colorVariants[0];
-    if (Array.isArray(v0.images) && v0.images.length > 0) {
-      const vImg0 = v0.images[0];
+    const v0 = p.colorVariants[0] as any;
+    const vImgs = v0.images || v0.image;
+    if (Array.isArray(vImgs) && vImgs.length > 0) {
+      const vImg0 = vImgs[0];
       if (typeof vImg0 === 'string' && vImg0) return vImg0;
       if (vImg0?.url) return vImg0.url;
     }
@@ -691,7 +692,7 @@ function MensCollectionContent() {
           <div style={{ textAlign: 'center', padding: '80px 20px', background: '#fff', borderRadius: '12px', border: '1px border rgba(26,18,9,0.06)' }}>
             <h3 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '24px', margin: '0 0 10px' }}>No Timepieces Found</h3>
             <p style={{ color: 'rgba(26,18,9,0.5)', fontSize: '13px', margin: '0 0 20px' }}>Try resetting your filter selection or search query.</p>
-            <button onClick={() => { setSelectedSection('all'); setSelectedGender('all'); setSearchQuery(''); }} style={{ padding: '10px 24px', background: '#8b6914', color: '#fff', border: 'none', borderRadius: '4px', fontSize: '11px', letterSpacing: '0.15em', textTransform: 'uppercase', cursor: 'pointer' }}>Reset All Filters</button>
+            <button onClick={() => { setSelectedSection('all'); setSearchQuery(''); }} style={{ padding: '10px 24px', background: '#8b6914', color: '#fff', border: 'none', borderRadius: '4px', fontSize: '11px', letterSpacing: '0.15em', textTransform: 'uppercase', cursor: 'pointer' }}>Reset All Filters</button>
           </div>
         ) : (
           <div className="product-grid">

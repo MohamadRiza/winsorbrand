@@ -369,7 +369,7 @@ export function generateReceiptPdf(data: ReceiptData) {
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(7.5);
   doc.setTextColor(textGray[0], textGray[1], textGray[2]);
-  doc.text('Thank you for choosing Winsor Maison. For order inquiries or support, visit winsorbrand.com or email info@winsorbrand.com', pageWidth / 2, footerY, { align: 'center' });
+  doc.text('Thank you for choosing Winsor Maison. For order inquiries or support, visit winsorbrand.com or email support@winsorbrand.com', pageWidth / 2, footerY, { align: 'center' });
 
   doc.setFontSize(6.5);
   doc.setTextColor(150, 150, 150);
