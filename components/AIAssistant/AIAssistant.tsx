@@ -26,11 +26,32 @@ export default function AIAssistant() {
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const recognitionRef = useRef<any>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   // Auto-scroll to bottom of messages
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, loading]);
+
+  // Auto-focus input when chat window opens
+  useEffect(() => {
+    if (isOpen) {
+      const timer = setTimeout(() => {
+        inputRef.current?.focus();
+      }, 150);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen]);
+
+  // Pre-fetch SpeechSynthesis voices on mount
+  useEffect(() => {
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      window.speechSynthesis.getVoices();
+      window.speechSynthesis.onvoiceschanged = () => {
+        window.speechSynthesis.getVoices();
+      };
+    }
+  }, []);
 
   // Initialize Speech Recognition
   useEffect(() => {
@@ -45,6 +66,7 @@ export default function AIAssistant() {
         const transcript = event.results[0][0].transcript;
         setInput(transcript);
         toast.success('Speech recognized');
+        setTimeout(() => inputRef.current?.focus(), 50);
       };
 
       rec.onerror = (event: any) => {
@@ -65,49 +87,68 @@ export default function AIAssistant() {
 
       rec.onend = () => {
         setIsListening(false);
+        setTimeout(() => inputRef.current?.focus(), 50);
       };
 
       recognitionRef.current = rec;
     }
   }, []);
 
-  // Helper to select high-quality female/lady voice for Winsi AI
+  // Helper to select ultra-natural female/lady voice for Winsi AI (Gemini quality)
   const selectLadyVoice = (voices: SpeechSynthesisVoice[]): SpeechSynthesisVoice | null => {
     if (!voices || voices.length === 0) return null;
     const enVoices = voices.filter(v => v.lang.startsWith('en'));
     const candidatePool = enVoices.length > 0 ? enVoices : voices;
 
+    // Top priority natural/neural female voices across Chrome, Edge, Safari, iOS, Android, Windows
     const femalePriorityKeywords = [
-      'jenny', 'zira', 'samantha', 'aria', 'victoria', 'karen', 'sonia', 'fiona',
-      'veena', 'moira', 'hazel', 'susan', 'catherine', 'female', 'google us english female',
-      'google uk english female', 'microsoft jenny', 'microsoft zira'
+      'google us english',
+      'google uk english female',
+      'google assistant',
+      'microsoft aria online (natural)',
+      'microsoft jenny online (natural)',
+      'microsoft sonia online (natural)',
+      'microsoft emma online (natural)',
+      'microsoft zira',
+      'samantha',
+      'karen',
+      'victoria',
+      'fiona',
+      'aria',
+      'jenny',
+      'zira',
+      'female'
     ];
 
-    // 1. Check for Neural / Natural / Premium female voices
+    // 1. Priority match for Natural / Neural / Google voices
     for (const kw of femalePriorityKeywords) {
       const found = candidatePool.find(v => {
         const name = v.name.toLowerCase();
-        return name.includes(kw) && (name.includes('natural') || name.includes('online') || name.includes('neural') || name.includes('google'));
+        return name.includes(kw);
       });
       if (found) return found;
     }
 
-    // 2. Check for any known female voice name (e.g. Zira, Samantha, Jenny, Karen, Victoria)
-    for (const kw of femalePriorityKeywords) {
-      const found = candidatePool.find(v => v.name.toLowerCase().includes(kw));
-      if (found) return found;
-    }
-
-    // 3. Fallback to any voice with 'female' in name
+    // 2. Fallback to any voice with 'female' in name
     const fallbackFemale = candidatePool.find(v => v.name.toLowerCase().includes('female'));
     if (fallbackFemale) return fallbackFemale;
 
-    // 4. Default to first English voice
     return candidatePool[0] || null;
   };
 
+  // Clean Markdown formatting for clear natural voice reading
+  const cleanTextForSpeech = (text: string): string => {
+    return text
+      .replace(/\*\*(.*?)\*\*/g, '$1')
+      .replace(/\*(.*?)\*/g, '$1')
+      .replace(/#(.*?)\n/g, '$1 ')
+      .replace(/\[(.*?)\]\(.*?\)/g, '$1')
+      .replace(/[`~]/g, '')
+      .trim();
+  };
+
   // Handle Speech Output (Text-To-Speech)
-  const speakText = (text: string, messageIndex: number) => {
+  const speakText = (rawText: string, messageIndex: number) => {
     if (!('speechSynthesis' in window)) {
       toast.error('Speech synthesis is not supported on this browser');
       return;
@@ -121,8 +162,10 @@ export default function AIAssistant() {
       return;
     }
 
+    const cleanSpeechText = cleanTextForSpeech(rawText);
+
     // Create new speech utterance
-    const utterance = new SpeechSynthesisUtterance(text);
+    const utterance = new SpeechSynthesisUtterance(cleanSpeechText);
     
     // Select high-quality Female / Lady Voice for Winsi AI
     const voices = window.speechSynthesis.getVoices();
@@ -131,8 +174,8 @@ export default function AIAssistant() {
       utterance.voice = ladyVoice;
     }
     
-    utterance.rate = 1.0;
-    utterance.pitch = 1.15; // Elegant, warm pitch for Winsi AI female voice
+    utterance.rate = 0.97; // Natural, unhurried speaking pace
+    utterance.pitch = 1.06; // Smooth, warm natural female frequency
 
     utterance.onend = () => {
       setMessages(prev => prev.map((msg, i) => i === messageIndex ? { ...msg, isAudioPlaying: false } : msg));
@@ -177,6 +220,9 @@ export default function AIAssistant() {
     setMessages(newMessages);
     setLoading(true);
 
+    // Keep focus on input immediately
+    setTimeout(() => inputRef.current?.focus(), 10);
+
     try {
       const res = await fetch('/api/chat', {
         method: 'POST',
@@ -207,6 +253,8 @@ export default function AIAssistant() {
       ]);
     } finally {
       setLoading(false);
+      // Re-focus text input so user can type next message without clicking!
+      setTimeout(() => inputRef.current?.focus(), 50);
     }
   };
 
@@ -670,12 +718,12 @@ export default function AIAssistant() {
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v1a7 7 0 0 1-14 0v-1"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
           </button>
           <input
+            ref={inputRef}
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Ask Winsi about watches..."
             className="ai-chat-input"
-            disabled={loading}
           />
           <button 
             type="submit" 
