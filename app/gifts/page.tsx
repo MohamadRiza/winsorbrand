@@ -180,65 +180,40 @@ export default function GiftsPage() {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300&family=Jost:wght@300;400;500;600&display=swap');
 
-        /* ── HERO BANNER ── */
-        .gifts-hero-banner {
-          position: relative;
-          background: radial-gradient(circle at right, #242220 0%, #0a0a0a 100%);
-          color: #fff;
-          display: flex;
+        /* ── HERO BANNER (VIDEO + IMAGE COMBINED) ── */
+        .gifts-hero-grid {
+          display: grid;
+          grid-template-columns: 1.1fr 0.9fr;
+          gap: 48px;
           align-items: center;
-          justify-content: space-between;
-          overflow: hidden;
-          padding: 130px 6% 60px;
-          min-height: 520px;
-          margin-bottom: 0;
-          border-bottom: 1.5px solid rgba(139,105,20,0.15);
-        }
-        .hero-banner-content {
-          max-width: 48%;
+          max-width: 1320px;
+          margin: 0 auto;
           position: relative;
           z-index: 10;
+          width: 100%;
         }
-        .hero-banner-tag {
-          color: #8b6914;
-          font-size: 10px;
-          letter-spacing: 0.35em;
-          font-weight: 600;
-          text-transform: uppercase;
-          margin-bottom: 18px;
-          display: block;
+        .gifts-hero-img-card {
+          position: relative;
+          height: 380px;
+          border-radius: 14px;
+          overflow: hidden;
+          border: 1px solid rgba(139,105,20,0.4);
+          box-shadow: 0 24px 60px rgba(0,0,0,0.6);
+          transition: transform 0.4s ease, border-color 0.4s ease;
         }
-        .hero-banner-title {
-          font-family: 'Cormorant Garamond', serif;
-          font-size: clamp(32px, 4vw, 56px);
-          line-height: 1.15;
-          font-weight: 300;
-          letter-spacing: 0.02em;
-          margin-bottom: 20px;
-          color: #fff;
-        }
-        .hero-banner-desc {
-          font-family: 'Cormorant Garamond', serif;
-          font-style: italic;
-          font-size: clamp(15px, 2vw, 20px);
-          color: rgba(255,255,255,0.7);
-          line-height: 1.45;
-          margin-bottom: 36px;
-        }
-        .hero-banner-actions {
-          display: flex;
-          gap: 16px;
-          align-items: center;
+        .gifts-hero-img-card:hover {
+          transform: translateY(-4px) scale(1.015);
+          border-color: rgba(223,177,91,0.8);
         }
         .hero-btn-primary {
           background: #8b6914;
           color: #fff;
           border: none;
-          padding: 14px 30px;
+          padding: 12px 26px;
           font-size: 11px;
           letter-spacing: 0.15em;
           text-transform: uppercase;
-          font-weight: 500;
+          font-weight: 600;
           cursor: pointer;
           transition: all 0.3s ease;
           border-radius: 4px;
@@ -246,30 +221,26 @@ export default function GiftsPage() {
         .hero-btn-primary:hover {
           background: #a37c17;
           transform: translateY(-2px);
+          box-shadow: 0 6px 20px rgba(139,105,20,0.35);
         }
-        .hero-banner-image-container {
-          position: absolute;
-          right: 0;
-          top: 0;
-          height: 100%;
-          width: 50%;
-          z-index: 1;
-        }
-        .hero-banner-watch-bg {
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          background: linear-gradient(to right, #0a0a0a 0%, transparent 40%);
-          z-index: 2;
-        }
-        .hero-banner-watch-img {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-          position: relative;
-          z-index: 1;
+        @media (max-width: 900px) {
+          .gifts-hero-grid {
+            grid-template-columns: 1fr;
+            text-align: center;
+            gap: 32px;
+          }
+          .gifts-hero-text-block {
+            text-align: center !important;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+          }
+          .gifts-hero-img-card {
+            height: 240px;
+            max-width: 480px;
+            margin: 0 auto;
+            width: 100%;
+          }
         }
 
         /* ── BODY CONTAINER ── */
@@ -918,28 +889,75 @@ export default function GiftsPage() {
         }
       `}</style>
 
-      {/* HERO BANNER SECTION */}
-      <section className="gifts-hero-banner">
-        <div className="hero-banner-content">
-          <span className="hero-banner-tag">THE ART OF GIVING</span>
-          <h1 className="hero-banner-title">Curated Gifts for Memorable Milestones</h1>
-          <div className="hero-banner-desc" style={{ marginBottom: '36px' }}>
-            Express your gratitude and love with a timeless Winsor timepiece. Crafted with Japanese movements and Dubai verification.
-          </div>
-          <div className="hero-banner-actions">
-            <button className="hero-btn-primary" onClick={() => setSelectedCategorySlug('all')}>EXPLORE ALL GIFTS</button>
-          </div>
-        </div>
+      {/* ── HERO BANNER (VIDEO + IMAGE COMBINED) ── */}
+      <section 
+        style={{ 
+          position: 'relative', 
+          minHeight: 'min(82vh, 680px)', 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'center', 
+          overflow: 'hidden',
+          color: '#ffffff',
+          padding: '130px 24px 70px',
+          background: '#0a0a0a'
+        }}
+      >
+        {/* Background Video */}
+        <video 
+          src="/winsor_gift_vid.webm" 
+          autoPlay 
+          muted 
+          loop 
+          playsInline 
+          style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 1, opacity: 0.55 }}
+        />
 
-        <div className="hero-banner-image-container">
-          <div className="hero-banner-watch-bg" />
-          <Image
-            src="/graduation_gift.png"
-            alt="Winsor Gifting Collection"
-            fill
-            priority
-            className="hero-banner-watch-img"
-          />
+        {/* Gradient Overlay */}
+        <div 
+          style={{ position: 'absolute', inset: 0, zIndex: 2, background: 'linear-gradient(180deg, rgba(10,8,5,0.85) 0%, rgba(10,8,5,0.65) 50%, rgba(10,8,5,0.95) 100%)' }} 
+        />
+
+        {/* Foreground Content */}
+        <div className="gifts-hero-grid">
+          {/* Left Column: Text & Badge */}
+          <div style={{ textAlign: 'left' }} className="gifts-hero-text-block">
+            <div style={{ fontSize: '10px', letterSpacing: '0.28em', color: '#dfb15b', textTransform: 'uppercase', fontWeight: 600, marginBottom: '12px' }}>
+              THE ART OF GIVING
+            </div>
+            <h1 style={{ fontFamily: "'Cinzel', 'Cormorant Garamond', Georgia, serif", fontSize: 'clamp(26px, 3.4vw, 44px)', fontWeight: 600, lineHeight: 1.15, margin: '0 0 14px', letterSpacing: '0.02em', color: '#fff' }}>
+              Curated Gifts for Memorable Milestones
+            </h1>
+            <p style={{ fontFamily: "'Jost', sans-serif", fontSize: 'clamp(13px, 1.1vw, 15px)', lineHeight: 1.6, color: 'rgba(255,255,255,0.82)', maxWidth: '480px', margin: '0 0 22px', fontWeight: 300 }}>
+              Express your gratitude and love with a timeless Winsor timepiece. Crafted with Japanese precision movements and Dubai-verified quality.
+            </p>
+            <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap', alignItems: 'center' }}>
+              <button className="hero-btn-primary" onClick={() => setSelectedCategorySlug('all')}>EXPLORE ALL GIFTS</button>
+              <div style={{ padding: '8px 18px', background: 'rgba(139,105,20,0.2)', border: '1px solid rgba(223,177,91,0.45)', borderRadius: '20px', fontSize: '10px', letterSpacing: '0.18em', textTransform: 'uppercase', fontWeight: 600, color: '#dfb15b' }}>
+                {filteredProducts.length} TIMEPIECE GIFTS AVAILABLE
+              </div>
+            </div>
+          </div>
+
+          {/* Right Column: Featured Image Card */}
+          <div className="gifts-hero-img-card">
+            <Image 
+              src="/graduation_gift.png" 
+              alt="Winsor Gifting Collection" 
+              fill 
+              sizes="(max-width: 900px) 100vw, 500px" 
+              style={{ objectFit: 'cover', objectPosition: 'center' }}
+              priority
+            />
+            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(10,8,5,0.85) 0%, transparent 60%)' }} />
+            <div style={{ position: 'absolute', bottom: '20px', left: '20px', right: '20px', zIndex: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+              <div>
+                <span style={{ fontSize: '9px', letterSpacing: '0.25em', color: '#dfb15b', textTransform: 'uppercase', fontWeight: 600, display: 'block' }}>WINSOR LUXURY GIFTS</span>
+                <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '20px', color: '#ffffff', fontWeight: 500 }}>The Art of Giving</span>
+              </div>
+              <span style={{ fontSize: '10px', letterSpacing: '0.15em', color: 'rgba(255,255,255,0.7)', border: '1px solid rgba(255,255,255,0.2)', padding: '4px 10px', borderRadius: '4px' }}>DUBAI & SRI LANKA</span>
+            </div>
+          </div>
         </div>
       </section>
 

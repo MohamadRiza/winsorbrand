@@ -147,7 +147,7 @@ export default function GuestCheckoutModal({
   const handleReceiptSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const allowed = ['image/jpeg','image/jpg','image/png','image/webp','application/pdf'];
+    const allowed = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'application/pdf'];
     if (!allowed.includes(file.type)) { toast.error('Invalid file. Please upload a PDF, JPG, PNG, or WEBP.'); return; }
     if (file.size > 10 * 1024 * 1024) { toast.error('File too large. Maximum receipt size is 10 MB.'); return; }
     setBankReceipt(file); setBankReceiptName(file.name);
@@ -802,78 +802,78 @@ export default function GuestCheckoutModal({
             {step === 'payment' && (
               <div>
                 {/* Total bar */}
-                <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', padding:'10px 14px', background:'#fff', border:'1px solid rgba(139,105,20,0.15)', borderRadius:10, marginBottom:16 }}>
-                  <span style={{ fontSize:'12px', color:'rgba(26,18,9,0.55)', fontWeight:600, textTransform:'uppercase', letterSpacing:'0.08em' }}>Order Total</span>
-                  <span style={{ fontSize:'20px', fontWeight:700, color:'#8b6914', fontFamily:'monospace' }}>LKR {subtotal.toLocaleString()}</span>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 14px', background: '#fff', border: '1px solid rgba(139,105,20,0.15)', borderRadius: 10, marginBottom: 16 }}>
+                  <span style={{ fontSize: '12px', color: 'rgba(26,18,9,0.55)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Order Total</span>
+                  <span style={{ fontSize: '20px', fontWeight: 700, color: '#8b6914', fontFamily: 'monospace' }}>LKR {subtotal.toLocaleString()}</span>
                 </div>
 
-                <div style={{ fontSize:'10px', fontWeight:700, color:'rgba(26,18,9,0.45)', textTransform:'uppercase', letterSpacing:'0.1em', marginBottom:10 }}>Payment Method</div>
+                <div style={{ fontSize: '10px', fontWeight: 700, color: 'rgba(26,18,9,0.45)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 10 }}>Payment Method</div>
 
                 {/* PayHere option */}
                 <button type="button" onClick={() => setPayMethod('payhere')}
-                  style={{ border:`2px solid ${payMethod === 'payhere' ? '#8b6914' : 'rgba(139,105,20,0.2)'}`, borderRadius:12, padding:'14px 16px', cursor:'pointer', transition:'all 0.2s ease', background: payMethod === 'payhere' ? 'rgba(139,105,20,0.04)' : '#fff', display:'flex', alignItems:'center', gap:12, width:'100%', boxSizing:'border-box' as const, marginBottom:10, textAlign:'left' as const, boxShadow: payMethod === 'payhere' ? '0 0 0 3px rgba(139,105,20,0.08)' : 'none' }}>
-                  <div style={{ width:18, height:18, borderRadius:'50%', border:`2px solid ${payMethod === 'payhere' ? '#8b6914' : 'rgba(139,105,20,0.35)'}`, background: payMethod === 'payhere' ? '#8b6914' : 'transparent', flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center' }}>
-                    {payMethod === 'payhere' && <div style={{ width:6, height:6, background:'#fff', borderRadius:'50%' }} />}
+                  style={{ border: `2px solid ${payMethod === 'payhere' ? '#8b6914' : 'rgba(139,105,20,0.2)'}`, borderRadius: 12, padding: '14px 16px', cursor: 'pointer', transition: 'all 0.2s ease', background: payMethod === 'payhere' ? 'rgba(139,105,20,0.04)' : '#fff', display: 'flex', alignItems: 'center', gap: 12, width: '100%', boxSizing: 'border-box' as const, marginBottom: 10, textAlign: 'left' as const, boxShadow: payMethod === 'payhere' ? '0 0 0 3px rgba(139,105,20,0.08)' : 'none' }}>
+                  <div style={{ width: 18, height: 18, borderRadius: '50%', border: `2px solid ${payMethod === 'payhere' ? '#8b6914' : 'rgba(139,105,20,0.35)'}`, background: payMethod === 'payhere' ? '#8b6914' : 'transparent', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    {payMethod === 'payhere' && <div style={{ width: 6, height: 6, background: '#fff', borderRadius: '50%' }} />}
                   </div>
-                  <div style={{ flex:1 }}>
-                    <div style={{ display:'flex', alignItems:'center', gap:8 }}>
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8b6914" strokeWidth="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-                      <span style={{ fontWeight:700, fontSize:'13.5px', color:'#1a1209' }}>Pay via PayHere</span>
-                      <span style={{ fontSize:'9.5px', fontWeight:700, color:'#2e7d32', background:'rgba(46,125,50,0.1)', border:'1px solid rgba(46,125,50,0.25)', borderRadius:4, padding:'2px 8px', textTransform:'uppercase', letterSpacing:'0.06em' }}>Secure</span>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8b6914" strokeWidth="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2" /><line x1="1" y1="10" x2="23" y2="10" /></svg>
+                      <span style={{ fontWeight: 700, fontSize: '13.5px', color: '#1a1209' }}>Pay via PayHere</span>
+                      <span style={{ fontSize: '9.5px', fontWeight: 700, color: '#2e7d32', background: 'rgba(46,125,50,0.1)', border: '1px solid rgba(46,125,50,0.25)', borderRadius: 4, padding: '2px 8px', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Secure</span>
                     </div>
-                    <div style={{ fontSize:'11px', color:'rgba(26,18,9,0.5)', marginTop:3 }}>Visa · Mastercard · Amex · eWallet · Bank · USSD</div>
+                    <div style={{ fontSize: '11px', color: 'rgba(26,18,9,0.5)', marginTop: 3 }}>Visa · Mastercard · Amex · eWallet · Bank · USSD</div>
                   </div>
                 </button>
 
                 {/* Bank Transfer option */}
                 <button type="button" onClick={() => setPayMethod('bank_transfer')}
-                  style={{ border:`2px solid ${payMethod === 'bank_transfer' ? '#8b6914' : 'rgba(139,105,20,0.2)'}`, borderRadius:12, padding:'14px 16px', cursor:'pointer', transition:'all 0.2s ease', background: payMethod === 'bank_transfer' ? 'rgba(139,105,20,0.04)' : '#fff', display:'flex', alignItems:'center', gap:12, width:'100%', boxSizing:'border-box' as const, marginBottom:10, textAlign:'left' as const, boxShadow: payMethod === 'bank_transfer' ? '0 0 0 3px rgba(139,105,20,0.08)' : 'none' }}>
-                  <div style={{ width:18, height:18, borderRadius:'50%', border:`2px solid ${payMethod === 'bank_transfer' ? '#8b6914' : 'rgba(139,105,20,0.35)'}`, background: payMethod === 'bank_transfer' ? '#8b6914' : 'transparent', flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center' }}>
-                    {payMethod === 'bank_transfer' && <div style={{ width:6, height:6, background:'#fff', borderRadius:'50%' }} />}
+                  style={{ border: `2px solid ${payMethod === 'bank_transfer' ? '#8b6914' : 'rgba(139,105,20,0.2)'}`, borderRadius: 12, padding: '14px 16px', cursor: 'pointer', transition: 'all 0.2s ease', background: payMethod === 'bank_transfer' ? 'rgba(139,105,20,0.04)' : '#fff', display: 'flex', alignItems: 'center', gap: 12, width: '100%', boxSizing: 'border-box' as const, marginBottom: 10, textAlign: 'left' as const, boxShadow: payMethod === 'bank_transfer' ? '0 0 0 3px rgba(139,105,20,0.08)' : 'none' }}>
+                  <div style={{ width: 18, height: 18, borderRadius: '50%', border: `2px solid ${payMethod === 'bank_transfer' ? '#8b6914' : 'rgba(139,105,20,0.35)'}`, background: payMethod === 'bank_transfer' ? '#8b6914' : 'transparent', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    {payMethod === 'bank_transfer' && <div style={{ width: 6, height: 6, background: '#fff', borderRadius: '50%' }} />}
                   </div>
                   <div>
-                    <div style={{ display:'flex', alignItems:'center', gap:8 }}>
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8b6914" strokeWidth="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-                      <span style={{ fontWeight:700, fontSize:'13.5px', color:'#1a1209' }}>Direct Bank Transfer</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8b6914" strokeWidth="2"><line x1="12" y1="1" x2="12" y2="23" /><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" /></svg>
+                      <span style={{ fontWeight: 700, fontSize: '13.5px', color: '#1a1209' }}>Direct Bank Transfer</span>
                     </div>
-                    <div style={{ fontSize:'11px', color:'rgba(26,18,9,0.5)', marginTop:3 }}>Transfer and upload receipt — verified within 24 hrs</div>
+                    <div style={{ fontSize: '11px', color: 'rgba(26,18,9,0.5)', marginTop: 3 }}>Transfer and upload receipt — verified within 24 hrs</div>
                   </div>
                 </button>
 
                 {payMethod === 'bank_transfer' && (
                   <>
-                    <div style={{ background:'rgba(139,105,20,0.05)', border:'1px solid rgba(139,105,20,0.18)', borderRadius:10, padding:'12px 14px', marginBottom:12 }}>
-                      <div style={{ fontSize:'9.5px', fontWeight:700, color:'rgba(26,18,9,0.45)', textTransform:'uppercase', letterSpacing:'0.1em', marginBottom:8 }}>Bank Transfer Details</div>
-                      {[['Bank','Bank of Ceylon'],['Account No.','1234567890'],['Branch','Main Branch'],['Amount',`LKR ${subtotal.toLocaleString()}`]].map(([label,value],i) => (
-                        <div key={i} style={{ display:'flex', justifyContent:'space-between', fontSize:'12.5px', borderTop: i > 0 ? '1px solid rgba(139,105,20,0.1)' : undefined, marginTop: i > 0 ? 6 : 0, paddingTop: i > 0 ? 6 : 0, color:'#1a1209' }}>
-                          <span style={{ color:'rgba(26,18,9,0.5)', fontSize:'11px' }}>{label}</span>
+                    <div style={{ background: 'rgba(139,105,20,0.05)', border: '1px solid rgba(139,105,20,0.18)', borderRadius: 10, padding: '12px 14px', marginBottom: 12 }}>
+                      <div style={{ fontSize: '9.5px', fontWeight: 700, color: 'rgba(26,18,9,0.45)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 8 }}>Bank Transfer Details</div>
+                      {[['Bank', 'NATIONS TRUST BANK'], ['Account No.', '100460045365'], ['Branch', 'Bankshall Street (PETTAH)'], ['Amount', `LKR ${subtotal.toLocaleString()}`]].map(([label, value], i) => (
+                        <div key={i} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12.5px', borderTop: i > 0 ? '1px solid rgba(139,105,20,0.1)' : undefined, marginTop: i > 0 ? 6 : 0, paddingTop: i > 0 ? 6 : 0, color: '#1a1209' }}>
+                          <span style={{ color: 'rgba(26,18,9,0.5)', fontSize: '11px' }}>{label}</span>
                           <span style={{ fontWeight: label === 'Amount' ? 700 : 600, color: label === 'Amount' ? '#8b6914' : '#1a1209', fontFamily: label === 'Account No.' ? 'monospace' : undefined }}>{value}</span>
                         </div>
                       ))}
                     </div>
 
-                    <label style={{ display:'block', fontSize:'9.5px', fontWeight:700, color:'rgba(26,18,9,0.55)', textTransform:'uppercase', letterSpacing:'0.1em', marginBottom:6 }}>Upload Transfer Receipt</label>
-                    <div style={{ border:'2px dashed rgba(139,105,20,0.3)', borderRadius:10, padding:14, textAlign:'center', cursor:'pointer', position:'relative', overflow:'hidden', marginBottom:12 }}>
-                      <input type="file" accept=".jpg,.jpeg,.png,.webp,.pdf" onChange={handleReceiptSelect} style={{ position:'absolute', inset:0, opacity:0, cursor:'pointer', width:'100%', height:'100%' }} />
+                    <label style={{ display: 'block', fontSize: '9.5px', fontWeight: 700, color: 'rgba(26,18,9,0.55)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>Upload Transfer Receipt</label>
+                    <div style={{ border: '2px dashed rgba(139,105,20,0.3)', borderRadius: 10, padding: 14, textAlign: 'center', cursor: 'pointer', position: 'relative', overflow: 'hidden', marginBottom: 12 }}>
+                      <input type="file" accept=".jpg,.jpeg,.png,.webp,.pdf" onChange={handleReceiptSelect} style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer', width: '100%', height: '100%' }} />
                       {bankReceiptName ? (
-                        <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:8 }}>
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2e7d32" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                          <span style={{ fontSize:'13px', color:'#2e7d32', fontWeight:600 }}>{bankReceiptName}</span>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2e7d32" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg>
+                          <span style={{ fontSize: '13px', color: '#2e7d32', fontWeight: 600 }}>{bankReceiptName}</span>
                         </div>
                       ) : (
                         <>
-                          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="rgba(139,105,20,0.5)" strokeWidth="1.5" style={{ marginBottom:6 }}><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
-                          <div style={{ fontSize:'12.5px', color:'rgba(26,18,9,0.6)', fontWeight:500 }}>Click to upload receipt</div>
-                          <div style={{ fontSize:'10.5px', color:'rgba(26,18,9,0.35)', marginTop:3 }}>PDF, JPG, PNG, WEBP · Max 10 MB</div>
+                          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="rgba(139,105,20,0.5)" strokeWidth="1.5" style={{ marginBottom: 6 }}><polyline points="16 16 12 12 8 16" /><line x1="12" y1="12" x2="12" y2="21" /><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3" /></svg>
+                          <div style={{ fontSize: '12.5px', color: 'rgba(26,18,9,0.6)', fontWeight: 500 }}>Click to upload receipt</div>
+                          <div style={{ fontSize: '10.5px', color: 'rgba(26,18,9,0.35)', marginTop: 3 }}>PDF, JPG, PNG, WEBP · Max 10 MB</div>
                         </>
                       )}
                     </div>
 
-                    <div onClick={() => setBankTransferConfirmed(v => !v)} style={{ display:'flex', alignItems:'flex-start', gap:10, padding:'10px 0', cursor:'pointer', marginBottom:14 }}>
-                      <div style={{ width:18, height:18, border:`2px solid ${bankTransferConfirmed ? '#8b6914' : 'rgba(139,105,20,0.35)'}`, borderRadius:4, background: bankTransferConfirmed ? '#8b6914' : 'transparent', flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center', marginTop:1, transition:'all 0.2s ease' }}>
-                        {bankTransferConfirmed && <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>}
+                    <div onClick={() => setBankTransferConfirmed(v => !v)} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, padding: '10px 0', cursor: 'pointer', marginBottom: 14 }}>
+                      <div style={{ width: 18, height: 18, border: `2px solid ${bankTransferConfirmed ? '#8b6914' : 'rgba(139,105,20,0.35)'}`, borderRadius: 4, background: bankTransferConfirmed ? '#8b6914' : 'transparent', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 1, transition: 'all 0.2s ease' }}>
+                        {bankTransferConfirmed && <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3"><polyline points="20 6 9 17 4 12" /></svg>}
                       </div>
-                      <span style={{ fontSize:'12.5px', color:'rgba(26,18,9,0.7)', lineHeight:1.5 }}>
+                      <span style={{ fontSize: '12.5px', color: 'rgba(26,18,9,0.7)', lineHeight: 1.5 }}>
                         I confirm I have transferred <strong>LKR {subtotal.toLocaleString()}</strong> to the account above.
                       </span>
                     </div>
@@ -881,20 +881,20 @@ export default function GuestCheckoutModal({
                 )}
 
                 {errorMsg && (
-                  <div style={{ background:'rgba(198,40,40,0.06)', border:'1px solid rgba(198,40,40,0.2)', borderRadius:10, padding:'12px 14px', marginBottom:14, fontSize:'12.5px', color:'#c62828' }}>
+                  <div style={{ background: 'rgba(198,40,40,0.06)', border: '1px solid rgba(198,40,40,0.2)', borderRadius: 10, padding: '12px 14px', marginBottom: 14, fontSize: '12.5px', color: '#c62828' }}>
                     {errorMsg}
                   </div>
                 )}
 
                 <button
                   className="gcm-btn-primary"
-                  style={{ marginTop:0, display:'flex', alignItems:'center', justifyContent:'center', gap:8 }}
+                  style={{ marginTop: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
                   onClick={handlePay}
                   disabled={submitting || bankReceiptUploading || (payMethod === 'bank_transfer' && (!bankTransferConfirmed || !bankReceipt))}
                 >
                   {(submitting || bankReceiptUploading) ? (
                     <>
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ animation:'gcm-spin 1s linear infinite' }}><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ animation: 'gcm-spin 1s linear infinite' }}><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" /></svg>
                       {bankReceiptUploading ? 'Uploading Receipt...' : 'Processing...'}
                     </>
                   ) : (
@@ -929,7 +929,7 @@ export default function GuestCheckoutModal({
                   {payMethod === 'payhere' ? 'Payment successful. Your timepiece order has been placed.' : 'Your order is placed. We will verify your bank transfer within 24 hours.'}
                 </p>
                 {payMethod === 'bank_transfer' && (
-                  <div style={{ fontSize:'11.5px', color:'rgba(26,18,9,0.5)', background:'rgba(139,105,20,0.06)', border:'1px solid rgba(139,105,20,0.15)', borderRadius:8, padding:'8px 12px', marginBottom:12, textAlign:'left' }}>
+                  <div style={{ fontSize: '11.5px', color: 'rgba(26,18,9,0.5)', background: 'rgba(139,105,20,0.06)', border: '1px solid rgba(139,105,20,0.15)', borderRadius: 8, padding: '8px 12px', marginBottom: 12, textAlign: 'left' }}>
                     Receipt uploaded. Our team will verify and update your order status within 24 hours.
                   </div>
                 )}

@@ -16,7 +16,7 @@ export default function CartPage() {
 
   // Selection state
   const [selectedItems, setSelectedItems] = useState<{ [key: string]: boolean }>({});
-  
+
   // Profile state
   const [profile, setProfile] = useState<any>(null);
   const [profileLoading, setProfileLoading] = useState(false);
@@ -329,7 +329,7 @@ export default function CartPage() {
 
   const selectedCount = selectedItemsList.reduce((acc, item) => acc + item.quantity, 0);
 
-  const hasGiftItem = selectedItemsList.some(item => 
+  const hasGiftItem = selectedItemsList.some(item =>
     item.product?.giftCategories && item.product.giftCategories.length > 0
   );
 
@@ -458,23 +458,23 @@ export default function CartPage() {
             reject(new Error(`Payment failed: ${error}`));
 
           payhere.startPayment({
-            sandbox:     hashData.data.isSandbox,
+            sandbox: hashData.data.isSandbox,
             merchant_id: hashData.data.merchantId,
-            return_url:  '',
-            cancel_url:  '',
-            notify_url:  `${window.location.origin}/api/payment/payhere-notify`,
-            order_id:    ref,
-            items:       `Winsor Atelier Timepieces (${selectedCount} item${selectedCount > 1 ? 's' : ''})`,
-            amount:      finalAmount.toFixed(2),
-            currency:    'LKR',
-            first_name:  user?.firstName || 'Valued',
-            last_name:   user?.lastName  || 'Client',
-            email:       user?.emailAddresses?.[0]?.emailAddress || profile?.email || '',
-            phone:       `${profile?.mobileCode || ''}${profile?.mobile || ''}`.replace(/\s/g, ''),
-            address:     profile?.address || '',
-            city:        profile?.city    || '',
-            country:     profile?.country || 'Sri Lanka',
-            hash:        hashData.data.hash,
+            return_url: '',
+            cancel_url: '',
+            notify_url: `${window.location.origin}/api/payment/payhere-notify`,
+            order_id: ref,
+            items: `Winsor Atelier Timepieces (${selectedCount} item${selectedCount > 1 ? 's' : ''})`,
+            amount: finalAmount.toFixed(2),
+            currency: 'LKR',
+            first_name: user?.firstName || 'Valued',
+            last_name: user?.lastName || 'Client',
+            email: user?.emailAddresses?.[0]?.emailAddress || profile?.email || '',
+            phone: `${profile?.mobileCode || ''}${profile?.mobile || ''}`.replace(/\s/g, ''),
+            address: profile?.address || '',
+            city: profile?.city || '',
+            country: profile?.country || 'Sri Lanka',
+            hash: hashData.data.hash,
           });
         });
 
@@ -516,7 +516,7 @@ export default function CartPage() {
         setShowConfirmModal(false);
         toast.success('Payment confirmed! Your timepiece order is placed.');
 
-      // ── Step 2b: Bank transfer receipt upload ────────────────────────────
+        // ── Step 2b: Bank transfer receipt upload ────────────────────────────
       } else {
         const res = await fetch('/api/customer/orders', {
           method: 'POST',
@@ -1671,7 +1671,7 @@ export default function CartPage() {
         return (
           <div className="modal-overlay" onClick={() => setActiveGiftKey(null)}>
             <div className="modal-box" onClick={e => e.stopPropagation()} style={{ maxWidth: '520px', padding: '24px 24px 16px', display: 'flex', flexDirection: 'column', maxHeight: 'min(88vh, 600px)', overflow: 'hidden' }}>
-              
+
               {/* Fixed Header */}
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', borderBottom: '1px solid rgba(139,105,20,0.12)', paddingBottom: '12px', flexShrink: 0 }}>
                 <div style={{ color: '#8b6914', marginBottom: '4px' }}>
@@ -1692,13 +1692,13 @@ export default function CartPage() {
               {/* Scrollable Middle Body Container */}
               <div style={{ flex: 1, overflowY: 'auto', paddingRight: '4px', display: 'flex', flexDirection: 'column', gap: '14px', paddingTop: '12px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', userSelect: 'none' }} onClick={() => setModalIsGift(!modalIsGift)}>
-                  <button 
+                  <button
                     className={`modal-custom-checkbox ${modalIsGift ? 'checked' : ''}`}
                     type="button"
                   >
                     {modalIsGift && (
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
-                        <polyline points="20 6 9 17 4 12"/>
+                        <polyline points="20 6 9 17 4 12" />
                       </svg>
                     )}
                   </button>
@@ -1711,7 +1711,7 @@ export default function CartPage() {
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', borderTop: '1px dashed rgba(139,105,20,0.15)', paddingTop: '14px' }}>
                     <div className="gifting-input-group">
                       <label className="gifting-label">Personal Greeting Note (Free)</label>
-                      <textarea 
+                      <textarea
                         value={modalGiftNote}
                         onChange={e => setModalGiftNote(e.target.value)}
                         placeholder="Write a greeting note wishing your recipient the best..."
@@ -1726,7 +1726,7 @@ export default function CartPage() {
 
                     <div className="gifting-input-group">
                       <label className="gifting-label">Canva Card Design Link (Optional)</label>
-                      <input 
+                      <input
                         type="text"
                         value={modalCanvaLink}
                         onChange={e => setModalCanvaLink(e.target.value)}
@@ -1756,14 +1756,14 @@ export default function CartPage() {
                         <div className="file-preview-box" style={{ background: 'rgba(139, 105, 20, 0.04)', border: '1px solid rgba(139, 105, 20, 0.15)', borderRadius: '8px', padding: '10px 14px' }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#8B6914', fontWeight: 500, fontSize: '12px' }}>
                             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                              <polyline points="14 2 14 8 20 8"/>
+                              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                              <polyline points="14 2 14 8 20 8" />
                             </svg>
                             <span style={{ textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap', maxWidth: '280px' }}>
                               {modalAttachmentName}
                             </span>
                           </div>
-                          <button 
+                          <button
                             type="button"
                             onClick={() => { setModalAttachmentUrl(''); setModalAttachmentName(''); }}
                             style={{ background: 'none', border: 'none', color: '#c62828', fontSize: '11px', fontWeight: 600, cursor: 'pointer', fontFamily: "'Jost', sans-serif" }}
@@ -1773,17 +1773,17 @@ export default function CartPage() {
                         </div>
                       ) : (
                         <div className="file-upload-zone" style={{ padding: '12px' }}>
-                          <input 
-                            type="file" 
-                            accept="image/*,application/pdf" 
+                          <input
+                            type="file"
+                            accept="image/*,application/pdf"
                             onChange={handleFileUpload}
                             disabled={modalUploadingFile}
                           />
                           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3px' }}>
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(139,105,20,0.5)" strokeWidth="2" style={{ marginBottom: '2px' }}>
-                              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                              <polyline points="17 8 12 3 7 8"/>
-                              <line x1="12" y1="3" x2="12" y2="15"/>
+                              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                              <polyline points="17 8 12 3 7 8" />
+                              <line x1="12" y1="3" x2="12" y2="15" />
                             </svg>
                             <span style={{ fontSize: '11.5px', color: '#1a1209', fontStyle: 'normal', fontWeight: 500 }}>
                               Choose file to upload wishes card
@@ -1986,7 +1986,7 @@ export default function CartPage() {
                       </div>
                       <div style={{ flex: 1 }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8b6914" strokeWidth="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8b6914" strokeWidth="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2" /><line x1="1" y1="10" x2="23" y2="10" /></svg>
                           <span style={{ fontWeight: 700, fontSize: '13px', color: '#1a1209' }}>Pay via PayHere</span>
                           <span style={{ fontSize: '9px', fontWeight: 700, color: '#2e7d32', background: 'rgba(46,125,50,0.1)', border: '1px solid rgba(46,125,50,0.25)', borderRadius: 3, padding: '1px 6px', textTransform: 'uppercase' as const, letterSpacing: '0.06em' }}>Secure</span>
                         </div>
@@ -2002,7 +2002,7 @@ export default function CartPage() {
                       </div>
                       <div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8b6914" strokeWidth="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8b6914" strokeWidth="2"><line x1="12" y1="1" x2="12" y2="23" /><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" /></svg>
                           <span style={{ fontWeight: 700, fontSize: '13px', color: '#1a1209' }}>Direct Bank Transfer</span>
                         </div>
                         <div style={{ fontSize: '11px', color: 'rgba(26,18,9,0.5)', marginTop: 2 }}>Transfer &amp; upload receipt &mdash; verified within 24 hrs</div>
@@ -2014,38 +2014,38 @@ export default function CartPage() {
                       <div style={{ marginTop: 12 }}>
                         <div style={{ background: 'rgba(139,105,20,0.05)', border: '1px solid rgba(139,105,20,0.18)', borderRadius: 8, padding: '10px 12px', marginBottom: 10 }}>
                           <div style={{ fontSize: '9px', fontWeight: 700, color: 'rgba(26,18,9,0.45)', textTransform: 'uppercase' as const, letterSpacing: '0.1em', marginBottom: 6 }}>Bank Transfer Details</div>
-                          {[['Bank','Bank of Ceylon'],['Account No.','1234567890'],['Branch','Main Branch'],['Amount', appliedCoupon ? `LKR ${Math.max(0,selectedSubtotal-Math.round(selectedSubtotal*appliedCoupon.discountPercent/100)).toLocaleString()}` : `LKR ${selectedSubtotal.toLocaleString()}`]].map(([label,value],i) => (
-                            <div key={i} style={{ display:'flex', justifyContent:'space-between', fontSize:'12px', borderTop: i>0 ? '1px solid rgba(139,105,20,0.1)' : undefined, marginTop: i>0 ? 5 : 0, paddingTop: i>0 ? 5 : 0, color:'#1a1209' }}>
-                              <span style={{ color:'rgba(26,18,9,0.5)', fontSize:'10.5px' }}>{label}</span>
-                              <span style={{ fontWeight: label==='Amount' ? 700 : 600, color: label==='Amount' ? '#8b6914' : '#1a1209', fontFamily: label==='Account No.' ? 'monospace' : undefined }}>{value}</span>
+                          {[['Bank', 'NATIONS TRUST BANK'], ['Account No.', '100460045365'], ['Branch', 'Bankshall Street (PETTAH)'], ['Amount', appliedCoupon ? `LKR ${Math.max(0, selectedSubtotal - Math.round(selectedSubtotal * appliedCoupon.discountPercent / 100)).toLocaleString()}` : `LKR ${selectedSubtotal.toLocaleString()}`]].map(([label, value], i) => (
+                            <div key={i} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', borderTop: i > 0 ? '1px solid rgba(139,105,20,0.1)' : undefined, marginTop: i > 0 ? 5 : 0, paddingTop: i > 0 ? 5 : 0, color: '#1a1209' }}>
+                              <span style={{ color: 'rgba(26,18,9,0.5)', fontSize: '10.5px' }}>{label}</span>
+                              <span style={{ fontWeight: label === 'Amount' ? 700 : 600, color: label === 'Amount' ? '#8b6914' : '#1a1209', fontFamily: label === 'Account No.' ? 'monospace' : undefined }}>{value}</span>
                             </div>
                           ))}
                         </div>
 
-                        <label style={{ display:'block', fontSize:'9px', fontWeight:700, color:'rgba(26,18,9,0.55)', textTransform:'uppercase' as const, letterSpacing:'0.1em', marginBottom:5 }}>Upload Transfer Receipt</label>
-                        <div style={{ border:'2px dashed rgba(139,105,20,0.3)', borderRadius:8, padding:'12px', textAlign:'center', cursor:'pointer', position:'relative', overflow:'hidden', marginBottom:10 }}>
-                          <input type="file" accept=".jpg,.jpeg,.png,.webp,.pdf" onChange={handleBankReceiptSelect} style={{ position:'absolute', inset:0, opacity:0, cursor:'pointer', width:'100%', height:'100%' }} />
+                        <label style={{ display: 'block', fontSize: '9px', fontWeight: 700, color: 'rgba(26,18,9,0.55)', textTransform: 'uppercase' as const, letterSpacing: '0.1em', marginBottom: 5 }}>Upload Transfer Receipt</label>
+                        <div style={{ border: '2px dashed rgba(139,105,20,0.3)', borderRadius: 8, padding: '12px', textAlign: 'center', cursor: 'pointer', position: 'relative', overflow: 'hidden', marginBottom: 10 }}>
+                          <input type="file" accept=".jpg,.jpeg,.png,.webp,.pdf" onChange={handleBankReceiptSelect} style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer', width: '100%', height: '100%' }} />
                           {bankReceiptName ? (
-                            <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:6 }}>
-                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2e7d32" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                              <span style={{ fontSize:'12px', color:'#2e7d32', fontWeight:600 }}>{bankReceiptName}</span>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2e7d32" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg>
+                              <span style={{ fontSize: '12px', color: '#2e7d32', fontWeight: 600 }}>{bankReceiptName}</span>
                             </div>
                           ) : (
                             <div>
-                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(139,105,20,0.5)" strokeWidth="1.5" style={{ marginBottom:4 }}><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
-                              <div style={{ fontSize:'12px', color:'rgba(26,18,9,0.6)', fontWeight:500 }}>Click to upload receipt</div>
-                              <div style={{ fontSize:'10px', color:'rgba(26,18,9,0.35)', marginTop:2 }}>PDF, JPG, PNG, WEBP &middot; Max 10 MB</div>
+                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(139,105,20,0.5)" strokeWidth="1.5" style={{ marginBottom: 4 }}><polyline points="16 16 12 12 8 16" /><line x1="12" y1="12" x2="12" y2="21" /><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3" /></svg>
+                              <div style={{ fontSize: '12px', color: 'rgba(26,18,9,0.6)', fontWeight: 500 }}>Click to upload receipt</div>
+                              <div style={{ fontSize: '10px', color: 'rgba(26,18,9,0.35)', marginTop: 2 }}>PDF, JPG, PNG, WEBP &middot; Max 10 MB</div>
                             </div>
                           )}
                         </div>
 
-                        <div onClick={() => setBankTransferConfirmed(v => !v)} style={{ display:'flex', alignItems:'flex-start', gap:8, cursor:'pointer' }}>
-                          <div style={{ width:16, height:16, border:`2px solid ${bankTransferConfirmed ? '#8b6914' : 'rgba(139,105,20,0.35)'}`, borderRadius:3, background: bankTransferConfirmed ? '#8b6914' : 'transparent', flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center', marginTop:1, transition:'all 0.2s ease' }}>
-                            {bankTransferConfirmed && <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>}
+                        <div onClick={() => setBankTransferConfirmed(v => !v)} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, cursor: 'pointer' }}>
+                          <div style={{ width: 16, height: 16, border: `2px solid ${bankTransferConfirmed ? '#8b6914' : 'rgba(139,105,20,0.35)'}`, borderRadius: 3, background: bankTransferConfirmed ? '#8b6914' : 'transparent', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 1, transition: 'all 0.2s ease' }}>
+                            {bankTransferConfirmed && <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3"><polyline points="20 6 9 17 4 12" /></svg>}
                           </div>
-                          <span style={{ fontSize:'12px', color:'rgba(26,18,9,0.7)', lineHeight:1.5 }}>
+                          <span style={{ fontSize: '12px', color: 'rgba(26,18,9,0.7)', lineHeight: 1.5 }}>
                             I confirm I have transferred{' '}
-                            <strong>{appliedCoupon ? `LKR ${Math.max(0,selectedSubtotal-Math.round(selectedSubtotal*appliedCoupon.discountPercent/100)).toLocaleString()}` : `LKR ${selectedSubtotal.toLocaleString()}`}</strong>{' '}
+                            <strong>{appliedCoupon ? `LKR ${Math.max(0, selectedSubtotal - Math.round(selectedSubtotal * appliedCoupon.discountPercent / 100)).toLocaleString()}` : `LKR ${selectedSubtotal.toLocaleString()}`}</strong>{' '}
                             to the account above.
                           </span>
                         </div>
@@ -2066,7 +2066,7 @@ export default function CartPage() {
                   >
                     {(paymentProcessing || bankReceiptUploading) ? (
                       <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ animation: 'spin 1s linear infinite' }}><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ animation: 'spin 1s linear infinite' }}><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" /></svg>
                         {bankReceiptUploading ? 'Uploading...' : 'Processing...'}
                       </span>
                     ) : (
@@ -2087,7 +2087,7 @@ export default function CartPage() {
             <div className="success-screen">
               <div className="success-tick">
                 <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                  <polyline points="20 6 9 17 4 12"/>
+                  <polyline points="20 6 9 17 4 12" />
                 </svg>
               </div>
               <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '32px', color: '#1a1209', margin: '0 0 10px', fontWeight: 500 }}>
@@ -2096,7 +2096,7 @@ export default function CartPage() {
               <p style={{ fontSize: '14.5px', color: 'rgba(26, 18, 9, 0.55)', margin: '0 0 24px', lineHeight: 1.5 }}>
                 Thank you for choosing Winsor. Your handcrafted timepiece order has been successfully recorded. Our boutique dispatch will email courier information shortly.
               </p>
-              
+
               <div className="ref-box">
                 <p style={{ margin: '0 0 4px', fontSize: '10.5px', color: 'rgba(26,18,9,0.4)', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 500 }}>
                   Transaction Reference
@@ -2118,8 +2118,8 @@ export default function CartPage() {
               <div className="cart-header-section">
                 <h1 className="cart-title">Shopping Bag</h1>
                 <p className="cart-subtitle">
-                  {cartItems.length === 0 
-                    ? 'Your shopping bag is empty.' 
+                  {cartItems.length === 0
+                    ? 'Your shopping bag is empty.'
                     : `You have ${cartItems.length} timepiece${cartItems.length > 1 ? 's' : ''} in your bag.`}
                 </p>
               </div>
@@ -2129,9 +2129,9 @@ export default function CartPage() {
                 <div className="empty-cart-view">
                   <div className="empty-cart-icon">
                     <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
-                      <line x1="3" y1="6" x2="21" y2="6"/>
-                      <path d="M16 10a4 4 0 0 1-8 0"/>
+                      <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+                      <line x1="3" y1="6" x2="21" y2="6" />
+                      <path d="M16 10a4 4 0 0 1-8 0" />
                     </svg>
                   </div>
                   <h2 className="empty-cart-title">Your shopping bag is empty.</h2>
@@ -2145,249 +2145,315 @@ export default function CartPage() {
               ) : (
                 /* CART LAYOUT GRID */
                 <div className="cart-grid">
-                  
+
                   {/* Left Column: Items Panel & Gifting Options */}
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
                     <div className="cart-items-panel">
-                    
-                    {/* Store / Boutique Grouping Header */}
-                    <div className="store-header">
-                      <div className="store-info">
-                        <span className="store-badge">Official Store</span>
-                        <span className="store-name">Winsor Brand Official Boutique</span>
-                      </div>
-                      <div className="store-shipping-notice">
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                          <circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/>
-                        </svg>
-                        <span>Free Island-Wide Shipping in Sri Lanka</span>
-                      </div>
-                    </div>
 
-                    {/* Checkbox Select All Controls */}
-                    <div className="select-all-row">
-                      <button
-                        onClick={toggleSelectAll}
-                        className={`custom-checkbox ${allSelected ? 'checked' : ''}`}
-                        aria-label="Select all items"
-                      >
-                        {allSelected && (
-                          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
-                            <polyline points="20 6 9 17 4 12"/>
+                      {/* Store / Boutique Grouping Header */}
+                      <div className="store-header">
+                        <div className="store-info">
+                          <span className="store-badge">Official Store</span>
+                          <span className="store-name">Winsor Brand Official Boutique</span>
+                        </div>
+                        <div className="store-shipping-notice">
+                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                            <circle cx="12" cy="12" r="10" /><path d="m9 12 2 2 4-4" />
                           </svg>
-                        )}
-                      </button>
-                      <span>Select All Items ({cartItems.length})</span>
-                    </div>
+                          <span>Free Island-Wide Shipping in Sri Lanka</span>
+                        </div>
+                      </div>
 
-                    {/* Cart Items List */}
-                    {cartItems.map(item => {
-                      const itemKey = `${item.productId}-${item.colorVariant || ''}`;
-                      const isChecked = !!selectedItems[itemKey];
-                      const productPrice = item.product?.price || 0;
-                      const productTotal = productPrice * item.quantity;
-                      const isProductSoldOut = item.product?.isSoldOut;
+                      {/* Checkbox Select All Controls */}
+                      <div className="select-all-row">
+                        <button
+                          onClick={toggleSelectAll}
+                          className={`custom-checkbox ${allSelected ? 'checked' : ''}`}
+                          aria-label="Select all items"
+                        >
+                          {allSelected && (
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
+                              <polyline points="20 6 9 17 4 12" />
+                            </svg>
+                          )}
+                        </button>
+                        <span>Select All Items ({cartItems.length})</span>
+                      </div>
 
-                      return (
-                        <div key={itemKey} className="cart-item-card">
-                          
-                          {/* Row Checkbox */}
-                          <button
-                            onClick={() => toggleItem(item.productId, item.colorVariant)}
-                            className={`custom-checkbox ${isChecked ? 'checked' : ''}`}
-                            aria-label={`Select ${item.product?.title || 'item'}`}
-                          >
-                            {isChecked && (
-                              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
-                                <polyline points="20 6 9 17 4 12"/>
-                              </svg>
-                            )}
-                          </button>
+                      {/* Cart Items List */}
+                      {cartItems.map(item => {
+                        const itemKey = `${item.productId}-${item.colorVariant || ''}`;
+                        const isChecked = !!selectedItems[itemKey];
+                        const productPrice = item.product?.price || 0;
+                        const productTotal = productPrice * item.quantity;
+                        const isProductSoldOut = item.product?.isSoldOut;
 
-                          {/* Image Container */}
-                          <div className="cart-item-img-container">
-                            {item.product?.thumbnail?.url ? (
-                              <img
-                                src={item.product.thumbnail.url}
-                                alt={item.product.title || 'Winsor product'}
-                                className="w-full h-full object-cover"
-                              />
-                            ) : (
-                              <div className="w-full h-full bg-[#1a1209]/5" />
-                            )}
-                          </div>
+                        return (
+                          <div key={itemKey} className="cart-item-card">
 
-                          {/* Info Column */}
-                          <div className="cart-item-info">
-                            <h3 className="item-title">
-                              {item.product ? (
-                                <Link href={`/collections/${item.productId}`} style={{ color: 'inherit', textDecoration: 'none' }}>
-                                  {item.product.title}
-                                </Link>
+                            {/* Row Checkbox */}
+                            <button
+                              onClick={() => toggleItem(item.productId, item.colorVariant)}
+                              className={`custom-checkbox ${isChecked ? 'checked' : ''}`}
+                              aria-label={`Select ${item.product?.title || 'item'}`}
+                            >
+                              {isChecked && (
+                                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
+                                  <polyline points="20 6 9 17 4 12" />
+                                </svg>
+                              )}
+                            </button>
+
+                            {/* Image Container */}
+                            <div className="cart-item-img-container">
+                              {item.product?.thumbnail?.url ? (
+                                <img
+                                  src={item.product.thumbnail.url}
+                                  alt={item.product.title || 'Winsor product'}
+                                  className="w-full h-full object-cover"
+                                />
                               ) : (
-                                'Timepiece details unavailable'
+                                <div className="w-full h-full bg-[#1a1209]/5" />
                               )}
-                            </h3>
-                            
-                            <div className="item-meta-row">
-                              <span>Model: {item.product?.modelNo || 'N/A'}</span>
-                              {item.colorVariant && (
-                                <>
-                                  <div className="meta-divider" />
-                                  <span className="item-variant-tag">Edition: {item.colorVariant}</span>
-                                </>
-                              )}
-                              <div className="meta-divider" />
-                              <span className="item-stock-status">
-                                {isProductSoldOut ? 'Sold Out' : 'In Stock'}
-                              </span>
                             </div>
 
-                            {/* Gifting Options Trigger (if gifts category product) */}
-                            {item.product?.giftCategories && item.product.giftCategories.length > 0 && (
-                              <div style={{ marginTop: '10px', display: 'flex' }}>
-                                {giftDetails[itemKey]?.isGift ? (
-                                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                    <button
-                                      onClick={() => openGiftingModal(itemKey)}
-                                      className="gifting-trigger-btn added"
-                                      type="button"
-                                    >
-                                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '6px' }}>
-                                        <path d="M20 12v10H4V12" />
-                                        <path d="M2 7h20v5H2z" />
-                                        <path d="M12 22V7" />
-                                        <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z" />
-                                        <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z" />
-                                      </svg>
-                                      Gift Options Added (Edit)
-                                    </button>
-                                    <button
-                                      onClick={() => clearGiftingDetails(itemKey)}
-                                      style={{ background: 'none', border: 'none', color: '#c62828', fontSize: '11px', fontWeight: 600, cursor: 'pointer', fontFamily: "'Jost', sans-serif", textTransform: 'uppercase', letterSpacing: '0.04em' }}
-                                      type="button"
-                                    >
-                                      Remove
-                                    </button>
-                                  </div>
+                            {/* Info Column */}
+                            <div className="cart-item-info">
+                              <h3 className="item-title">
+                                {item.product ? (
+                                  <Link href={`/collections/${item.productId}`} style={{ color: 'inherit', textDecoration: 'none' }}>
+                                    {item.product.title}
+                                  </Link>
                                 ) : (
-                                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', position: 'relative' }}>
-                                    <button
-                                      onClick={() => openGiftingModal(itemKey)}
-                                      className="gifting-trigger-btn"
-                                      type="button"
-                                    >
-                                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '6px' }}>
-                                        <path d="M20 12v10H4V12" />
-                                        <path d="M2 7h20v5H2z" />
-                                        <path d="M12 22V7" />
-                                        <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z" />
-                                        <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z" />
-                                      </svg>
-                                      Add Gift Options (Free)
-                                    </button>
+                                  'Timepiece details unavailable'
+                                )}
+                              </h3>
 
-                                    {/* Gift Info Trigger */}
-                                    <div style={{ position: 'relative' }}>
+                              <div className="item-meta-row">
+                                <span>Model: {item.product?.modelNo || 'N/A'}</span>
+                                {item.colorVariant && (
+                                  <>
+                                    <div className="meta-divider" />
+                                    <span className="item-variant-tag">Edition: {item.colorVariant}</span>
+                                  </>
+                                )}
+                                <div className="meta-divider" />
+                                <span className="item-stock-status">
+                                  {isProductSoldOut ? 'Sold Out' : 'In Stock'}
+                                </span>
+                              </div>
+
+                              {/* Gifting Options Trigger (if gifts category product) */}
+                              {item.product?.giftCategories && item.product.giftCategories.length > 0 && (
+                                <div style={{ marginTop: '10px', display: 'flex' }}>
+                                  {giftDetails[itemKey]?.isGift ? (
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                                       <button
+                                        onClick={() => openGiftingModal(itemKey)}
+                                        className="gifting-trigger-btn added"
                                         type="button"
-                                        onClick={() => setActiveGiftInfoKey(activeGiftInfoKey === itemKey ? null : itemKey)}
-                                        onMouseEnter={() => !isMobile && setActiveGiftInfoKey(itemKey)}
-                                        onMouseLeave={() => !isMobile && setActiveGiftInfoKey(null)}
-                                        style={{
-                                          display: 'flex',
-                                          alignItems: 'center',
-                                          justifyContent: 'center',
-                                          width: '24px',
-                                          height: '24px',
-                                          borderRadius: '50%',
-                                          border: '1.2px solid #8B6914',
-                                          background: 'none',
-                                          color: '#8B6914',
-                                          cursor: 'pointer',
-                                          fontSize: '12px',
-                                          fontWeight: 600,
-                                          fontFamily: 'serif',
-                                          transition: 'all 0.2s',
-                                        }}
                                       >
-                                        i
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '6px' }}>
+                                          <path d="M20 12v10H4V12" />
+                                          <path d="M2 7h20v5H2z" />
+                                          <path d="M12 22V7" />
+                                          <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z" />
+                                          <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z" />
+                                        </svg>
+                                        Gift Options Added (Edit)
+                                      </button>
+                                      <button
+                                        onClick={() => clearGiftingDetails(itemKey)}
+                                        style={{ background: 'none', border: 'none', color: '#c62828', fontSize: '11px', fontWeight: 600, cursor: 'pointer', fontFamily: "'Jost', sans-serif", textTransform: 'uppercase', letterSpacing: '0.04em' }}
+                                        type="button"
+                                      >
+                                        Remove
+                                      </button>
+                                    </div>
+                                  ) : (
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', position: 'relative' }}>
+                                      <button
+                                        onClick={() => openGiftingModal(itemKey)}
+                                        className="gifting-trigger-btn"
+                                        type="button"
+                                      >
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '6px' }}>
+                                          <path d="M20 12v10H4V12" />
+                                          <path d="M2 7h20v5H2z" />
+                                          <path d="M12 22V7" />
+                                          <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z" />
+                                          <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z" />
+                                        </svg>
+                                        Add Gift Options (Free)
                                       </button>
 
-                                      {/* Gift Info Tooltip Pop-up */}
-                                      {activeGiftInfoKey === itemKey && (
-                                        isMobile ? (
-                                          /* Mobile Modal Overlay Wrapper */
-                                          <div 
-                                            onClick={() => setActiveGiftInfoKey(null)}
-                                            style={{
-                                              position: 'fixed',
-                                              top: 0,
-                                              left: 0,
-                                              right: 0,
-                                              bottom: 0,
-                                              backgroundColor: 'rgba(26, 18, 9, 0.45)',
-                                              backdropFilter: 'blur(3px)',
-                                              display: 'flex',
-                                              alignItems: 'center',
-                                              justifyContent: 'center',
-                                              padding: '20px',
-                                              zIndex: 2000,
-                                              pointerEvents: 'auto',
-                                            }}
-                                          >
-                                            {/* Centered Modal Card */}
-                                            <div 
-                                              onClick={(e) => e.stopPropagation()} /* Prevent close when clicking inside card */
+                                      {/* Gift Info Trigger */}
+                                      <div style={{ position: 'relative' }}>
+                                        <button
+                                          type="button"
+                                          onClick={() => setActiveGiftInfoKey(activeGiftInfoKey === itemKey ? null : itemKey)}
+                                          onMouseEnter={() => !isMobile && setActiveGiftInfoKey(itemKey)}
+                                          onMouseLeave={() => !isMobile && setActiveGiftInfoKey(null)}
+                                          style={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            width: '24px',
+                                            height: '24px',
+                                            borderRadius: '50%',
+                                            border: '1.2px solid #8B6914',
+                                            background: 'none',
+                                            color: '#8B6914',
+                                            cursor: 'pointer',
+                                            fontSize: '12px',
+                                            fontWeight: 600,
+                                            fontFamily: 'serif',
+                                            transition: 'all 0.2s',
+                                          }}
+                                        >
+                                          i
+                                        </button>
+
+                                        {/* Gift Info Tooltip Pop-up */}
+                                        {activeGiftInfoKey === itemKey && (
+                                          isMobile ? (
+                                            /* Mobile Modal Overlay Wrapper */
+                                            <div
+                                              onClick={() => setActiveGiftInfoKey(null)}
                                               style={{
-                                                width: '100%',
-                                                maxWidth: '320px',
-                                                background: '#ffffff',
-                                                border: '1.5px solid #8B6914',
-                                                borderRadius: '12px',
-                                                padding: '16px',
-                                                boxShadow: '0 15px 35px rgba(26,18,9,0.3)',
-                                                position: 'relative',
+                                                position: 'fixed',
+                                                top: 0,
+                                                left: 0,
+                                                right: 0,
+                                                bottom: 0,
+                                                backgroundColor: 'rgba(26, 18, 9, 0.45)',
+                                                backdropFilter: 'blur(3px)',
                                                 display: 'flex',
-                                                flexDirection: 'column',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                padding: '20px',
+                                                zIndex: 2000,
+                                                pointerEvents: 'auto',
                                               }}
                                             >
-                                              {/* Mobile Close Button */}
-                                              <button
-                                                type="button"
-                                                onClick={() => setActiveGiftInfoKey(null)}
-                                                style={{
-                                                  position: 'absolute',
-                                                  top: '12px',
-                                                  right: '12px',
-                                                  background: 'none',
-                                                  border: 'none',
-                                                  fontSize: '16px',
-                                                  fontWeight: 600,
-                                                  color: '#1a1209',
-                                                  cursor: 'pointer',
-                                                  padding: '4px',
-                                                }}
-                                              >
-                                                ✕
-                                              </button>
-
-                                              <img 
-                                                src="/graduation_gift.png" 
-                                                alt="Winsor Premium Gift Presentation" 
+                                              {/* Centered Modal Card */}
+                                              <div
+                                                onClick={(e) => e.stopPropagation()} /* Prevent close when clicking inside card */
                                                 style={{
                                                   width: '100%',
-                                                  height: '180px',
+                                                  maxWidth: '320px',
+                                                  background: '#ffffff',
+                                                  border: '1.5px solid #8B6914',
+                                                  borderRadius: '12px',
+                                                  padding: '16px',
+                                                  boxShadow: '0 15px 35px rgba(26,18,9,0.3)',
+                                                  position: 'relative',
+                                                  display: 'flex',
+                                                  flexDirection: 'column',
+                                                }}
+                                              >
+                                                {/* Mobile Close Button */}
+                                                <button
+                                                  type="button"
+                                                  onClick={() => setActiveGiftInfoKey(null)}
+                                                  style={{
+                                                    position: 'absolute',
+                                                    top: '12px',
+                                                    right: '12px',
+                                                    background: 'none',
+                                                    border: 'none',
+                                                    fontSize: '16px',
+                                                    fontWeight: 600,
+                                                    color: '#1a1209',
+                                                    cursor: 'pointer',
+                                                    padding: '4px',
+                                                  }}
+                                                >
+                                                  ✕
+                                                </button>
+
+                                                <img
+                                                  src="/graduation_gift.png"
+                                                  alt="Winsor Premium Gift Presentation"
+                                                  style={{
+                                                    width: '100%',
+                                                    height: '180px',
+                                                    objectFit: 'cover',
+                                                    borderRadius: '8px',
+                                                    border: '1px solid rgba(139,105,20,0.12)',
+                                                    marginBottom: '10px'
+                                                  }}
+                                                />
+                                                <p style={{
+                                                  margin: '0 0 4px',
+                                                  fontFamily: "'Cormorant Garamond', serif",
+                                                  fontSize: '16px',
+                                                  fontWeight: 600,
+                                                  color: '#8B6914'
+                                                }}>
+                                                  Signature Gift Presentation
+                                                </p>
+                                                <p style={{
+                                                  margin: 0,
+                                                  fontFamily: "'Jost', sans-serif",
+                                                  fontSize: '12px',
+                                                  lineHeight: '1.45',
+                                                  color: 'rgba(26,18,9,0.75)'
+                                                }}>
+                                                  Every gift timepiece is shipped in our multi-slot leatherette watch case with velvet-cushions, wrapped in brand-textured protective paper, and accompanied by your wishes.
+                                                </p>
+                                              </div>
+                                            </div>
+                                          ) : (
+                                            /* Desktop Tooltip Popover */
+                                            <div
+                                              style={{
+                                                position: 'absolute',
+                                                bottom: '34px',
+                                                left: '50%',
+                                                transform: 'translateX(-50%)',
+                                                width: '280px',
+                                                background: '#ffffff',
+                                                border: '1.5px solid #8B6914',
+                                                borderRadius: '10px',
+                                                padding: '12px',
+                                                boxShadow: '0 10px 25px rgba(26,18,9,0.18)',
+                                                zIndex: 100,
+                                                textAlign: 'left',
+                                                pointerEvents: 'auto',
+                                              }}
+                                              onMouseEnter={() => setActiveGiftInfoKey(itemKey)}
+                                              onMouseLeave={() => setActiveGiftInfoKey(null)}
+                                            >
+                                              {/* Tooltip Arrow */}
+                                              <div style={{
+                                                position: 'absolute',
+                                                bottom: '-8px',
+                                                left: '50%',
+                                                transform: 'translateX(-50%) rotate(45deg)',
+                                                width: '14px',
+                                                height: '14px',
+                                                background: '#ffffff',
+                                                borderRight: '1.5px solid #8B6914',
+                                                borderBottom: '1.5px solid #8B6914',
+                                              }} />
+
+                                              <img
+                                                src="/graduation_gift.png"
+                                                alt="Winsor Premium Gift Presentation"
+                                                style={{
+                                                  width: '100%',
+                                                  height: '150px',
                                                   objectFit: 'cover',
-                                                  borderRadius: '8px',
+                                                  borderRadius: '6px',
                                                   border: '1px solid rgba(139,105,20,0.12)',
-                                                  marginBottom: '10px'
+                                                  marginBottom: '8px'
                                                 }}
                                               />
                                               <p style={{
                                                 margin: '0 0 4px',
                                                 fontFamily: "'Cormorant Garamond', serif",
-                                                fontSize: '16px',
+                                                fontSize: '14px',
                                                 fontWeight: 600,
                                                 color: '#8B6914'
                                               }}>
@@ -2396,136 +2462,70 @@ export default function CartPage() {
                                               <p style={{
                                                 margin: 0,
                                                 fontFamily: "'Jost', sans-serif",
-                                                fontSize: '12px',
+                                                fontSize: '11px',
                                                 lineHeight: '1.45',
                                                 color: 'rgba(26,18,9,0.75)'
                                               }}>
-                                                Every gift timepiece is shipped in our multi-slot leatherette watch case with velvet-cushions, wrapped in brand-textured protective paper, and accompanied by your wishes.
+                                                Every gift timepiece is shipped in our multi-slot leatherette watch case with velvet-cushions, wrapped in brand-textured protective paper, and accompanied by your custom wishes.
                                               </p>
                                             </div>
-                                          </div>
-                                        ) : (
-                                          /* Desktop Tooltip Popover */
-                                          <div 
-                                            style={{
-                                              position: 'absolute',
-                                              bottom: '34px',
-                                              left: '50%',
-                                              transform: 'translateX(-50%)',
-                                              width: '280px',
-                                              background: '#ffffff',
-                                              border: '1.5px solid #8B6914',
-                                              borderRadius: '10px',
-                                              padding: '12px',
-                                              boxShadow: '0 10px 25px rgba(26,18,9,0.18)',
-                                              zIndex: 100,
-                                              textAlign: 'left',
-                                              pointerEvents: 'auto',
-                                            }}
-                                            onMouseEnter={() => setActiveGiftInfoKey(itemKey)}
-                                            onMouseLeave={() => setActiveGiftInfoKey(null)}
-                                          >
-                                            {/* Tooltip Arrow */}
-                                            <div style={{
-                                              position: 'absolute',
-                                              bottom: '-8px',
-                                              left: '50%',
-                                              transform: 'translateX(-50%) rotate(45deg)',
-                                              width: '14px',
-                                              height: '14px',
-                                              background: '#ffffff',
-                                              borderRight: '1.5px solid #8B6914',
-                                              borderBottom: '1.5px solid #8B6914',
-                                            }} />
-
-                                            <img 
-                                              src="/graduation_gift.png" 
-                                              alt="Winsor Premium Gift Presentation" 
-                                              style={{
-                                                width: '100%',
-                                                height: '150px',
-                                                objectFit: 'cover',
-                                                borderRadius: '6px',
-                                                border: '1px solid rgba(139,105,20,0.12)',
-                                                marginBottom: '8px'
-                                              }}
-                                            />
-                                            <p style={{
-                                              margin: '0 0 4px',
-                                              fontFamily: "'Cormorant Garamond', serif",
-                                              fontSize: '14px',
-                                              fontWeight: 600,
-                                              color: '#8B6914'
-                                            }}>
-                                              Signature Gift Presentation
-                                            </p>
-                                            <p style={{
-                                              margin: 0,
-                                              fontFamily: "'Jost', sans-serif",
-                                              fontSize: '11px',
-                                              lineHeight: '1.45',
-                                              color: 'rgba(26,18,9,0.75)'
-                                            }}>
-                                              Every gift timepiece is shipped in our multi-slot leatherette watch case with velvet-cushions, wrapped in brand-textured protective paper, and accompanied by your custom wishes.
-                                            </p>
-                                          </div>
-                                        )
-                                      )}
+                                          )
+                                        )}
+                                      </div>
                                     </div>
-                                  </div>
-                                )}
-                              </div>
-                            )}
+                                  )}
+                                </div>
+                              )}
 
-                            {/* Row Action Controls */}
-                            <div className="item-actions-panel">
-                              {/* Quantity Control Pill */}
-                              <div className="qty-controller">
+                              {/* Row Action Controls */}
+                              <div className="item-actions-panel">
+                                {/* Quantity Control Pill */}
+                                <div className="qty-controller">
+                                  <button
+                                    onClick={() => updateQuantity(item.productId, item.quantity - 1, item.colorVariant)}
+                                    disabled={item.quantity <= 1}
+                                    className="qty-btn"
+                                  >
+                                    −
+                                  </button>
+                                  <span className="qty-val">{item.quantity}</span>
+                                  <button
+                                    onClick={() => updateQuantity(item.productId, item.quantity + 1, item.colorVariant)}
+                                    className="qty-btn"
+                                  >
+                                    +
+                                  </button>
+                                </div>
+
+                                {/* Remove Link Button */}
                                 <button
-                                  onClick={() => updateQuantity(item.productId, item.quantity - 1, item.colorVariant)}
-                                  disabled={item.quantity <= 1}
-                                  className="qty-btn"
+                                  onClick={() => removeFromCart(item.productId, item.colorVariant)}
+                                  className="text-action-btn delete"
                                 >
-                                  −
-                                </button>
-                                <span className="qty-val">{item.quantity}</span>
-                                <button
-                                  onClick={() => updateQuantity(item.productId, item.quantity + 1, item.colorVariant)}
-                                  className="qty-btn"
-                                >
-                                  +
+                                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                                    <polyline points="3 6 5 6 21 6" />
+                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                                  </svg>
+                                  Delete
                                 </button>
                               </div>
-
-                              {/* Remove Link Button */}
-                              <button
-                                onClick={() => removeFromCart(item.productId, item.colorVariant)}
-                                className="text-action-btn delete"
-                              >
-                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                                  <polyline points="3 6 5 6 21 6"/>
-                                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
-                                </svg>
-                                Delete
-                              </button>
                             </div>
-                          </div>
 
-                          {/* Pricing Column (Far Right, Amazon-style) */}
-                          <div className="item-price-column">
-                            <span className="item-price-total">
-                              {convertPrice(productTotal)}
-                            </span>
-                            {item.quantity > 1 && (
-                              <span className="item-price-unit">
-                                ({convertPrice(productPrice)} / unit)
+                            {/* Pricing Column (Far Right, Amazon-style) */}
+                            <div className="item-price-column">
+                              <span className="item-price-total">
+                                {convertPrice(productTotal)}
                               </span>
-                            )}
-                          </div>
+                              {item.quantity > 1 && (
+                                <span className="item-price-unit">
+                                  ({convertPrice(productPrice)} / unit)
+                                </span>
+                              )}
+                            </div>
 
-                        </div>
-                      );
-                    })}
+                          </div>
+                        );
+                      })}
 
                     </div>
                   </div>
@@ -2533,17 +2533,17 @@ export default function CartPage() {
                   {/* Right Column: Checkout Summary & Sticky Actions */}
                   <div className="cart-summary-panel">
                     <h3 className="summary-title">Order Summary</h3>
-                    
+
                     <div className="summary-row">
                       <span>Items Selected ({selectedCount}):</span>
                       <span>{convertPrice(selectedSubtotal)}</span>
                     </div>
-                    
+
                     <div className="summary-row">
                       <span>Shipping & Transit:</span>
                       <span className="shipping-detail-txt">FREE</span>
                     </div>
-                    
+
                     <div className="summary-row">
                       <span>Customs Duties & Tax:</span>
                       <span style={{ color: 'rgba(26,18,9,0.5)', fontWeight: 500 }}>Included</span>
@@ -2634,7 +2634,7 @@ export default function CartPage() {
                     {!isSignedIn && (
                       <div className="guard-banner banner-warning">
                         <div className="banner-title">
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
                           <span>Sign In Required</span>
                         </div>
                         <p className="banner-text">
@@ -2652,7 +2652,7 @@ export default function CartPage() {
                     {isSignedIn && !profileLoading && !isProfileComplete && (
                       <div className="guard-banner banner-warning">
                         <div className="banner-title">
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>
                           <span>Address Incomplete</span>
                         </div>
                         <p className="banner-text">
@@ -2670,42 +2670,42 @@ export default function CartPage() {
                       disabled={selectedItemsList.length === 0 || !isSignedIn || !isProfileComplete}
                       className="checkout-action-btn"
                     >
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                      {selectedItemsList.length === 0 
-                        ? 'Select Timepieces' 
-                        : !isSignedIn 
-                          ? 'Sign In to Purchase' 
-                          : !isProfileComplete 
-                            ? 'Complete Shipping Info' 
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
+                      {selectedItemsList.length === 0
+                        ? 'Select Timepieces'
+                        : !isSignedIn
+                          ? 'Sign In to Purchase'
+                          : !isProfileComplete
+                            ? 'Complete Shipping Info'
                             : 'Proceed to Checkout'}
                     </button>
-                    
+
                     {/* Secure Checkout details */}
                     <div className="security-badges">
                       <div className="security-badge-title">
-                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
                         <span>100% secure checkout with payhere.lk</span>
                       </div>
                       <div className="payment-logo-row">
                         {/* Visa */}
-                        <img 
-                          src="https://cdn.jsdelivr.net/gh/datatrans/payment-logos@master/assets/cards/visa.svg" 
-                          alt="Visa" 
-                          className="payment-logo" 
+                        <img
+                          src="https://cdn.jsdelivr.net/gh/datatrans/payment-logos@master/assets/cards/visa.svg"
+                          alt="Visa"
+                          className="payment-logo"
                           style={{ width: '38px', height: '24px', display: 'block', objectFit: 'contain' }}
                         />
                         {/* Mastercard */}
-                        <img 
-                          src="https://cdn.jsdelivr.net/gh/datatrans/payment-logos@master/assets/cards/mastercard.svg" 
-                          alt="Mastercard" 
-                          className="payment-logo" 
+                        <img
+                          src="https://cdn.jsdelivr.net/gh/datatrans/payment-logos@master/assets/cards/mastercard.svg"
+                          alt="Mastercard"
+                          className="payment-logo"
                           style={{ width: '38px', height: '24px', display: 'block', objectFit: 'contain' }}
                         />
                         {/* Amex */}
-                        <img 
-                          src="https://cdn.jsdelivr.net/gh/aaronfagan/svg-credit-card-payment-icons@master/flat/amex.svg" 
-                          alt="American Express" 
-                          className="payment-logo" 
+                        <img
+                          src="https://cdn.jsdelivr.net/gh/aaronfagan/svg-credit-card-payment-icons@master/flat/amex.svg"
+                          alt="American Express"
+                          className="payment-logo"
                           style={{ width: '38px', height: '24px', display: 'block', objectFit: 'contain' }}
                         />
                       </div>
@@ -2716,28 +2716,28 @@ export default function CartPage() {
               )}
             </>
           )}
+        </div>
       </div>
-    </div>
 
-    {/* ── Guest Checkout Modal (for non-signed-in cart checkout) ──── */}
-    <GuestCheckoutModal
-      isOpen={showGuestCheckoutModal}
-      onClose={() => setShowGuestCheckoutModal(false)}
-      items={selectedItemsList.map(item => ({
-        productId: item.productId,
-        productTitle: item.product?.title || 'Timepiece',
-        productModelNo: item.product?.modelNo || 'N/A',
-        productThumbnail: item.product?.thumbnail?.url || '',
-        colorVariant: item.colorVariant,
-        quantity: item.quantity,
-        price: item.product?.price || 0,
-      }))}
-      onLoginClick={() => setShowGuestCheckoutModal(false)}
-      onOrderSuccess={(orderRef) => {
-        clearCart();
-        // Keep modal open so step 4 success popup (ref code + copy button + PDF receipt) is displayed to guest
-      }}
-    />
+      {/* ── Guest Checkout Modal (for non-signed-in cart checkout) ──── */}
+      <GuestCheckoutModal
+        isOpen={showGuestCheckoutModal}
+        onClose={() => setShowGuestCheckoutModal(false)}
+        items={selectedItemsList.map(item => ({
+          productId: item.productId,
+          productTitle: item.product?.title || 'Timepiece',
+          productModelNo: item.product?.modelNo || 'N/A',
+          productThumbnail: item.product?.thumbnail?.url || '',
+          colorVariant: item.colorVariant,
+          quantity: item.quantity,
+          price: item.product?.price || 0,
+        }))}
+        onLoginClick={() => setShowGuestCheckoutModal(false)}
+        onOrderSuccess={(orderRef) => {
+          clearCart();
+          // Keep modal open so step 4 success popup (ref code + copy button + PDF receipt) is displayed to guest
+        }}
+      />
 
     </>
   );
