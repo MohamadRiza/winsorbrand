@@ -281,104 +281,134 @@ export default function GiftsPage() {
           padding: 40px 4% 100px;
         }
 
-        /* ── CATEGORY GRID ── */
+        /* ── CIRCULAR LUXURY OCCASION BADGES (.|.) ── */
         .gifts-category-row {
-          display: grid;
-          grid-template-columns: repeat(4, 1fr);
-          gap: 20px;
-          margin-bottom: 64px;
+          display: flex;
+          flex-wrap: wrap;
+          align-items: flex-start;
+          justify-content: center;
+          gap: 24px 36px;
+          margin-bottom: 56px;
+          padding: 10px 0;
         }
-        .gender-header-card {
-          position: relative;
-          height: 220px;
-          border-radius: 12px;
-          overflow: hidden;
+
+        .gift-circle-item {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
           cursor: pointer;
-          box-shadow: 0 4px 20px rgba(0,0,0,0.03);
-          border: 1px solid rgba(26, 18, 9, 0.05);
-          transition: transform 0.4s ease, box-shadow 0.4s ease, border-color 0.4s ease;
+          transition: all 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+          text-decoration: none;
+          outline: none;
+          max-width: 125px;
+          width: 100%;
         }
-        .gender-header-card:hover {
-          transform: translateY(-4px);
-          box-shadow: 0 8px 30px rgba(26, 18, 9, 0.08);
-          border-color: rgba(139,105,20,0.2);
+
+        .gift-circle-badge {
+          position: relative;
+          width: 108px;
+          height: 108px;
+          border-radius: 50%;
+          padding: 3px;
+          background: linear-gradient(135deg, rgba(139,105,20,0.3) 0%, rgba(223,177,91,0.65) 50%, rgba(139,105,20,0.3) 100%);
+          border: 1.5px solid rgba(139,105,20,0.35);
+          box-shadow: 0 4px 16px rgba(26,18,9,0.06);
+          transition: all 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
-        .gender-header-card.active {
+
+        .gift-circle-item:hover .gift-circle-badge {
+          transform: translateY(-4px) scale(1.05);
           border-color: #8b6914;
-          border-width: 2px;
-          box-shadow: 0 8px 30px rgba(139,105,20,0.12);
+          background: linear-gradient(135deg, #8b6914 0%, #dfb15b 50%, #8b6914 100%);
+          box-shadow: 0 8px 24px rgba(139,105,20,0.3), 0 0 16px rgba(223,177,91,0.25);
         }
-        .gender-card-img-wrapper {
-          position: absolute;
-          top: 0;
-          left: 0;
+
+        .gift-circle-item.active .gift-circle-badge {
+          transform: translateY(-2px) scale(1.06);
+          border-color: #8b6914;
+          background: linear-gradient(135deg, #8b6914 0%, #dfb15b 50%, #8b6914 100%);
+          box-shadow: 0 0 20px rgba(139,105,20,0.4), 0 6px 20px rgba(26,18,9,0.12);
+        }
+
+        .gift-circle-inner {
+          position: relative;
           width: 100%;
           height: 100%;
-          z-index: 1;
-          background: #eee;
+          border-radius: 50%;
+          overflow: hidden;
+          background: #110e0b;
         }
-        .gender-card-img {
+
+        .gift-circle-bg-img {
           width: 100%;
           height: 100%;
           object-fit: cover;
           transition: transform 0.6s ease;
         }
-        .gender-header-card:hover .gender-card-img {
-          transform: scale(1.05);
+
+        .gift-circle-item:hover .gift-circle-bg-img {
+          transform: scale(1.12);
         }
-        .gender-header-overlay {
+
+        .gift-circle-overlay {
           position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          background: linear-gradient(to top, rgba(10,8,6,0.85) 0%, rgba(10,8,6,0.3) 50%, rgba(10,8,6,0.2) 100%);
+          inset: 0;
+          background: radial-gradient(circle at center, rgba(17,14,11,0.35) 0%, rgba(17,14,11,0.75) 100%);
           z-index: 2;
+          transition: opacity 0.3s ease;
         }
-        .gender-header-content {
+
+        .gift-circle-item:hover .gift-circle-overlay {
+          background: radial-gradient(circle at center, rgba(17,14,11,0.25) 0%, rgba(17,14,11,0.65) 100%);
+        }
+
+        .gift-circle-watch-wrapper {
           position: absolute;
-          bottom: 24px;
-          left: 24px;
-          right: 24px;
+          inset: 0;
           z-index: 3;
-          color: #fff;
-        }
-        .gender-header-content h2 {
-          font-family: 'Cormorant Garamond', serif;
-          font-size: 20px;
-          font-weight: 500;
-          letter-spacing: 0.1em;
-          margin: 0 0 4px;
-          text-transform: uppercase;
           display: flex;
           align-items: center;
-          gap: 8px;
+          justify-content: center;
+          pointer-events: none;
         }
-        .gender-header-content span {
-          font-size: 11px;
-          color: rgba(255,255,255,0.7);
-          letter-spacing: 0.05em;
-          display: block;
+
+        .gift-circle-watch-img {
+          width: 58%;
+          height: 58%;
+          object-fit: contain;
+          filter: drop-shadow(0 4px 10px rgba(0,0,0,0.65));
+          transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        .gender-header-arrow {
-          position: absolute;
-          top: 24px;
-          right: 24px;
-          z-index: 3;
-          color: rgba(255,255,255,0.6);
-          transition: all 0.3s ease;
-          opacity: 0;
-          transform: scale(0.9);
+
+        .gift-circle-item:hover .gift-circle-watch-img {
+          transform: scale(1.14);
         }
-        .gender-header-card:hover .gender-header-arrow {
-          opacity: 1;
-          transform: scale(1.1);
+
+        .gift-circle-label {
+          font-family: 'Cormorant Garamond', serif;
+          font-size: 13.5px;
+          font-weight: 600;
+          letter-spacing: 0.1em;
+          color: rgba(26,18,9,0.75);
+          text-transform: uppercase;
+          text-align: center;
+          margin-top: 12px;
+          transition: color 0.3s ease;
+          line-height: 1.25;
+        }
+
+        .gift-circle-item:hover .gift-circle-label,
+        .gift-circle-item.active .gift-circle-label {
           color: #8b6914;
         }
-        .gender-header-card.active .gender-header-arrow {
-          opacity: 1;
-          transform: scale(1.1);
-          color: #8b6914;
+
+        .gift-circle-dot {
+          width: 4px;
+          height: 4px;
+          border-radius: 50%;
+          background: #8b6914;
+          margin-top: 5px;
+          box-shadow: 0 0 6px rgba(139,105,20,0.6);
         }
 
         /* ── PRODUCT SECTION ── */
@@ -769,8 +799,7 @@ export default function GiftsPage() {
             z-index: 2;
           }
           .gifts-category-row {
-            grid-template-columns: repeat(2, 1fr);
-            gap: 16px;
+            gap: 20px 24px;
           }
           .product-grid {
             grid-template-columns: repeat(2, 1fr);
@@ -810,6 +839,33 @@ export default function GiftsPage() {
         }
 
         @media (max-width: 768px) {
+          .gifts-category-row {
+            display: flex;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            justify-content: flex-start;
+            padding: 8px 12px 20px;
+            gap: 18px;
+            margin-bottom: 36px;
+            -webkit-overflow-scrolling: touch;
+          }
+          .gifts-category-row::-webkit-scrollbar {
+            display: none;
+          }
+          .gift-circle-item {
+            flex-shrink: 0;
+            scroll-snap-align: start;
+            max-width: 90px;
+          }
+          .gift-circle-badge {
+            width: 82px;
+            height: 82px;
+          }
+          .gift-circle-label {
+            font-size: 11.5px;
+            margin-top: 8px;
+          }
           .benefits-bar {
             display: flex;
             overflow-x: auto;
@@ -843,20 +899,12 @@ export default function GiftsPage() {
         }
 
         @media (max-width: 480px) {
-          .gifts-category-row {
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
+          .gift-circle-badge {
+            width: 74px;
+            height: 74px;
           }
-          .gender-header-card {
-            height: 150px;
-          }
-          .gender-header-content {
-            bottom: 16px;
-            left: 16px;
-            right: 16px;
-          }
-          .gender-header-content h2 {
-            font-size: 15px;
+          .gift-circle-label {
+            font-size: 10.5px;
           }
           .product-grid {
             grid-template-columns: repeat(2, 1fr);
@@ -1003,58 +1051,72 @@ export default function GiftsPage() {
               </div>
             ) : (
               <div className="gifts-category-row">
-                {/* Reset Option card */}
+                {/* Reset / All Occasions option */}
                 <div
-                  className={`gender-header-card ${selectedCategorySlug === 'all' ? 'active' : ''}`}
+                  className={`gift-circle-item ${selectedCategorySlug === 'all' ? 'active' : ''}`}
                   onClick={() => setSelectedCategorySlug('all')}
                 >
-                  <div className="gender-card-img-wrapper">
-                    <Image
-                      src="/graduation_gift.png"
-                      alt="All Gifts"
-                      fill
-                      sizes="(max-width: 768px) 50vw, 350px"
-                      style={{ objectFit: 'cover', objectPosition: 'center center' }}
-                      className="gender-card-img"
-                      priority
-                    />
+                  <div className="gift-circle-badge">
+                    <div className="gift-circle-inner" style={{ position: 'relative', width: '100%', height: '100%', borderRadius: '50%', overflow: 'hidden', background: '#110e0b' }}>
+                      <Image
+                        src="/graduation_gift.png"
+                        alt="All Occasions"
+                        fill
+                        sizes="110px"
+                        style={{ objectFit: 'cover', objectPosition: 'center center' }}
+                        className="gift-circle-bg-img"
+                        priority
+                      />
+                      <div className="gift-circle-overlay" />
+                      <div className="gift-circle-watch-wrapper">
+                        <Image
+                          src="/winsor_hero_backgroundremoved.webp"
+                          alt="Luxury Watch"
+                          width={65}
+                          height={65}
+                          style={{ objectFit: 'contain' }}
+                          className="gift-circle-watch-img"
+                        />
+                      </div>
+                    </div>
                   </div>
-                  <div className="gender-header-overlay" />
-                  <div className="gender-header-content">
-                    <h2>ALL OCCASIONS</h2>
-                    <span>View all gifting watches</span>
-                  </div>
-                  <div className="gender-header-arrow">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="12" cy="12" r="10" /><path d="M8 12h8M12 8l4 4-4 4" /></svg>
-                  </div>
+                  <span className="gift-circle-label">ALL OCCASIONS</span>
+                  {selectedCategorySlug === 'all' && <div className="gift-circle-dot" />}
                 </div>
 
                 {/* Categories cards dynamically mapped */}
                 {giftCategories.map(cat => (
                   <div
                     key={cat._id}
-                    className={`gender-header-card ${selectedCategorySlug === cat.slug ? 'active' : ''}`}
+                    className={`gift-circle-item ${selectedCategorySlug === cat.slug ? 'active' : ''}`}
                     onClick={() => setSelectedCategorySlug(cat.slug)}
                   >
-                    <div className="gender-card-img-wrapper">
-                      <Image
-                        src={getGiftCategoryImage(cat.slug, cat.image)}
-                        alt={cat.label}
-                        fill
-                        sizes="(max-width: 768px) 50vw, 350px"
-                        style={{ objectFit: 'cover', objectPosition: 'center center' }}
-                        className="gender-card-img"
-                        priority
-                      />
+                    <div className="gift-circle-badge">
+                      <div className="gift-circle-inner" style={{ position: 'relative', width: '100%', height: '100%', borderRadius: '50%', overflow: 'hidden', background: '#110e0b' }}>
+                        <Image
+                          src={getGiftCategoryImage(cat.slug, cat.image)}
+                          alt={cat.label}
+                          fill
+                          sizes="110px"
+                          style={{ objectFit: 'cover', objectPosition: 'center center' }}
+                          className="gift-circle-bg-img"
+                          priority
+                        />
+                        <div className="gift-circle-overlay" />
+                        <div className="gift-circle-watch-wrapper">
+                          <Image
+                            src={cat.slug.includes('sport') ? "/winsor_hero_backgroundremoved_sport.webp" : "/winsor_hero_backgroundremoved.webp"}
+                            alt="Luxury Watch"
+                            width={65}
+                            height={65}
+                            style={{ objectFit: 'contain' }}
+                            className="gift-circle-watch-img"
+                          />
+                        </div>
+                      </div>
                     </div>
-                    <div className="gender-header-overlay" />
-                    <div className="gender-header-content">
-                      <h2>{stripEmojis(cat.label)}</h2>
-                      <span>Explore this curated collection</span>
-                    </div>
-                    <div className="gender-header-arrow">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="12" cy="12" r="10" /><path d="M8 12h8M12 8l4 4-4 4" /></svg>
-                    </div>
+                    <span className="gift-circle-label">{stripEmojis(cat.label)}</span>
+                    {selectedCategorySlug === cat.slug && <div className="gift-circle-dot" />}
                   </div>
                 ))}
               </div>

@@ -8,6 +8,7 @@ import { useCurrency } from '@/app/context/CurrencyContext';
 import { useCart } from '@/app/context/CartContext';
 import { IProduct, CollectionSection } from '@/types';
 import NewsletterCard from '@/components/NewsletterCard';
+import ProductCard from '@/components/ProductCard';
 import { toast } from 'react-hot-toast';
 
 interface IGiftCategory {
@@ -198,6 +199,184 @@ function SportsCollectionContent() {
             max-width: 480px;
             margin: 0 auto;
             width: 100%;
+          }
+        }
+
+        /* ── PRODUCT GRID & WATCH CARD CONTAINER ── */
+        .product-grid {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 30px;
+        }
+        .watch-card-container {
+          background: #faf7f0;
+          border-radius: 16px;
+          border: 1px solid rgba(26,18,9,0.08);
+          overflow: hidden;
+          display: flex;
+          flex-direction: column;
+          height: 100%;
+          transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+          box-shadow: 0 4px 16px rgba(26,18,9,0.02);
+          text-decoration: none;
+          color: inherit;
+          position: relative;
+        }
+        .watch-card-container:hover {
+          transform: translateY(-6px);
+          box-shadow: 0 16px 36px rgba(26,18,9,0.08);
+          border-color: rgba(139,105,20,0.3);
+          background: #ffffff;
+        }
+        .watch-img-container {
+          position: relative;
+          aspect-ratio: 1;
+          background: transparent;
+          padding: 24px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          overflow: hidden;
+        }
+        .watch-card-image {
+          width: 100%;
+          height: 100%;
+          object-fit: contain;
+          transition: transform 0.6s ease;
+        }
+        .watch-card-container:hover .watch-card-image {
+          transform: scale(1.06);
+        }
+        .watch-card-badge {
+          position: absolute;
+          left: 16px;
+          top: 16px;
+          background: #1a1209;
+          color: #fff;
+          font-size: 9px;
+          font-weight: 600;
+          letter-spacing: 0.12em;
+          padding: 4px 10px;
+          border-radius: 4px;
+          z-index: 2;
+          text-transform: uppercase;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+        .watch-card-info {
+          padding: 20px;
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+          background: transparent;
+        }
+        .watch-card-title-link {
+          text-decoration: none;
+          color: inherit;
+        }
+        .watch-card-title {
+          font-size: 15.5px;
+          font-weight: 500;
+          margin: 0 0 6px;
+          color: #1a1209;
+          letter-spacing: 0.01em;
+          font-variant-numeric: lining-nums;
+          font-feature-settings: "lnum" 1;
+        }
+        .watch-card-specs {
+          font-size: 12px;
+          color: rgba(26,18,9,0.5);
+          margin: 0;
+        }
+        .watch-card-footer {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-top: 16px;
+          border-top: 1px solid rgba(26,18,9,0.05);
+          padding-top: 14px;
+        }
+        .watch-card-price {
+          font-size: 14.5px;
+          font-weight: 600;
+          color: #8b6914;
+        }
+        .watch-card-actions {
+          display: flex;
+          gap: 8px;
+          align-items: center;
+        }
+        .card-action-btn {
+          background: transparent;
+          border: 1px solid rgba(26,18,9,0.1);
+          width: 32px;
+          height: 32px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: rgba(26, 18, 9, 0.7);
+          cursor: pointer;
+          transition: all 0.3s ease;
+        }
+        .card-action-btn:hover {
+          background: rgba(26, 18, 9, 0.04);
+          color: #1a1209;
+          border-color: #1a1209;
+        }
+        .card-action-btn.active {
+          background: #ffebeb;
+          color: #ff3b30;
+          border-color: #ff3b30;
+        }
+        .card-action-btn.highlight:hover {
+          background: #1a1209;
+          color: #fff;
+          border-color: #1a1209;
+        }
+
+        @media (max-width: 1024px) {
+          .product-grid {
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+          }
+        }
+
+        @media (max-width: 768px) {
+          .product-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+          }
+          .watch-img-container {
+            padding: 12px;
+          }
+          .watch-card-info {
+            padding: 12px;
+          }
+          .watch-card-title {
+            font-size: 13.5px;
+            margin-bottom: 4px;
+          }
+          .watch-card-specs {
+            font-size: 11px;
+          }
+          .watch-card-footer {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+            margin-top: 12px;
+            padding-top: 10px;
+          }
+          .watch-card-price {
+            font-size: 13px;
+          }
+          .watch-card-actions {
+            width: 100%;
+            justify-content: flex-end;
+          }
+          .card-action-btn {
+            width: 28px;
+            height: 28px;
           }
         }
 
@@ -540,140 +719,18 @@ function SportsCollectionContent() {
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-            {filteredProducts.map((p) => {
-              const isFav = wishlist.includes(p._id);
-              const mainImg = getWatchImageUrl(p);
-              const ratingData = reviewRatings[p._id] || { averageRating: 5, reviewCount: 1 };
-
-              return (
-                <div
-                  key={p._id}
-                  style={{
-                    background: '#ffffff',
-                    borderRadius: '12px',
-                    overflow: 'hidden',
-                    border: '1px solid rgba(26,18,9,0.06)',
-                    boxShadow: '0 4px 16px rgba(0,0,0,0.02)',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'space-between',
-                    position: 'relative',
-                    transition: 'all 0.3s ease'
-                  }}
-                  className="group hover:shadow-xl hover:border-[#8b6914]/30"
-                >
-                  {/* Badge */}
-                  <div style={{ position: 'absolute', top: '12px', left: '12px', zIndex: 10, display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                    <span style={{ background: '#8b6914', color: '#ffffff', fontSize: '9px', fontWeight: 700, padding: '3px 8px', borderRadius: '4px', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-                      SPORT PRO
-                    </span>
-                  </div>
-
-                  {/* Wishlist Button */}
-                  <button
-                    onClick={(e) => { e.preventDefault(); toggleWishlist(p._id); }}
-                    style={{ position: 'absolute', top: '12px', right: '12px', zIndex: 10, background: 'rgba(255,255,255,0.85)', border: 'none', borderRadius: '50%', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}
-                  >
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill={isFav ? '#8b6914' : 'none'} stroke="#8b6914" strokeWidth="2">
-                      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-                    </svg>
-                  </button>
-
-                  {/* Image Container */}
-                  <Link href={`/collections/${p._id}`} style={{ display: 'block', textDecoration: 'none' }}>
-                    <div style={{ position: 'relative', width: '100%', aspectRatio: '1', padding: '16px', background: '#faf7f0' }}>
-                      <Image
-                        src={mainImg}
-                        alt={p.title}
-                        fill
-                        sizes="(max-width: 768px) 50vw, 25vw"
-                        style={{ objectFit: 'contain' }}
-                        className="group-hover:scale-105 transition-transform duration-500"
-                      />
-                    </div>
-                  </Link>
-
-                  {/* Details Container */}
-                  <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', flexGrow: 1, justifyContent: 'space-between' }}>
-                    <div>
-                      {/* Rating Stars */}
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '3px', marginBottom: '6px' }}>
-                        {Array.from({ length: 5 }).map((_, i) => (
-                          <svg key={i} width="11" height="11" viewBox="0 0 24 24" fill={i < Math.round(ratingData.averageRating) ? '#8b6914' : 'none'} stroke="#8b6914" strokeWidth="1.5">
-                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                          </svg>
-                        ))}
-                        <span style={{ fontSize: '10px', color: 'rgba(26,18,9,0.4)', marginLeft: '4px' }}>({ratingData.reviewCount})</span>
-                      </div>
-
-                      {/* Title */}
-                      <Link href={`/collections/${p._id}`} style={{ textDecoration: 'none' }}>
-                        <h3 style={{ fontFamily: "'Cinzel', serif", fontSize: '14px', fontWeight: 600, color: '#1a1209', margin: '0 0 6px 0', lineHeight: 1.3 }} className="hover:text-[#8b6914] transition-colors">
-                          {p.title}
-                        </h3>
-                      </Link>
-                    </div>
-
-                    <div>
-                      {/* Price Tag */}
-                      <div style={{ margin: '8px 0 12px' }}>
-                        <span style={{ fontSize: '15px', fontWeight: 700, color: '#1a1209' }}>
-                          {convertPrice(p.price)}
-                        </span>
-                      </div>
-
-                      {/* Actions */}
-                      <div style={{ display: 'flex', gap: '6px' }}>
-                        <button
-                          onClick={() => {
-                            if (p._id) addToCart(p._id, 1, p.colorVariants?.[0]?.colorName, p);
-                          }}
-                          style={{
-                            flex: 1,
-                            padding: '9px 4px',
-                            background: '#1a1209',
-                            color: '#ffffff',
-                            border: 'none',
-                            borderRadius: '6px',
-                            fontSize: '10.5px',
-                            fontWeight: 600,
-                            letterSpacing: '0.08em',
-                            cursor: 'pointer',
-                            textTransform: 'uppercase',
-                            transition: 'background 0.2s ease'
-                          }}
-                          className="hover:bg-[#8b6914]"
-                        >
-                          ADD TO CART
-                        </button>
-
-                        <Link
-                          href={`/collections/${p._id}`}
-                          style={{
-                            padding: '9px 12px',
-                            background: 'transparent',
-                            color: '#8b6914',
-                            border: '1px solid #8b6914',
-                            borderRadius: '6px',
-                            fontSize: '10.5px',
-                            fontWeight: 600,
-                            letterSpacing: '0.08em',
-                            textDecoration: 'none',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            textTransform: 'uppercase'
-                          }}
-                        >
-                          VIEW
-                        </Link>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
+          <div className="product-grid">
+            {filteredProducts.map((p) => (
+              <ProductCard
+                key={p._id}
+                product={p}
+                convertPrice={convertPrice}
+                addToCart={addToCart}
+                toggleWishlist={toggleWishlist}
+                isWishlisted={wishlist.includes(p._id)}
+                ratingData={reviewRatings[p._id]}
+              />
+            ))}
           </div>
         )}
 

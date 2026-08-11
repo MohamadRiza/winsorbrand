@@ -6,8 +6,10 @@ import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
 import { useCurrency } from '@/app/context/CurrencyContext';
 import { useCart } from '@/app/context/CartContext';
-import { IProduct, CollectionSection } from '@/types';
+import { IProduct, CollectionSection, IGiftCategory } from '@/types';
 import NewsletterCard from '@/components/NewsletterCard';
+import ProductCard from '@/components/ProductCard';
+import { toast } from 'react-hot-toast';
 
 // Helper to determine product gender
 const getProductGender = (product: IProduct): 'Gents' | 'Ladies' | 'Unisex' => {
@@ -317,6 +319,184 @@ function MensCollectionContent() {
             box-shadow: 0 4px 12px rgba(0,0,0,0.015);
           }
         }
+
+        /* ── PRODUCT GRID & WATCH CARD CONTAINER ── */
+        .product-grid {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 30px;
+        }
+        .watch-card-container {
+          background: #faf7f0;
+          border-radius: 16px;
+          border: 1px solid rgba(26,18,9,0.08);
+          overflow: hidden;
+          display: flex;
+          flex-direction: column;
+          height: 100%;
+          transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+          box-shadow: 0 4px 16px rgba(26,18,9,0.02);
+          text-decoration: none;
+          color: inherit;
+          position: relative;
+        }
+        .watch-card-container:hover {
+          transform: translateY(-6px);
+          box-shadow: 0 16px 36px rgba(26,18,9,0.08);
+          border-color: rgba(139,105,20,0.3);
+          background: #ffffff;
+        }
+        .watch-img-container {
+          position: relative;
+          aspect-ratio: 1;
+          background: transparent;
+          padding: 24px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          overflow: hidden;
+        }
+        .watch-card-image {
+          width: 100%;
+          height: 100%;
+          object-fit: contain;
+          transition: transform 0.6s ease;
+        }
+        .watch-card-container:hover .watch-card-image {
+          transform: scale(1.06);
+        }
+        .watch-card-badge {
+          position: absolute;
+          left: 16px;
+          top: 16px;
+          background: #1a1209;
+          color: #fff;
+          font-size: 9px;
+          font-weight: 600;
+          letter-spacing: 0.12em;
+          padding: 4px 10px;
+          border-radius: 4px;
+          z-index: 2;
+          text-transform: uppercase;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+        .watch-card-info {
+          padding: 20px;
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+          background: transparent;
+        }
+        .watch-card-title-link {
+          text-decoration: none;
+          color: inherit;
+        }
+        .watch-card-title {
+          font-size: 15.5px;
+          font-weight: 500;
+          margin: 0 0 6px;
+          color: #1a1209;
+          letter-spacing: 0.01em;
+          font-variant-numeric: lining-nums;
+          font-feature-settings: "lnum" 1;
+        }
+        .watch-card-specs {
+          font-size: 12px;
+          color: rgba(26,18,9,0.5);
+          margin: 0;
+        }
+        .watch-card-footer {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-top: 16px;
+          border-top: 1px solid rgba(26,18,9,0.05);
+          padding-top: 14px;
+        }
+        .watch-card-price {
+          font-size: 14.5px;
+          font-weight: 600;
+          color: #8b6914;
+        }
+        .watch-card-actions {
+          display: flex;
+          gap: 8px;
+          align-items: center;
+        }
+        .card-action-btn {
+          background: transparent;
+          border: 1px solid rgba(26,18,9,0.1);
+          width: 32px;
+          height: 32px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: rgba(26, 18, 9, 0.7);
+          cursor: pointer;
+          transition: all 0.3s ease;
+        }
+        .card-action-btn:hover {
+          background: rgba(26, 18, 9, 0.04);
+          color: #1a1209;
+          border-color: #1a1209;
+        }
+        .card-action-btn.active {
+          background: #ffebeb;
+          color: #ff3b30;
+          border-color: #ff3b30;
+        }
+        .card-action-btn.highlight:hover {
+          background: #1a1209;
+          color: #fff;
+          border-color: #1a1209;
+        }
+
+        @media (max-width: 1024px) {
+          .product-grid {
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+          }
+        }
+
+        @media (max-width: 768px) {
+          .product-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+          }
+          .watch-img-container {
+            padding: 12px;
+          }
+          .watch-card-info {
+            padding: 12px;
+          }
+          .watch-card-title {
+            font-size: 13.5px;
+            margin-bottom: 4px;
+          }
+          .watch-card-specs {
+            font-size: 11px;
+          }
+          .watch-card-footer {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+            margin-top: 12px;
+            padding-top: 10px;
+          }
+          .watch-card-price {
+            font-size: 13px;
+          }
+          .watch-card-actions {
+            width: 100%;
+            justify-content: flex-end;
+          }
+          .card-action-btn {
+            width: 28px;
+            height: 28px;
+          }
+        }
       `}</style>
 
       {/* ── HERO BANNER (VIDEO + IMAGE COMBINED) ── */}
@@ -514,69 +694,18 @@ function MensCollectionContent() {
             <button onClick={() => { setSelectedSection('all'); setSelectedGender('all'); setSearchQuery(''); }} style={{ padding: '10px 24px', background: '#8b6914', color: '#fff', border: 'none', borderRadius: '4px', fontSize: '11px', letterSpacing: '0.15em', textTransform: 'uppercase', cursor: 'pointer' }}>Reset All Filters</button>
           </div>
         ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '28px' }}>
-            {filteredProducts.map(product => {
-              const ratingData = reviewRatings[product._id] || { averageRating: 5, reviewCount: 0 };
-              const isFav = wishlist.includes(product._id);
-              const isOut = product.stock <= 0;
-
-              return (
-                <div 
-                  key={product._id} 
-                  style={{ background: '#fff', borderRadius: '14px', border: '1px solid rgba(26,18,9,0.07)', overflow: 'hidden', display: 'flex', flexDirection: 'column', transition: 'all 0.3s ease', position: 'relative' }}
-                >
-                  {/* Image Block */}
-                  <Link href={`/collections/${product._id}`} style={{ position: 'relative', aspectRatio: '1', display: 'block', padding: '20px', background: '#fcfaf5', textDecoration: 'none' }}>
-                    <Image 
-                      src={getWatchImageUrl(product)} 
-                      alt={product.title} 
-                      fill 
-                      sizes="(max-width: 768px) 50vw, 25vw"
-                      style={{ objectFit: 'contain' }}
-                    />
-                    <button 
-                      onClick={(e) => { e.preventDefault(); toggleWishlist(product._id); }}
-                      style={{ position: 'absolute', top: '14px', right: '14px', width: '32px', height: '32px', borderRadius: '50%', background: 'rgba(255,255,255,0.85)', border: '1px solid rgba(26,18,9,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', zIndex: 3 }}
-                    >
-                      <svg width="15" height="15" viewBox="0 0 24 24" fill={isFav ? '#8b6914' : 'none'} stroke={isFav ? '#8b6914' : '#1a1209'} strokeWidth="1.8"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-                    </button>
-                  </Link>
-
-                  {/* Card Info */}
-                  <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', flex: 1, justifyContent: 'space-between' }}>
-                    <div>
-                      <div style={{ fontSize: '10.5px', letterSpacing: '0.22em', color: '#8b6914', textTransform: 'uppercase', fontWeight: 600, marginBottom: '6px', fontFamily: "'Jost', sans-serif" }}>
-                        {product.modelNo || 'WINSOR ORIGINAL'}
-                      </div>
-                      <Link href={`/collections/${product._id}`} style={{ textDecoration: 'none', color: '#1a1209' }}>
-                        <h3 style={{ fontFamily: "'Cinzel', 'Cormorant Garamond', serif", fontSize: '17px', fontWeight: 600, margin: '0 0 8px', lineHeight: 1.3, letterSpacing: '0.02em', fontVariantNumeric: 'lining-nums' }}>
-                          {product.title}
-                        </h3>
-                      </Link>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', color: '#8b6914', marginBottom: '14px' }}>
-                        <span>★ {ratingData.averageRating.toFixed(1)}</span>
-                        <span style={{ color: 'rgba(26,18,9,0.4)' }}>({ratingData.reviewCount})</span>
-                      </div>
-                    </div>
-
-                    <div>
-                      <div style={{ fontSize: '17px', fontWeight: 600, color: '#1a1209', marginBottom: '14px' }}>
-                        {convertPrice(product.price)}
-                      </div>
-                      <button 
-                        disabled={isOut}
-                        onClick={() => {
-                          if (product._id) addToCart(product._id, 1, product.colorVariants?.[0]?.colorName, product);
-                        }}
-                        style={{ width: '100%', padding: '12px 0', background: isOut ? '#ccc' : '#1a1209', color: '#fff', border: 'none', borderRadius: '6px', fontSize: '11px', letterSpacing: '0.15em', textTransform: 'uppercase', fontWeight: 500, cursor: isOut ? 'not-allowed' : 'pointer', transition: 'background 0.2s ease' }}
-                      >
-                        {isOut ? 'Sold Out' : 'Add to Cart'}
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
+          <div className="product-grid">
+            {filteredProducts.map(product => (
+              <ProductCard
+                key={product._id}
+                product={product}
+                convertPrice={convertPrice}
+                addToCart={addToCart}
+                toggleWishlist={toggleWishlist}
+                isWishlisted={wishlist.includes(product._id)}
+                ratingData={reviewRatings[product._id]}
+              />
+            ))}
           </div>
         )}
 
