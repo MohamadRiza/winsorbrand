@@ -32,8 +32,6 @@ interface Retailer {
 
 const BOUTIQUE_PLACEHOLDER = 'https://images.unsplash.com/photo-1582037936109-1a06705d2334?q=80&w=800&auto=format&fit=crop';
 
-
-
 // Haversine distance formula in kilometers
 function calculateHaversineDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
   const R = 6371; // Earth radius in km
@@ -122,7 +120,7 @@ export default function StoreLocatorPage() {
   // Active / Highlighted Boutique selection
   const [selectedBoutiqueId, setSelectedBoutiqueId] = useState<string | null>(null);
   const [sliderIndex, setSliderIndex] = useState(0);
-  const [listLimit, setListLimit] = useState(3);
+  const [listLimit, setListLimit] = useState(4);
 
   useEffect(() => {
     fetchLocations();
@@ -170,7 +168,6 @@ export default function StoreLocatorPage() {
     const runFallbackIPLocation = async () => {
       console.warn('Attempting IP-based geolocation fallback...');
 
-      // Fallback 1: ipapi.co
       try {
         const res = await fetch('https://ipapi.co/json/');
         if (res.ok) {
@@ -187,7 +184,6 @@ export default function StoreLocatorPage() {
         console.warn('ipapi.co failed, trying freeipapi...', err);
       }
 
-      // Fallback 2: freeipapi.com
       try {
         const res = await fetch('https://freeipapi.com/api/json');
         if (res.ok) {
@@ -282,7 +278,7 @@ export default function StoreLocatorPage() {
         return r;
       });
 
-      // Sort by distance (nearest first). Boutique locations without GPS coords are placed last.
+      // Sort by distance (nearest first)
       list.sort((a, b) => {
         if (a.distance !== undefined && b.distance !== undefined) {
           return a.distance - b.distance;
@@ -299,7 +295,6 @@ export default function StoreLocatorPage() {
   // Sync selected boutique when list is filtered
   useEffect(() => {
     if (processedRetailers.length > 0) {
-      // Keep selected if still in the list, otherwise select the first item
       const exists = processedRetailers.some(r => r._id === selectedBoutiqueId);
       if (!exists) {
         setSelectedBoutiqueId(processedRetailers[0]._id);
@@ -314,7 +309,7 @@ export default function StoreLocatorPage() {
   const selectedBoutique = retailers.find(r => r._id === selectedBoutiqueId) || null;
   const todayHours = selectedBoutique ? getTodayHours(selectedBoutique.operatingHours) : null;
 
-  // Build images array for slider using exact boutique photo uploaded by owner
+  // Build images array for slider
   const sliderImages = (() => {
     if (!selectedBoutique) return [];
     const mainImg = selectedBoutique.image?.url || BOUTIQUE_PLACEHOLDER;
@@ -334,10 +329,14 @@ export default function StoreLocatorPage() {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Jost:wght@300;400;500;600;700&display=swap');
 
-        /* ── HERO BANNER ── */
+        /* ── LUXURY HERO BANNER ── */
         .locator-hero-banner {
           position: relative;
-          background: linear-gradient(rgba(26,18,9,0.35), rgba(26,18,9,0.6)), url('/KCC.webp');
+          min-height: 460px;
+          background-image: 
+            linear-gradient(180deg, rgba(10, 8, 5, 0.82) 0%, rgba(10, 8, 5, 0.7) 50%, rgba(10, 8, 5, 0.95) 100%),
+            radial-gradient(circle at 50% 30%, rgba(223, 177, 91, 0.18) 0%, transparent 65%),
+            url('/KCC.webp');
           background-size: cover;
           background-position: center 35%;
           background-attachment: fixed;
@@ -347,56 +346,59 @@ export default function StoreLocatorPage() {
           justify-content: center;
           text-align: center;
           color: #ffffff;
-          padding: 220px 24px 100px;
-          border-bottom: 1.5px solid rgba(139,105,20,0.15);
+          padding: 120px 24px 60px;
         }
-        .hero-banner-inner {
-          max-width: 780px;
-          margin: 0 auto;
-          display: flex;
-          flex-direction: column;
+
+        .hero-badge-pill {
+          display: inline-flex;
           align-items: center;
-        }
-        .locator-tag {
-          font-family: 'Jost', sans-serif;
+          gap: 8px;
+          padding: 8px 20px;
+          background: rgba(139, 105, 20, 0.22);
+          border: 1px solid rgba(223, 177, 91, 0.45);
+          border-radius: 30px;
           font-size: 10px;
-          font-weight: 700;
-          letter-spacing: 0.35em;
+          letter-spacing: 0.26em;
           text-transform: uppercase;
+          font-weight: 600;
           color: #dfb15b;
-          margin-bottom: 16px;
-          display: flex;
-          align-items: center;
-          gap: 6px;
+          margin-bottom: 18px;
+          backdrop-filter: blur(8px);
+          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
         }
+
         .locator-title {
           font-family: 'Cormorant Garamond', serif;
-          font-size: clamp(34px, 5vw, 56px);
-          font-weight: 300;
-          letter-spacing: 0.12em;
+          font-size: clamp(34px, 4.5vw, 56px);
+          font-weight: 400;
+          letter-spacing: 0.08em;
           text-transform: uppercase;
-          margin: 0 0 16px;
-          text-shadow: 0 4px 15px rgba(0,0,0,0.25);
+          margin: 0 0 14px;
+          color: #ffffff;
+          text-shadow: 0 4px 18px rgba(0, 0, 0, 0.4);
+          line-height: 1.15;
         }
+
         .locator-subtitle {
-          font-family: 'Cormorant Garamond', serif;
-          font-size: clamp(15px, 2.2vw, 20px);
-          font-style: italic;
-          color: rgba(255,255,255,0.85);
-          line-height: 1.45;
+          font-family: 'Jost', sans-serif;
+          font-size: clamp(13px, 1.2vw, 15px);
+          font-weight: 300;
+          letter-spacing: 0.04em;
+          color: rgba(250, 247, 240, 0.85);
+          max-width: 680px;
+          line-height: 1.65;
           margin: 0;
-          max-width: 620px;
         }
 
         /* ── FLOATING TOOLBAR ── */
         .locator-toolbar {
-          max-width: 1280px;
+          max-width: 1300px;
           width: calc(100% - 48px);
-          margin: -36px auto 48px;
+          margin: -36px auto 36px;
           background: #ffffff;
-          border: 1px solid rgba(26,18,9,0.08);
+          border: 1.5px solid rgba(139, 105, 20, 0.18);
           border-radius: 12px;
-          padding: 16px 24px;
+          padding: 18px 24px;
           box-shadow: 0 12px 36px rgba(26,18,9,0.06);
           display: flex;
           align-items: center;
@@ -407,7 +409,7 @@ export default function StoreLocatorPage() {
         .locator-search-container {
           position: relative;
           flex: 1.6;
-          min-width: 260px;
+          min-width: 240px;
         }
         .search-icon-svg {
           position: absolute;
@@ -415,31 +417,31 @@ export default function StoreLocatorPage() {
           top: 50%;
           transform: translateY(-50%);
           color: #8b6914;
-          opacity: 0.7;
         }
         .search-input-field {
           width: 100%;
+          box-sizing: border-box;
           background: #fdfaf6;
-          border: 1px solid rgba(26,18,9,0.1);
+          border: 1.5px solid rgba(26,18,9,0.12);
           border-radius: 8px;
           padding: 12px 16px 12px 46px;
           font-family: 'Jost', sans-serif;
           font-size: 13.5px;
           color: #1a1209;
           outline: none;
-          transition: all 0.3s ease;
+          transition: all 0.25s ease;
         }
         .search-input-field:focus {
           border-color: #8b6914;
           background: #ffffff;
-          box-shadow: 0 0 0 3px rgba(139,105,20,0.08);
+          box-shadow: 0 0 0 3px rgba(139,105,20,0.12);
         }
         
         .locator-filter-select {
           flex: 1;
-          min-width: 150px;
+          min-width: 140px;
           background: #ffffff;
-          border: 1px solid rgba(26,18,9,0.1);
+          border: 1.5px solid rgba(26,18,9,0.12);
           border-radius: 8px;
           padding: 12px 36px 12px 16px;
           font-family: 'Jost', sans-serif;
@@ -447,7 +449,7 @@ export default function StoreLocatorPage() {
           color: #1a1209;
           outline: none;
           cursor: pointer;
-          transition: all 0.3s ease;
+          transition: all 0.25s ease;
           appearance: none;
           background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%238B6914' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19.5 8.25l-7.5 7.5-7.5-7.5'/%3E%3C/svg%3E");
           background-repeat: no-repeat;
@@ -456,10 +458,11 @@ export default function StoreLocatorPage() {
         }
         .locator-filter-select:focus {
           border-color: #8b6914;
+          box-shadow: 0 0 0 3px rgba(139,105,20,0.12);
         }
 
         .location-trigger-btn {
-          background: #1a1209;
+          background: linear-gradient(135deg, #1a1209 0%, #2b2016 100%);
           color: #ffffff;
           border: 1px solid rgba(139, 105, 20, 0.4);
           border-radius: 8px;
@@ -467,7 +470,7 @@ export default function StoreLocatorPage() {
           font-family: 'Jost', sans-serif;
           font-size: 11.5px;
           font-weight: 600;
-          letter-spacing: 0.08em;
+          letter-spacing: 0.1em;
           text-transform: uppercase;
           cursor: pointer;
           display: flex;
@@ -475,11 +478,13 @@ export default function StoreLocatorPage() {
           gap: 8px;
           transition: all 0.3s ease;
           flex-shrink: 0;
+          box-shadow: 0 4px 14px rgba(26,18,9,0.12);
         }
         .location-trigger-btn:hover {
           background: #8b6914;
           border-color: #8b6914;
-          box-shadow: 0 4px 15px rgba(139, 105, 20, 0.2);
+          box-shadow: 0 6px 20px rgba(139, 105, 20, 0.25);
+          transform: translateY(-1px);
         }
         .location-trigger-btn.gps-active {
           background: #8b6914;
@@ -492,11 +497,11 @@ export default function StoreLocatorPage() {
           font-family: 'Jost', sans-serif;
         }
         .locator-workspace-grid {
-          max-width: 1280px;
-          margin: 0 auto 72px;
+          max-width: 1300px;
+          margin: 0 auto 56px;
           display: grid;
           grid-template-columns: 460px 1fr;
-          gap: 32px;
+          gap: 36px;
           align-items: flex-start;
         }
 
@@ -504,15 +509,15 @@ export default function StoreLocatorPage() {
         .list-column-container {
           display: flex;
           flex-direction: column;
-          gap: 20px;
+          gap: 16px;
         }
         .list-result-tag {
           font-size: 11px;
           font-weight: 700;
-          letter-spacing: 0.1em;
-          color: rgba(26,18,9,0.5);
+          letter-spacing: 0.12em;
+          color: rgba(26,18,9,0.55);
           text-transform: uppercase;
-          margin: 0;
+          margin: 0 0 4px;
         }
         .list-result-tag span {
           color: #8b6914;
@@ -522,11 +527,11 @@ export default function StoreLocatorPage() {
 
         .retailer-card {
           background: #ffffff;
-          border: 1px solid rgba(26,18,9,0.06);
+          border: 1px solid rgba(26,18,9,0.08);
           border-radius: 12px;
           overflow: hidden;
           display: flex;
-          box-shadow: 0 4px 20px rgba(0,0,0,0.015);
+          box-shadow: 0 4px 20px rgba(0,0,0,0.02);
           cursor: pointer;
           transition: all 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
           position: relative;
@@ -534,13 +539,13 @@ export default function StoreLocatorPage() {
         }
         .retailer-card:hover {
           transform: translateY(-3px);
-          box-shadow: 0 10px 25px rgba(26,18,9,0.05);
-          border-color: rgba(139,105,20,0.2);
+          box-shadow: 0 10px 25px rgba(26,18,9,0.06);
+          border-color: rgba(139,105,20,0.3);
         }
         .retailer-card.selected {
           border-color: #8b6914;
-          border-width: 2.5px;
-          box-shadow: 0 10px 25px rgba(139,105,20,0.08);
+          border-width: 2px;
+          box-shadow: 0 10px 28px rgba(139,105,20,0.14);
         }
         
         .retailer-card-img-side {
@@ -560,13 +565,13 @@ export default function StoreLocatorPage() {
         .retailer-card-badge {
           display: inline-flex;
           align-items: center;
-          gap: 4px;
-          background: rgba(139,105,20,0.06);
+          gap: 5px;
+          background: rgba(139,105,20,0.08);
           color: #8b6914;
-          border: 1px solid rgba(139,105,20,0.12);
+          border: 1px solid rgba(139,105,20,0.18);
           border-radius: 4px;
           padding: 3px 8px;
-          font-size: 8px;
+          font-size: 8.5px;
           font-weight: 700;
           letter-spacing: 0.08em;
           text-transform: uppercase;
@@ -575,10 +580,10 @@ export default function StoreLocatorPage() {
         }
         .retailer-card-name {
           font-family: 'Cormorant Garamond', serif;
-          font-size: 18px;
+          font-size: 19px;
           font-weight: 600;
           color: #1a1209;
-          margin: 0 0 6px;
+          margin: 0 0 4px;
           line-height: 1.25;
           text-overflow: ellipsis;
           overflow: hidden;
@@ -586,7 +591,7 @@ export default function StoreLocatorPage() {
         }
         .retailer-card-addr {
           font-size: 11.5px;
-          color: rgba(26,18,9,0.55);
+          color: rgba(26,18,9,0.58);
           margin: 0 0 8px;
           line-height: 1.4;
           display: -webkit-box;
@@ -597,7 +602,7 @@ export default function StoreLocatorPage() {
         .retailer-card-distance {
           font-size: 10.5px;
           font-weight: 600;
-          color: rgba(26,18,9,0.45);
+          color: #8b6914;
           display: flex;
           align-items: center;
           gap: 4px;
@@ -606,7 +611,7 @@ export default function StoreLocatorPage() {
         .retailer-card-actions {
           display: flex;
           gap: 12px;
-          border-top: 1.5px solid rgba(26,18,9,0.04);
+          border-top: 1px solid rgba(26,18,9,0.06);
           padding-top: 10px;
           margin-top: auto;
         }
@@ -616,7 +621,7 @@ export default function StoreLocatorPage() {
           font-weight: 600;
           color: #8b6914;
           text-transform: uppercase;
-          letter-spacing: 0.1em;
+          letter-spacing: 0.08em;
           text-decoration: none;
           display: inline-flex;
           align-items: center;
@@ -631,7 +636,7 @@ export default function StoreLocatorPage() {
           width: 100%;
           text-align: center;
           background: #ffffff;
-          border: 1px solid rgba(26,18,9,0.1);
+          border: 1.5px solid rgba(139,105,20,0.25);
           border-radius: 8px;
           padding: 14px;
           font-size: 11px;
@@ -656,23 +661,23 @@ export default function StoreLocatorPage() {
           height: 580px;
           border-radius: 16px;
           overflow: hidden;
-          border: 1px solid rgba(26,18,9,0.08);
-          box-shadow: 0 16px 40px rgba(0,0,0,0.03);
-          z-index: 10;
+          border: 1.5px solid rgba(139, 105, 20, 0.2);
+          box-shadow: 0 16px 40px rgba(0,0,0,0.05);
+          z-index: 5;
         }
 
         /* ── HIGHLIGHT DETAIL BOX ── */
         .boutique-highlight-panel {
-          max-width: 1280px;
-          margin: 0 auto;
+          max-width: 1300px;
+          margin: 0 auto 56px;
           background: #ffffff;
-          border: 1px solid rgba(26,18,9,0.06);
+          border: 1px solid rgba(26,18,9,0.08);
+          border-top: 3.5px solid #8b6914;
           border-radius: 16px;
           overflow: hidden;
-          box-shadow: 0 12px 40px rgba(0,0,0,0.015);
+          box-shadow: 0 12px 40px rgba(0,0,0,0.03);
           display: grid;
           grid-template-columns: 1.2fr 1fr;
-          margin-bottom: 72px;
         }
         .highlight-slider-side {
           background: #faf7f0;
@@ -680,7 +685,7 @@ export default function StoreLocatorPage() {
           display: flex;
           flex-direction: column;
           gap: 20px;
-          border-right: 1.5px solid rgba(26,18,9,0.04);
+          border-right: 1.5px solid rgba(26,18,9,0.06);
         }
         .highlight-main-frame {
           position: relative;
@@ -688,55 +693,11 @@ export default function StoreLocatorPage() {
           border-radius: 12px;
           overflow: hidden;
           background: #eee;
-          box-shadow: 0 4px 15px rgba(0,0,0,0.03);
-        }
-        .slider-nav-arrow {
-          position: absolute;
-          top: 50%;
-          transform: translateY(-50%);
-          width: 36px;
-          height: 36px;
-          border-radius: 50%;
-          background: rgba(255,255,255,0.9);
-          border: none;
-          color: #1a1209;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          cursor: pointer;
-          z-index: 5;
-          box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-          transition: all 0.2s;
-        }
-        .slider-nav-arrow:hover {
-          background: #1a1209;
-          color: #fff;
-        }
-        .slider-nav-arrow.prev { left: 16px; }
-        .slider-nav-arrow.next { right: 16px; }
-
-        .highlight-thumbnail-row {
-          display: grid;
-          grid-template-columns: repeat(4, 1fr);
-          gap: 12px;
-        }
-        .thumbnail-card-btn {
-          position: relative;
-          aspect-ratio: 16/10;
-          border-radius: 6px;
-          overflow: hidden;
-          cursor: pointer;
-          border: 2px solid transparent;
-          background: #eee;
-          padding: 0;
-          transition: all 0.2s;
-        }
-        .thumbnail-card-btn.active {
-          border-color: #8b6914;
+          box-shadow: 0 4px 18px rgba(0,0,0,0.04);
         }
 
         .highlight-content-side {
-          padding: 48px;
+          padding: 44px;
           display: flex;
           flex-direction: column;
           justify-content: center;
@@ -747,43 +708,43 @@ export default function StoreLocatorPage() {
           gap: 6px;
           background: rgba(139,105,20,0.08);
           color: #8b6914;
-          border: 1px solid rgba(139,105,20,0.15);
+          border: 1px solid rgba(139,105,20,0.18);
           font-size: 10px;
           font-weight: 700;
-          letter-spacing: 0.12em;
+          letter-spacing: 0.14em;
           text-transform: uppercase;
           padding: 4px 12px;
           border-radius: 4px;
           width: fit-content;
-          margin-bottom: 18px;
+          margin-bottom: 16px;
         }
         .highlight-name {
           font-family: 'Cormorant Garamond', serif;
-          font-size: clamp(28px, 4vw, 36px);
+          font-size: clamp(28px, 3.5vw, 36px);
           font-weight: 500;
           color: #1a1209;
-          margin: 0 0 10px;
+          margin: 0 0 8px;
           line-height: 1.2;
           letter-spacing: 0.01em;
         }
         .highlight-addr {
           font-size: 13.5px;
-          color: rgba(26,18,9,0.55);
+          color: rgba(26,18,9,0.6);
           line-height: 1.5;
-          margin: 0 0 28px;
+          margin: 0 0 24px;
         }
 
         .highlight-info-grid {
           display: grid;
           grid-template-columns: repeat(3, 1fr);
           gap: 12px;
-          margin-bottom: 28px;
+          margin-bottom: 24px;
         }
         .info-card-block {
           background: #faf7f0;
-          border: 1px solid rgba(26,18,9,0.04);
+          border: 1px solid rgba(139,105,20,0.12);
           border-radius: 8px;
-          padding: 14px;
+          padding: 14px 10px;
           display: flex;
           flex-direction: column;
           justify-content: center;
@@ -815,25 +776,27 @@ export default function StoreLocatorPage() {
           font-size: 13px;
           color: rgba(26,18,9,0.65);
           line-height: 1.6;
-          margin: 0 0 36px;
+          margin: 0 0 28px;
         }
 
         .highlight-actions-row {
           display: flex;
-          gap: 16px;
+          gap: 14px;
           align-items: center;
+          flex-wrap: wrap;
         }
         .highlight-action-btn {
           flex: 1;
+          min-width: 140px;
           display: flex;
           align-items: center;
           justify-content: center;
           gap: 8px;
           background: #ffffff;
           color: #1a1209;
-          border: 1.5px solid rgba(26,18,9,0.12);
+          border: 1.5px solid rgba(26,18,9,0.14);
           border-radius: 8px;
-          padding: 14px 20px;
+          padding: 13px 18px;
           font-family: 'Jost', sans-serif;
           font-size: 11px;
           font-weight: 600;
@@ -856,27 +819,27 @@ export default function StoreLocatorPage() {
         .highlight-action-btn.primary:hover {
           background: #a37c17;
           border-color: #a37c17;
-          box-shadow: 0 4px 15px rgba(139,105,20,0.2);
+          box-shadow: 0 4px 15px rgba(139,105,20,0.25);
         }
 
         /* ── SERVICE FEATURES BANNER ── */
         .locator-features-banner {
-          max-width: 1280px;
+          max-width: 1300px;
           margin: 0 auto;
           background: #ffffff;
-          border: 1px solid rgba(26,18,9,0.05);
-          border-radius: 16px;
-          padding: 36px 24px;
+          border: 1px solid rgba(26,18,9,0.08);
+          border-radius: 14px;
+          padding: 32px 24px;
           display: grid;
           grid-template-columns: repeat(4, 1fr);
           gap: 24px;
-          box-shadow: 0 8px 30px rgba(0,0,0,0.01);
+          box-shadow: 0 8px 30px rgba(0,0,0,0.02);
         }
         .feature-block-item {
           display: flex;
           align-items: center;
           gap: 16px;
-          border-right: 1px solid rgba(26,18,9,0.06);
+          border-right: 1px solid rgba(26,18,9,0.08);
           padding-right: 16px;
         }
         .feature-block-item:last-child {
@@ -884,10 +847,11 @@ export default function StoreLocatorPage() {
           padding-right: 0;
         }
         .feature-item-icon {
-          width: 48px;
-          height: 48px;
+          width: 44px;
+          height: 44px;
           border-radius: 50%;
-          background: rgba(139,105,20,0.06);
+          background: rgba(139,105,20,0.08);
+          border: 1px solid rgba(139,105,20,0.2);
           color: #8b6914;
           display: flex;
           align-items: center;
@@ -900,10 +864,10 @@ export default function StoreLocatorPage() {
           letter-spacing: 0.1em;
           text-transform: uppercase;
           color: #1a1209;
-          margin: 0 0 4px;
+          margin: 0 0 3px;
         }
         .feature-item-details p {
-          font-size: 10.5px;
+          font-size: 11px;
           color: rgba(26,18,9,0.5);
           margin: 0;
           line-height: 1.4;
@@ -916,7 +880,7 @@ export default function StoreLocatorPage() {
           left: 0;
           width: 100vw;
           height: 100vh;
-          background: rgba(10,8,6,0.6);
+          background: rgba(10,8,6,0.65);
           backdrop-filter: blur(8px);
           display: flex;
           align-items: center;
@@ -927,10 +891,10 @@ export default function StoreLocatorPage() {
         .gps-modal-box {
           background: #ffffff;
           border-radius: 16px;
-          border: 1px solid rgba(139,105,20,0.12);
-          box-shadow: 0 24px 60px rgba(26,18,9,0.15);
+          border: 1.5px solid rgba(139,105,20,0.2);
+          box-shadow: 0 24px 60px rgba(26,18,9,0.2);
           width: 100%;
-          max-width: 400px;
+          max-width: 420px;
           padding: 32px;
           text-align: center;
           animation: modal-zoom 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -940,19 +904,19 @@ export default function StoreLocatorPage() {
           to { transform: scale(1) translateY(0); opacity: 1; }
         }
 
-        /* ── RESPONSIVE OVERRIDES ── */
+        /* ── RESPONSIVE STYLES ── */
         @media (max-width: 1024px) {
           .locator-toolbar {
             flex-direction: column;
             align-items: stretch;
-            margin-top: -24px;
+            margin-bottom: 28px;
           }
           .locator-search-container, .locator-filter-select, .location-trigger-btn {
             width: 100%;
           }
           .locator-workspace-grid {
             grid-template-columns: 1fr;
-            gap: 40px;
+            gap: 32px;
           }
           .map-column-container {
             position: relative;
@@ -964,18 +928,37 @@ export default function StoreLocatorPage() {
           }
           .highlight-slider-side {
             border-right: none;
-            border-bottom: 1.5px solid rgba(26,18,9,0.04);
+            border-bottom: 1.5px solid rgba(26,18,9,0.06);
           }
           .locator-features-banner {
             grid-template-columns: repeat(2, 1fr);
-            gap: 28px;
+            gap: 24px;
           }
           .feature-block-item {
             border-right: none;
           }
+          .hero-attached-benefits-bar {
+            display: flex;
+            overflow-x: auto;
+            gap: 24px;
+            padding: 16px 20px;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+          }
+          .hero-attached-benefits-bar::-webkit-scrollbar {
+            display: none;
+          }
+          .hero-attached-benefit-item {
+            flex: 0 0 auto;
+          }
         }
 
         @media (max-width: 640px) {
+          .locator-hero-banner {
+            min-height: 380px;
+            padding-top: 100px;
+            background-attachment: scroll;
+          }
           .retailer-card {
             flex-direction: column;
             height: auto;
@@ -1008,7 +991,7 @@ export default function StoreLocatorPage() {
           }
           .highlight-actions-row {
             flex-direction: column;
-            gap: 12px;
+            gap: 10px;
           }
           .highlight-action-btn {
             width: 100%;
@@ -1041,24 +1024,20 @@ export default function StoreLocatorPage() {
         }
       `}</style>
 
-      {/* HERO BANNER SECTION */}
+      {/* ── LUXURY HERO BANNER SECTION ── */}
       <section className="locator-hero-banner">
-        <div className="hero-banner-inner">
-          <span className="locator-tag">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-              <circle cx="12" cy="10" r="3" />
-            </svg>
-            Official Retailers
-          </span>
-          <h1 className="locator-title">Find A Retailer</h1>
-          <p className="locator-subtitle">
-            Discover authorized Winsor boutiques and partners near you for an exceptional experience.
-          </p>
+        <div className="hero-badge-pill">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="#dfb15b"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" /></svg>
+          <span>AUTHORIZED RETAILERS & BOUTIQUES</span>
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="#dfb15b"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" /></svg>
         </div>
+        <h1 className="locator-title">Find A Retailer</h1>
+        <p className="locator-subtitle">
+          Discover official Winsor partner showrooms and flagship boutiques across Sri Lanka and internationally for an exceptional horological experience.
+        </p>
       </section>
 
-      {/* SEARCH TOOLBAR */}
+      {/* ── SEARCH TOOLBAR ── */}
       <section className="locator-toolbar">
         <div className="locator-search-container">
           <svg className="search-icon-svg" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -1111,15 +1090,18 @@ export default function StoreLocatorPage() {
         </button>
       </section>
 
-      {/* MAIN CONTAINER */}
+      {/* ── MAIN WORKSPACE CONTAINER ── */}
       <div className="locator-main-wrapper">
         {loading ? (
           <div style={{ textAlign: 'center', padding: '100px 20px' }}>
             <div style={{
-              width: '32px', height: '32px', border: '2px solid rgba(139,105,20,0.15)', borderTopColor: '#8b6914',
+              width: '36px', height: '36px', border: '3px solid rgba(139,105,20,0.15)', borderTopColor: '#8b6914',
               borderRadius: '50%', animation: 'spin 0.8s linear infinite', margin: '0 auto 16px'
             }} />
-            <p style={{ color: 'rgba(26,18,9,0.45)', fontSize: '13px' }}>Loading authorized showrooms…</p>
+            <p style={{ color: 'rgba(26,18,9,0.5)', fontSize: '13px', letterSpacing: '0.04em' }}>Loading authorized showrooms…</p>
+            <style>{`
+              @keyframes spin { to { transform: rotate(360deg); } }
+            `}</style>
           </div>
         ) : (
           <>
@@ -1162,7 +1144,7 @@ export default function StoreLocatorPage() {
                                 <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                                   <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
                                 </svg>
-                                Authorized Retailer
+                                Authorized Partner
                               </span>
                               <h4 className="retailer-card-name">{r.name}</h4>
                               <p className="retailer-card-addr">{r.address}</p>
@@ -1198,9 +1180,9 @@ export default function StoreLocatorPage() {
                     {processedRetailers.length > listLimit && (
                       <button
                         className="load-more-locator-btn"
-                        onClick={() => setListLimit(prev => prev + 3)}
+                        onClick={() => setListLimit(prev => prev + 4)}
                       >
-                        Load More Retailers
+                        Load More Showrooms ({processedRetailers.length - listLimit} Remaining)
                       </button>
                     )}
                   </>
@@ -1243,25 +1225,6 @@ export default function StoreLocatorPage() {
                       </>
                     )}
                   </div>
-
-                  {sliderImages.length > 1 && (
-                    <div className="highlight-thumbnail-row">
-                      {sliderImages.map((img, idx) => (
-                        <button
-                          key={idx}
-                          onClick={() => setSliderIndex(idx)}
-                          className={`thumbnail-card-btn ${idx === sliderIndex ? 'active' : ''}`}
-                          aria-label={`Show boutique photo ${idx + 1}`}
-                        >
-                          <img
-                            src={img}
-                            alt="Thumbnail"
-                            className="w-full h-full object-cover"
-                          />
-                        </button>
-                      ))}
-                    </div>
-                  )}
                 </div>
 
                 {/* Info Details Column */}
@@ -1270,7 +1233,7 @@ export default function StoreLocatorPage() {
                     <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ marginRight: '4px' }}>
                       <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
                     </svg>
-                    Authorized Retailer
+                    Authorized Showroom Partner
                   </span>
                   <h2 className="highlight-name">{selectedBoutique.name}</h2>
                   <p className="highlight-addr">{selectedBoutique.address}</p>
@@ -1296,9 +1259,7 @@ export default function StoreLocatorPage() {
                   </div>
 
                   <p className="highlight-desc">
-                    {selectedBoutique.name} has been a trusted partner in luxury timepieces since 2002.
-                    Explore the complete Winsor collection with expert horology guidance and exceptional,
-                    bespoke after-sales service at this authorized boutique partner showroom.
+                    {selectedBoutique.name} is an official Winsor partner showroom. Explore the complete handcrafted Winsor timepiece collection with expert horology guidance and official after-sales support.
                   </p>
 
                   <div className="highlight-actions-row">
@@ -1367,7 +1328,7 @@ export default function StoreLocatorPage() {
         )}
       </div>
 
-      {/* GPSs Confirmation Popup Modall */}
+      {/* GPS Confirmation Popup Modal */}
       {showGPSModal && (
         <div className="gps-modal-overlay">
           <div className="gps-modal-box">

@@ -325,7 +325,7 @@ export default function CollectionsPage() {
           overflow: hidden;
           padding: 130px 6% 60px;
           min-height: 520px;
-          margin-bottom: 56px;
+          margin-bottom: 0;
         }
         .hero-banner-content {
           max-width: 48%;
@@ -539,28 +539,52 @@ export default function CollectionsPage() {
           color: #8b6914;
         }
 
-        /* ── BENEFITS BAR ── */
-        .benefits-carousel-wrapper {
+        /* ── ATTACHED BENEFITS BAR (MATCHING IMG2 LUXURY ATTACHED DESIGN) ── */
+        .hero-attached-benefits-wrapper {
+          position: relative;
+          z-index: 30;
+          max-width: 1400px;
+          margin: -34px auto 20px;
+          padding: 0 4%;
           width: 100%;
-          overflow: visible;
         }
-        .benefits-bar {
+        .hero-attached-benefits-bar {
+          position: relative;
+          background: #ffffff;
+          border-radius: 14px;
+          border: 1.5px solid rgba(139, 105, 20, 0.2);
+          box-shadow: 0 12px 36px rgba(0, 0, 0, 0.09);
           display: grid;
           grid-template-columns: repeat(5, 1fr);
-          gap: 20px;
-          background: #fff;
-          padding: 24px 32px;
-          border-radius: 12px;
-          border: 1px solid rgba(26, 18, 9, 0.06);
-          margin: 0 auto 56px;
-          max-width: 1400px;
-          width: 100%;
+          gap: 16px;
+          padding: 20px 32px;
+          align-items: center;
+          backdrop-filter: blur(12px);
         }
-        .benefits-marquee-track {
-          display: contents;
+        .hero-attached-benefit-item {
+          display: flex;
+          align-items: center;
+          gap: 14px;
+          color: #1a1209;
         }
-        .benefits-marquee-track[aria-hidden="true"] {
-          display: none;
+        .hero-attached-benefit-item svg {
+          color: #8b6914;
+          flex-shrink: 0;
+        }
+        .hero-attached-benefit-item h4 {
+          font-size: 13px;
+          font-weight: 600;
+          margin: 0;
+          letter-spacing: 0.01em;
+          color: #1a1209;
+          white-space: nowrap;
+        }
+        .hero-attached-benefit-item span {
+          font-size: 10.5px;
+          color: rgba(26, 18, 9, 0.5);
+          margin: 0;
+          display: block;
+          white-space: nowrap;
         }
         .benefit-item {
           display: flex;
@@ -1489,6 +1513,51 @@ export default function CollectionsPage() {
           </div>
         </section>
 
+        {/* ── ATTACHED BENEFITS BAR (DIRECTLY ATTACHED TO HERO BANNER - IMG2 REPLICATE) ── */}
+        <div className="hero-attached-benefits-wrapper">
+          <div className="hero-attached-benefits-bar">
+            <div className="hero-attached-benefit-item">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><path d="m12 6-2 4h4l-2 4" /></svg>
+              <div>
+                <h4>Japan Movement</h4>
+                <span>UAE Registered Brand</span>
+              </div>
+            </div>
+
+            <div className="hero-attached-benefit-item">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>
+              <div>
+                <h4>International Warranty</h4>
+                <span>Sri Lanka & UAE</span>
+              </div>
+            </div>
+
+            <div className="hero-attached-benefit-item">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="3" width="15" height="13" rx="2" ry="2" /><line x1="16" y1="8" x2="20" y2="8" /><line x1="16" y1="12" x2="22" y2="12" /></svg>
+              <div>
+                <h4>Free Shipping</h4>
+                <span>Island-wide in Sri Lanka</span>
+              </div>
+            </div>
+
+            <div className="hero-attached-benefit-item">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" /><path d="M21 3v5h-5" /></svg>
+              <div>
+                <h4>Easy Returns</h4>
+                <span>Within 7 Days</span>
+              </div>
+            </div>
+
+            <div className="hero-attached-benefit-item">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
+              <div>
+                <h4>Secure Payments</h4>
+                <span>100% Secure Checkout with payhere.lk</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div className="collections-inner-body">
           {/* GENDER & COLLECTION FILTER HEADER CARDS (4 Columns) */}
           <div className="gender-header-row">
@@ -1609,88 +1678,7 @@ export default function CollectionsPage() {
             </div>
           </div>
 
-          {/* BENEFITS BAR */}
-          <div className="benefits-carousel-wrapper">
-            <div className="benefits-bar">
-              {/* Track 1 */}
-              <div className="benefits-marquee-track">
-                <div className="benefit-item">
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="12" cy="12" r="10" /><path d="m12 6-2 4h4l-2 4" /></svg>
-                  <div>
-                    <h4>Japan Movement</h4>
-                    <span>UAE Registered Brand</span>
-                  </div>
-                </div>
-                <div className="benefit-item">
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>
-                  <div>
-                    <h4>International Warranty</h4>
-                    <span>Sri Lanka & UAE</span>
-                  </div>
-                </div>
-                <div className="benefit-item">
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="1" y="3" width="15" height="13" rx="2" ry="2" /><line x1="16" y1="8" x2="20" y2="8" /><line x1="16" y1="12" x2="22" y2="12" /></svg>
-                  <div>
-                    <h4>Free Shipping</h4>
-                    <span>Island-wide in Sri Lanka</span>
-                  </div>
-                </div>
-                <div className="benefit-item">
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" /><path d="M21 3v5h-5" /></svg>
-                  <div>
-                    <h4>Easy Returns</h4>
-                    <span>Within 7 Days</span>
-                  </div>
-                </div>
-                <div className="benefit-item">
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
-                  <div>
-                    <h4>Secure Payments</h4>
-                    <span>100% Secure Checkout with payhere.lk</span>
-                  </div>
-                </div>
-              </div>
 
-              {/* Track 2 (Duplicate for Seamless Loop) */}
-              <div className="benefits-marquee-track" aria-hidden="true">
-                <div className="benefit-item">
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="12" cy="12" r="10" /><path d="m12 6-2 4h4l-2 4" /></svg>
-                  <div>
-                    <h4>Japan Movement</h4>
-                    <span>UAE Registered Brand</span>
-                  </div>
-                </div>
-                <div className="benefit-item">
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>
-                  <div>
-                    <h4>1 Year International Warranty</h4>
-                    <span>Official Coverage</span>
-                  </div>
-                </div>
-                <div className="benefit-item">
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="1" y="3" width="15" height="13" rx="2" ry="2" /><line x1="16" y1="8" x2="20" y2="8" /><line x1="16" y1="12" x2="22" y2="12" /></svg>
-                  <div>
-                    <h4>Free Shipping</h4>
-                    <span>Island-wide in Sri Lanka</span>
-                  </div>
-                </div>
-                <div className="benefit-item">
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" /><path d="M21 3v5h-5" /></svg>
-                  <div>
-                    <h4>Easy Returns</h4>
-                    <span>Within 7 Days</span>
-                  </div>
-                </div>
-                <div className="benefit-item">
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
-                  <div>
-                    <h4>Secure Payments</h4>
-                    <span>100% Secure Checkout with payhere.lk</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
 
           {/* SECTION TITLE & TABS */}
           <div className="featured-section-header" id="featured-products-section">

@@ -250,7 +250,7 @@ export default function GiftsPage() {
           min-height: 100vh;
           font-family: 'Jost', sans-serif;
           color: #1a1209;
-          padding: 40px 4% 100px;
+          padding: 0 4% 60px;
         }
 
         /* ── CIRCULAR LUXURY OCCASION BADGES (.|.) ── */
@@ -259,9 +259,9 @@ export default function GiftsPage() {
           flex-wrap: wrap;
           align-items: flex-start;
           justify-content: center;
-          gap: 24px 36px;
-          margin-bottom: 56px;
-          padding: 10px 0;
+          gap: 20px 32px;
+          margin-bottom: 32px;
+          padding: 0;
         }
 
         .gift-circle-item {
@@ -274,6 +274,54 @@ export default function GiftsPage() {
           outline: none;
           max-width: 125px;
           width: 100%;
+        }
+
+        /* ── ATTACHED BENEFITS BAR (MATCHING IMG2 LUXURY ATTACHED DESIGN) ── */
+        .hero-attached-benefits-wrapper {
+          position: relative;
+          z-index: 30;
+          max-width: 1400px;
+          margin: -34px auto 16px;
+          padding: 0 4%;
+          width: 100%;
+        }
+        .hero-attached-benefits-bar {
+          position: relative;
+          background: #ffffff;
+          border-radius: 14px;
+          border: 1.5px solid rgba(139, 105, 20, 0.2);
+          box-shadow: 0 12px 36px rgba(0, 0, 0, 0.09);
+          display: grid;
+          grid-template-columns: repeat(5, 1fr);
+          gap: 16px;
+          padding: 20px 32px;
+          align-items: center;
+          backdrop-filter: blur(12px);
+        }
+        .hero-attached-benefit-item {
+          display: flex;
+          align-items: center;
+          gap: 14px;
+          color: #1a1209;
+        }
+        .hero-attached-benefit-item svg {
+          color: #8b6914;
+          flex-shrink: 0;
+        }
+        .hero-attached-benefit-item h4 {
+          font-size: 13px;
+          font-weight: 600;
+          margin: 0;
+          letter-spacing: 0.01em;
+          color: #1a1209;
+          white-space: nowrap;
+        }
+        .hero-attached-benefit-item span {
+          font-size: 10.5px;
+          color: rgba(26, 18, 9, 0.5);
+          margin: 0;
+          display: block;
+          white-space: nowrap;
         }
 
         .gift-circle-badge {
@@ -374,13 +422,30 @@ export default function GiftsPage() {
           color: #8b6914;
         }
 
-        .gift-circle-dot {
-          width: 4px;
-          height: 4px;
-          border-radius: 50%;
+        .gift-by-occasion-wrapper {
+          border-top: 1px solid rgba(26,18,9,0.08);
+          padding-top: 20px;
+          margin-top: 8px;
+          margin-bottom: 24px;
+        }
+        .gift-by-occasion-title {
+          font-family: 'Cormorant Garamond', 'Cinzel', serif;
+          font-size: 19px;
+          font-weight: 500;
+          letter-spacing: 0.18em;
+          color: #1a1209;
+          text-transform: uppercase;
+          text-align: center;
+          margin: 0 0 20px 0;
+        }
+
+        .gift-circle-active-bar {
+          width: 32px;
+          height: 2px;
           background: #8b6914;
-          margin-top: 5px;
-          box-shadow: 0 0 6px rgba(139,105,20,0.6);
+          margin: 6px auto 0;
+          border-radius: 2px;
+          box-shadow: 0 0 6px rgba(139,105,20,0.5);
         }
 
         /* ── PRODUCT SECTION ── */
@@ -962,6 +1027,51 @@ export default function GiftsPage() {
         </div>
       </section>
 
+      {/* ── ATTACHED BENEFITS BAR (DIRECTLY ATTACHED TO HERO BANNER - IMG2 REPLICATE) ── */}
+      <div className="hero-attached-benefits-wrapper">
+        <div className="hero-attached-benefits-bar">
+          <div className="hero-attached-benefit-item">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><path d="m12 6-2 4h4l-2 4" /></svg>
+            <div>
+              <h4>Japan Movement</h4>
+              <span>UAE Registered Brand</span>
+            </div>
+          </div>
+
+          <div className="hero-attached-benefit-item">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>
+            <div>
+              <h4>International Warranty</h4>
+              <span>Sri Lanka & UAE</span>
+            </div>
+          </div>
+
+          <div className="hero-attached-benefit-item">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="3" width="15" height="13" rx="2" ry="2" /><line x1="16" y1="8" x2="20" y2="8" /><line x1="16" y1="12" x2="22" y2="12" /></svg>
+            <div>
+              <h4>Free Shipping</h4>
+              <span>Island-wide in Sri Lanka</span>
+            </div>
+          </div>
+
+          <div className="hero-attached-benefit-item">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" /><path d="M21 3v5h-5" /></svg>
+            <div>
+              <h4>Easy Returns</h4>
+              <span>Within 7 Days</span>
+            </div>
+          </div>
+
+          <div className="hero-attached-benefit-item">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
+            <div>
+              <h4>Secure Payments</h4>
+              <span>100% Secure Checkout with payhere.lk</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* BODY CONTENT */}
       <div className="gifts-container">
         {loading ? (
@@ -977,88 +1087,7 @@ export default function GiftsPage() {
         ) : (
           <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
 
-            {/* BENEFITS BAR (MAISON TRUST HIGHLIGHTS) */}
-            <div className="benefits-carousel-wrapper">
-              <div className="benefits-bar">
-                {/* Track 1 */}
-                <div className="benefits-marquee-track">
-                  <div className="benefit-item">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="12" cy="12" r="10" /><path d="m12 6-2 4h4l-2 4" /></svg>
-                    <div>
-                      <h4>Japan Movement</h4>
-                      <span>UAE Registered Brand</span>
-                    </div>
-                  </div>
-                  <div className="benefit-item">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>
-                    <div>
-                      <h4>International Warranty</h4>
-                      <span>Sri Lanka & UAE</span>
-                    </div>
-                  </div>
-                  <div className="benefit-item">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="1" y="3" width="15" height="13" rx="2" ry="2" /><line x1="16" y1="8" x2="20" y2="8" /><line x1="16" y1="12" x2="22" y2="12" /></svg>
-                    <div>
-                      <h4>Free Shipping</h4>
-                      <span>Island-wide in Sri Lanka</span>
-                    </div>
-                  </div>
-                  <div className="benefit-item">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" /><path d="M21 3v5h-5" /></svg>
-                    <div>
-                      <h4>Easy Returns</h4>
-                      <span>Within 7 Days</span>
-                    </div>
-                  </div>
-                  <div className="benefit-item">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
-                    <div>
-                      <h4>Secure Payments</h4>
-                      <span>100% Secure Checkout with payhere.lk</span>
-                    </div>
-                  </div>
-                </div>
 
-                {/* Track 2 (Duplicate for Seamless Infinite Loop) */}
-                <div className="benefits-marquee-track" aria-hidden="true">
-                  <div className="benefit-item">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="12" cy="12" r="10" /><path d="m12 6-2 4h4l-2 4" /></svg>
-                    <div>
-                      <h4>Japan Movement</h4>
-                      <span>UAE Registered Brand</span>
-                    </div>
-                  </div>
-                  <div className="benefit-item">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>
-                    <div>
-                      <h4>1 Year International Warranty</h4>
-                      <span>Official Coverage</span>
-                    </div>
-                  </div>
-                  <div className="benefit-item">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="1" y="3" width="15" height="13" rx="2" ry="2" /><line x1="16" y1="8" x2="20" y2="8" /><line x1="16" y1="12" x2="22" y2="12" /></svg>
-                    <div>
-                      <h4>Free Shipping</h4>
-                      <span>Island-wide in Sri Lanka</span>
-                    </div>
-                  </div>
-                  <div className="benefit-item">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" /><path d="M21 3v5h-5" /></svg>
-                    <div>
-                      <h4>Easy Returns</h4>
-                      <span>Within 7 Days</span>
-                    </div>
-                  </div>
-                  <div className="benefit-item">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
-                    <div>
-                      <h4>Secure Payments</h4>
-                      <span>100% Secure Checkout with payhere.lk</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
 
             {/* GIFT CATEGORIES (SHOW CARDS THAT ADMIN TURNED ON) */}
             {giftCategories.length === 0 ? (
@@ -1069,52 +1098,20 @@ export default function GiftsPage() {
                 </p>
               </div>
             ) : (
-              <div className="gifts-category-row">
-                {/* Reset / All Occasions option */}
-                <div
-                  className={`gift-circle-item ${selectedCategorySlug === 'all' ? 'active' : ''}`}
-                  onClick={() => setSelectedCategorySlug('all')}
-                >
-                  <div className="gift-circle-badge">
-                    <div className="gift-circle-inner" style={{ position: 'relative', width: '100%', height: '100%', borderRadius: '50%', overflow: 'hidden', background: '#110e0b' }}>
-                      <Image
-                        src="/graduation_gift.png"
-                        alt="All Occasions"
-                        fill
-                        sizes="110px"
-                        style={{ objectFit: 'cover', objectPosition: 'center center' }}
-                        className="gift-circle-bg-img"
-                        priority
-                      />
-                      <div className="gift-circle-overlay" />
-                      <div className="gift-circle-watch-wrapper">
-                        <Image
-                          src="/winsor_hero_backgroundremoved.webp"
-                          alt="Luxury Watch"
-                          width={65}
-                          height={65}
-                          style={{ objectFit: 'contain' }}
-                          className="gift-circle-watch-img"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                  <span className="gift-circle-label">ALL OCCASIONS</span>
-                  {selectedCategorySlug === 'all' && <div className="gift-circle-dot" />}
-                </div>
+              <div className="gift-by-occasion-wrapper">
+                <h2 className="gift-by-occasion-title">GIFT BY OCCASION</h2>
 
-                {/* Categories cards dynamically mapped */}
-                {giftCategories.map(cat => (
+                <div className="gifts-category-row">
+                  {/* Reset / All Occasions option */}
                   <div
-                    key={cat._id}
-                    className={`gift-circle-item ${selectedCategorySlug === cat.slug ? 'active' : ''}`}
-                    onClick={() => setSelectedCategorySlug(cat.slug)}
+                    className={`gift-circle-item ${selectedCategorySlug === 'all' ? 'active' : ''}`}
+                    onClick={() => setSelectedCategorySlug('all')}
                   >
                     <div className="gift-circle-badge">
                       <div className="gift-circle-inner" style={{ position: 'relative', width: '100%', height: '100%', borderRadius: '50%', overflow: 'hidden', background: '#110e0b' }}>
                         <Image
-                          src={getGiftCategoryImage(cat.slug, cat.image)}
-                          alt={cat.label}
+                          src="/graduation_gift.png"
+                          alt="All Occasions"
                           fill
                           sizes="110px"
                           style={{ objectFit: 'cover', objectPosition: 'center center' }}
@@ -1124,7 +1121,7 @@ export default function GiftsPage() {
                         <div className="gift-circle-overlay" />
                         <div className="gift-circle-watch-wrapper">
                           <Image
-                            src={cat.slug.includes('sport') ? "/winsor_hero_backgroundremoved_sport.webp" : "/winsor_hero_backgroundremoved.webp"}
+                            src="/winsor_hero_backgroundremoved.webp"
                             alt="Luxury Watch"
                             width={65}
                             height={65}
@@ -1134,10 +1131,46 @@ export default function GiftsPage() {
                         </div>
                       </div>
                     </div>
-                    <span className="gift-circle-label">{stripEmojis(cat.label)}</span>
-                    {selectedCategorySlug === cat.slug && <div className="gift-circle-dot" />}
+                    <span className="gift-circle-label">ALL OCCASIONS</span>
+                    {selectedCategorySlug === 'all' && <div className="gift-circle-active-bar" />}
                   </div>
-                ))}
+
+                  {/* Categories cards dynamically mapped */}
+                  {giftCategories.map(cat => (
+                    <div
+                      key={cat._id}
+                      className={`gift-circle-item ${selectedCategorySlug === cat.slug ? 'active' : ''}`}
+                      onClick={() => setSelectedCategorySlug(cat.slug)}
+                    >
+                      <div className="gift-circle-badge">
+                        <div className="gift-circle-inner" style={{ position: 'relative', width: '100%', height: '100%', borderRadius: '50%', overflow: 'hidden', background: '#110e0b' }}>
+                          <Image
+                            src={getGiftCategoryImage(cat.slug, cat.image)}
+                            alt={cat.label}
+                            fill
+                            sizes="110px"
+                            style={{ objectFit: 'cover', objectPosition: 'center center' }}
+                            className="gift-circle-bg-img"
+                            priority
+                          />
+                          <div className="gift-circle-overlay" />
+                          <div className="gift-circle-watch-wrapper">
+                            <Image
+                              src={cat.slug.includes('sport') ? "/winsor_hero_backgroundremoved_sport.webp" : "/winsor_hero_backgroundremoved.webp"}
+                              alt="Luxury Watch"
+                              width={65}
+                              height={65}
+                              style={{ objectFit: 'contain' }}
+                              className="gift-circle-watch-img"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                      <span className="gift-circle-label">{stripEmojis(cat.label)}</span>
+                      {selectedCategorySlug === cat.slug && <div className="gift-circle-active-bar" />}
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
 

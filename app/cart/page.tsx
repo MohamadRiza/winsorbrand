@@ -613,7 +613,7 @@ export default function CartPage() {
         .cart-container {
           background-color: #faf7f0;
           min-height: 100vh;
-          padding: 160px 4% 100px;
+          padding: 140px 4% 100px;
           font-family: 'Jost', sans-serif;
           color: #1a1209;
         }
@@ -630,18 +630,19 @@ export default function CartPage() {
         
         .cart-title {
           font-family: 'Cormorant Garamond', serif;
-          font-size: clamp(32px, 4vw, 42px);
-          font-weight: 300;
-          letter-spacing: 0.05em;
+          font-size: clamp(32px, 4.5vw, 44px);
+          font-weight: 400;
+          letter-spacing: 0.06em;
           text-transform: uppercase;
           color: #1a1209;
           margin: 0 0 6px;
+          line-height: 1.15;
         }
 
         .cart-subtitle {
           font-family: 'Jost', sans-serif;
           font-size: 13.5px;
-          color: rgba(26, 18, 9, 0.5);
+          color: rgba(26, 18, 9, 0.55);
           letter-spacing: 0.02em;
           margin: 0;
         }
@@ -658,8 +659,8 @@ export default function CartPage() {
         .cart-items-panel {
           background: #ffffff;
           border-radius: 16px;
-          border: 1px solid rgba(139, 105, 20, 0.12);
-          box-shadow: 0 10px 30px rgba(26, 18, 9, 0.02);
+          border: 1.5px solid rgba(139, 105, 20, 0.15);
+          box-shadow: 0 10px 30px rgba(26, 18, 9, 0.025);
           overflow: visible;
         }
 
@@ -667,11 +668,11 @@ export default function CartPage() {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          padding: 20px 28px;
-          border-bottom: 1.5px solid rgba(139, 105, 20, 0.1);
-          background-color: rgba(139, 105, 20, 0.03);
-          border-top-left-radius: 15px;
-          border-top-right-radius: 15px;
+          padding: 18px 28px;
+          border-bottom: 1.5px solid rgba(139, 105, 20, 0.12);
+          background-color: rgba(139, 105, 20, 0.04);
+          border-top-left-radius: 14px;
+          border-top-right-radius: 14px;
         }
 
         .store-info {
@@ -716,7 +717,7 @@ export default function CartPage() {
           background-color: #ffffff;
           border-bottom: 1px solid rgba(26, 18, 9, 0.06);
           font-size: 13px;
-          color: rgba(26, 18, 9, 0.6);
+          color: rgba(26, 18, 9, 0.65);
           font-weight: 600;
         }
 
@@ -724,7 +725,7 @@ export default function CartPage() {
         .custom-checkbox {
           width: 20px;
           height: 20px;
-          border: 2px solid rgba(139, 105, 20, 0.25);
+          border: 1.5px solid rgba(139, 105, 20, 0.35);
           border-radius: 4px;
           cursor: pointer;
           display: flex;
