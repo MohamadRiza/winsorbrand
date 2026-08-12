@@ -71,7 +71,7 @@ export default function CareersPage() {
       {/* Hero Header */}
       <section className="careers-hero-banner relative w-full pt-16 lg:pt-24 pb-20 lg:pb-28 flex items-center justify-center overflow-hidden bg-gradient-to-b from-[#0a0a0a] via-[#1a140d] to-[#0a0a0a] text-white">
         <Image
-          src="/discover-service.jpg"
+          src="/hmebnr1.webp"
           alt="Careers at Winsor Atelier"
           fill
           priority

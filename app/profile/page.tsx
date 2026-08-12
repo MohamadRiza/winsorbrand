@@ -141,8 +141,8 @@ export default function ProfilePage() {
         fetch('/api/reviews/pending'),
         fetch('/api/reviews/my'),
       ]);
-      const pendingData = await pendingRes.json();
-      const myData = await myRes.json();
+      const pendingData = pendingRes.ok && pendingRes.headers.get('content-type')?.includes('application/json') ? await pendingRes.json() : { success: false, data: [] };
+      const myData = myRes.ok && myRes.headers.get('content-type')?.includes('application/json') ? await myRes.json() : { success: false, data: [] };
       if (pendingData.success) setPendingReviews(pendingData.data || []);
       if (myData.success) setMyReviews(myData.data || []);
     } catch (err) {

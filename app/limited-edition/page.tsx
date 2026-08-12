@@ -286,13 +286,92 @@ function LimitedEditionContent() {
         .card-action-btn:hover { background: rgba(26,18,9,0.04); color: #1a1209; border-color: #1a1209; }
         .card-action-btn.active { background: #ffebeb; color: #ff3b30; border-color: #ff3b30; }
         .card-action-btn.highlight:hover { background: #1a1209; color: #fff; border-color: #1a1209; }
-        @media (max-width: 1024px) { .product-grid { grid-template-columns: repeat(3, 1fr); gap: 20px; } }
+
+        @keyframes hero-benefits-marquee {
+          0% { transform: translate3d(0, 0, 0); }
+          100% { transform: translate3d(-50%, 0, 0); }
+        }
+        .hero-attached-benefits-wrapper {
+          position: relative;
+          z-index: 30;
+          max-width: 1400px;
+          margin: -34px auto 20px;
+          padding: 0 4%;
+          width: 100%;
+        }
+        .hero-attached-benefits-bar {
+          position: relative;
+          background: #ffffff;
+          border-radius: 14px;
+          border: 1.5px solid rgba(139, 105, 20, 0.2);
+          box-shadow: 0 12px 36px rgba(0, 0, 0, 0.09);
+          padding: 20px 32px;
+          backdrop-filter: blur(12px);
+          overflow: hidden;
+        }
+        .hero-attached-benefit-item {
+          display: flex;
+          align-items: center;
+          gap: 14px;
+          color: #1a1209;
+        }
+        .hero-attached-benefit-item svg {
+          color: #8b6914;
+          flex-shrink: 0;
+        }
+        .hero-attached-benefit-item h4 {
+          font-size: 13px;
+          font-weight: 600;
+          margin: 0;
+          letter-spacing: 0.01em;
+          color: #1a1209;
+          white-space: nowrap;
+        }
+        .hero-attached-benefit-item span {
+          font-size: 10.5px;
+          color: rgba(26, 18, 9, 0.5);
+          margin: 0;
+          display: block;
+          white-space: nowrap;
+        }
+
+        @media (min-width: 1025px) {
+          .hero-attached-benefits-marquee-container { display: block; }
+          .hero-attached-benefits-track {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 16px;
+            align-items: center;
+            width: 100%;
+          }
+          .hero-attached-benefits-track.duplicate { display: none !important; }
+        }
+
+        @media (max-width: 1024px) {
+          .hero-attached-benefits-wrapper { margin: -24px auto 16px; padding: 0 16px; }
+          .hero-attached-benefits-bar { padding: 16px 0; display: flex; box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+          .hero-attached-benefits-bar::before, .hero-attached-benefits-bar::after {
+            content: ''; position: absolute; top: 0; bottom: 0; width: 24px; z-index: 5; pointer-events: none;
+          }
+          .hero-attached-benefits-bar::before { left: 0; background: linear-gradient(to right, #ffffff 0%, transparent 100%); }
+          .hero-attached-benefits-bar::after { right: 0; background: linear-gradient(to left, #ffffff 0%, transparent 100%); }
+          .hero-attached-benefits-marquee-container {
+            display: flex; width: max-content; animation: hero-benefits-marquee 25s linear infinite; will-change: transform;
+          }
+          .hero-attached-benefits-marquee-container:hover { animation-play-state: paused; }
+          .hero-attached-benefits-track { display: flex; align-items: center; gap: 32px; padding-right: 32px; flex-shrink: 0; }
+          .hero-attached-benefit-item { flex-shrink: 0; }
+          .product-grid { grid-template-columns: repeat(3, 1fr); gap: 20px; }
+        }
+
         @media (max-width: 768px) {
           .product-grid { grid-template-columns: repeat(2, 1fr); gap: 16px; }
           .watch-img-container { padding: 12px; }
           .watch-card-info { padding: 12px; }
-          .watch-card-title { font-size: 13.5px; }
-          .watch-card-footer { flex-direction: column; align-items: flex-start; gap: 10px; }
+          .watch-card-title { font-size: 13.5px; margin-bottom: 4px; }
+          .watch-card-specs { font-size: 11px; }
+          .watch-card-footer { flex-direction: column; align-items: flex-start; gap: 10px; margin-top: 12px; padding-top: 10px; }
+          .watch-card-price { font-size: 13px; }
           .watch-card-actions { width: 100%; justify-content: flex-end; }
           .card-action-btn { width: 28px; height: 28px; }
         }
@@ -309,7 +388,7 @@ function LimitedEditionContent() {
           overflow: 'hidden',
           color: '#ffffff',
           padding: '130px 24px 70px',
-          background: '#070604'
+          background: '#090806'
         }}
       >
         {/* Background Video */}
@@ -322,9 +401,9 @@ function LimitedEditionContent() {
           style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 1, opacity: 0.55 }}
         />
 
-        {/* Dark Gold Gradient Overlay */}
+        {/* Gradient Overlay */}
         <div 
-          style={{ position: 'absolute', inset: 0, zIndex: 2, background: 'linear-gradient(180deg, rgba(8,6,4,0.88) 0%, rgba(18,14,8,0.72) 50%, rgba(8,6,4,0.96) 100%)' }} 
+          style={{ position: 'absolute', inset: 0, zIndex: 2, background: 'linear-gradient(180deg, rgba(10,8,5,0.85) 0%, rgba(10,8,5,0.65) 50%, rgba(10,8,5,0.95) 100%)' }} 
         />
 
         {/* Hero Content */}
@@ -332,17 +411,17 @@ function LimitedEditionContent() {
           {/* Left Column: Text & Badge */}
           <div style={{ textAlign: 'left' }}>
             <div style={{ fontSize: '10px', letterSpacing: '0.28em', color: '#dfb15b', textTransform: 'uppercase', fontWeight: 600, marginBottom: '12px' }}>
-              WINSOR MAISON HORLOGERIE
+              EXCLUSIVITY & RARE CRAFTSMANSHIP
             </div>
             <h1 style={{ fontFamily: "'Cinzel', 'Cormorant Garamond', Georgia, serif", fontSize: 'clamp(26px, 3.4vw, 44px)', fontWeight: 600, lineHeight: 1.15, margin: '0 0 14px', letterSpacing: '0.02em', color: '#fff' }}>
               Limited Edition Reserve
             </h1>
             <p style={{ fontFamily: "'Jost', sans-serif", fontSize: 'clamp(13px, 1.1vw, 15px)', lineHeight: 1.6, color: 'rgba(255,255,255,0.82)', maxWidth: '480px', margin: '0 0 22px', fontWeight: 300 }}>
-              Strictly numbered horological masterpieces. Designed for collectors who value rarity, hand-finishing, and unique heritage craftsmanship.
+              Strictly numbered production runs. Mastercrafted with premium materials, automatic & precision movements, and bespoke luxury packaging.
             </p>
             <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap', alignItems: 'center' }}>
               <div style={{ padding: '8px 18px', background: 'rgba(139,105,20,0.2)', border: '1px solid rgba(223,177,91,0.45)', borderRadius: '20px', fontSize: '10px', letterSpacing: '0.18em', textTransform: 'uppercase', fontWeight: 600, color: '#dfb15b' }}>
-                {filteredProducts.length} LIMITED EDITIONS AVAILABLE
+                {filteredProducts.length} LIMITED EDITIONS PRODUCED
               </div>
             </div>
           </div>
@@ -351,7 +430,7 @@ function LimitedEditionContent() {
           <div className="limited-hero-img-card">
             <Image
               src="/winsor_limited_actor.webp"
-              alt="Winsor Limited Edition"
+              alt="Winsor Limited Edition Watch"
               fill
               priority
               sizes="(max-width: 900px) 100vw, 500px"
@@ -360,8 +439,8 @@ function LimitedEditionContent() {
             <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(10,8,5,0.85) 0%, transparent 60%)' }} />
             <div style={{ position: 'absolute', bottom: '20px', left: '20px', right: '20px', zIndex: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
               <div>
-                <span style={{ fontSize: '9px', letterSpacing: '0.25em', color: '#dfb15b', textTransform: 'uppercase', fontWeight: 600, display: 'block' }}>FOUNDER'S RESERVE</span>
-                <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '20px', color: '#ffffff', fontWeight: 500 }}>Rare & Numbered Timepieces</span>
+                <span style={{ fontSize: '9px', letterSpacing: '0.25em', color: '#dfb15b', textTransform: 'uppercase', fontWeight: 600, display: 'block' }}>INDIVIDUALLY NUMBERED</span>
+                <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '20px', color: '#ffffff', fontWeight: 500 }}>Rare Horological Masterpiece</span>
               </div>
               <span style={{ fontSize: '10px', letterSpacing: '0.15em', color: 'rgba(255,255,255,0.7)', border: '1px solid rgba(255,255,255,0.2)', padding: '4px 10px', borderRadius: '4px' }}>DUBAI 2023</span>
             </div>
@@ -369,8 +448,90 @@ function LimitedEditionContent() {
         </div>
       </section>
 
+      {/* ── ATTACHED BENEFITS BAR ── */}
+      <div className="hero-attached-benefits-wrapper">
+        <div className="hero-attached-benefits-bar">
+          <div className="hero-attached-benefits-marquee-container">
+            <div className="hero-attached-benefits-track">
+              <div className="hero-attached-benefit-item">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><path d="m12 6-2 4h4l-2 4" /></svg>
+                <div>
+                  <h4>Japan Movement</h4>
+                  <span>UAE Registered Brand</span>
+                </div>
+              </div>
+              <div className="hero-attached-benefit-item">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>
+                <div>
+                  <h4>International Warranty</h4>
+                  <span>Sri Lanka & UAE</span>
+                </div>
+              </div>
+              <div className="hero-attached-benefit-item">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="3" width="15" height="13" rx="2" ry="2" /><line x1="16" y1="8" x2="20" y2="8" /><line x1="16" y1="12" x2="22" y2="12" /></svg>
+                <div>
+                  <h4>Free Shipping</h4>
+                  <span>Island-wide in Sri Lanka</span>
+                </div>
+              </div>
+              <div className="hero-attached-benefit-item">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" /><path d="M21 3v5h-5" /></svg>
+                <div>
+                  <h4>Easy Returns</h4>
+                  <span>Within 7 Days</span>
+                </div>
+              </div>
+              <div className="hero-attached-benefit-item">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
+                <div>
+                  <h4>Secure Payments</h4>
+                  <span>100% Secure Checkout with payhere.lk</span>
+                </div>
+              </div>
+            </div>
+            <div className="hero-attached-benefits-track duplicate" aria-hidden="true">
+              <div className="hero-attached-benefit-item">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><path d="m12 6-2 4h4l-2 4" /></svg>
+                <div>
+                  <h4>Japan Movement</h4>
+                  <span>UAE Registered Brand</span>
+                </div>
+              </div>
+              <div className="hero-attached-benefit-item">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>
+                <div>
+                  <h4>International Warranty</h4>
+                  <span>Sri Lanka & UAE</span>
+                </div>
+              </div>
+              <div className="hero-attached-benefit-item">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="3" width="15" height="13" rx="2" ry="2" /><line x1="16" y1="8" x2="20" y2="8" /><line x1="16" y1="12" x2="22" y2="12" /></svg>
+                <div>
+                  <h4>Free Shipping</h4>
+                  <span>Island-wide in Sri Lanka</span>
+                </div>
+              </div>
+              <div className="hero-attached-benefit-item">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" /><path d="M21 3v5h-5" /></svg>
+                <div>
+                  <h4>Easy Returns</h4>
+                  <span>Within 7 Days</span>
+                </div>
+              </div>
+              <div className="hero-attached-benefit-item">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
+                <div>
+                  <h4>Secure Payments</h4>
+                  <span>100% Secure Checkout with payhere.lk</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* ── MAIN CATALOG CONTENT ── */}
-      <main id="limited-catalog" style={{ maxWidth: '1400px', margin: '0 auto', padding: '60px 24px 100px' }}>
+      <main id="limited-catalog" style={{ maxWidth: '1400px', margin: '0 auto', padding: '20px 24px 100px' }}>
 
         {/* ── TOOLBAR & FILTERS ── */}
         <div 

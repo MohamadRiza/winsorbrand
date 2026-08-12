@@ -381,92 +381,163 @@ function SportsCollectionContent() {
           }
         }
 
-        /* ── BENEFITS MARQUEE SLIDER FOR MOBILE ── */
-        @keyframes benefits-marquee {
-          0% { transform: translate3d(0, 0, 0); }
-          100% { transform: translate3d(-100%, 0, 0); }
+        /* ── ATTACHED BENEFITS BAR ── */
+        @keyframes hero-benefits-marquee {
+          0% {
+            transform: translate3d(0, 0, 0);
+          }
+          100% {
+            transform: translate3d(-50%, 0, 0);
+          }
         }
-        .benefits-carousel-wrapper {
-          width: 100%;
-          overflow: hidden;
-          margin-bottom: 40px;
-        }
-        .benefits-bar {
-          display: grid;
-          grid-template-columns: repeat(4, 1fr);
-          gap: 20px;
-          background: #fff;
-          padding: 24px 32px;
-          border-radius: 12px;
-          border: 1px solid rgba(26, 18, 9, 0.06);
-          margin: 0 auto;
+        .hero-attached-benefits-wrapper {
+          position: relative;
+          z-index: 30;
           max-width: 1400px;
+          margin: -34px auto 20px;
+          padding: 0 4%;
           width: 100%;
         }
-        .benefits-marquee-track {
-          display: contents;
+        .hero-attached-benefits-bar {
+          position: relative;
+          background: #ffffff;
+          border-radius: 14px;
+          border: 1.5px solid rgba(139, 105, 20, 0.2);
+          box-shadow: 0 12px 36px rgba(0, 0, 0, 0.09);
+          padding: 20px 32px;
+          backdrop-filter: blur(12px);
+          overflow: hidden;
         }
-        .benefits-marquee-track[aria-hidden="true"] {
-          display: none;
-        }
-        .benefit-item {
+        .hero-attached-benefit-item {
           display: flex;
           align-items: center;
           gap: 14px;
           color: #1a1209;
         }
-        .benefit-item svg {
+        .hero-attached-benefit-item svg {
           color: #8b6914;
           flex-shrink: 0;
         }
-        .benefit-item h4 {
+        .hero-attached-benefit-item h4 {
           font-size: 13px;
           font-weight: 600;
           margin: 0;
           letter-spacing: 0.01em;
+          color: #1a1209;
+          white-space: nowrap;
         }
-        .benefit-item span {
+        .hero-attached-benefit-item span {
           font-size: 10.5px;
           color: rgba(26, 18, 9, 0.5);
           margin: 0;
           display: block;
+          white-space: nowrap;
+        }
+
+        @media (min-width: 1025px) {
+          .hero-attached-benefits-marquee-container {
+            display: block;
+          }
+          .hero-attached-benefits-track {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 16px;
+            align-items: center;
+            width: 100%;
+          }
+          .hero-attached-benefits-track.duplicate {
+            display: none !important;
+          }
         }
 
         @media (max-width: 1024px) {
-          .benefits-carousel-wrapper {
-            margin-bottom: 32px;
-            overflow: hidden;
-            width: 100vw;
-            margin-left: calc(-50vw + 50%);
-            padding: 0 0 10px;
+          .hero-attached-benefits-wrapper {
+            margin: -24px auto 16px;
+            padding: 0 16px;
           }
-          .benefits-bar {
+          .hero-attached-benefits-bar {
+            padding: 16px 0;
             display: flex;
-            flex-wrap: nowrap;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+          }
+          .hero-attached-benefits-bar::before,
+          .hero-attached-benefits-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 24px;
+            z-index: 5;
+            pointer-events: none;
+          }
+          .hero-attached-benefits-bar::before {
+            left: 0;
+            background: linear-gradient(to right, #ffffff 0%, transparent 100%);
+          }
+          .hero-attached-benefits-bar::after {
+            right: 0;
+            background: linear-gradient(to left, #ffffff 0%, transparent 100%);
+          }
+          .hero-attached-benefits-marquee-container {
+            display: flex;
             width: max-content;
-            border: none;
-            background: transparent;
-            padding: 0;
-            margin: 0;
-            gap: 0;
+            animation: hero-benefits-marquee 25s linear infinite;
+            will-change: transform;
           }
-          .benefits-marquee-track {
-            display: flex !important;
+          .hero-attached-benefits-marquee-container:hover {
+            animation-play-state: paused;
+          }
+          .hero-attached-benefits-track {
+            display: flex;
             align-items: center;
-            gap: 16px;
-            animation: benefits-marquee 22s linear infinite;
+            gap: 32px;
+            padding-right: 32px;
             flex-shrink: 0;
-            padding-right: 16px;
           }
-          .benefit-item {
-            flex: 0 0 270px;
-            width: 270px;
-            box-sizing: border-box;
-            background: #fff;
-            border-radius: 12px;
-            padding: 16px 20px;
-            border: 1px solid rgba(26, 18, 9, 0.05);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.015);
+          .hero-attached-benefit-item {
+            flex-shrink: 0;
+          }
+          .product-grid {
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+          }
+        }
+
+        @media (max-width: 768px) {
+          .product-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+          }
+          .watch-img-container {
+            padding: 12px;
+          }
+          .watch-card-info {
+            padding: 12px;
+          }
+          .watch-card-title {
+            font-size: 13.5px;
+            margin-bottom: 4px;
+          }
+          .watch-card-specs {
+            font-size: 11px;
+          }
+          .watch-card-footer {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+            margin-top: 12px;
+            padding-top: 10px;
+          }
+          .watch-card-price {
+            font-size: 13px;
+          }
+          .watch-card-actions {
+            width: 100%;
+            justify-content: flex-end;
+          }
+          .card-action-btn {
+            width: 28px;
+            height: 28px;
           }
         }
       `}</style>
@@ -542,65 +613,101 @@ function SportsCollectionContent() {
         </div>
       </section>
 
-      {/* ── MAIN CONTENT WRAPPER ── */}
-      <main id="sports-catalog" style={{ maxWidth: '1400px', margin: '0 auto', padding: '60px 24px 100px' }}>
-
-        {/* ── BENEFITS BAR ── */}
-        <div className="benefits-carousel-wrapper">
-          <div className="benefits-bar">
-            {/* Duplicated track for continuous infinite marquee scroll on mobile */}
-            {[1, 2].map((repeatIndex) => (
-              <div 
-                key={repeatIndex} 
-                className="benefits-marquee-track"
-                aria-hidden={repeatIndex === 2 ? 'true' : undefined}
-              >
-                <div className="benefit-item">
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                  </svg>
-                  <div>
-                    <h4>Dubai Registered Brand</h4>
-                    <span>Trademark registered 2023</span>
-                  </div>
-                </div>
-
-                <div className="benefit-item">
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                  </svg>
-                  <div>
-                    <h4>1-Year Warranty</h4>
-                    <span>International coverage</span>
-                  </div>
-                </div>
-
-                <div className="benefit-item">
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-                    <rect x="1" y="3" width="15" height="13" rx="2" />
-                    <polygon points="16 8 20 8 23 11 23 16 16 16 16 8" />
-                    <circle cx="5.5" cy="18.5" r="2.5" />
-                    <circle cx="18.5" cy="18.5" r="2.5" />
-                  </svg>
-                  <div>
-                    <h4>Free Delivery</h4>
-                    <span>Island-wide in Sri Lanka</span>
-                  </div>
-                </div>
-
-                <div className="benefit-item">
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-                    <path d="M12 22a7 7 0 007-7c0-4.3-7-11-7-11S5 10.7 5 15a7 7 0 007 7z" />
-                  </svg>
-                  <div>
-                    <h4>100% Authentic</h4>
-                    <span>Crafted with precision</span>
-                  </div>
+      {/* ── ATTACHED BENEFITS BAR ── */}
+      <div className="hero-attached-benefits-wrapper">
+        <div className="hero-attached-benefits-bar">
+          <div className="hero-attached-benefits-marquee-container">
+            {/* Track 1 */}
+            <div className="hero-attached-benefits-track">
+              <div className="hero-attached-benefit-item">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><path d="m12 6-2 4h4l-2 4" /></svg>
+                <div>
+                  <h4>Japan Movement</h4>
+                  <span>UAE Registered Brand</span>
                 </div>
               </div>
-            ))}
+
+              <div className="hero-attached-benefit-item">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>
+                <div>
+                  <h4>International Warranty</h4>
+                  <span>Sri Lanka & UAE</span>
+                </div>
+              </div>
+
+              <div className="hero-attached-benefit-item">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="3" width="15" height="13" rx="2" ry="2" /><line x1="16" y1="8" x2="20" y2="8" /><line x1="16" y1="12" x2="22" y2="12" /></svg>
+                <div>
+                  <h4>Free Shipping</h4>
+                  <span>Island-wide in Sri Lanka</span>
+                </div>
+              </div>
+
+              <div className="hero-attached-benefit-item">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" /><path d="M21 3v5h-5" /></svg>
+                <div>
+                  <h4>Easy Returns</h4>
+                  <span>Within 7 Days</span>
+                </div>
+              </div>
+
+              <div className="hero-attached-benefit-item">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
+                <div>
+                  <h4>Secure Payments</h4>
+                  <span>100% Secure Checkout with payhere.lk</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Track 2 (Duplicate for Seamless Infinite Marquee Loop on Mobile) */}
+            <div className="hero-attached-benefits-track duplicate" aria-hidden="true">
+              <div className="hero-attached-benefit-item">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><path d="m12 6-2 4h4l-2 4" /></svg>
+                <div>
+                  <h4>Japan Movement</h4>
+                  <span>UAE Registered Brand</span>
+                </div>
+              </div>
+
+              <div className="hero-attached-benefit-item">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>
+                <div>
+                  <h4>International Warranty</h4>
+                  <span>Sri Lanka & UAE</span>
+                </div>
+              </div>
+
+              <div className="hero-attached-benefit-item">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="3" width="15" height="13" rx="2" ry="2" /><line x1="16" y1="8" x2="20" y2="8" /><line x1="16" y1="12" x2="22" y2="12" /></svg>
+                <div>
+                  <h4>Free Shipping</h4>
+                  <span>Island-wide in Sri Lanka</span>
+                </div>
+              </div>
+
+              <div className="hero-attached-benefit-item">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" /><path d="M21 3v5h-5" /></svg>
+                <div>
+                  <h4>Easy Returns</h4>
+                  <span>Within 7 Days</span>
+                </div>
+              </div>
+
+              <div className="hero-attached-benefit-item">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
+                <div>
+                  <h4>Secure Payments</h4>
+                  <span>100% Secure Checkout with payhere.lk</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
+      </div>
+
+      {/* ── MAIN CONTENT WRAPPER ── */}
+      <main id="sports-catalog" style={{ maxWidth: '1400px', margin: '0 auto', padding: '20px 24px 100px' }}>
 
         {/* ── TOOLBAR & FILTERS ── */}
         <div 

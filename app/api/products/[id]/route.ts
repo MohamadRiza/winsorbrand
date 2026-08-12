@@ -2,16 +2,31 @@ import { NextRequest, NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db';
 import Product from '@/lib/models/Product';
 import { verifyPermissions } from '@/lib/authHelper';
+import { GET as getCollections } from '../collections/route';
+import { GET as getGifts } from '../gifts/route';
 
 // GET
 export async function GET(
-  _: NextRequest,
+  req: NextRequest,
   context: { params: Promise<{ id: string }> }
 ) {
   const { id } = await context.params;
 
+  if (id === 'collections') {
+    return getCollections(req);
+  }
+  if (id === 'gifts') {
+    return getGifts(req);
+  }
+
   try {
     await connectDB();
+    if (!id || id.length !== 24) {
+      return NextResponse.json(
+        { success: false, error: 'Invalid product ID' },
+        { status: 400 }
+      );
+    }
     const product = await Product.findById(id);
 
     if (!product) {

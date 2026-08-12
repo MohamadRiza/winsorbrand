@@ -540,6 +540,14 @@ export default function CollectionsPage() {
         }
 
         /* ── ATTACHED BENEFITS BAR (MATCHING IMG2 LUXURY ATTACHED DESIGN) ── */
+        @keyframes hero-benefits-marquee {
+          0% {
+            transform: translate3d(0, 0, 0);
+          }
+          100% {
+            transform: translate3d(-50%, 0, 0);
+          }
+        }
         .hero-attached-benefits-wrapper {
           position: relative;
           z-index: 30;
@@ -554,12 +562,9 @@ export default function CollectionsPage() {
           border-radius: 14px;
           border: 1.5px solid rgba(139, 105, 20, 0.2);
           box-shadow: 0 12px 36px rgba(0, 0, 0, 0.09);
-          display: grid;
-          grid-template-columns: repeat(5, 1fr);
-          gap: 16px;
           padding: 20px 32px;
-          align-items: center;
           backdrop-filter: blur(12px);
+          overflow: hidden;
         }
         .hero-attached-benefit-item {
           display: flex;
@@ -585,6 +590,71 @@ export default function CollectionsPage() {
           margin: 0;
           display: block;
           white-space: nowrap;
+        }
+
+        @media (min-width: 1025px) {
+          .hero-attached-benefits-marquee-container {
+            display: block;
+          }
+          .hero-attached-benefits-track {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 16px;
+            align-items: center;
+            width: 100%;
+          }
+          .hero-attached-benefits-track.duplicate {
+            display: none !important;
+          }
+        }
+
+        @media (max-width: 1024px) {
+          .hero-attached-benefits-wrapper {
+            margin: -24px auto 16px;
+            padding: 0 16px;
+          }
+          .hero-attached-benefits-bar {
+            padding: 16px 0;
+            display: flex;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+          }
+          .hero-attached-benefits-bar::before,
+          .hero-attached-benefits-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 24px;
+            z-index: 5;
+            pointer-events: none;
+          }
+          .hero-attached-benefits-bar::before {
+            left: 0;
+            background: linear-gradient(to right, #ffffff 0%, transparent 100%);
+          }
+          .hero-attached-benefits-bar::after {
+            right: 0;
+            background: linear-gradient(to left, #ffffff 0%, transparent 100%);
+          }
+          .hero-attached-benefits-marquee-container {
+            display: flex;
+            width: max-content;
+            animation: hero-benefits-marquee 25s linear infinite;
+            will-change: transform;
+          }
+          .hero-attached-benefits-marquee-container:hover {
+            animation-play-state: paused;
+          }
+          .hero-attached-benefits-track {
+            display: flex;
+            align-items: center;
+            gap: 32px;
+            padding-right: 32px;
+            flex-shrink: 0;
+          }
+          .hero-attached-benefit-item {
+            flex-shrink: 0;
+          }
         }
         .benefit-item {
           display: flex;
@@ -1516,43 +1586,91 @@ export default function CollectionsPage() {
         {/* ── ATTACHED BENEFITS BAR (DIRECTLY ATTACHED TO HERO BANNER - IMG2 REPLICATE) ── */}
         <div className="hero-attached-benefits-wrapper">
           <div className="hero-attached-benefits-bar">
-            <div className="hero-attached-benefit-item">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><path d="m12 6-2 4h4l-2 4" /></svg>
-              <div>
-                <h4>Japan Movement</h4>
-                <span>UAE Registered Brand</span>
-              </div>
-            </div>
+            <div className="hero-attached-benefits-marquee-container">
+              {/* Track 1 */}
+              <div className="hero-attached-benefits-track">
+                <div className="hero-attached-benefit-item">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><path d="m12 6-2 4h4l-2 4" /></svg>
+                  <div>
+                    <h4>Japan Movement</h4>
+                    <span>UAE Registered Brand</span>
+                  </div>
+                </div>
 
-            <div className="hero-attached-benefit-item">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>
-              <div>
-                <h4>International Warranty</h4>
-                <span>Sri Lanka & UAE</span>
-              </div>
-            </div>
+                <div className="hero-attached-benefit-item">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>
+                  <div>
+                    <h4>International Warranty</h4>
+                    <span>Sri Lanka & UAE</span>
+                  </div>
+                </div>
 
-            <div className="hero-attached-benefit-item">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="3" width="15" height="13" rx="2" ry="2" /><line x1="16" y1="8" x2="20" y2="8" /><line x1="16" y1="12" x2="22" y2="12" /></svg>
-              <div>
-                <h4>Free Shipping</h4>
-                <span>Island-wide in Sri Lanka</span>
-              </div>
-            </div>
+                <div className="hero-attached-benefit-item">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="3" width="15" height="13" rx="2" ry="2" /><line x1="16" y1="8" x2="20" y2="8" /><line x1="16" y1="12" x2="22" y2="12" /></svg>
+                  <div>
+                    <h4>Free Shipping</h4>
+                    <span>Island-wide in Sri Lanka</span>
+                  </div>
+                </div>
 
-            <div className="hero-attached-benefit-item">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" /><path d="M21 3v5h-5" /></svg>
-              <div>
-                <h4>Easy Returns</h4>
-                <span>Within 7 Days</span>
-              </div>
-            </div>
+                <div className="hero-attached-benefit-item">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" /><path d="M21 3v5h-5" /></svg>
+                  <div>
+                    <h4>Easy Returns</h4>
+                    <span>Within 7 Days</span>
+                  </div>
+                </div>
 
-            <div className="hero-attached-benefit-item">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
-              <div>
-                <h4>Secure Payments</h4>
-                <span>100% Secure Checkout with payhere.lk</span>
+                <div className="hero-attached-benefit-item">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
+                  <div>
+                    <h4>Secure Payments</h4>
+                    <span>100% Secure Checkout with payhere.lk</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Track 2 (Duplicate for Seamless Infinite Marquee Loop on Mobile) */}
+              <div className="hero-attached-benefits-track duplicate" aria-hidden="true">
+                <div className="hero-attached-benefit-item">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><path d="m12 6-2 4h4l-2 4" /></svg>
+                  <div>
+                    <h4>Japan Movement</h4>
+                    <span>UAE Registered Brand</span>
+                  </div>
+                </div>
+
+                <div className="hero-attached-benefit-item">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>
+                  <div>
+                    <h4>International Warranty</h4>
+                    <span>Sri Lanka & UAE</span>
+                  </div>
+                </div>
+
+                <div className="hero-attached-benefit-item">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="3" width="15" height="13" rx="2" ry="2" /><line x1="16" y1="8" x2="20" y2="8" /><line x1="16" y1="12" x2="22" y2="12" /></svg>
+                  <div>
+                    <h4>Free Shipping</h4>
+                    <span>Island-wide in Sri Lanka</span>
+                  </div>
+                </div>
+
+                <div className="hero-attached-benefit-item">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" /><path d="M21 3v5h-5" /></svg>
+                  <div>
+                    <h4>Easy Returns</h4>
+                    <span>Within 7 Days</span>
+                  </div>
+                </div>
+
+                <div className="hero-attached-benefit-item">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
+                  <div>
+                    <h4>Secure Payments</h4>
+                    <span>100% Secure Checkout with payhere.lk</span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

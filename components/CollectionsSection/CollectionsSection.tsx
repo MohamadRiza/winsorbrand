@@ -178,7 +178,7 @@ function WatchCard({ product, index }: { product: WatchProduct; index: number })
   useEffect(() => {
     let active = true;
     fetch(`/api/reviews?productId=${product._id}`)
-      .then(res => res.json())
+      .then(res => (res.ok && res.headers.get('content-type')?.includes('application/json') ? res.json() : { success: false, data: [] }))
       .then(data => {
         if (active && data.success) {
           setReviews(data.data || []);

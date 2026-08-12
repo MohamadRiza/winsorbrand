@@ -419,24 +419,28 @@ export default function Footer() {
               </p>
 
               {/* Contact Details */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '28px' }}>
-                <a href="tel:+94771234567" className="ft-a" style={{ fontSize: '13px' }}>
-                  +94 77 123 4567
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '28px' }}>
+                <div style={{ fontSize: '11px', color: '#8b6914', letterSpacing: '0.12em', fontWeight: 600, textTransform: 'uppercase' }}>HEAD OFFICE:</div>
+                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
+                  <a href="tel:0770716212" className="ft-a" style={{ fontSize: '13px' }}>
+                    077 071 6212
+                  </a>
+                  <span style={{ fontSize: '12px', color: 'rgba(26,18,9,0.3)' }}>|</span>
+                  <a href="tel:0778778555" className="ft-a" style={{ fontSize: '13px' }}>
+                    077 877 8555
+                  </a>
+                </div>
+                <div style={{ fontSize: '11px', color: '#8b6914', letterSpacing: '0.12em', fontWeight: 600, textTransform: 'uppercase', marginTop: '4px' }}>KANDY CITY CENTRE (LEVEL 3):</div>
+                <a href="tel:0779779666" className="ft-a" style={{ fontSize: '13px' }}>
+                  077 977 9666
                 </a>
-                <a href="tel:+94712345678" className="ft-a" style={{ fontSize: '13px' }}>
-                  +94 71 234 5678
+                <div style={{ fontSize: '11px', color: '#8b6914', letterSpacing: '0.12em', fontWeight: 600, textTransform: 'uppercase', marginTop: '4px' }}>OFFICIAL EMAILS:</div>
+                <a href="mailto:winsorwatches@gmail.com" className="ft-a" style={{ fontSize: '13px' }}>
+                  winsorwatches@gmail.com
                 </a>
                 <a href="mailto:support@winsorbrand.com" className="ft-a" style={{ fontSize: '13px' }}>
                   support@winsorbrand.com
                 </a>
-                <address className="ft-a" style={{
-                  fontSize: '13px',
-                  fontStyle: 'normal',
-                  lineHeight: 1.6
-                }}>
-                  49A Keyzer Street, Pettah,<br />
-                  Colombo, Sri Lanka
-                </address>
               </div>
 
               {/* Social Icons */}

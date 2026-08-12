@@ -15,21 +15,32 @@ export async function GET(req: NextRequest) {
     const section = req.nextUrl.searchParams.get('section') as CollectionSection | null;
     const limit   = parseInt(req.nextUrl.searchParams.get('limit') ?? '10', 10);
 
-    // Base filter — must be active and visible on homepage
-    const filter: Record<string, unknown> = { isActive: true, showOnHome: true };
+    let filter: Record<string, unknown> = { isActive: true };
 
-    // Section-specific filter maps to the stickerText or a dedicated section field
-    // We use a collectionSections array field on the product (add to model below)
     if (section) {
-      filter['collectionSections'] = section;
+      filter['$or'] = [
+        { collectionSections: section },
+        { stickerText: new RegExp(section, 'i') },
+        { title: new RegExp(section, 'i') },
+        { description: new RegExp(section, 'i') }
+      ];
     }
 
-    const products = await Product
+    let products = await Product
       .find(filter)
       .select('title modelNo price thumbnail colorVariants stickerEnabled stickerText collectionSections images specifications description')
-      .limit(Math.min(limit, 10)) // max 10 per section
+      .limit(Math.min(limit, 10))
       .sort({ createdAt: -1 })
       .lean();
+
+    if (products.length === 0) {
+      products = await Product
+        .find({ isActive: true })
+        .select('title modelNo price thumbnail colorVariants stickerEnabled stickerText collectionSections images specifications description')
+        .limit(Math.min(limit, 10))
+        .sort({ createdAt: -1 })
+        .lean();
+    }
 
     return NextResponse.json({ success: true, data: products });
   } catch (error) {

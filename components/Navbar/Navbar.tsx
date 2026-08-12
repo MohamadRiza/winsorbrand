@@ -203,31 +203,63 @@ export default function Navbar() {
     return () => window.removeEventListener('winsor-hero-slide-change', handleSlideChange);
   }, []);
 
+  // Dynamically measure hero section height across all pages
   useEffect(() => {
-    if (!isTransparentPage) {
-      setIsTransparent(false);
-    } else {
-      const hero = document.getElementById('hero') || document.querySelector('.collections-hero-banner') || document.querySelector('.care-hero') || document.querySelector('.gifts-hero-banner') || document.querySelector('.locator-hero-banner') || document.querySelector('.careers-hero-banner');
-      heroHeight.current = hero ? (hero as HTMLElement).offsetHeight : window.innerHeight;
-      setIsTransparent(window.scrollY < heroHeight.current - 80);
-    }
-  }, [isTransparentPage]);
+    const updateHeroHeight = () => {
+      const hero = document.getElementById('hero') 
+        || document.querySelector('.collections-hero-banner') 
+        || document.querySelector('.care-hero') 
+        || document.querySelector('.gifts-hero-banner') 
+        || document.querySelector('.locator-hero-banner') 
+        || document.querySelector('.careers-hero-banner')
+        || document.querySelector('.ws-parallax-bg')
+        || document.querySelector('main > section:first-of-type')
+        || document.querySelector('section:first-of-type');
+      
+      if (hero) {
+        const h = (hero as HTMLElement).offsetHeight;
+        heroHeight.current = h > 150 ? h : 500;
+      } else {
+        heroHeight.current = 450;
+      }
 
+      const cur = window.scrollY;
+      const threshold = (heroHeight.current > 150 ? heroHeight.current : 450) - 80;
+      setIsTransparent(cur < threshold);
+    };
+
+    updateHeroHeight();
+    const timer = setTimeout(updateHeroHeight, 250);
+    window.addEventListener('resize', updateHeroHeight);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('resize', updateHeroHeight);
+    };
+  }, [pathname]);
+
+  // Scroll listener to update transparency and visibility dynamically
   useEffect(() => {
     const onScroll = () => {
       const cur = window.scrollY;
-      if (isTransparentPage) {
-        setIsTransparent(cur < heroHeight.current - 80);
-      } else {
-        setIsTransparent(false);
+      const h = heroHeight.current > 150 ? heroHeight.current : 450;
+      const threshold = h - 80;
+      
+      setIsTransparent(cur < threshold);
+
+      if (cur > lastScrollY.current && cur > 120) { 
+        setIsVisible(false); 
+        setMegaVisible(false); 
+      } else { 
+        setIsVisible(true); 
       }
-      if (cur > lastScrollY.current && cur > 120) { setIsVisible(false); setMegaVisible(false); }
-      else setIsVisible(true);
       lastScrollY.current = cur;
     };
+
+    onScroll();
+
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
-  }, [isTransparentPage]);
+  }, [pathname]);
 
   useEffect(() => {
     if (mobileOpen) {
@@ -248,7 +280,7 @@ export default function Navbar() {
     if (searchOpen && products.length === 0) {
       setSearching(true);
       fetch('/api/products')
-        .then(res => res.json())
+        .then(res => (res.ok && res.headers.get('content-type')?.includes('application/json') ? res.json() : { success: false, data: [] }))
         .then(data => {
           if (data.success && Array.isArray(data.data)) {
             setProducts(data.data);

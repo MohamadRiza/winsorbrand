@@ -316,8 +316,11 @@ export default function AdminOrdersPage() {
                             #{order.orderRef}
                           </span>
                           {order.isGift && (
-                            <span className="inline-flex items-center px-2 py-0.5 rounded text-[9px] font-extrabold bg-[#8b6914]/15 text-[#8b6914] border border-[#8b6914]/30 uppercase tracking-widest">
-                              🎁 GIFT
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[9px] font-extrabold bg-[#8b6914]/15 text-[#8b6914] border border-[#8b6914]/30 uppercase tracking-widest">
+                              <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V6a2 2 0 10-2 2h2zm-4 4h8m-8 0v7a2 2 0 002 2h4a2 2 0 002-2v-7m-8 0a2 2 0 01-2-2v-1a2 2 0 012-2h8a2 2 0 012 2v1a2 2 0 01-2 2" />
+                              </svg>
+                              GIFT
                             </span>
                           )}
                         </div>
@@ -353,12 +356,18 @@ export default function AdminOrdersPage() {
                       <div className="flex flex-col gap-1.5">
                         {/* Payment Method Badge */}
                         {order.paymentMethod === 'bank_transfer' ? (
-                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
-                            🏦 Bank Transfer
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
+                            <svg className="w-3 h-3 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5m0 0h4" />
+                            </svg>
+                            Bank Transfer
                           </span>
                         ) : (
-                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-sky-50 text-sky-700 border border-sky-200">
-                            💳 PayHere
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-sky-50 text-sky-700 border border-sky-200">
+                            <svg className="w-3 h-3 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                            </svg>
+                            PayHere
                           </span>
                         )}
                         {/* Payment Status Badge */}
@@ -521,7 +530,11 @@ export default function AdminOrdersPage() {
                   {selectedOrder.status === 'cancel_requested' && (
                     <div className="p-4 bg-amber-50 border border-amber-300 rounded-xl space-y-3">
                       <div className="flex items-start gap-2.5">
-                        <span className="text-xl">⚠️</span>
+                        <div className="w-7 h-7 rounded-lg bg-amber-100 border border-amber-300 flex items-center justify-center flex-shrink-0 mt-0.5">
+                          <svg className="w-4 h-4 text-amber-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                          </svg>
+                        </div>
                         <div>
                           <p className="text-xs font-bold text-amber-900 uppercase tracking-wide">Cancellation Request Pending</p>
                           <p className="text-xs text-amber-800 mt-1 leading-relaxed">
@@ -557,8 +570,11 @@ export default function AdminOrdersPage() {
                   )}
 
                   {selectedOrder.status === 'cancelled' && (
-                    <div className="p-3.5 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-800 text-center font-medium">
-                      ❌ Order has been Cancelled. Stock restored to inventory.
+                    <div className="p-3.5 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-800 text-center font-medium flex items-center justify-center gap-2">
+                      <svg className="w-4 h-4 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      Order has been Cancelled. Stock restored to inventory.
                     </div>
                   )}
                 </div>
@@ -595,7 +611,10 @@ export default function AdminOrdersPage() {
                       {item.isGift && (
                         <div className="p-3.5 rounded-xl bg-[#faf7f0] border border-[#8B6914]/20 text-xs space-y-2">
                           <div className="font-bold text-[#8B6914] flex items-center gap-1.5">
-                            <span>🎁</span> Premium Gift Packaging Included
+                            <svg className="w-3.5 h-3.5 text-[#8B6914]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V6a2 2 0 10-2 2h2zm-4 4h8m-8 0v7a2 2 0 002 2h4a2 2 0 002-2v-7m-8 0a2 2 0 01-2-2v-1a2 2 0 012-2h8a2 2 0 012 2v1a2 2 0 01-2 2" />
+                            </svg>
+                            Premium Gift Packaging Included
                           </div>
                           {item.giftNote && (
                             <div className="space-y-1">
@@ -612,9 +631,12 @@ export default function AdminOrdersPage() {
                                 href={item.canvaLink} 
                                 target="_blank" 
                                 rel="noopener noreferrer" 
-                                className="text-[#8B6914] font-semibold hover:underline break-all inline-flex items-center gap-1 bg-white px-2.5 py-1 rounded border border-[#8B6914]/20"
+                                className="text-[#8B6914] font-semibold hover:underline break-all inline-flex items-center gap-1.5 bg-white px-2.5 py-1 rounded border border-[#8B6914]/20"
                               >
-                                View Greeting Link ↗
+                                View Greeting Link
+                                <svg className="w-3 h-3 text-[#8B6914]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                </svg>
                               </a>
                             </div>
                           )}
@@ -625,9 +647,12 @@ export default function AdminOrdersPage() {
                                 href={item.giftAttachmentUrl} 
                                 target="_blank" 
                                 rel="noopener noreferrer" 
-                                className="text-[#8B6914] font-semibold hover:underline inline-flex items-center gap-1 bg-white px-2.5 py-1 rounded border border-[#8B6914]/20"
+                                className="text-[#8B6914] font-semibold hover:underline inline-flex items-center gap-1.5 bg-white px-2.5 py-1 rounded border border-[#8B6914]/20"
                               >
-                                📄 Download Attached Document ↗
+                                <svg className="w-3.5 h-3.5 text-[#8B6914]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                </svg>
+                                Download Attached Document
                               </a>
                             </div>
                           )}
@@ -656,11 +681,17 @@ export default function AdminOrdersPage() {
                       <span className="text-[#1a1209]/60 font-medium">Payment Method</span>
                       {selectedOrder.paymentMethod === 'bank_transfer' ? (
                         <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
-                          🏦 Bank Transfer
+                          <svg className="w-3.5 h-3.5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5m0 0h4" />
+                          </svg>
+                          Bank Transfer
                         </span>
                       ) : (
                         <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-sky-50 text-sky-700 border border-sky-200">
-                          💳 PayHere (Card)
+                          <svg className="w-3.5 h-3.5 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                          </svg>
+                          PayHere (Card)
                         </span>
                       )}
                     </div>
@@ -678,7 +709,7 @@ export default function AdminOrdersPage() {
                         <span className={`w-1.5 h-1.5 rounded-full ${
                           selectedOrder.paymentStatus === 'paid' ? 'bg-emerald-500' : selectedOrder.paymentStatus === 'failed' ? 'bg-rose-500' : 'bg-amber-500'
                         }`} />
-                        {selectedOrder.paymentStatus === 'paid' ? '✓ Paid' : selectedOrder.paymentStatus === 'failed' ? '✗ Failed' : '⏳ Pending'}
+                        {selectedOrder.paymentStatus === 'paid' ? 'Paid' : selectedOrder.paymentStatus === 'failed' ? 'Failed' : 'Pending'}
                       </span>
                     </div>
 
@@ -734,7 +765,11 @@ export default function AdminOrdersPage() {
                           </div>
                         ) : (
                           <div className="flex items-center gap-2.5 p-3 bg-amber-50 border border-amber-200 rounded-xl">
-                            <span className="text-lg">⏳</span>
+                            <div className="w-7 h-7 rounded-lg bg-amber-100 border border-amber-300 flex items-center justify-center flex-shrink-0">
+                              <svg className="w-4 h-4 text-amber-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                              </svg>
+                            </div>
                             <div>
                               <p className="font-semibold text-amber-800 text-xs">Receipt Not Yet Uploaded</p>
                               <p className="text-amber-700 text-[10px] mt-0.5">Customer has not uploaded a bank receipt yet.</p>

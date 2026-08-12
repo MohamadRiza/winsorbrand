@@ -1285,6 +1285,68 @@ export default function StoreLocatorPage() {
               </section>
             )}
 
+            {/* WHOLESALE & SHOP REGISTRATION CALLOUT */}
+            <div style={{
+              background: 'linear-gradient(135deg, #1a1209 0%, #2a1f10 100%)',
+              color: '#ffffff',
+              borderRadius: '16px',
+              padding: '28px 36px',
+              marginBottom: '40px',
+              display: 'flex',
+              flexWrap: 'wrap',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: '20px',
+              boxShadow: '0 12px 32px rgba(26,18,9,0.15)',
+              border: '1px solid rgba(223,177,91,0.3)'
+            }}>
+              <div>
+                <span style={{ fontSize: '10px', letterSpacing: '0.22em', color: '#dfb15b', textTransform: 'uppercase', fontWeight: 600, display: 'block', marginBottom: '6px' }}>
+                  BECOME AN AUTHORIZED RETAILER / WHOLESALE
+                </span>
+                <h4 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '24px', fontWeight: 600, margin: '0 0 8px', color: '#ffffff' }}>
+                  Register for Wholesale or Shop Purchases
+                </h4>
+                <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.78)', margin: 0, maxWidth: '600px', lineHeight: 1.5 }}>
+                  Expand your store catalog with luxury Winsor timepieces. Contact our Head Office concierge to initiate your retailer application or place wholesale orders.
+                </p>
+              </div>
+              <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+                <a
+                  href="tel:0770716212"
+                  style={{
+                    padding: '12px 20px',
+                    background: '#8b6914',
+                    color: '#ffffff',
+                    borderRadius: '8px',
+                    fontSize: '12px',
+                    fontWeight: 600,
+                    textDecoration: 'none',
+                    letterSpacing: '0.05em',
+                    boxShadow: '0 4px 12px rgba(139, 105, 20, 0.3)'
+                  }}
+                >
+                  Call Head Office: 077 071 6212
+                </a>
+                <a
+                  href="tel:0778778555"
+                  style={{
+                    padding: '12px 20px',
+                    background: 'rgba(255,255,255,0.12)',
+                    color: '#ffffff',
+                    border: '1px solid rgba(255,255,255,0.3)',
+                    borderRadius: '8px',
+                    fontSize: '12px',
+                    fontWeight: 600,
+                    textDecoration: 'none',
+                    letterSpacing: '0.05em'
+                  }}
+                >
+                  Line 2: 077 877 8555
+                </a>
+              </div>
+            </div>
+
             {/* SERVICES BANNER */}
             <section className="locator-features-banner">
               <div className="feature-block-item">

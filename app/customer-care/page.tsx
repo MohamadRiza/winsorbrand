@@ -65,6 +65,9 @@ export default function CustomerCarePage() {
         setProfileLoading(true);
         try {
           const res = await fetch('/api/customer/profile');
+          if (!res.ok || !res.headers.get('content-type')?.includes('application/json')) {
+            return;
+          }
           const data = await res.json();
           if (data.success && data.data) {
             const { mobileCode, mobile } = data.data;
@@ -74,8 +77,8 @@ export default function CustomerCarePage() {
               mobile: mobile || '',
             }));
           }
-        } catch (err) {
-          console.error('Failed to fetch profile contact details:', err);
+        } catch (error) {
+          // Silently handle profile fetch failure for unauthenticated guest users
         } finally {
           setProfileLoading(false);
         }
@@ -270,6 +273,14 @@ export default function CustomerCarePage() {
         }
 
         /* ── ATTACHED BENEFITS BAR ── */
+        @keyframes hero-benefits-marquee {
+          0% {
+            transform: translate3d(0, 0, 0);
+          }
+          100% {
+            transform: translate3d(-50%, 0, 0);
+          }
+        }
         .hero-attached-benefits-wrapper {
           position: relative;
           z-index: 30;
@@ -284,12 +295,9 @@ export default function CustomerCarePage() {
           border-radius: 14px;
           border: 1.5px solid rgba(139, 105, 20, 0.2);
           box-shadow: 0 12px 36px rgba(0, 0, 0, 0.09);
-          display: grid;
-          grid-template-columns: repeat(5, 1fr);
-          gap: 16px;
           padding: 20px 32px;
-          align-items: center;
           backdrop-filter: blur(12px);
+          overflow: hidden;
         }
         .hero-attached-benefit-item {
           display: flex;
@@ -315,6 +323,71 @@ export default function CustomerCarePage() {
           margin: 0;
           display: block;
           white-space: nowrap;
+        }
+
+        @media (min-width: 1025px) {
+          .hero-attached-benefits-marquee-container {
+            display: block;
+          }
+          .hero-attached-benefits-track {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 16px;
+            align-items: center;
+            width: 100%;
+          }
+          .hero-attached-benefits-track.duplicate {
+            display: none !important;
+          }
+        }
+
+        @media (max-width: 1024px) {
+          .hero-attached-benefits-wrapper {
+            margin: -24px auto 16px;
+            padding: 0 16px;
+          }
+          .hero-attached-benefits-bar {
+            padding: 16px 0;
+            display: flex;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+          }
+          .hero-attached-benefits-bar::before,
+          .hero-attached-benefits-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 24px;
+            z-index: 5;
+            pointer-events: none;
+          }
+          .hero-attached-benefits-bar::before {
+            left: 0;
+            background: linear-gradient(to right, #ffffff 0%, transparent 100%);
+          }
+          .hero-attached-benefits-bar::after {
+            right: 0;
+            background: linear-gradient(to left, #ffffff 0%, transparent 100%);
+          }
+          .hero-attached-benefits-marquee-container {
+            display: flex;
+            width: max-content;
+            animation: hero-benefits-marquee 25s linear infinite;
+            will-change: transform;
+          }
+          .hero-attached-benefits-marquee-container:hover {
+            animation-play-state: paused;
+          }
+          .hero-attached-benefits-track {
+            display: flex;
+            align-items: center;
+            gap: 32px;
+            padding-right: 32px;
+            flex-shrink: 0;
+          }
+          .hero-attached-benefit-item {
+            flex-shrink: 0;
+          }
         }
 
         /* ── PAGE BODY CONTAINER ── */
@@ -878,43 +951,91 @@ export default function CustomerCarePage() {
       {/* ── ATTACHED BENEFITS BAR ── */}
       <div className="hero-attached-benefits-wrapper">
         <div className="hero-attached-benefits-bar">
-          <div className="hero-attached-benefit-item">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><path d="m12 6-2 4h4l-2 4" /></svg>
-            <div>
-              <h4>Japan Movement</h4>
-              <span>UAE Registered Brand</span>
-            </div>
-          </div>
+          <div className="hero-attached-benefits-marquee-container">
+            {/* Track 1 */}
+            <div className="hero-attached-benefits-track">
+              <div className="hero-attached-benefit-item">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><path d="m12 6-2 4h4l-2 4" /></svg>
+                <div>
+                  <h4>Japan Movement</h4>
+                  <span>UAE Registered Brand</span>
+                </div>
+              </div>
 
-          <div className="hero-attached-benefit-item">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>
-            <div>
-              <h4>International Warranty</h4>
-              <span>Sri Lanka & UAE</span>
-            </div>
-          </div>
+              <div className="hero-attached-benefit-item">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>
+                <div>
+                  <h4>International Warranty</h4>
+                  <span>Sri Lanka & UAE</span>
+                </div>
+              </div>
 
-          <div className="hero-attached-benefit-item">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="3" width="15" height="13" rx="2" ry="2" /><line x1="16" y1="8" x2="20" y2="8" /><line x1="16" y1="12" x2="22" y2="12" /></svg>
-            <div>
-              <h4>Free Shipping</h4>
-              <span>Island-wide in Sri Lanka</span>
-            </div>
-          </div>
+              <div className="hero-attached-benefit-item">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="3" width="15" height="13" rx="2" ry="2" /><line x1="16" y1="8" x2="20" y2="8" /><line x1="16" y1="12" x2="22" y2="12" /></svg>
+                <div>
+                  <h4>Free Shipping</h4>
+                  <span>Island-wide in Sri Lanka</span>
+                </div>
+              </div>
 
-          <div className="hero-attached-benefit-item">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" /><path d="M21 3v5h-5" /></svg>
-            <div>
-              <h4>Easy Returns</h4>
-              <span>Within 7 Days</span>
-            </div>
-          </div>
+              <div className="hero-attached-benefit-item">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" /><path d="M21 3v5h-5" /></svg>
+                <div>
+                  <h4>Easy Returns</h4>
+                  <span>Within 7 Days</span>
+                </div>
+              </div>
 
-          <div className="hero-attached-benefit-item">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
-            <div>
-              <h4>Secure Payments</h4>
-              <span>100% Secure Checkout with payhere.lk</span>
+              <div className="hero-attached-benefit-item">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
+                <div>
+                  <h4>Secure Payments</h4>
+                  <span>100% Secure Checkout with payhere.lk</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Track 2 (Duplicate for Seamless Infinite Marquee Loop on Mobile) */}
+            <div className="hero-attached-benefits-track duplicate" aria-hidden="true">
+              <div className="hero-attached-benefit-item">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><path d="m12 6-2 4h4l-2 4" /></svg>
+                <div>
+                  <h4>Japan Movement</h4>
+                  <span>UAE Registered Brand</span>
+                </div>
+              </div>
+
+              <div className="hero-attached-benefit-item">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>
+                <div>
+                  <h4>International Warranty</h4>
+                  <span>Sri Lanka & UAE</span>
+                </div>
+              </div>
+
+              <div className="hero-attached-benefit-item">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="3" width="15" height="13" rx="2" ry="2" /><line x1="16" y1="8" x2="20" y2="8" /><line x1="16" y1="12" x2="22" y2="12" /></svg>
+                <div>
+                  <h4>Free Shipping</h4>
+                  <span>Island-wide in Sri Lanka</span>
+                </div>
+              </div>
+
+              <div className="hero-attached-benefit-item">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" /><path d="M21 3v5h-5" /></svg>
+                <div>
+                  <h4>Easy Returns</h4>
+                  <span>Within 7 Days</span>
+                </div>
+              </div>
+
+              <div className="hero-attached-benefit-item">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
+                <div>
+                  <h4>Secure Payments</h4>
+                  <span>100% Secure Checkout with payhere.lk</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -924,55 +1045,64 @@ export default function CustomerCarePage() {
       <div className="care-content-container">
         <div className="care-wrapper">
 
-          {/* 3 QUICK CONTACT HIGHLIGHT CARDS */}
+          {/* 3 QUICK CONTACT HIGHLIGHT CARDS WITH INDIVIDUAL CALL & EMAIL LINKS */}
           <div className="quick-contact-grid">
-            <a href="tel:+94112345678" className="quick-contact-card">
+            {/* Head Office Phone Card */}
+            <div className="quick-contact-card" style={{ cursor: 'default' }}>
               <div className="quick-icon-circle">
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
                 </svg>
               </div>
               <div>
-                <div className="quick-card-tag">Direct Call Line</div>
-                <div className="quick-card-title">+94 (11) 234-5678</div>
+                <div className="quick-card-tag">Head Office & Wholesale</div>
+                <div className="quick-card-title" style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
+                  <a href="tel:0770716212" style={{ color: 'inherit', textDecoration: 'underline' }}>077 071 6212</a>
+                  <span style={{ opacity: 0.3 }}>|</span>
+                  <a href="tel:0778778555" style={{ color: 'inherit', textDecoration: 'underline' }}>077 877 8555</a>
+                </div>
                 <div className="quick-card-sub">
                   <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#2e7d32', display: 'inline-block', flexShrink: 0 }} />
-                  Mon–Sat 9:00 AM – 6:00 PM
+                  Touch number to call directly
                 </div>
               </div>
-            </a>
+            </div>
 
-            <a href="mailto:support@winsorbrand.com" className="quick-contact-card">
-              <div className="quick-icon-circle">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" /><polyline points="22,6 12,13 2,6" />
-                </svg>
-              </div>
-              <div>
-                <div className="quick-card-tag">Concierge Email</div>
-                <div className="quick-card-title">support@winsorbrand.com</div>
-                <div className="quick-card-sub">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#8b6914" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" /></svg>
-                  24/7 Email Monitoring
-                </div>
-              </div>
-            </a>
-
-            <a href="https://maps.google.com/maps?q=Happy%20Time%20(Pvt)%20Ltd%20-%20Colombo%2011" target="_blank" rel="noopener noreferrer" className="quick-contact-card">
+            {/* KCC Showroom Card */}
+            <a href="tel:0779779666" className="quick-contact-card">
               <div className="quick-icon-circle">
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" />
                 </svg>
               </div>
               <div>
-                <div className="quick-card-tag">Colombo Showroom</div>
-                <div className="quick-card-title">49A Keyzer St, Pettah</div>
+                <div className="quick-card-tag">Kandy City Centre</div>
+                <div className="quick-card-title" style={{ textDecoration: 'underline' }}>077 977 9666</div>
                 <div className="quick-card-sub">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#8b6914" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><line x1="3" y1="22" x2="21" y2="22" /><line x1="6" y1="18" x2="6" y2="11" /><line x1="10" y1="18" x2="10" y2="11" /><line x1="14" y1="18" x2="14" y2="11" /><line x1="18" y1="18" x2="18" y2="11" /><polygon points="12 2 20 7 4 7 12 2" /></svg>
-                  Visit Flagship Store
+                  Level 3 - KCC, Sri Lanka
                 </div>
               </div>
             </a>
+
+            {/* Official Emails Card (Both Emails) */}
+            <div className="quick-contact-card" style={{ cursor: 'default' }}>
+              <div className="quick-icon-circle">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" /><polyline points="22,6 12,13 2,6" />
+                </svg>
+              </div>
+              <div>
+                <div className="quick-card-tag">Official Concierge Emails</div>
+                <div className="quick-card-title" style={{ fontSize: '13px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                  <a href="mailto:winsorwatches@gmail.com" style={{ color: '#8b6914', textDecoration: 'underline' }}>winsorwatches@gmail.com</a>
+                  <a href="mailto:support@winsorbrand.com" style={{ color: 'inherit', textDecoration: 'underline' }}>support@winsorbrand.com</a>
+                </div>
+                <div className="quick-card-sub" style={{ marginTop: '4px' }}>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#8b6914" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" /></svg>
+                  24/7 Email Concierge Support
+                </div>
+              </div>
+            </div>
           </div>
 
           {success ? (
@@ -1001,7 +1131,7 @@ export default function CustomerCarePage() {
                   <div className="details-header-tag">OFFICIAL BRAND CARE</div>
                   <h3 className="details-title">Care Boutique</h3>
                   <p className="details-paragraph">
-                    For over three decades, Winsor has provided handcrafted horological excellence. Our concierge team stands ready to assist with servicing, inquiries, warranty registrations, and bespoke requests.
+                    For over three decades, Winsor has provided handcrafted horological excellence. Our concierge team stands ready to assist with servicing, inquiries, warranty registrations, wholesale registrations, and shop purchases.
                   </p>
 
                   <div className="contact-info-block">
@@ -1012,9 +1142,10 @@ export default function CustomerCarePage() {
                         </svg>
                       </div>
                       <div>
-                        <div className="info-label">Direct Concierge Line</div>
+                        <div className="info-label">Head Office & Wholesale Inquiries</div>
                         <div className="info-value">
-                          <a href="tel:+94112345678" className="contact-link">+94 (11) 234-5678</a>
+                          <a href="tel:0770716212" className="contact-link">077 071 6212</a>,{' '}
+                          <a href="tel:0778778555" className="contact-link">077 877 8555</a>
                         </div>
                       </div>
                     </div>
@@ -1022,12 +1153,15 @@ export default function CustomerCarePage() {
                     <div className="contact-info-row">
                       <div className="info-icon">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                          <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
+                          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" />
                         </svg>
                       </div>
                       <div>
-                        <div className="info-label">Boutique Hours</div>
-                        <div className="info-value">Monday – Saturday<br />09:00 AM – 06:00 PM (GMT+5:30)</div>
+                        <div className="info-label">Kandy City Centre Showroom</div>
+                        <div className="info-value">
+                          Level 3 - Kandy City Centre (KCC), Sri Lanka<br />
+                          <a href="tel:0779779666" className="contact-link">077 977 9666</a>
+                        </div>
                       </div>
                     </div>
 
@@ -1038,8 +1172,9 @@ export default function CustomerCarePage() {
                         </svg>
                       </div>
                       <div>
-                        <div className="info-label">Concierge Email</div>
+                        <div className="info-label">Official Emails</div>
                         <div className="info-value">
+                          <a href="mailto:winsorwatches@gmail.com" className="contact-link">winsorwatches@gmail.com</a><br />
                           <a href="mailto:support@winsorbrand.com" className="contact-link">support@winsorbrand.com</a>
                         </div>
                       </div>
@@ -1047,19 +1182,11 @@ export default function CustomerCarePage() {
                   </div>
 
                   <div className="headquarters-box">
-                    <div className="info-label" style={{ marginBottom: '8px' }}>Global Headquarters & Showroom</div>
+                    <div className="info-label" style={{ marginBottom: '8px' }}>Wholesale & Retailer Purchases</div>
                     <p style={{ margin: 0, fontSize: '13px', color: 'rgba(26,18,9,0.68)', lineHeight: 1.6 }}>
-                      <strong style={{ color: '#1a1209', fontWeight: 600 }}>Winsor Brand Horology</strong><br />
-                      Happy Time (Pvt) Ltd,<br />
-                      49A Keyzer Street, Pettah, Colombo 11, Sri Lanka<br />
-                      <span style={{ display: 'block', marginTop: '8px' }}>
-                        <span style={{ color: 'rgba(26,18,9,0.5)' }}>Phone:</span>{' '}
-                        <a href="tel:+94112345678" className="contact-link">+94 (11) 234-5678</a>,{' '}
-                        <a href="tel:+94771234567" className="contact-link">+94 77 123 4567</a>
-                      </span>
-                      <span style={{ display: 'block', marginTop: '4px' }}>
-                        <span style={{ color: 'rgba(26,18,9,0.5)' }}>Email:</span>{' '}
-                        <a href="mailto:support@winsorbrand.com" className="contact-link">support@winsorbrand.com</a>
+                      To register for wholesale or to purchase timepieces for your shop, contact our Head Office directly:<br />
+                      <span style={{ display: 'block', marginTop: '6px' }}>
+                        <strong>Phone:</strong> <a href="tel:0770716212" className="contact-link">077 071 6212</a> / <a href="tel:0778778555" className="contact-link">077 877 8555</a>
                       </span>
                     </p>
                   </div>

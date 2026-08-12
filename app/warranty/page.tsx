@@ -609,12 +609,14 @@ export default function WarrantyPage() {
 
       {/* ── FOOTER CALL TO ACTION ── */}
       <section className="bg-[#faf5e8] border-t border-[#8b6914]/20 py-16 px-4 text-center">
-        <div className="max-w-xl mx-auto">
+        <div className="max-w-2xl mx-auto">
           <h3 className="font-['Cinzel',serif] text-2xl md:text-3xl text-[#1a1209] mb-3 tracking-wide">
-            Need Personalized Assistance?
+            Need Warranty Support or Wholesale Inquiries?
           </h3>
-          <p className="text-xs md:text-sm text-[#1a1209]/65 mb-6 leading-relaxed">
-            Our customer care specialists are available island-wide to answer any warranty or servicing queries.
+          <p className="text-xs md:text-sm text-[#1a1209]/70 mb-6 leading-relaxed">
+            Our customer care & wholesale concierge team is available to assist with warranty claims, repairs, or shop registration.<br />
+            <strong>Head Office:</strong> <a href="tel:0770716212" className="underline text-[#8b6914]">077 071 6212</a> / <a href="tel:0778778555" className="underline text-[#8b6914]">077 877 8555</a><br />
+            <strong>Email:</strong> <a href="mailto:winsorwatches@gmail.com" className="underline text-[#8b6914]">winsorwatches@gmail.com</a>
           </p>
           <div className="flex flex-wrap justify-center gap-3">
             <Link

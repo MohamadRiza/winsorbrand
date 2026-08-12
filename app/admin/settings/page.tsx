@@ -61,7 +61,7 @@ export default function SettingsPage() {
     
     // Auto-copy generated password to system clipboard
     navigator.clipboard.writeText(finalPass);
-    toast.success('⚡ Secure password generated & copied to clipboard!');
+    toast.success('Secure password generated & copied to clipboard!');
   };
 
   const handleSelfUpdate = async (e: FormEvent) => {
@@ -190,7 +190,21 @@ export default function SettingsPage() {
                 <div className="flex justify-between items-center py-2 border-b border-[#1a1209]/5">
                   <span className="text-xs font-bold text-[#8B6914] uppercase">Account Lifespan</span>
                   <span className="font-mono font-bold text-xs text-[#1a1209]">
-                    {currentUser?.isTemporary ? '⏳ Temporary Access' : '🛡️ Permanent Access'}
+                    {currentUser?.isTemporary ? (
+                      <span className="inline-flex items-center gap-1.5 text-amber-800 bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-300 font-sans">
+                        <svg className="w-3.5 h-3.5 text-amber-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        Temporary Access
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1.5 text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-300 font-sans">
+                        <svg className="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                        </svg>
+                        Permanent Access
+                      </span>
+                    )}
                   </span>
                 </div>
               </div>
@@ -285,9 +299,12 @@ export default function SettingsPage() {
                       <button
                         type="button"
                         onClick={generatePassword}
-                        className="px-3.5 py-2.5 bg-[#8B6914] hover:bg-[#1a1209] text-white text-xs font-bold font-mono rounded-xl transition-all shadow-sm cursor-pointer whitespace-nowrap"
+                        className="px-3.5 py-2.5 bg-[#8B6914] hover:bg-[#1a1209] text-white text-xs font-bold font-mono rounded-xl transition-all shadow-sm cursor-pointer whitespace-nowrap inline-flex items-center gap-1.5"
                       >
-                        ⚡ Generate
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                        Generate
                       </button>
                     </div>
                   </div>

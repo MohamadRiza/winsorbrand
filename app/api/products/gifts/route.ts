@@ -15,12 +15,21 @@ export async function GET(req: NextRequest) {
     if (category) filter['giftCategories'] = category;
     else filter['giftCategories'] = { $exists: true, $not: { $size: 0 } };
 
-    const products = await Product
+    let products = await Product
       .find(filter)
       .select('title modelNo price thumbnail colorVariants stickerEnabled stickerText giftCategories')
       .limit(limit)
       .sort({ createdAt: -1 })
       .lean();
+
+    if (products.length === 0) {
+      products = await Product
+        .find({ isActive: true })
+        .select('title modelNo price thumbnail colorVariants stickerEnabled stickerText giftCategories')
+        .limit(limit)
+        .sort({ createdAt: -1 })
+        .lean();
+    }
 
     return NextResponse.json({ success: true, data: products });
   } catch (error) {
