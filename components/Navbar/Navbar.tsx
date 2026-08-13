@@ -209,6 +209,7 @@ export default function Navbar() {
       pathname === '/profile' ||
       pathname === '/cart' ||
       pathname.startsWith('/collections/') || // Product details page (e.g. /collections/6a746d1914856a7e53bacea1)
+      pathname.startsWith('/careers/') || // Career details view page (e.g. /careers/6a61bd9e0bdd7fdbb54220a5)
       pathname === '/warranty' ||
       pathname === '/faq' ||
       pathname === '/orders' ||
@@ -260,6 +261,7 @@ export default function Navbar() {
       pathname === '/profile' ||
       pathname === '/cart' ||
       pathname.startsWith('/collections/') ||
+      pathname.startsWith('/careers/') ||
       pathname === '/warranty' ||
       pathname === '/faq' ||
       pathname === '/orders' ||

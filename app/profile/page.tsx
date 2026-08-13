@@ -389,7 +389,7 @@ export default function ProfilePage() {
 
       const data = await res.json();
       if (data.success) {
-        toast.success('Information updated successfully! ✨');
+        toast.success('Information updated successfully!');
       } else {
         throw new Error(data.error || 'Failed to save details');
       }
@@ -703,103 +703,103 @@ export default function ProfilePage() {
         .portal-sidebar { display: flex; flex-direction: column; gap: 20px; }
         .portal-sidebar-desktop { display: flex; flex-direction: column; gap: 20px; }
         .sidebar-card {
-          background: #fff;
-          border: 1px solid rgba(26,18,9,0.06);
-          border-radius: 14px;
-          box-shadow: 0 4px 20px rgba(26,18,9,0.02);
+          background: #FAF7F0;
+          border: 1.5px solid rgba(184, 142, 60, 0.22);
+          border-radius: 16px;
+          box-shadow: 0 6px 24px rgba(26, 18, 9, 0.03);
           overflow: hidden; padding: 10px 0;
         }
         .sidebar-menu-btn {
           display: flex; align-items: center; gap: 11px;
-          width: 100%; padding: 11px 20px;
+          width: 100%; padding: 12px 22px;
           border: none; background: transparent;
           font-family: 'Jost', sans-serif;
-          font-size: 12.5px; font-weight: 500;
-          color: rgba(26,18,9,0.6);
+          font-size: 13px; font-weight: 500;
+          color: rgba(26,18,9,0.65);
           text-align: left; cursor: pointer;
-          transition: all 0.2s ease;
+          transition: all 0.25s ease;
           border-left: 3px solid transparent;
         }
-        .sidebar-menu-btn:hover { background: rgba(139,105,20,0.03); color: #1a1209; }
+        .sidebar-menu-btn:hover { background: rgba(184,142,60,0.08); color: #1a1209; }
         .sidebar-menu-btn.active {
-          background: rgba(139,105,20,0.06);
+          background: rgba(184,142,60,0.12);
           border-left-color: #8b6914;
-          color: #8b6914; font-weight: 650;
+          color: #8b6914; font-weight: 700;
         }
         .sidebar-menu-btn svg { flex-shrink: 0; }
 
         /* ── Completion Box ── */
         .completion-box {
-          background: #fff;
-          border: 1px solid rgba(26,18,9,0.06);
-          border-radius: 14px;
-          padding: 22px 18px;
+          background: #FAF7F0;
+          border: 1.5px solid rgba(184, 142, 60, 0.22);
+          border-radius: 16px;
+          padding: 24px 20px;
           text-align: center;
           display: flex; flex-direction: column; align-items: center; gap: 10px;
-          box-shadow: 0 4px 20px rgba(26,18,9,0.02);
+          box-shadow: 0 6px 24px rgba(26, 18, 9, 0.03);
         }
-        .completion-title { font-size: 12px; font-weight: 700; color: #8b6914; text-transform: uppercase; letter-spacing: 0.07em; margin: 0; }
-        .completion-desc { font-size: 10.5px; color: rgba(26,18,9,0.48); line-height: 1.55; margin: 0; }
+        .completion-title { font-size: 12px; font-weight: 700; color: #8b6914; text-transform: uppercase; letter-spacing: 0.08em; margin: 0; }
+        .completion-desc { font-size: 11px; color: rgba(26,18,9,0.55); line-height: 1.55; margin: 0; }
         .circular-chart { display: block; margin: 4px auto; max-width: 72px; max-height: 72px; }
-        .circle-bg { stroke: rgba(139,105,20,0.1); }
+        .circle-bg { stroke: rgba(184,142,60,0.15); }
         .circle { transition: stroke-dasharray 0.4s ease; }
         .percentage { font-family: 'Jost', sans-serif; }
 
         /* ── Content Panel ── */
         .portal-content-panel { display: flex; flex-direction: column; gap: 24px; }
         .content-card {
-          background: #fff;
-          border: 1px solid rgba(26,18,9,0.06);
-          border-radius: 14px;
-          padding: 28px 30px;
-          box-shadow: 0 4px 24px rgba(26,18,9,0.02);
+          background: #FAF7F0;
+          border: 1.5px solid rgba(184, 142, 60, 0.22);
+          border-radius: 16px;
+          padding: 30px 32px;
+          box-shadow: 0 8px 30px rgba(26,18,9,0.03);
         }
         .card-header-block {
-          border-bottom: 1px solid rgba(26,18,9,0.06);
-          padding-bottom: 16px; margin-bottom: 22px;
+          border-bottom: 1.5px solid rgba(184, 142, 60, 0.15);
+          padding-bottom: 18px; margin-bottom: 24px;
         }
-        .card-title { font-family: 'Cormorant Garamond', serif; font-size: 24px; font-weight: 600; color: #1a1209; margin: 0; }
-        .card-subtitle { font-size: 12.5px; color: rgba(26,18,9,0.42); margin: 4px 0 0; }
+        .card-title { font-family: 'Cormorant Garamond', serif; font-size: 26px; font-weight: 600; color: #1a1209; margin: 0; }
+        .card-subtitle { font-size: 13px; color: rgba(26,18,9,0.55); margin: 4px 0 0; }
 
         /* ── Form ── */
         .profile-custom-form { display: flex; flex-direction: column; gap: 20px; }
         .profile-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
         .profile-form-group { display: flex; flex-direction: column; gap: 7px; }
-        .profile-form-label { font-size: 10.5px; font-weight: 700; color: rgba(26,18,9,0.5); letter-spacing: 0.07em; text-transform: uppercase; }
+        .profile-form-label { font-size: 10.5px; font-weight: 700; color: rgba(26,18,9,0.55); letter-spacing: 0.08em; text-transform: uppercase; }
         .input-wrapper-gold { position: relative; display: flex; align-items: center; width: 100%; }
         .input-icon-left { position: absolute; left: 13px; color: #8b6914; display: flex; align-items: center; pointer-events: none; }
-        .input-icon-right { position: absolute; right: 13px; color: rgba(26,18,9,0.28); display: flex; align-items: center; pointer-events: none; }
+        .input-icon-right { position: absolute; right: 13px; color: rgba(26,18,9,0.35); display: flex; align-items: center; pointer-events: none; }
         .profile-form-input {
-          width: 100%; padding: 11px 16px 11px 40px;
-          border: 1.5px solid rgba(26,18,9,0.1);
-          border-radius: 8px;
+          width: 100%; padding: 12px 16px 12px 40px;
+          border: 1.5px solid rgba(184, 142, 60, 0.2);
+          border-radius: 10px;
           font-family: 'Jost', sans-serif; font-size: 13.5px;
-          color: #1a1209; background: #fdfcfa;
-          outline: none; transition: all 0.22s;
+          color: #1a1209; background: #FAF7F0;
+          outline: none; transition: all 0.25s;
           box-sizing: border-box;
         }
-        .profile-form-input:focus { border-color: #8b6914; background: #fff; box-shadow: 0 0 0 3px rgba(139,105,20,0.09); }
-        .profile-form-input:disabled { background: rgba(26,18,9,0.02); border-color: rgba(26,18,9,0.06); color: rgba(26,18,9,0.45); cursor: not-allowed; padding-right: 40px; }
+        .profile-form-input:focus { border-color: #8b6914; background: #ffffff; box-shadow: 0 0 0 3px rgba(139,105,20,0.12); }
+        .profile-form-input:disabled { background: rgba(26,18,9,0.03); border-color: rgba(184,142,60,0.12); color: rgba(26,18,9,0.5); cursor: not-allowed; padding-right: 40px; }
         .custom-select {
-          width: 100%; padding: 11px 28px 11px 40px;
-          border: 1.5px solid rgba(26,18,9,0.1);
-          border-radius: 8px;
+          width: 100%; padding: 12px 28px 12px 40px;
+          border: 1.5px solid rgba(184, 142, 60, 0.2);
+          border-radius: 10px;
           font-family: 'Jost', sans-serif; font-size: 13.5px;
-          color: #1a1209; background: #fdfcfa;
+          color: #1a1209; background: #FAF7F0;
           outline: none; appearance: none;
-          background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%231a1209' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>");
+          background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238B6914' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>");
           background-repeat: no-repeat; background-position: right 12px center; background-size: 12px;
-          cursor: pointer; box-sizing: border-box; transition: all 0.22s;
+          cursor: pointer; box-sizing: border-box; transition: all 0.25s;
         }
-        .custom-select:focus { border-color: #8b6914; background-color: #fff; box-shadow: 0 0 0 3px rgba(139,105,20,0.09); }
+        .custom-select:focus { border-color: #8b6914; background-color: #ffffff; box-shadow: 0 0 0 3px rgba(139,105,20,0.12); }
 
         /* ── Buttons ── */
         .gold-action-btn {
           background: linear-gradient(135deg, #8b6914 0%, #a07c20 100%);
           border: none; color: #fff;
-          padding: 13px 28px;
+          padding: 14px 28px;
           font-family: 'Jost', sans-serif; font-size: 11px; font-weight: 700;
-          letter-spacing: 0.16em; border-radius: 8px;
+          letter-spacing: 0.16em; border-radius: 100px;
           cursor: pointer; transition: all 0.25s ease;
           width: 100%; text-transform: uppercase;
           box-shadow: 0 4px 16px rgba(139,105,20,0.28);
@@ -811,23 +811,23 @@ export default function ProfilePage() {
         .portal-bottom-split { display: grid; grid-template-columns: 1.2fr 1fr; gap: 24px; }
 
         /* ── Recent Orders ── */
-        .recent-orders-list { display: flex; flex-direction: column; gap: 10px; }
+        .recent-orders-list { display: flex; flex-direction: column; gap: 12px; }
         .recent-order-item {
-          display: flex; align-items: center; gap: 12px;
-          padding: 11px 12px;
-          border: 1px solid rgba(26,18,9,0.05);
-          border-radius: 10px;
-          background: #fdfcfa;
-          transition: all 0.2s;
+          display: flex; align-items: center; gap: 14px;
+          padding: 12px 14px;
+          border: 1.5px solid rgba(184, 142, 60, 0.18);
+          border-radius: 12px;
+          background: #FAF7F0;
+          transition: all 0.25s ease;
         }
-        .recent-order-item:hover { border-color: rgba(139,105,20,0.18); background: rgba(139,105,20,0.02); }
+        .recent-order-item:hover { border-color: rgba(184,142,60,0.38); background: rgba(184,142,60,0.06); transform: translateY(-1px); }
         .order-watch-thumb {
-          width: 46px; height: 46px;
-          border-radius: 6px;
-          background: #fff;
-          border: 1px solid rgba(26,18,9,0.07);
+          width: 48px; height: 48px;
+          border-radius: 8px;
+          background: transparent;
+          border: 1px solid rgba(184,142,60,0.18);
           display: flex; align-items: center; justify-content: center;
-          padding: 3px; flex-shrink: 0;
+          padding: 4px; flex-shrink: 0;
         }
         .order-watch-thumb img { max-width: 100%; max-height: 100%; object-fit: contain; }
         .recent-order-info { flex: 1; min-width: 0; }
@@ -1037,9 +1037,9 @@ export default function ProfilePage() {
           /* ── Compact completion strip ── */
           .mobile-completion-strip {
             display: flex; align-items: center; gap: 14px;
-            background: rgba(255, 255, 255, 0.95);
+            background: #FAF7F0;
             backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(139,105,20,0.12);
+            border-bottom: 1.5px solid rgba(184,142,60,0.2);
             padding: 12px 18px;
           }
           .mcs-ring { flex-shrink: 0; }
@@ -1061,7 +1061,8 @@ export default function ProfilePage() {
           .content-card {
             padding: 20px 16px; border-radius: 16px;
             box-shadow: 0 4px 20px rgba(26,18,9,0.05);
-            background: rgba(255, 255, 255, 0.95);
+            background: #FAF7F0;
+            border: 1.5px solid rgba(184, 142, 60, 0.22);
             backdrop-filter: blur(8px);
           }
           .card-title { font-size: 20px; }
@@ -1351,7 +1352,7 @@ export default function ProfilePage() {
                 style={{ padding: '8px 16px', fontSize: '9.5px', marginTop: '6px' }}
                 onClick={() => {
                   setActiveTab('profile-details');
-                  toast.success('Scroll to fill blank details below! 📝');
+                  toast.success('Scroll to fill blank details below.');
                 }}
               >
                 COMPLETE NOW
@@ -1613,7 +1614,7 @@ export default function ProfilePage() {
                       {activeOrdersCount.toString().padStart(2, '0')}
                     </div>
                     <div className="metric-tile-sub" style={{ fontSize: '10.5px', color: 'rgba(26,18,9,0.45)', marginTop: '8px' }}>
-                      {activeOrdersCount > 0 ? '🚚 In transit via express courier' : '✓ No active pending dispatches'}
+                      {activeOrdersCount > 0 ? 'In transit via express courier' : 'No active pending dispatches'}
                     </div>
                   </div>
 
@@ -1694,7 +1695,9 @@ export default function ProfilePage() {
                       Patron Membership Benefits
                     </h4>
                     <div className="patron-black-card">
-                      <div className="black-card-gold-seal">⚜</div>
+                      <div className="black-card-gold-seal">
+                        <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#d4af37" strokeWidth="1.2" style={{ opacity: 0.25 }}><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" /></svg>
+                      </div>
                       <h5 className="black-card-title">✦ {membershipTier} PRIVILEGES ✦</h5>
                       <p className="black-card-desc">Your exclusive membership status grants tier 1 perks across all global Winsor boutiques.</p>
                       
@@ -1738,32 +1741,32 @@ export default function ProfilePage() {
                   <p className="card-subtitle">Track your recent Winsor timepiece purchases.</p>
                 </div>
                 {orders.length > 0 ? (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
                     {orders.map((o: any, idx) => (
-                      <div key={idx} style={{ border: '1px solid rgba(26,18,9,0.08)', padding: '16px', borderRadius: '8px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(26,18,9,0.05)', paddingBottom: '8px' }}>
+                      <div key={idx} style={{ border: '1.5px solid rgba(184, 142, 60, 0.22)', padding: '20px', borderRadius: '16px', background: '#FAF7F0', display: 'flex', flexDirection: 'column', gap: '14px', boxShadow: '0 4px 18px rgba(26,18,9,0.03)' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1.5px solid rgba(184, 142, 60, 0.15)', paddingBottom: '10px' }}>
                           <div>
-                            <span style={{ fontWeight: 650, color: '#1a1209', fontSize: '13px' }}>Order: #{o.orderRef}</span>
-                            <span style={{ fontSize: '11px', color: 'rgba(26,18,9,0.45)', marginLeft: '12px' }}>
+                            <span style={{ fontWeight: 700, color: '#1a1209', fontSize: '13.5px', fontFamily: 'Jost, monospace' }}>Order: #{o.orderRef}</span>
+                            <span style={{ fontSize: '11.5px', color: 'rgba(26,18,9,0.55)', marginLeft: '12px' }}>
                               {new Date(o.createdAt).toLocaleDateString()}
                             </span>
                           </div>
                           <div className={`status-badge ${o.status.toLowerCase()}`}>{o.status}</div>
                         </div>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                           {o.items.map((item: any, itemIdx: number) => (
-                            <div key={itemIdx} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                              <div className="order-watch-thumb" style={{ width: '48px', height: '48px' }}>
-                                <img src={item.productThumbnail} alt={item.productTitle} />
+                            <div key={itemIdx} style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                              <div className="order-watch-thumb" style={{ width: '52px', height: '52px', background: 'transparent', border: '1px solid rgba(184, 142, 60, 0.18)', borderRadius: '8px' }}>
+                                <img src={item.productThumbnail} alt={item.productTitle} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
                               </div>
                               <div style={{ flex: 1, minWidth: 0 }}>
-                                <div style={{ fontSize: '12.5px', fontWeight: 600, color: '#1a1209' }}>{item.productTitle}</div>
-                                <div style={{ fontSize: '10.5px', color: 'rgba(26,18,9,0.5)', marginTop: '2px' }}>
+                                <div style={{ fontSize: '13px', fontWeight: 650, color: '#1a1209' }}>{item.productTitle}</div>
+                                <div style={{ fontSize: '11px', color: 'rgba(26,18,9,0.55)', marginTop: '2px' }}>
                                   Model: {item.productModelNo} {item.colorVariant ? `— Variant: ${item.colorVariant}` : ''}
                                 </div>
                               </div>
                               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
-                                <div style={{ textAlign: 'right', fontSize: '12px', fontWeight: 550, color: '#8b6914' }}>
+                                <div style={{ textAlign: 'right', fontSize: '13px', fontWeight: 700, color: '#8b6914' }}>
                                   {item.quantity} × LKR {item.price.toLocaleString()}
                                 </div>
                                 {o.status.toLowerCase() === 'delivered' && (
@@ -1772,17 +1775,18 @@ export default function ProfilePage() {
                                       style={{
                                         display: 'inline-flex',
                                         alignItems: 'center',
-                                        gap: '4px',
+                                        gap: '5px',
                                         background: 'rgba(46, 125, 50, 0.08)',
                                         border: '1px solid rgba(46, 125, 50, 0.28)',
                                         color: '#2e7d32',
                                         fontSize: '10.5px',
-                                        padding: '5px 11px',
-                                        borderRadius: '20px',
+                                        padding: '6px 14px',
+                                        borderRadius: '100px',
                                         fontFamily: "'Jost', sans-serif",
                                         fontWeight: 700,
-                                        letterSpacing: '0.04em',
+                                        letterSpacing: '0.05em',
                                         whiteSpace: 'nowrap',
+                                        textTransform: 'uppercase',
                                       }}
                                     >
                                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg>
@@ -1805,21 +1809,26 @@ export default function ProfilePage() {
                                         setIsReviewModalOpen(true);
                                       }}
                                       style={{
-                                        background: 'rgba(139,105,20,0.07)',
-                                        border: '1px solid rgba(139,105,20,0.25)',
+                                        display: 'inline-flex',
+                                        alignItems: 'center',
+                                        gap: '5px',
+                                        background: 'rgba(139,105,20,0.08)',
+                                        border: '1px solid rgba(139,105,20,0.28)',
                                         color: '#8b6914',
                                         fontSize: '10.5px',
-                                        padding: '5px 11px',
-                                        borderRadius: '6px',
+                                        padding: '6px 14px',
+                                        borderRadius: '100px',
                                         cursor: 'pointer',
                                         fontFamily: "'Jost', sans-serif",
-                                        fontWeight: 600,
-                                        letterSpacing: '0.04em',
+                                        fontWeight: 700,
+                                        letterSpacing: '0.05em',
                                         whiteSpace: 'nowrap',
-                                        transition: 'all 0.2s ease',
+                                        textTransform: 'uppercase',
+                                        transition: 'all 0.25s ease',
                                       }}
                                     >
-                                      ★ Write Review
+                                      <svg width="12" height="12" viewBox="0 0 24 24" fill="#8b6914" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" /></svg>
+                                      Write Review
                                     </button>
                                   )
                                 )}
@@ -1831,8 +1840,8 @@ export default function ProfilePage() {
                     ))}
                   </div>
                 ) : (
-                  <div style={{ textAlign: 'center', padding: '30px 10px', color: 'rgba(26,18,9,0.5)', fontSize: '13px' }}>
-                    No orders found in your patron history. Mockup previews are shown on your Dashboard tab.
+                  <div style={{ textAlign: 'center', padding: '40px 10px', color: 'rgba(26,18,9,0.55)', fontSize: '13px' }}>
+                    No orders found in your patron history. Explore our catalog to make your first acquisition.
                   </div>
                 )}
               </div>
@@ -1848,23 +1857,23 @@ export default function ProfilePage() {
                 {wishlistedProducts.length > 0 ? (
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '20px' }}>
                     {wishlistedProducts.map((p, idx) => (
-                      <div key={idx} style={{ border: '1px solid rgba(26,18,9,0.08)', borderRadius: '8px', padding: '14px', background: '#ffffff', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                        <div style={{ width: '100%', height: '140px', background: '#faf7f0', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '10px' }}>
+                      <div key={idx} style={{ border: '1.5px solid rgba(184, 142, 60, 0.22)', borderRadius: '16px', padding: '16px', background: '#FAF7F0', display: 'flex', flexDirection: 'column', gap: '12px', boxShadow: '0 4px 18px rgba(26,18,9,0.03)' }}>
+                        <div style={{ width: '100%', height: '145px', background: 'transparent', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '8px' }}>
                           <img src={getWatchImageUrl(p)} alt={p.title} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', margin: '0 auto' }} />
                         </div>
                         <div style={{ flex: 1 }}>
-                          <h4 style={{ fontSize: '13.5px', fontWeight: 600, color: '#1a1209', margin: 0 }}>{p.title}</h4>
-                          <div style={{ fontSize: '11px', color: 'rgba(26,18,9,0.5)', marginTop: '2px' }}>Model: {p.modelNo}</div>
-                          <div style={{ fontSize: '13px', fontWeight: 650, color: '#8b6914', marginTop: '6px' }}>LKR {p.price?.toLocaleString()}</div>
+                          <h4 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '17px', fontWeight: 600, color: '#1a1209', margin: 0 }}>{p.title}</h4>
+                          <div style={{ fontSize: '11px', color: 'rgba(26,18,9,0.55)', marginTop: '2px' }}>Model: {p.modelNo}</div>
+                          <div style={{ fontSize: '14px', fontWeight: 700, color: '#8b6914', marginTop: '6px' }}>LKR {p.price?.toLocaleString()}</div>
                         </div>
                         <div style={{ display: 'flex', gap: '8px', marginTop: '4px' }}>
-                          <Link href={`/collections/${p._id}`} style={{ flex: 1, textAlign: 'center', background: '#8b6914', color: '#ffffff', fontSize: '10.5px', padding: '6px 0', borderRadius: '4px', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600 }}>
+                          <Link href={`/collections/${p._id}`} style={{ flex: 1, textAlign: 'center', background: '#8b6914', color: '#ffffff', fontSize: '10.5px', padding: '8px 0', borderRadius: '100px', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 700, textDecoration: 'none' }}>
                             View Details
                           </Link>
                           <button
                             type="button"
                             onClick={() => handleRemoveFromWishlist(p._id)}
-                            style={{ background: 'rgba(198, 40, 40, 0.05)', border: '1px solid rgba(198, 40, 40, 0.15)', color: '#c62828', fontSize: '10.5px', padding: '6px 10px', borderRadius: '4px', cursor: 'pointer', fontFamily: "'Jost', sans-serif" }}
+                            style={{ background: 'rgba(198, 40, 40, 0.05)', border: '1px solid rgba(198, 40, 40, 0.25)', color: '#c62828', fontSize: '10.5px', padding: '8px 12px', borderRadius: '100px', cursor: 'pointer', fontFamily: "'Jost', sans-serif", fontWeight: 700, textTransform: 'uppercase' }}
                           >
                             Remove
                           </button>
@@ -1963,15 +1972,16 @@ export default function ProfilePage() {
                   ) : (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                       {pendingReviews.map((item, idx) => (
-                        <div key={idx} style={{ display: 'flex', gap: '16px', border: '1px solid rgba(26,18,9,0.08)', borderRadius: '8px', padding: '16px', alignItems: 'center' }}>
-                          <div style={{ position: 'relative', width: '64px', height: '64px', borderRadius: '4px', overflow: 'hidden', flexShrink: 0, border: '1px solid rgba(26,18,9,0.05)' }}>
-                            <img src={item.productThumbnail} alt={item.productTitle} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        <div key={idx} style={{ display: 'flex', gap: '16px', border: '1.5px solid rgba(184, 142, 60, 0.2)', borderRadius: '14px', padding: '16px', alignItems: 'center', background: '#FAF7F0' }}>
+                          <div style={{ position: 'relative', width: '64px', height: '64px', borderRadius: '8px', overflow: 'hidden', flexShrink: 0, border: '1px solid rgba(184, 142, 60, 0.18)', background: 'transparent' }}>
+                            <img src={item.productThumbnail} alt={item.productTitle} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
                           </div>
                           <div style={{ flexGrow: 1, minWidth: 0 }}>
-                            <h4 style={{ margin: '0 0 2px 0', fontSize: '14px', fontWeight: 600, color: '#1a1209' }}>{item.productTitle}</h4>
-                            <span style={{ fontSize: '11px', color: 'rgba(26,18,9,0.4)', textTransform: 'uppercase' }}>Model: {item.productModelNo}</span>
-                            <div style={{ marginTop: '6px', fontSize: '11.5px', color: '#8B6914', fontWeight: 550 }}>
-                              ⏳ {item.daysLeft} days remaining to review
+                            <h4 style={{ margin: '0 0 2px 0', fontSize: '14.5px', fontWeight: 650, color: '#1a1209', fontFamily: 'Cormorant Garamond, serif' }}>{item.productTitle}</h4>
+                            <span style={{ fontSize: '11px', color: 'rgba(26,18,9,0.5)', textTransform: 'uppercase' }}>Model: {item.productModelNo}</span>
+                            <div style={{ marginTop: '6px', fontSize: '11.5px', color: '#8B6914', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '5px' }}>
+                              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#8b6914" strokeWidth="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                              <span>{item.daysLeft} days remaining to review</span>
                             </div>
                           </div>
                           <button
@@ -1980,8 +1990,7 @@ export default function ProfilePage() {
                               setReviewItem(item);
                               setIsReviewModalOpen(true);
                             }}
-                            className="store-banner-btn"
-                            style={{ padding: '8px 16px', fontSize: '10.5px', borderRadius: '4px', cursor: 'pointer' }}
+                            style={{ background: '#8b6914', color: '#ffffff', border: 'none', padding: '8px 18px', fontSize: '10.5px', fontWeight: 700, letterSpacing: '0.08em', borderRadius: '100px', cursor: 'pointer', textTransform: 'uppercase' }}
                           >
                             WRITE REVIEW
                           </button>
@@ -2006,14 +2015,14 @@ export default function ProfilePage() {
                   ) : (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                       {myReviews.map((rev, idx) => (
-                        <div key={idx} style={{ border: '1px solid rgba(139,105,20,0.15)', borderRadius: '12px', padding: '20px', background: '#faf7f0', display: 'flex', flexDirection: 'column', gap: '14px', width: '100%', boxSizing: 'border-box' }}>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(139,105,20,0.12)', paddingBottom: '12px', flexWrap: 'wrap', gap: '10px' }}>
+                        <div key={idx} style={{ border: '1.5px solid rgba(184,142,60,0.22)', borderRadius: '16px', padding: '20px', background: '#FAF7F0', display: 'flex', flexDirection: 'column', gap: '14px', width: '100%', boxSizing: 'border-box' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1.5px solid rgba(184,142,60,0.15)', paddingBottom: '12px', flexWrap: 'wrap', gap: '10px' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                              <div style={{ width: '44px', height: '44px', position: 'relative', borderRadius: '8px', overflow: 'hidden', border: '1px solid rgba(26,18,9,0.08)', background: '#ffffff', padding: '2px', flexShrink: 0 }}>
+                              <div style={{ width: '48px', height: '48px', position: 'relative', borderRadius: '8px', overflow: 'hidden', border: '1px solid rgba(184,142,60,0.18)', background: 'transparent', padding: '2px', flexShrink: 0 }}>
                                 <img src={rev.productId?.thumbnail?.url || '/mens-watch-highlight.png'} alt={rev.productId?.title || 'Timepiece'} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
                               </div>
                               <div>
-                                <h4 style={{ margin: '0 0 2px 0', fontSize: '14px', fontWeight: 650, color: '#1a1209' }}>{rev.productId?.title || 'Timepiece'}</h4>
+                                <h4 style={{ margin: '0 0 2px 0', fontSize: '15px', fontWeight: 650, color: '#1a1209', fontFamily: 'Cormorant Garamond, serif' }}>{rev.productId?.title || 'Timepiece'}</h4>
                                 <span style={{ fontSize: '11px', color: '#8b6914', fontFamily: 'Jost, monospace', fontWeight: 600 }}>Model: #{rev.productId?.modelNo || 'N/A'}</span>
                               </div>
                             </div>
@@ -2022,15 +2031,33 @@ export default function ProfilePage() {
                             <span style={{
                               fontSize: '9.5px',
                               fontWeight: 700,
-                              padding: '4px 12px',
-                              borderRadius: '20px',
+                              padding: '5px 14px',
+                              borderRadius: '100px',
                               textTransform: 'uppercase',
                               letterSpacing: '0.06em',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '5px',
                               background: rev.status === 'approved' ? 'rgba(46,125,50,0.08)' : rev.status === 'rejected' ? 'rgba(198,40,40,0.08)' : 'rgba(212,175,55,0.12)',
                               color: rev.status === 'approved' ? '#2e7d32' : rev.status === 'rejected' ? '#c62828' : '#8b6914',
                               border: rev.status === 'approved' ? '1px solid rgba(46,125,50,0.25)' : rev.status === 'rejected' ? '1px solid rgba(198,40,40,0.25)' : '1px solid rgba(212,175,55,0.3)',
                             }}>
-                              {rev.status === 'pending' ? '⏳ Pending Approval' : rev.status === 'approved' ? '✓ Approved' : '✕ Rejected'}
+                              {rev.status === 'pending' ? (
+                                <>
+                                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                                  Pending Approval
+                                </>
+                              ) : rev.status === 'approved' ? (
+                                <>
+                                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                                  Approved
+                                </>
+                              ) : (
+                                <>
+                                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                                  Rejected
+                                </>
+                              )}
                             </span>
                           </div>
 
@@ -2039,15 +2066,16 @@ export default function ProfilePage() {
                             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '10px', flexWrap: 'wrap' }}>
                               <div style={{ display: 'flex', gap: '2px' }}>
                                 {Array.from({ length: 5 }).map((_, i) => (
-                                  <span key={i} style={{ color: i < rev.rating ? '#d4af37' : '#d1c7b7', fontSize: '16px', lineHeight: 1 }}>★</span>
+                                  <svg key={i} width="14" height="14" viewBox="0 0 24 24" fill={i < rev.rating ? '#d4af37' : '#d1c7b7'} stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" /></svg>
                                 ))}
                               </div>
-                              <span style={{ fontSize: '11px', color: 'rgba(26,18,9,0.5)', marginLeft: '6px', fontWeight: 500 }}>
+                              <span style={{ fontSize: '11px', color: 'rgba(26,18,9,0.55)', marginLeft: '6px', fontWeight: 500 }}>
                                 Reviewed on {new Date(rev.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                               </span>
                               {rev.isAnonymous && (
-                                <span style={{ fontSize: '10px', background: 'rgba(26,18,9,0.06)', color: 'rgba(26,18,9,0.6)', padding: '2px 8px', borderRadius: '10px', marginLeft: 'auto', fontWeight: 600 }}>
-                                  🔒 Anonymous Review
+                                <span style={{ fontSize: '10px', background: 'rgba(26,18,9,0.06)', color: 'rgba(26,18,9,0.6)', padding: '3px 10px', borderRadius: '100px', marginLeft: 'auto', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                                  Anonymous Review
                                 </span>
                               )}
                             </div>
@@ -2138,7 +2166,9 @@ export default function ProfilePage() {
                   <div className="patron-black-card">
                     <h5 className="black-card-title">{membershipTier} BENEFITS</h5>
                     <p className="black-card-desc">Enjoy exclusive benefits and privileges.</p>
-                    <span className="black-card-gold-seal">👑</span>
+                    <span className="black-card-gold-seal">
+                      <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#d4af37" strokeWidth="1.2" style={{ opacity: 0.25 }}><path d="M2 4l3 12h14l3-12-6 7-4-7-4 7-6-7zm3 14h14v2H5v-2z"/></svg>
+                    </span>
                   </div>
 
                   <div className="benefits-checklist">

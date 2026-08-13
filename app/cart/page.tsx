@@ -657,7 +657,7 @@ export default function CartPage() {
 
         /* LEFT BLOCK - ITEMS CONTAINER */
         .cart-items-panel {
-          background: #ffffff;
+          background: #FAF7F0;
           border-radius: 16px;
           border: 1.5px solid rgba(139, 105, 20, 0.15);
           box-shadow: 0 10px 30px rgba(26, 18, 9, 0.025);
@@ -714,7 +714,7 @@ export default function CartPage() {
           align-items: center;
           gap: 14px;
           padding: 16px 28px;
-          background-color: #ffffff;
+          background-color: #FAF7F0;
           border-bottom: 1px solid rgba(26, 18, 9, 0.06);
           font-size: 13px;
           color: rgba(26, 18, 9, 0.65);
@@ -732,7 +732,7 @@ export default function CartPage() {
           align-items: center;
           justify-content: center;
           padding: 0;
-          background: #ffffff;
+          background: #FAF7F0;
           transition: all 0.25s ease;
           flex-shrink: 0;
         }
@@ -756,7 +756,7 @@ export default function CartPage() {
           gap: 24px;
           padding: 28px;
           border-bottom: 1px solid rgba(26, 18, 9, 0.06);
-          background-color: #ffffff;
+          background-color: #FAF7F0;
           transition: all 0.3s ease;
         }
 
@@ -765,7 +765,7 @@ export default function CartPage() {
         }
 
         .cart-item-card:hover {
-          background-color: rgba(139, 105, 20, 0.01);
+          background-color: rgba(139, 105, 20, 0.04);
         }
 
         .cart-item-img-container {
@@ -775,7 +775,7 @@ export default function CartPage() {
           border-radius: 8px;
           border: 1px solid rgba(139, 105, 20, 0.12);
           overflow: hidden;
-          background-color: #faf7f0;
+          background-color: transparent;
           flex-shrink: 0;
           transition: all 0.3s ease;
           box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
@@ -850,7 +850,7 @@ export default function CartPage() {
           border: 1px solid rgba(139, 105, 20, 0.2);
           border-radius: 20px;
           overflow: hidden;
-          background: #ffffff;
+          background: #FAF7F0;
           box-shadow: 0 2px 6px rgba(0,0,0,0.01);
         }
 
@@ -933,8 +933,8 @@ export default function CartPage() {
 
         /* RIGHT BLOCK - SUMMARY SIDEBAR */
         .cart-summary-panel {
-          background: #ffffff;
-          border: 1px solid rgba(139, 105, 20, 0.12);
+          background: #FAF7F0;
+          border: 1px solid rgba(139, 105, 20, 0.15);
           border-radius: 16px;
           padding: 32px 28px;
           position: sticky;
@@ -2598,7 +2598,7 @@ export default function CartPage() {
                                                 style={{
                                                   width: '100%',
                                                   maxWidth: '320px',
-                                                  background: '#ffffff',
+                                                  background: '#FAF7F0',
                                                   border: '1.5px solid #8B6914',
                                                   borderRadius: '12px',
                                                   padding: '16px',
@@ -2669,7 +2669,7 @@ export default function CartPage() {
                                                 left: '50%',
                                                 transform: 'translateX(-50%)',
                                                 width: '280px',
-                                                background: '#ffffff',
+                                                background: '#FAF7F0',
                                                 border: '1.5px solid #8B6914',
                                                 borderRadius: '10px',
                                                 padding: '12px',
@@ -2841,7 +2841,7 @@ export default function CartPage() {
                                   border: '1.5px solid rgba(26,18,9,0.12)', borderRadius: 8,
                                   fontFamily: "'Jost', sans-serif", fontSize: 13,
                                   fontWeight: 700, letterSpacing: '0.12em', color: '#1a1209',
-                                  background: '#ffffff', outline: 'none',
+                                  background: '#FAF7F0', outline: 'none',
                                 }}
                               />
                               <button

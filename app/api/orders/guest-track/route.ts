@@ -7,51 +7,67 @@ export async function GET(req: NextRequest) {
     await connectDB();
 
     const { searchParams } = new URL(req.url);
-    const orderRef = searchParams.get('ref')?.trim().toUpperCase() || '';
+    const rawRef = searchParams.get('ref')?.trim() || '';
     const mobile = searchParams.get('mobile')?.trim() || '';
 
-    if (!orderRef || !mobile) {
+    if (!rawRef || !mobile) {
       return NextResponse.json(
-        { success: false, error: 'Order reference and mobile number are required' },
+        { success: false, error: 'Order reference and registered mobile number are required.' },
         { status: 400 }
       );
     }
 
-    // Find guest order by reference (case-insensitive on guestMobile)
+    // Case-insensitive regex query for orderRef (e.g. WNS-2026-373243 or WG-8F9A2B)
+    const orderRefRegex = new RegExp(`^${rawRef.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')}$`, 'i');
+
+    // Find order in DB (matches both guest & registered user orders)
     const order = await Order.findOne({
-      orderRef,
-      isGuestOrder: true,
+      orderRef: orderRefRegex,
     });
 
     if (!order) {
       return NextResponse.json(
-        { success: false, error: 'Order not found. Please check your order reference.' },
+        { success: false, error: 'Order reference not found. Please double-check your reference code.' },
         { status: 404 }
       );
     }
 
-    // Verify mobile matches (strips spaces/dashes for comparison)
-    const normalise = (m: string) => m.replace(/[\s\-]/g, '');
-    const storedMobile = normalise(order.guestMobile || '');
+    // Normalise phone numbers for robust matching (removes +, spaces, dashes, parentheses)
+    const normalise = (m?: string | null) => (m ? m.replace(/[\s\-\+\(\)]/g, '') : '');
     const inputMobile = normalise(mobile);
+    
+    // Extract candidate mobile numbers stored on the order document
+    const candidateMobiles = [
+      normalise(order.guestMobile),
+      normalise(order.shippingAddress?.mobile),
+      order.shippingAddress?.mobileCode && order.shippingAddress?.mobile
+        ? normalise(`${order.shippingAddress.mobileCode}${order.shippingAddress.mobile}`)
+        : '',
+    ].filter(Boolean);
 
-    if (!storedMobile || !inputMobile || !storedMobile.includes(inputMobile) && !inputMobile.includes(storedMobile)) {
+    // Verify if any candidate mobile matches input
+    const isMobileMatch = candidateMobiles.some(stored => {
+      if (!stored || !inputMobile) return false;
+      return stored.includes(inputMobile) || inputMobile.includes(stored);
+    });
+
+    if (!isMobileMatch) {
       return NextResponse.json(
-        { success: false, error: 'Mobile number does not match our records for this order.' },
+        { success: false, error: 'Mobile number does not match our records for this order reference.' },
         { status: 403 }
       );
     }
 
-    // Return safe subset — never expose internal IDs or full guest email
+    // Return sanitized order data
     return NextResponse.json({
       success: true,
       data: {
         orderRef: order.orderRef,
-        status: order.status,
+        status: order.status || 'pending',
         createdAt: order.createdAt,
-        subtotal: order.subtotal,
-        finalTotal: order.finalTotal,
-        items: order.items.map((item: any) => ({
+        subtotal: order.subtotal || 0,
+        finalTotal: order.finalTotal || order.subtotal || 0,
+        items: (order.items || []).map((item: any) => ({
           productTitle: item.productTitle,
           productModelNo: item.productModelNo,
           productThumbnail: item.productThumbnail,
@@ -60,17 +76,17 @@ export async function GET(req: NextRequest) {
           price: item.price,
         })),
         shippingAddress: {
-          address: order.shippingAddress.address,
-          city: order.shippingAddress.city,
-          country: order.shippingAddress.country,
+          address: order.shippingAddress?.address || '',
+          city: order.shippingAddress?.city || '',
+          country: order.shippingAddress?.country || 'LK',
         },
-        guestName: order.guestName,
+        guestName: order.guestName || (order.shippingAddress?.address ? 'Valued Client' : 'Customer'),
       },
     });
   } catch (error: any) {
-    console.error('Guest order tracking error:', error);
+    console.error('Order tracking API error:', error);
     return NextResponse.json(
-      { success: false, error: error?.message || 'Server error' },
+      { success: false, error: error?.message || 'Server error while tracking order.' },
       { status: 500 }
     );
   }

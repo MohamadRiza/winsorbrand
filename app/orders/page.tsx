@@ -37,13 +37,33 @@ interface Order {
   createdAt: string;
 }
 
+function formatTitleCase(str?: string) {
+  if (!str) return '';
+  return str
+    .trim()
+    .split(/\s+/)
+    .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+    .join(' ');
+}
+
+function formatAddress(addr?: OrderAddress) {
+  if (!addr) return 'Boutique Pickup / Standard Delivery';
+  const parts = [
+    formatTitleCase(addr.address),
+    formatTitleCase(addr.city),
+    addr.postalCode ? addr.postalCode.toUpperCase() : '',
+    addr.country === 'LK' ? 'Sri Lanka' : formatTitleCase(addr.country),
+  ].filter(Boolean);
+  return parts.join(', ');
+}
+
 const STATUS_LABELS: Record<string, { label: string; color: string; bg: string; border: string }> = {
-  pending: { label: 'Order Pending', color: '#8B6914', bg: 'rgba(139, 105, 20, 0.06)', border: 'rgba(139, 105, 20, 0.2)' },
-  processing: { label: 'Processing', color: '#2b5c8f', bg: 'rgba(43, 92, 143, 0.06)', border: 'rgba(43, 92, 143, 0.2)' },
-  shipped: { label: 'Shipped', color: '#0f6e52', bg: 'rgba(15, 110, 82, 0.06)', border: 'rgba(15, 110, 82, 0.2)' },
-  delivered: { label: 'Delivered', color: '#1b5e20', bg: 'rgba(27, 94, 32, 0.06)', border: 'rgba(27, 94, 32, 0.2)' },
-  cancelled: { label: 'Cancelled', color: '#c62828', bg: 'rgba(198, 40, 40, 0.06)', border: 'rgba(198, 40, 40, 0.2)' },
-  cancel_requested: { label: 'Cancellation Requested', color: '#c9a14a', bg: 'rgba(201, 161, 74, 0.08)', border: 'rgba(201, 161, 74, 0.25)' },
+  pending: { label: 'Order Pending', color: '#8B6914', bg: 'rgba(139, 105, 20, 0.1)', border: 'rgba(139, 105, 20, 0.3)' },
+  processing: { label: 'Processing Dispatch', color: '#1e5385', bg: 'rgba(30, 83, 133, 0.1)', border: 'rgba(30, 83, 133, 0.3)' },
+  shipped: { label: 'In Transit / Shipped', color: '#0d6b50', bg: 'rgba(13, 107, 80, 0.1)', border: 'rgba(13, 107, 80, 0.3)' },
+  delivered: { label: 'Delivered', color: '#1b5e20', bg: 'rgba(27, 94, 32, 0.1)', border: 'rgba(27, 94, 32, 0.3)' },
+  cancelled: { label: 'Cancelled', color: '#b71c1c', bg: 'rgba(183, 28, 28, 0.1)', border: 'rgba(183, 28, 28, 0.3)' },
+  cancel_requested: { label: 'Cancellation Requested', color: '#b88e3c', bg: 'rgba(184, 142, 60, 0.12)', border: 'rgba(184, 142, 60, 0.35)' },
 };
 
 export default function CustomerOrdersPage() {
@@ -166,7 +186,7 @@ export default function CustomerOrdersPage() {
   if (!isSignedIn) {
     return (
       <div style={{ minHeight: '80vh', background: '#faf7f0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Jost', sans-serif", padding: '120px 24px 80px' }}>
-        <div style={{ maxWidth: '450px', width: '100%', background: '#ffffff', border: '1px solid rgba(26, 18, 9, 0.08)', borderRadius: '8px', padding: '40px 30px', boxShadow: '0 8px 30px rgba(0,0,0,0.02)', textAlign: 'center' }}>
+        <div style={{ maxWidth: '450px', width: '100%', background: '#FAF7F0', border: '1.5px solid rgba(184, 142, 60, 0.25)', borderRadius: '16px', padding: '40px 30px', boxShadow: '0 8px 30px rgba(26,18,9,0.04)', textAlign: 'center' }}>
           <div style={{ color: '#8B6914', marginBottom: '20px' }}>
             <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
           </div>
@@ -190,7 +210,7 @@ export default function CustomerOrdersPage() {
         @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Jost:wght@300;400;500;600&display=swap');
 
         .orders-container {
-          background-color: #f5f5f0;
+          background-color: #FAF7F0;
           min-height: 100vh;
           padding: 120px 24px 80px;
           font-family: 'Jost', sans-serif;
@@ -198,30 +218,31 @@ export default function CustomerOrdersPage() {
         }
 
         .orders-wrapper {
-          max-width: 900px;
+          max-width: 920px;
           margin: 0 auto;
         }
 
         .orders-header {
-          margin-bottom: 32px;
+          margin-bottom: 36px;
           display: flex;
           justify-content: space-between;
           align-items: flex-end;
-          border-bottom: 1px solid rgba(26, 18, 9, 0.08);
-          padding-bottom: 20px;
+          border-bottom: 1.5px solid rgba(184, 142, 60, 0.18);
+          padding-bottom: 22px;
         }
 
         .orders-title {
           font-family: 'Cormorant Garamond', serif;
-          font-size: 36px;
+          font-size: 38px;
           font-weight: 500;
           color: #1a1209;
           margin: 0 0 6px;
+          letter-spacing: 0.02em;
         }
 
         .orders-subtitle {
           font-size: 13.5px;
-          color: rgba(26, 18, 9, 0.5);
+          color: rgba(26, 18, 9, 0.55);
           margin: 0;
         }
 
@@ -229,31 +250,43 @@ export default function CustomerOrdersPage() {
           color: #8B6914;
           text-decoration: none;
           font-size: 13px;
-          font-weight: 500;
+          font-weight: 600;
           display: inline-flex;
           align-items: center;
-          gap: 6px;
-          transition: opacity 0.2s;
+          gap: 7px;
+          padding: 8px 16px;
+          border-radius: 100px;
+          background: rgba(184, 142, 60, 0.08);
+          border: 1px solid rgba(184, 142, 60, 0.22);
+          transition: all 0.25s ease;
         }
 
         .profile-link:hover {
-          opacity: 0.8;
+          background: #8B6914;
+          color: #FAF7F0;
+          box-shadow: 0 4px 14px rgba(139, 105, 20, 0.25);
         }
 
         /* ORDER CARD */
         .order-card {
-          background: #ffffff;
-          border: 1px solid rgba(26, 18, 9, 0.08);
-          border-radius: 8px;
-          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.015);
-          margin-bottom: 28px;
+          background: #FAF7F0;
+          border: 1.5px solid rgba(184, 142, 60, 0.22);
+          border-radius: 16px;
+          box-shadow: 0 8px 30px rgba(26, 18, 9, 0.03);
+          margin-bottom: 32px;
           overflow: hidden;
+          transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .order-card:hover {
+          border-color: rgba(184, 142, 60, 0.4);
+          box-shadow: 0 12px 36px rgba(184, 142, 60, 0.12);
         }
 
         .order-card-header {
-          background-color: rgba(26, 18, 9, 0.015);
-          border-bottom: 1px solid rgba(26, 18, 9, 0.06);
-          padding: 18px 24px;
+          background-color: rgba(184, 142, 60, 0.06);
+          border-bottom: 1.5px solid rgba(184, 142, 60, 0.15);
+          padding: 20px 28px;
           display: flex;
           justify-content: space-between;
           align-items: center;
@@ -263,7 +296,7 @@ export default function CustomerOrdersPage() {
 
         .order-meta {
           display: flex;
-          gap: 24px;
+          gap: 28px;
           flex-wrap: wrap;
         }
 
@@ -275,10 +308,10 @@ export default function CustomerOrdersPage() {
 
         .order-meta-label {
           font-size: 10.5px;
-          color: rgba(26, 18, 9, 0.4);
+          color: rgba(26, 18, 9, 0.5);
           text-transform: uppercase;
-          letter-spacing: 0.08em;
-          font-weight: 500;
+          letter-spacing: 0.1em;
+          font-weight: 700;
         }
 
         .order-meta-value {
@@ -289,27 +322,31 @@ export default function CustomerOrdersPage() {
 
         .order-status-badge {
           font-size: 11px;
-          font-weight: 600;
-          letter-spacing: 0.05em;
+          font-weight: 700;
+          letter-spacing: 0.08em;
           text-transform: uppercase;
-          padding: 4px 10px;
-          border-radius: 4px;
-          border: 1px solid transparent;
+          padding: 6px 16px;
+          border-radius: 100px;
+          border: 1.5px solid transparent;
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
         }
 
         /* ORDER BODY */
         .order-card-body {
-          padding: 24px;
+          padding: 24px 28px;
         }
 
         /* ORDER ITEMS */
         .order-item-row {
           display: grid;
-          grid-template-columns: 80px 1fr auto;
+          grid-template-columns: 84px 1fr auto;
           align-items: center;
           gap: 20px;
-          padding: 16px 0;
-          border-bottom: 1px dashed rgba(26, 18, 9, 0.06);
+          padding: 18px 0;
+          border-bottom: 1px dashed rgba(184, 142, 60, 0.18);
         }
 
         .order-item-row:first-child {
@@ -322,24 +359,25 @@ export default function CustomerOrdersPage() {
         }
 
         .order-item-img {
-          width: 80px;
-          height: 80px;
+          width: 84px;
+          height: 84px;
           position: relative;
-          border-radius: 6px;
-          border: 1px solid rgba(26, 18, 9, 0.06);
-          background-color: rgba(26, 18, 9, 0.01);
+          border-radius: 10px;
+          border: 1px solid rgba(184, 142, 60, 0.18);
+          background-color: transparent;
           overflow: hidden;
+          flex-shrink: 0;
         }
 
         .order-item-details {
           display: flex;
           flex-direction: column;
-          gap: 3px;
+          gap: 4px;
         }
 
         .order-item-title {
           font-family: 'Cormorant Garamond', serif;
-          font-size: 19px;
+          font-size: 20px;
           font-weight: 600;
           color: #1a1209;
           margin: 0;
@@ -347,7 +385,7 @@ export default function CustomerOrdersPage() {
 
         .order-item-meta {
           font-size: 12px;
-          color: rgba(26, 18, 9, 0.5);
+          color: rgba(26, 18, 9, 0.55);
           display: flex;
           align-items: center;
           gap: 10px;
@@ -355,23 +393,23 @@ export default function CustomerOrdersPage() {
 
         .order-item-price-calc {
           font-size: 13px;
-          font-weight: 500;
+          font-weight: 600;
           color: #8B6914;
           margin-top: 2px;
         }
 
         .order-item-total {
-          font-size: 16px;
-          font-weight: 600;
+          font-size: 17px;
+          font-weight: 700;
           color: #1a1209;
           text-align: right;
         }
 
         /* SHIPPING COLLAPSIBLE / DETAIL BLOCK */
         .order-shipping-section {
-          background-color: rgba(26, 18, 9, 0.01);
-          border-top: 1px solid rgba(26, 18, 9, 0.06);
-          padding: 16px 24px;
+          background-color: rgba(184, 142, 60, 0.04);
+          border-top: 1.5px solid rgba(184, 142, 60, 0.12);
+          padding: 20px 28px;
           display: flex;
           justify-content: space-between;
           align-items: center;
@@ -380,38 +418,56 @@ export default function CustomerOrdersPage() {
         }
 
         .shipping-info-block {
-          font-size: 12.5px;
-          color: rgba(26, 18, 9, 0.65);
-          line-height: 1.5;
+          font-size: 13px;
+          color: rgba(26, 18, 9, 0.7);
+          line-height: 1.55;
         }
 
         .shipping-info-title {
-          font-size: 10px;
-          font-weight: 600;
+          font-size: 10.5px;
+          font-weight: 700;
           color: #8B6914;
           text-transform: uppercase;
-          letter-spacing: 0.08em;
-          margin-bottom: 4px;
+          letter-spacing: 0.1em;
+          margin-bottom: 5px;
+          display: flex;
+          align-items: center;
+          gap: 6px;
         }
 
         .orders-cancel-btn {
-          background: transparent;
-          border: 1px solid rgba(198, 40, 40, 0.4);
+          background: rgba(198, 40, 40, 0.04);
+          border: 1.5px solid rgba(198, 40, 40, 0.35);
           color: #c62828;
-          padding: 8px 18px;
+          padding: 9px 22px;
           font-family: 'Jost', sans-serif;
-          font-size: 11.5px;
-          font-weight: 600;
-          letter-spacing: 0.08em;
+          font-size: 11px;
+          font-weight: 700;
+          letter-spacing: 0.1em;
           text-transform: uppercase;
-          border-radius: 20px;
+          border-radius: 100px;
           cursor: pointer;
-          transition: all 0.2s;
+          transition: all 0.25s ease;
         }
 
         .orders-cancel-btn:hover {
-          background: rgba(198, 40, 40, 0.05);
+          background: #c62828;
+          color: #ffffff;
           border-color: #c62828;
+          box-shadow: 0 4px 14px rgba(198, 40, 40, 0.25);
+        }
+
+        /* RESPONSIVE BREAKPOINTS */
+        @media (max-width: 640px) {
+          .orders-container { padding: 90px 16px 60px; }
+          .orders-header { flex-direction: column; align-items: flex-start; gap: 12px; }
+          .order-card-header { padding: 16px 20px; flex-direction: column; align-items: flex-start; }
+          .order-meta { gap: 14px 20px; }
+          .order-card-body { padding: 18px 20px; }
+          .order-item-row { grid-template-columns: 68px 1fr; gap: 14px; }
+          .order-item-total { grid-column: 1 / -1; text-align: right; border-top: 1px dashed rgba(184,142,60,0.15); padding-top: 8px; }
+          .order-shipping-section { flex-direction: column; align-items: flex-start; gap: 16px; padding: 18px 20px; }
+          .text-right-mobile-left { text-align: left !important; }
         }
 
         /* MODALS */
@@ -419,8 +475,8 @@ export default function CustomerOrdersPage() {
           position: fixed;
           inset: 0;
           z-index: 100;
-          background-color: rgba(26, 18, 9, 0.5);
-          backdrop-filter: blur(4px);
+          background-color: rgba(10, 6, 2, 0.65);
+          backdrop-filter: blur(6px);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -428,14 +484,14 @@ export default function CustomerOrdersPage() {
         }
 
         .modal-box {
-          background-color: #ffffff;
-          border-radius: 8px;
+          background-color: #FAF7F0;
+          border-radius: 16px;
           width: 100%;
-          max-width: 500px;
-          padding: 30px;
-          box-shadow: 0 20px 48px rgba(0, 0, 0, 0.15);
+          max-width: 520px;
+          padding: 32px;
+          box-shadow: 0 24px 60px rgba(26, 18, 9, 0.2);
           position: relative;
-          border: 1px solid rgba(26, 18, 9, 0.08);
+          border: 1.5px solid rgba(184, 142, 60, 0.3);
         }
 
         .modal-title {
@@ -801,8 +857,8 @@ export default function CustomerOrdersPage() {
                               src={item.productThumbnail}
                               alt={item.productTitle}
                               fill
-                              sizes="80px"
-                              style={{ objectFit: 'cover' }}
+                              sizes="84px"
+                              style={{ objectFit: 'contain' }}
                             />
                           ) : (
                             <div style={{ width: '100%', height: '100%', background: 'rgba(26,18,9,0.04)' }} />
@@ -816,7 +872,7 @@ export default function CustomerOrdersPage() {
                             {item.colorVariant && (
                               <>
                                 <span style={{ width: '4px', height: '4px', borderRadius: '50%', background: 'rgba(26,18,9,0.2)' }} />
-                                <span style={{ color: '#8B6914', fontWeight: 500 }}>Edition: {item.colorVariant}</span>
+                                <span style={{ color: '#8B6914', fontWeight: 600 }}>Edition: {item.colorVariant}</span>
                               </>
                             )}
                           </div>
@@ -835,13 +891,23 @@ export default function CustomerOrdersPage() {
                   {/* SHIPPING INFO FOOTER */}
                   <div className="order-shipping-section">
                     <div className="shipping-info-block">
-                      <div className="shipping-info-title">Secured Dispatch Address</div>
-                      {order.shippingAddress.address}, {order.shippingAddress.city}, {order.shippingAddress.postalCode}, {order.shippingAddress.country}
+                      <div className="shipping-info-title">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                        Secured Dispatch Address
+                      </div>
+                      <div style={{ color: '#1a1209', fontWeight: 500 }}>
+                        {formatAddress(order.shippingAddress)}
+                      </div>
                     </div>
                     
-                    <div className="shipping-info-block" style={{ textAlign: 'right' }}>
-                      <div className="shipping-info-title">Dispatch Phone Contact</div>
-                      {order.shippingAddress.mobileCode} {order.shippingAddress.mobile}
+                    <div className="shipping-info-block text-right-mobile-left" style={{ textAlign: 'right' }}>
+                      <div className="shipping-info-title" style={{ justifyContent: 'flex-end' }}>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                        Dispatch Phone Contact
+                      </div>
+                      <div style={{ color: '#1a1209', fontWeight: 600, fontFamily: 'monospace' }}>
+                        {order.shippingAddress?.mobileCode || '+94'} {order.shippingAddress?.mobile || ''}
+                      </div>
                     </div>
                   </div>
 

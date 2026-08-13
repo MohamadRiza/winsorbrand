@@ -35,6 +35,15 @@ function getStepIndex(status: string): number {
   }
 }
 
+function formatTitleCase(str?: string) {
+  if (!str) return '';
+  return str
+    .trim()
+    .split(/\s+/)
+    .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+    .join(' ');
+}
+
 interface OrderItemData {
   productTitle: string;
   productModelNo: string;
@@ -153,14 +162,13 @@ export default function GuestOrderTrackingPage() {
           margin: 0 auto;
         }
 
-        /* ── Glassmorphic Pure Card ── */
+        /* ── Luxury Card Container ── */
         .track-card {
-          background: rgba(255, 255, 255, 0.95);
-          backdrop-filter: blur(12px);
-          border: 1px solid rgba(139, 105, 20, 0.18);
+          background: #FAF7F0;
+          border: 1.5px solid rgba(184, 142, 60, 0.22);
           border-radius: 20px;
           padding: 36px;
-          box-shadow: 0 12px 40px rgba(26, 18, 9, 0.04), 0 2px 6px rgba(139, 105, 20, 0.04);
+          box-shadow: 0 12px 40px rgba(26, 18, 9, 0.04);
           transition: all 0.3s ease;
         }
 
@@ -565,7 +573,7 @@ export default function GuestOrderTrackingPage() {
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8b6914" strokeWidth="2" style={{ flexShrink: 0 }}>
                     <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" />
                   </svg>
-                  <span>{order.shippingAddress.address}, {order.shippingAddress.city}, {order.shippingAddress.country}</span>
+                  <span>{formatTitleCase(order.shippingAddress.address)}, {formatTitleCase(order.shippingAddress.city)}, {order.shippingAddress.country === 'LK' ? 'Sri Lanka' : formatTitleCase(order.shippingAddress.country)}</span>
                 </div>
               </div>
 
