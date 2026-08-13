@@ -1410,13 +1410,13 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
             </div>
 
             {/* Trust Badges Bar */}
-            <div className="grid grid-cols-3 gap-2 py-3 px-4 bg-white rounded-xl border border-[#8b6914]/20 mb-6 text-[11px] text-[#1a1209]/80 font-medium text-center">
-              <div className="flex items-center justify-center gap-1.5">
+            <div className="grid grid-cols-3 gap-2 py-3 px-4 bg-white rounded-xl border border-[#8b6914]/20 mb-3 text-[11px] text-[#1a1209]/80 font-medium text-center">
+              <Link href="/warranty" target="_blank" className="flex items-center justify-center gap-1.5 hover:text-[#8b6914] transition-colors">
                 <svg className="w-4 h-4 text-[#8b6914]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.8">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                 </svg>
-                <span>1 Year Warranty</span>
-              </div>
+                <span className="underline decoration-[#8b6914]/30">1 Year Warranty</span>
+              </Link>
               <div className="flex items-center justify-center gap-1.5 border-x border-[#1a1209]/10">
                 <svg className="w-4 h-4 text-[#8b6914]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.8">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
@@ -1430,6 +1430,23 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
                 </svg>
                 <span>Secure Payment</span>
               </div>
+            </div>
+
+            {/* Legal Notice Line */}
+            <div className="text-[10.5px] text-[#1a1209]/55 text-center mb-6 leading-relaxed">
+              Covered by Winsor's{' '}
+              <Link href="/terms" target="_blank" className="text-[#8b6914] underline font-medium hover:text-[#1a1209]">
+                Terms &amp; Conditions
+              </Link>
+              ,{' '}
+              <Link href="/privacy" target="_blank" className="text-[#8b6914] underline font-medium hover:text-[#1a1209]">
+                Privacy Policy
+              </Link>
+              , and{' '}
+              <Link href="/warranty" target="_blank" className="text-[#8b6914] underline font-medium hover:text-[#1a1209]">
+                Warranty Policy
+              </Link>
+              .
             </div>
 
             {/* Description */}

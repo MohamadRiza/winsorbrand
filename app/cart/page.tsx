@@ -2075,6 +2075,23 @@ export default function CartPage() {
                     )}
                   </button>
                 </div>
+
+                {/* Legal Policy Links Notice */}
+                <div style={{ marginTop: '12px', fontSize: '11px', color: 'rgba(26,18,9,0.55)', textAlign: 'center', lineHeight: '1.5' }}>
+                  By placing your order, you agree to Winsor's{' '}
+                  <Link href="/terms" target="_blank" style={{ color: '#8B6914', textDecoration: 'underline', fontWeight: 600 }}>
+                    Terms &amp; Conditions
+                  </Link>
+                  ,{' '}
+                  <Link href="/privacy" target="_blank" style={{ color: '#8B6914', textDecoration: 'underline', fontWeight: 600 }}>
+                    Privacy Policy
+                  </Link>
+                  , and{' '}
+                  <Link href="/warranty" target="_blank" style={{ color: '#8B6914', textDecoration: 'underline', fontWeight: 600 }}>
+                    Warranty Policy
+                  </Link>
+                  .
+                </div>
               </>
             )}
           </div>
@@ -2710,6 +2727,23 @@ export default function CartPage() {
                           style={{ width: '38px', height: '24px', display: 'block', objectFit: 'contain' }}
                         />
                       </div>
+                    </div>
+
+                    {/* Legal Policy Links Notice */}
+                    <div style={{ marginTop: '16px', paddingTop: '14px', borderTop: '1px solid rgba(139,105,20,0.12)', fontSize: '11px', color: 'rgba(26,18,9,0.55)', textAlign: 'center', lineHeight: '1.6' }}>
+                      By purchasing, you agree to Winsor's{' '}
+                      <Link href="/terms" target="_blank" style={{ color: '#8B6914', textDecoration: 'underline', fontWeight: 600 }}>
+                        Terms &amp; Conditions
+                      </Link>
+                      ,{' '}
+                      <Link href="/privacy" target="_blank" style={{ color: '#8B6914', textDecoration: 'underline', fontWeight: 600 }}>
+                        Privacy Policy
+                      </Link>
+                      , and{' '}
+                      <Link href="/warranty" target="_blank" style={{ color: '#8B6914', textDecoration: 'underline', fontWeight: 600 }}>
+                        Warranty Policy
+                      </Link>
+                      .
                     </div>
                   </div>
 

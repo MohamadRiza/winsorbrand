@@ -255,7 +255,7 @@ export default function GuestOrderTrackingPage() {
       `}</style>
 
       {/* 🌟 LUXURY HERO BANNER WITH ATELIER BENCH PHOTO */}
-      <section className="relative w-full h-[320px] sm:h-[400px] bg-[#0a0a0a] overflow-hidden flex items-center justify-center text-center mt-[72px] lg:mt-[86px]">
+      <section className="order-tracking-hero relative w-full min-h-[380px] sm:min-h-[440px] bg-[#0a0a0a] overflow-hidden flex items-center justify-center text-center pt-28 sm:pt-36 pb-16 sm:pb-24">
         <Image
           src="/order_tracking_hero.jpg"
           alt="Winsor Haute Horlogerie Atelier"
@@ -266,7 +266,7 @@ export default function GuestOrderTrackingPage() {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-[#faf7f0] via-black/45 to-black/70" />
         
-        <div className="relative z-10 max-w-2xl px-6 pt-8">
+        <div className="relative z-10 max-w-2xl px-6">
           <div className="inline-flex items-center gap-2 bg-[#8B6914]/25 border border-[#8B6914]/40 backdrop-blur-md px-4 py-1.5 rounded-full mb-4">
             <span className="w-1.5 h-1.5 rounded-full bg-[#8B6914] animate-pulse" />
             <span className="text-[10px] font-semibold text-[#d4af37] tracking-[0.25em] uppercase" style={{ fontFamily: "'Jost', sans-serif" }}>

@@ -474,6 +474,23 @@ export default function BuyNowModal({
                   )}
                 </button>
                 <button className="bnm-btn-outline" onClick={() => setStep('confirm')}>&#8592; Back</button>
+
+                {/* Legal Policy Links Notice */}
+                <div style={{ marginTop: '14px', fontSize: '11px', color: 'rgba(26,18,9,0.55)', textAlign: 'center', lineHeight: '1.6' }}>
+                  By placing your order, you agree to Winsor's{' '}
+                  <a href="/terms" target="_blank" rel="noopener noreferrer" style={{ color: '#8B6914', textDecoration: 'underline', fontWeight: 600 }}>
+                    Terms &amp; Conditions
+                  </a>
+                  ,{' '}
+                  <a href="/privacy" target="_blank" rel="noopener noreferrer" style={{ color: '#8B6914', textDecoration: 'underline', fontWeight: 600 }}>
+                    Privacy Policy
+                  </a>
+                  , and{' '}
+                  <a href="/warranty" target="_blank" rel="noopener noreferrer" style={{ color: '#8B6914', textDecoration: 'underline', fontWeight: 600 }}>
+                    Warranty Policy
+                  </a>
+                  .
+                </div>
               </>
             )}
 

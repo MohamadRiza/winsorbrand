@@ -205,6 +205,24 @@ export default function Navbar() {
 
   // Dynamically measure hero section height across all pages
   useEffect(() => {
+    const isNonHeroPage = 
+      pathname === '/profile' ||
+      pathname === '/cart' ||
+      pathname.startsWith('/collections/') || // Product details page (e.g. /collections/6a746d1914856a7e53bacea1)
+      pathname === '/warranty' ||
+      pathname === '/faq' ||
+      pathname === '/orders' ||
+      (pathname.startsWith('/orders/') && pathname !== '/orders/track') ||
+      pathname === '/contact' ||
+      pathname === '/terms' ||
+      pathname === '/privacy' ||
+      pathname === '/cookies';
+
+    if (isNonHeroPage) {
+      setIsTransparent(false);
+      return;
+    }
+
     const updateHeroHeight = () => {
       const hero = document.getElementById('hero') 
         || document.querySelector('.collections-hero-banner') 
@@ -212,9 +230,8 @@ export default function Navbar() {
         || document.querySelector('.gifts-hero-banner') 
         || document.querySelector('.locator-hero-banner') 
         || document.querySelector('.careers-hero-banner')
-        || document.querySelector('.ws-parallax-bg')
-        || document.querySelector('main > section:first-of-type')
-        || document.querySelector('section:first-of-type');
+        || document.querySelector('.order-tracking-hero')
+        || document.querySelector('.ws-parallax-bg');
       
       if (hero) {
         const h = (hero as HTMLElement).offsetHeight;
@@ -239,7 +256,36 @@ export default function Navbar() {
 
   // Scroll listener to update transparency and visibility dynamically
   useEffect(() => {
+    const isNonHeroPage = 
+      pathname === '/profile' ||
+      pathname === '/cart' ||
+      pathname.startsWith('/collections/') ||
+      pathname === '/warranty' ||
+      pathname === '/faq' ||
+      pathname === '/orders' ||
+      (pathname.startsWith('/orders/') && pathname !== '/orders/track') ||
+      pathname === '/contact' ||
+      pathname === '/terms' ||
+      pathname === '/privacy' ||
+      pathname === '/cookies';
+
+    if (isNonHeroPage) {
+      setIsTransparent(false);
+    }
+
     const onScroll = () => {
+      if (isNonHeroPage) {
+        setIsTransparent(false);
+        if (window.scrollY > lastScrollY.current && window.scrollY > 120) { 
+          setIsVisible(false); 
+          setMegaVisible(false); 
+        } else { 
+          setIsVisible(true); 
+        }
+        lastScrollY.current = window.scrollY;
+        return;
+      }
+
       const cur = window.scrollY;
       const h = heroHeight.current > 150 ? heroHeight.current : 450;
       const threshold = h - 80;

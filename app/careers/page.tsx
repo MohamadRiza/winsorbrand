@@ -31,9 +31,13 @@ export default function CareersPage() {
     const fetchJobs = async () => {
       try {
         const res = await fetch('/api/careers');
-        if (!res.ok) throw new Error('Failed to fetch positions');
+        if (!res.ok || !res.headers.get('content-type')?.includes('application/json')) {
+          setVacancies([]);
+          setLocations([]);
+          return;
+        }
         const data = await res.json();
-        if (data.success) {
+        if (data && data.success) {
           setVacancies(data.data || []);
           setLocations(data.locations || []);
         }
@@ -62,14 +66,14 @@ export default function CareersPage() {
   }, [vacancies, searchQuery, selectedLocation]);
 
   return (
-    <div className="min-h-screen bg-[#faf7f0] text-[#1a1209] flex flex-col mt-[72px] lg:mt-[86px]" style={{ fontFamily: "'Jost', sans-serif" }}>
+    <div className="min-h-screen bg-[#faf7f0] text-[#1a1209] flex flex-col" style={{ fontFamily: "'Jost', sans-serif" }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=Jost:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300&display=swap');
       `}</style>
       <Navbar />
 
       {/* Hero Header */}
-      <section className="careers-hero-banner relative w-full pt-16 lg:pt-24 pb-20 lg:pb-28 flex items-center justify-center overflow-hidden bg-gradient-to-b from-[#0a0a0a] via-[#1a140d] to-[#0a0a0a] text-white">
+      <section className="careers-hero-banner relative w-full pt-28 sm:pt-36 pb-20 lg:pb-28 min-h-[400px] sm:min-h-[480px] flex items-center justify-center overflow-hidden bg-gradient-to-b from-[#0a0a0a] via-[#1a140d] to-[#0a0a0a] text-white">
         <Image
           src="/hmebnr1.webp"
           alt="Careers at Winsor Atelier"
