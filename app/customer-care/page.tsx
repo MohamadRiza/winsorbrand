@@ -291,12 +291,13 @@ export default function CustomerCarePage() {
         }
         .hero-attached-benefits-bar {
           position: relative;
-          background: #ffffff;
+          background: rgba(255, 255, 255, 0.75);
           border-radius: 14px;
-          border: 1.5px solid rgba(139, 105, 20, 0.2);
-          box-shadow: 0 12px 36px rgba(0, 0, 0, 0.09);
+          border: 1.5px solid rgba(139, 105, 20, 0.22);
+          box-shadow: 0 16px 40px rgba(26, 18, 9, 0.06), 0 4px 12px rgba(139, 105, 20, 0.04);
           padding: 20px 32px;
-          backdrop-filter: blur(12px);
+          backdrop-filter: blur(16px);
+          -webkit-backdrop-filter: blur(16px);
           overflow: hidden;
         }
         .hero-attached-benefit-item {
@@ -363,11 +364,11 @@ export default function CustomerCarePage() {
           }
           .hero-attached-benefits-bar::before {
             left: 0;
-            background: linear-gradient(to right, #ffffff 0%, transparent 100%);
+            background: linear-gradient(to right, #faf7f0 0%, transparent 100%);
           }
           .hero-attached-benefits-bar::after {
             right: 0;
-            background: linear-gradient(to left, #ffffff 0%, transparent 100%);
+            background: linear-gradient(to left, #faf7f0 0%, transparent 100%);
           }
           .hero-attached-benefits-marquee-container {
             display: flex;
@@ -412,21 +413,24 @@ export default function CustomerCarePage() {
         }
 
         .quick-contact-card {
-          background: #ffffff;
-          border: 1px solid rgba(139, 105, 20, 0.16);
-          border-radius: 12px;
+          background: rgba(255, 255, 255, 0.72);
+          backdrop-filter: blur(14px);
+          -webkit-backdrop-filter: blur(14px);
+          border: 1px solid rgba(139, 105, 20, 0.18);
+          border-radius: 14px;
           padding: 22px 24px;
           display: flex;
           align-items: center;
           gap: 18px;
-          box-shadow: 0 4px 18px rgba(0, 0, 0, 0.025);
-          transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+          box-shadow: 0 10px 30px rgba(26, 18, 9, 0.04), 0 2px 8px rgba(139, 105, 20, 0.03);
+          transition: all 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
           text-decoration: none;
         }
 
         .quick-contact-card:hover {
-          transform: translateY(-4px);
-          box-shadow: 0 10px 28px rgba(139, 105, 20, 0.12);
+          transform: translateY(-5px);
+          background: rgba(255, 255, 255, 0.92);
+          box-shadow: 0 18px 42px rgba(139, 105, 20, 0.15), 0 4px 14px rgba(26, 18, 9, 0.06);
           border-color: #8b6914;
         }
 
@@ -485,12 +489,14 @@ export default function CustomerCarePage() {
 
         /* ── LEFT COLUMN - BOUTIQUE DETAILS ── */
         .care-details-card {
-          background-color: #ffffff;
-          border: 1px solid rgba(26, 18, 9, 0.08);
+          background: rgba(255, 255, 255, 0.78);
+          backdrop-filter: blur(16px);
+          -webkit-backdrop-filter: blur(16px);
+          border: 1px solid rgba(139, 105, 20, 0.18);
           border-top: 3.5px solid #8b6914;
-          border-radius: 12px;
+          border-radius: 14px;
           padding: 36px;
-          box-shadow: 0 8px 30px rgba(0, 0, 0, 0.03);
+          box-shadow: 0 16px 44px rgba(26, 18, 9, 0.05), 0 2px 10px rgba(139, 105, 20, 0.03);
         }
 
         .details-header-tag {
@@ -590,12 +596,14 @@ export default function CustomerCarePage() {
 
         /* ── RIGHT COLUMN - SUPPORT FORM ── */
         .care-form-card {
-          background-color: #ffffff;
-          border: 1px solid rgba(26, 18, 9, 0.08);
+          background: rgba(255, 255, 255, 0.78);
+          backdrop-filter: blur(16px);
+          -webkit-backdrop-filter: blur(16px);
+          border: 1px solid rgba(139, 105, 20, 0.18);
           border-top: 3.5px solid #1a1209;
-          border-radius: 12px;
+          border-radius: 14px;
           padding: 40px;
-          box-shadow: 0 8px 30px rgba(0, 0, 0, 0.03);
+          box-shadow: 0 16px 44px rgba(26, 18, 9, 0.05), 0 2px 10px rgba(139, 105, 20, 0.03);
         }
 
         .form-header-tag {
@@ -653,19 +661,23 @@ export default function CustomerCarePage() {
           box-sizing: border-box;
           height: 46px;
           border: 1.5px solid rgba(26, 18, 9, 0.12);
-          border-radius: 6px;
+          border-radius: 8px;
           padding: 0 14px;
           font-family: 'Jost', sans-serif;
           font-size: 13.5px;
           color: #1a1209;
           outline: none;
-          background-color: #ffffff;
+          background-color: rgba(250, 247, 240, 0.65);
+          backdrop-filter: blur(8px);
+          -webkit-backdrop-filter: blur(8px);
+          box-shadow: inset 0 1px 3px rgba(26, 18, 9, 0.02);
           transition: all 0.25s ease;
         }
 
         .input-field:focus {
           border-color: #8B6914;
-          box-shadow: 0 0 0 3px rgba(139, 105, 20, 0.12);
+          box-shadow: 0 0 0 3.5px rgba(139, 105, 20, 0.14), 0 6px 16px rgba(139, 105, 20, 0.08);
+          background-color: rgba(255, 255, 255, 0.95);
         }
 
         .input-field:disabled {
@@ -679,13 +691,16 @@ export default function CustomerCarePage() {
           width: 100%;
           box-sizing: border-box;
           border: 1.5px solid rgba(26, 18, 9, 0.12);
-          border-radius: 6px;
+          border-radius: 8px;
           padding: 14px;
           font-family: 'Jost', sans-serif;
           font-size: 13.5px;
           color: #1a1209;
           outline: none;
-          background-color: #ffffff;
+          background-color: rgba(250, 247, 240, 0.65);
+          backdrop-filter: blur(8px);
+          -webkit-backdrop-filter: blur(8px);
+          box-shadow: inset 0 1px 3px rgba(26, 18, 9, 0.02);
           transition: all 0.25s ease;
           resize: none;
           min-height: 140px;
@@ -693,7 +708,8 @@ export default function CustomerCarePage() {
 
         .textarea-field:focus {
           border-color: #8B6914;
-          box-shadow: 0 0 0 3px rgba(139, 105, 20, 0.12);
+          box-shadow: 0 0 0 3.5px rgba(139, 105, 20, 0.14), 0 6px 16px rgba(139, 105, 20, 0.08);
+          background-color: rgba(255, 255, 255, 0.95);
         }
 
         .char-counter {
@@ -787,7 +803,7 @@ export default function CustomerCarePage() {
           border-radius: 14px;
           overflow: hidden;
           border: 1.5px solid rgba(139, 105, 20, 0.2);
-          box-shadow: 0 12px 36px rgba(0, 0, 0, 0.06);
+          box-shadow: 0 18px 48px rgba(26, 18, 9, 0.08), 0 4px 12px rgba(139, 105, 20, 0.04);
           margin-bottom: 24px;
         }
 
@@ -808,7 +824,9 @@ export default function CustomerCarePage() {
           display: inline-flex;
           align-items: center;
           gap: 10px;
-          background: #ffffff;
+          background: rgba(255, 255, 255, 0.85);
+          backdrop-filter: blur(12px);
+          -webkit-backdrop-filter: blur(12px);
           color: #8B6914;
           border: 1.5px solid rgba(139, 105, 20, 0.35);
           border-radius: 6px;
@@ -819,7 +837,7 @@ export default function CustomerCarePage() {
           letter-spacing: 0.1em;
           text-transform: uppercase;
           transition: all 0.3s ease;
-          box-shadow: 0 4px 14px rgba(0, 0, 0, 0.03);
+          box-shadow: 0 6px 20px rgba(26, 18, 9, 0.04), 0 2px 6px rgba(139, 105, 20, 0.03);
         }
 
         .map-link-btn:hover {
@@ -832,12 +850,14 @@ export default function CustomerCarePage() {
 
         /* SUCCESS SCREEN */
         .success-card {
-          background-color: #ffffff;
+          background: rgba(255, 255, 255, 0.85);
+          backdrop-filter: blur(16px);
+          -webkit-backdrop-filter: blur(16px);
           border: 1.5px solid rgba(139, 105, 20, 0.3);
           border-radius: 14px;
           padding: 60px 40px;
           text-align: center;
-          box-shadow: 0 12px 40px rgba(0, 0, 0, 0.05);
+          box-shadow: 0 16px 44px rgba(26, 18, 9, 0.06);
           max-width: 680px;
           margin: 0 auto;
         }
