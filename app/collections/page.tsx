@@ -165,7 +165,7 @@ export default function CollectionsPage() {
     if (products.length === 0) return;
     const ids = products.map(p => p._id).filter(Boolean).join(',');
     fetch(`/api/reviews/ratings?ids=${ids}`)
-      .then(r => r.json())
+      .then(r => (r.ok && r.headers.get('content-type')?.includes('application/json') ? r.json() : { success: false, data: {} }))
       .then(data => { if (data.success) setReviewRatings(data.data || {}); })
       .catch(() => { });
   }, [products]);

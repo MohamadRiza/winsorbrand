@@ -22,7 +22,7 @@ const WatchShowcase = () => {
       <div className="mx-auto mt-8 grid max-w-7xl grid-cols-1 gap-6 px-4 sm:mt-14 sm:gap-8 sm:px-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,2.2fr)] lg:gap-10">
         {/* Product card */}
         <article className="group flex flex-col cursor-pointer">
-          <div className="relative overflow-hidden bg-white p-4 sm:p-5 rounded-2xl border border-[rgba(26,18,9,0.06)] flex flex-col justify-between h-full shadow-[0_4px_20px_rgba(0,0,0,0.02)] transition-all duration-300 hover:shadow-[0_12px_32px_rgba(26,18,9,0.06)] hover:border-[#8B6914]/40">
+          <div className="relative overflow-hidden bg-[#faf7f0] p-4 sm:p-5 rounded-2xl border border-[rgba(26,18,9,0.06)] flex flex-col justify-between h-full shadow-[0_4px_20px_rgba(0,0,0,0.02)] transition-all duration-300 hover:shadow-[0_12px_32px_rgba(26,18,9,0.06)] hover:border-[#8B6914]/40">
             <span className="absolute left-6 top-6 z-10 bg-[#1a1209] text-white px-3 py-1 text-[10px] tracking-widest uppercase font-medium">
               Exclusive
             </span>
@@ -62,7 +62,7 @@ const WatchShowcase = () => {
       <div className="mx-auto mt-10 max-w-7xl px-4 sm:mt-14 sm:px-6 space-y-5 sm:space-y-6">
         
         {/* Banner 1: ABOUT WINSOR */}
-        <div className="group relative overflow-hidden rounded-xl sm:rounded-2xl bg-white border border-[rgba(26,18,9,0.08)] shadow-[0_4px_20px_rgba(0,0,0,0.03)] grid grid-cols-[1.3fr_1fr] md:grid-cols-2 items-center md:h-[220px] lg:h-[240px]">
+        <div className="group relative overflow-hidden rounded-xl sm:rounded-2xl bg-[#faf7f0] border border-[rgba(26,18,9,0.08)] shadow-[0_4px_20px_rgba(0,0,0,0.03)] grid grid-cols-[1.3fr_1fr] md:grid-cols-2 items-center md:h-[220px] lg:h-[240px]">
           {/* Left Text Content */}
           <div className="p-4 sm:p-7 lg:p-10 flex flex-col justify-center items-start text-left z-10 space-y-1.5 sm:space-y-2.5">
             <span className="text-[9px] sm:text-[10px] lg:text-[11px] font-semibold text-[#8B6914] tracking-[0.22em] uppercase">
@@ -95,14 +95,14 @@ const WatchShowcase = () => {
             <div
               className="absolute inset-0 pointer-events-none"
               style={{
-                background: 'linear-gradient(to right, #ffffff 0%, rgba(255,255,255,0.85) 15%, transparent 50%)',
+                background: 'linear-gradient(to right, #faf7f0 0%, rgba(250,247,240,0.85) 15%, transparent 50%)',
               }}
             />
           </div>
         </div>
 
         {/* Banner 2: LIMITED EDITION */}
-        <div className="group relative overflow-hidden rounded-xl sm:rounded-2xl bg-white border border-[rgba(26,18,9,0.08)] shadow-[0_4px_20px_rgba(0,0,0,0.03)] grid grid-cols-[1fr_1.4fr] md:grid-cols-2 items-center md:h-[220px] lg:h-[240px]">
+        <div className="group relative overflow-hidden rounded-xl sm:rounded-2xl bg-[#faf7f0] border border-[rgba(26,18,9,0.08)] shadow-[0_4px_20px_rgba(0,0,0,0.03)] grid grid-cols-[1fr_1.4fr] md:grid-cols-2 items-center md:h-[220px] lg:h-[240px]">
           {/* Left Image Container */}
           <div className="relative h-full w-full overflow-hidden min-h-[160px] sm:min-h-[220px] order-1">
             <img
@@ -114,7 +114,7 @@ const WatchShowcase = () => {
             <div
               className="absolute inset-0 pointer-events-none"
               style={{
-                background: 'linear-gradient(to left, #ffffff 0%, rgba(255,255,255,0.85) 15%, transparent 50%)',
+                background: 'linear-gradient(to left, #faf7f0 0%, rgba(250,247,240,0.85) 15%, transparent 50%)',
               }}
             />
           </div>
@@ -142,7 +142,7 @@ const WatchShowcase = () => {
             </div>
 
             {/* Badge Box (100 PIECES ONLY) */}
-            <div className="self-start sm:self-center border border-[#8B6914]/40 bg-[#faf7f0]/70 px-3 py-2 sm:px-4 sm:py-3.5 rounded-md sm:rounded-lg text-center min-w-[80px] sm:min-w-[110px] flex-shrink-0">
+            <div className="self-start sm:self-center border border-[#8B6914]/40 bg-[#FAF4E8] px-3 py-2 sm:px-4 sm:py-3.5 rounded-md sm:rounded-lg text-center min-w-[80px] sm:min-w-[110px] flex-shrink-0">
               <span className="block font-serif text-lg sm:text-2xl lg:text-3xl font-bold text-[#8B6914] leading-none">
                 100
               </span>

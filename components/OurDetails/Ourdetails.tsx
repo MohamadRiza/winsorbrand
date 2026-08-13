@@ -8,65 +8,71 @@ const items = [
     description: "Locate our exclusive boutiques globally and explore our collections in person.",
     image: "/KCC.webp",
     alt: "Find a store",
-    href: "#",
+    href: "/retailers",
   },
   {
     title: "CUSTOMER SERVICE",
     description: "Access direct care, repair services, and specialist advice for your timepiece.",
     image: "/customer_service.webp",
     alt: "Customer service",
-    href: "#",
+    href: "/customer-care",
   },
   {
     title: "OUR RETAIL PARTNERS",
     description: "Connect with authorized Winsor retailers to discover authentic horology.",
     image: "/r_partners.webp",
     alt: "Our retail partners",
-    href: "#",
+    href: "/retailers",
   },
 ];
 
 const Card = ({ item }: { item: (typeof items)[number] }) => (
   <a
     href={item.href}
-    className="group flex flex-col bg-white rounded-xl border border-[rgba(26,18,9,0.06)] overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.02)] transition-all duration-700 hover:shadow-[0_20px_40px_rgba(139,105,20,0.08)] hover:border-[#8B6914]/30 hover:-translate-y-2"
+    className="group relative block w-full aspect-[3/4] sm:aspect-[4/5] rounded-2xl overflow-hidden shadow-lg transition-all duration-700 hover:shadow-2xl hover:-translate-y-2 border border-black/10 hover:border-[#8B6914]/50"
     style={{ textDecoration: 'none' }}
   >
-    {/* Image Container with Zoom effect */}
-    <div className="w-full overflow-hidden relative aspect-[4/5]">
-      <img
-        src={item.image}
-        alt={item.alt}
-        loading="lazy"
-        width={1024}
-        height={1280}
-        className="w-full h-full object-cover transition-transform duration-[1.2s] ease-out group-hover:scale-[1.06]"
-      />
-      {/* Premium warm gold overlay on hover */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(139,105,20,0.08)_0%,rgba(26,18,9,0.25)_100%)] opacity-0 transition-opacity duration-700 group-hover:opacity-100 pointer-events-none" />
+    {/* Full Cover Background Image */}
+    <img
+      src={item.image}
+      alt={item.alt}
+      loading="lazy"
+      width={1024}
+      height={1280}
+      className="w-full h-full object-cover transition-transform duration-[1.2s] ease-out group-hover:scale-[1.07]"
+    />
 
-      {/* Tiny top-right category label */}
-      <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-md border border-[#8B6914]/20 px-3 py-1 rounded-full pointer-events-none opacity-0 transform translate-y-[-10px] transition-all duration-500 group-hover:opacity-100 group-hover:translate-y-0">
-        <span className="text-[9px] tracking-[0.15em] text-[#8B6914] font-medium uppercase">Winsor</span>
-      </div>
+    {/* Luxury Dark Gradient Overlay */}
+    <div className="absolute inset-0 bg-gradient-to-t from-[#0a0805]/95 via-[#0a0805]/50 to-transparent opacity-90 transition-opacity duration-700 group-hover:opacity-95" />
+
+    {/* Top Right Luxury Brand Badge */}
+    <div className="absolute top-4 right-4 bg-black/40 backdrop-blur-md border border-white/20 px-3 py-1 rounded-full pointer-events-none transition-all duration-500 group-hover:border-[#8B6914]/60 group-hover:bg-[#8B6914]/20">
+      <span className="text-[9px] tracking-[0.2em] text-white/90 font-medium uppercase font-['Jost']">WINSOR</span>
     </div>
 
-    {/* Text Details Section */}
-    <div className="p-7 flex flex-col items-center text-center bg-white flex-grow justify-between">
-      <div className="flex flex-col items-center">
-        <h3 className="font-serif text-base sm:text-lg tracking-[0.12em] uppercase transition-colors duration-300 group-hover:text-[#8B6914] font-medium" style={{ color: '#1a1209', margin: 0 }}>
-          {item.title}
-        </h3>
-        <div className="mt-3.5 w-6 h-[1.5px] bg-[#8B6914]/20 transition-all duration-500 group-hover:w-16 group-hover:bg-[#8B6914]" />
+    {/* On-Image Text Overlay Content */}
+    <div className="absolute inset-x-0 bottom-0 p-6 sm:p-7 flex flex-col justify-end text-left z-10 transition-transform duration-500 group-hover:translate-y-[-4px]">
+      {/* Title */}
+      <h3 
+        className="font-serif text-lg sm:text-xl md:text-2xl font-medium uppercase tracking-[0.12em] text-white transition-colors duration-300 group-hover:text-[#dfb15b]"
+        style={{ margin: 0, fontFamily: "'Cormorant Garamond', Georgia, serif" }}
+      >
+        {item.title}
+      </h3>
 
-        <p className="text-[#666666] text-xs font-light tracking-[0.03em] leading-relaxed mt-4 max-w-[260px] min-h-[40px]">
-          {item.description}
-        </p>
+      {/* Gold Divider Line */}
+      <div className="my-3 w-8 h-[1.5px] bg-[#8B6914] transition-all duration-500 group-hover:w-16 group-hover:bg-[#dfb15b]" />
+
+      {/* Description */}
+      <p className="text-white/80 text-xs sm:text-sm font-light tracking-wide leading-relaxed font-['Jost'] max-w-[95%] mb-5">
+        {item.description}
+      </p>
+
+      {/* Action Link CTA */}
+      <div className="inline-flex items-center gap-2 text-xs tracking-[0.22em] uppercase font-semibold text-[#dfb15b] transition-all duration-300 group-hover:text-white font-['Jost']">
+        <span>DISCOVER</span>
+        <span className="transition-transform duration-300 group-hover:translate-x-2">→</span>
       </div>
-
-      <span className="mt-5 inline-flex items-center gap-1.5 text-[10.5px] tracking-[0.2em] uppercase font-semibold text-[#8B6914] transition-all duration-300 group-hover:text-[#1a1209]">
-        Discover <span className="transition-transform duration-300 group-hover:translate-x-1.5">→</span>
-      </span>
     </div>
   </a>
 );
@@ -103,7 +109,7 @@ const Ourdetaills = () => {
           className="flex snap-x snap-mandatory gap-5 overflow-x-auto scroll-smooth px-6 pb-6 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
           {items.map((item) => (
-            <div key={item.title} className="w-[82%] flex-shrink-0 snap-center">
+            <div key={item.title} className="w-[85%] flex-shrink-0 snap-center">
               <Card item={item} />
             </div>
           ))}

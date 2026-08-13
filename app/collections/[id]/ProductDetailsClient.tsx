@@ -67,6 +67,9 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
       try {
         setLoading(true);
         const res = await fetch(`/api/products/${id}`);
+        if (!res.ok || !res.headers.get('content-type')?.includes('application/json')) {
+          throw new Error('Failed to load timepiece details');
+        }
         const data = await res.json();
         if (data.success && data.data) {
           const prod: IProduct = data.data;
@@ -97,6 +100,10 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
       try {
         setLoadingReviews(true);
         const res = await fetch(`/api/reviews?productId=${id}`);
+        if (!res.ok || !res.headers.get('content-type')?.includes('application/json')) {
+          setReviews([]);
+          return;
+        }
         const data = await res.json();
         if (data.success) {
           setReviews(data.data || []);

@@ -689,6 +689,10 @@ export default function GiftSection() {
       setLoadingCats(true);
       try {
         const res = await fetch('/api/gift-categories');
+        if (!res.ok || !res.headers.get('content-type')?.includes('application/json')) {
+          setLoadingCats(false);
+          return;
+        }
         const data = await res.json();
         if (data.success && Array.isArray(data.data) && data.data.length > 0) {
           setCategories(data.data);
@@ -714,6 +718,10 @@ export default function GiftSection() {
         const res = await fetch(
           `/api/products/gifts?category=${activeSlug.toLowerCase()}&limit=20`,
         );
+        if (!res.ok || !res.headers.get('content-type')?.includes('application/json')) {
+          setProducts([]);
+          return;
+        }
         const data = await res.json();
         if (data.success && Array.isArray(data.data)) {
           setProducts(data.data);
