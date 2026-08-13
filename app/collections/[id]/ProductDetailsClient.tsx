@@ -379,8 +379,8 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
         .thumbnail-item {
           aspect-ratio: 1;
           border-radius: 8px;
-          border: 1px solid rgba(26, 18, 9, 0.08);
-          background-color: #fff;
+          border: 1px solid rgba(26, 18, 9, 0.1);
+          background: transparent;
           cursor: pointer;
           position: relative;
           overflow: hidden;
@@ -399,8 +399,8 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
           max-height: 560px;
           position: relative;
           border-radius: 12px;
-          border: 1px solid rgba(26, 18, 9, 0.06);
-          background-color: #fff;
+          border: none;
+          background: transparent;
           overflow: hidden;
         }
         
@@ -734,9 +734,7 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
           aspect-ratio: 1;
           border-radius: 12px;
           overflow: hidden;
-          box-shadow: 0 4px 20px rgba(0,0,0,0.02);
-          border: 1px solid rgba(26,18,9,0.05);
-          background-color: #fff;
+          background: transparent;
         }
         .large-gallery-video-item {
           width: 100%;
@@ -903,8 +901,20 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
         /* TIMELESS PAIRINGS CATEGORY GRID */
         .pairings-grid {
           display: grid;
-          grid-template-columns: repeat(4, 1fr);
-          gap: 24px;
+          grid-template-columns: repeat(5, 1fr);
+          gap: 20px;
+        }
+        @media (max-width: 1100px) {
+          .pairings-grid {
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+          }
+        }
+        @media (max-width: 640px) {
+          .pairings-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+          }
         }
         .pairing-card {
           display: flex;
@@ -970,7 +980,7 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
           border-color: #1a1209;
         }
 
-        /* SUGGESTIONS SECTION */
+        /* SUGGESTIONS SECTION (LUXURY CARDS) */
         .suggestions-section {
           margin-top: 80px;
           border-top: 1px solid rgba(26,18,9,0.08);
@@ -988,26 +998,52 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
         .suggestions-grid {
           display: grid;
           grid-template-columns: repeat(4, 1fr);
-          gap: 28px;
+          gap: 24px;
+        }
+        @media (max-width: 1024px) {
+          .suggestions-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 18px;
+          }
+        }
+        @media (max-width: 600px) {
+          .suggestions-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+          }
         }
         .suggested-card {
           display: flex;
           flex-direction: column;
-          transition: transform 0.3s;
+          background: #FAF7F0;
+          border: 1px solid rgba(184, 142, 60, 0.22);
+          border-radius: 16px;
+          padding: 14px;
+          box-shadow: 0 4px 18px rgba(26, 18, 9, 0.03);
+          transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+          text-decoration: none;
+          color: inherit;
+          height: 100%;
+          box-sizing: border-box;
+        }
+        .suggested-card:hover {
+          transform: translateY(-5px);
+          background: #FAF7F0;
+          border-color: #b88e3c;
+          box-shadow: 0 12px 32px rgba(184, 142, 60, 0.15);
         }
         .suggested-img-container {
           position: relative;
           aspect-ratio: 1;
-          border-radius: 8px;
+          border-radius: 12px;
           overflow: hidden;
-          background: rgba(26,18,9,0.02);
-          border: 1px solid rgba(26, 18, 9, 0.04);
+          background: transparent;
+        }
+        .suggested-img {
+          transition: transform 0.5s ease;
         }
         .suggested-card:hover .suggested-img {
-          transform: scale(1.05);
-        }
-        .suggested-card:hover {
-          transform: translateY(-4px);
+          transform: scale(1.06);
         }
 
         /* FOOTER FEATURES BANNER */
@@ -1270,7 +1306,7 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
                     alt={`${product.title} gallery ${i}`}
                     fill
                     sizes="80px"
-                    style={{ objectFit: 'cover' }}
+                    style={{ objectFit: 'contain' }}
                   />
                 </div>
               ))}
@@ -1314,7 +1350,7 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
                     alt={product.title}
                     fill
                     sizes="(max-width: 768px) 100vw, 55vw"
-                    style={{ objectFit: 'cover' }}
+                    style={{ objectFit: 'contain' }}
                     priority
                   />
                 )
@@ -1380,9 +1416,8 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
                         key={variant.colorName}
                         onClick={() => handleVariantSelect(variant)}
                         title={variant.colorName}
-                        className={`w-9 h-9 rounded-full p-0.5 border-2 transition-all duration-200 cursor-pointer overflow-hidden ${
-                          isSelected ? 'border-[#8b6914] ring-2 ring-[#8b6914]/30 scale-105' : 'border-[#1a1209]/15 hover:border-[#8b6914]/60'
-                        }`}
+                        className={`w-9 h-9 rounded-full p-0.5 border-2 transition-all duration-200 cursor-pointer overflow-hidden ${isSelected ? 'border-[#8b6914] ring-2 ring-[#8b6914]/30 scale-105' : 'border-[#1a1209]/15 hover:border-[#8b6914]/60'
+                          }`}
                       >
                         {variant.image?.url ? (
                           <img src={variant.image.url} alt={variant.colorName} className="w-full h-full object-cover rounded-full" />
@@ -1578,11 +1613,10 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
                     <div
                       key={idx}
                       onClick={() => setFocusSlideIdx(idx)}
-                      className={`relative cursor-pointer transition-all duration-500 ease-out rounded-2xl overflow-hidden bg-white border flex items-center justify-center p-3 sm:p-5 ${
-                        isCenter
-                          ? 'w-[68vw] sm:w-[300px] md:w-[320px] aspect-[4/5] z-20 scale-100 opacity-100 shadow-2xl border-[#8b6914]/40 ring-2 ring-[#8b6914]/25'
-                          : 'w-[45vw] sm:w-[200px] md:w-[240px] aspect-[4/5] z-10 scale-90 opacity-70 shadow-md hover:opacity-90 border-[#1a1209]/08'
-                      }`}
+                      className={`relative cursor-pointer transition-all duration-500 ease-out rounded-2xl overflow-hidden bg-transparent flex items-center justify-center p-3 sm:p-5 ${isCenter
+                          ? 'w-[68vw] sm:w-[300px] md:w-[320px] aspect-[4/5] z-20 scale-100 opacity-100'
+                          : 'w-[45vw] sm:w-[200px] md:w-[240px] aspect-[4/5] z-10 scale-90 opacity-70 hover:opacity-90'
+                        }`}
                       style={{
                         transform: `scale(${isCenter ? 1 : 0.88}) translateY(${isCenter ? '0px' : '8px'})`,
                         filter: isCenter ? 'none' : 'brightness(0.96)'
@@ -1619,11 +1653,10 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
                     key={idx}
                     type="button"
                     onClick={() => setFocusSlideIdx(idx)}
-                    className={`transition-all duration-300 rounded-full cursor-pointer border-none ${
-                      focusSlideIdx === idx
+                    className={`transition-all duration-300 rounded-full cursor-pointer border-none ${focusSlideIdx === idx
                         ? 'w-7 h-2 bg-[#8b6914]'
                         : 'w-2 h-2 bg-[#1a1209]/20 hover:bg-[#8b6914]/50'
-                    }`}
+                      }`}
                     aria-label={`View focus shot ${idx + 1}`}
                   />
                 ))}
@@ -1645,10 +1678,10 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
 
             const caseMat = getVal(['case', 'material', 'build']);
             const glassMat = getVal(['glass', 'crystal', 'lens', 'dial']);
-            
+
             const rawWaterRes = getVal(['water', 'atm', 'depth', 'resistant']);
             const waterRes = (!rawWaterRes || rawWaterRes.toLowerCase() === 'no' || rawWaterRes.toLowerCase() === 'none') ? 'Water Resistant' : rawWaterRes;
-            
+
             const movement = getVal(['movement', 'engine', 'mechanism']);
 
             const dynamicFeatures = [
@@ -1789,9 +1822,9 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
 
             <div className="pairings-grid">
               {/* Card 1: New Arrivals */}
-              <Link href="/collections?section=new" className="pairing-card">
+              <Link href="/new-arrivals" className="pairing-card">
                 <div className="pairing-img-container">
-                  <Image src="/category_HomeS/new_arrivals_bg.webp" alt="New Arrivals" fill sizes="(max-width: 768px) 50vw, 25vw" style={{ objectFit: 'cover' }} className="pairing-img" />
+                  <Image src="/category_HomeS/new_arrivals_bg.webp" alt="New Arrivals" fill sizes="(max-width: 768px) 50vw, 20vw" style={{ objectFit: 'cover' }} className="pairing-img" />
                 </div>
                 <div className="pairing-info">
                   <h4 className="pairing-card-title">New Arrivals</h4>
@@ -1801,9 +1834,9 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
               </Link>
 
               {/* Card 2: Classic */}
-              <Link href="/collections?section=classic" className="pairing-card">
+              <Link href="/mens" className="pairing-card">
                 <div className="pairing-img-container">
-                  <Image src="/category_HomeS/classic_bg.webp" alt="Classic" fill sizes="(max-width: 768px) 50vw, 25vw" style={{ objectFit: 'cover' }} className="pairing-img" />
+                  <Image src="/category_HomeS/classic_bg.webp" alt="Classic" fill sizes="(max-width: 768px) 50vw, 20vw" style={{ objectFit: 'cover' }} className="pairing-img" />
                 </div>
                 <div className="pairing-info">
                   <h4 className="pairing-card-title">Classic</h4>
@@ -1813,9 +1846,9 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
               </Link>
 
               {/* Card 3: Sport */}
-              <Link href="/collections?section=sports" className="pairing-card">
+              <Link href="/sports" className="pairing-card">
                 <div className="pairing-img-container">
-                  <Image src="/category_HomeS/sport_bg.webp" alt="Sport" fill sizes="(max-width: 768px) 50vw, 25vw" style={{ objectFit: 'cover' }} className="pairing-img" />
+                  <Image src="/category_HomeS/sport_bg.webp" alt="Sport" fill sizes="(max-width: 768px) 50vw, 20vw" style={{ objectFit: 'cover' }} className="pairing-img" />
                 </div>
                 <div className="pairing-info">
                   <h4 className="pairing-card-title">Sport</h4>
@@ -1825,13 +1858,25 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
               </Link>
 
               {/* Card 4: Limited Edition */}
-              <Link href="/collections?section=limited" className="pairing-card">
+              <Link href="/limited-edition" className="pairing-card">
                 <div className="pairing-img-container">
-                  <Image src="/category_HomeS/limitted_bg.webp" alt="Limited Edition" fill sizes="(max-width: 768px) 50vw, 25vw" style={{ objectFit: 'cover' }} className="pairing-img" />
+                  <Image src="/category_HomeS/limitted_bg.webp" alt="Limited Edition" fill sizes="(max-width: 768px) 50vw, 20vw" style={{ objectFit: 'cover' }} className="pairing-img" />
                 </div>
                 <div className="pairing-info">
                   <h4 className="pairing-card-title">Limited Edition</h4>
                   <p className="pairing-card-desc">Exclusivity at Its Finest</p>
+                  <span className="pairing-card-link">VIEW ALL</span>
+                </div>
+              </Link>
+
+              {/* Card 5: Gifts */}
+              <Link href="/gifts" className="pairing-card">
+                <div className="pairing-img-container">
+                  <Image src="/graduation_gift.png" alt="Gifts Collection" fill sizes="(max-width: 768px) 50vw, 20vw" style={{ objectFit: 'cover' }} className="pairing-img" />
+                </div>
+                <div className="pairing-info">
+                  <h4 className="pairing-card-title">Gifts</h4>
+                  <p className="pairing-card-desc">Curated Luxury Gifting</p>
                   <span className="pairing-card-link">VIEW ALL</span>
                 </div>
               </Link>
@@ -1861,19 +1906,21 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
                             alt={p.title}
                             fill
                             sizes="(max-width: 768px) 50vw, 25vw"
-                            style={{ objectFit: 'cover', transition: 'transform 0.4s' }}
+                            style={{ objectFit: 'contain' }}
                             className="suggested-img"
                           />
                         )}
                       </div>
-                      <div style={{ padding: '12px 4px 4px' }}>
-                        <span style={{ fontSize: '9px', fontWeight: 600, letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(26,18,9,0.4)', display: 'block', marginBottom: '4px' }}>
-                          {gender}
-                        </span>
-                        <h4 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '16px', fontWeight: 500, margin: '0 0 6px', color: '#1a1209' }}>
-                          {p.title}
-                        </h4>
-                        <span style={{ fontSize: '12.5px', fontWeight: 500, color: '#8B6914' }}>
+                      <div style={{ padding: '14px 4px 4px', display: 'flex', flexDirection: 'column', flexGrow: 1, justifyContent: 'space-between' }}>
+                        <div>
+                          <span style={{ fontSize: '9.5px', fontWeight: 700, letterSpacing: '0.15em', textTransform: 'uppercase', color: '#8B6914', display: 'block', marginBottom: '4px' }}>
+                            {gender}
+                          </span>
+                          <h4 style={{ fontFamily: "'Jost', sans-serif", fontSize: '14px', fontWeight: 600, margin: '0 0 6px', color: '#1a1209', lineHeight: 1.3 }}>
+                            {p.title}
+                          </h4>
+                        </div>
+                        <span style={{ fontSize: '13.5px', fontWeight: 700, color: '#8B6914', fontFamily: 'monospace', marginTop: '6px' }}>
                           {convertPrice(p.price)}
                         </span>
                       </div>
