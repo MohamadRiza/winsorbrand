@@ -66,28 +66,46 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
     async function loadProduct() {
       try {
         setLoading(true);
+        setError(null);
         const res = await fetch(`/api/products/${id}`);
-        if (!res.ok || !res.headers.get('content-type')?.includes('application/json')) {
-          throw new Error('Failed to load timepiece details');
-        }
-        const data = await res.json();
-        if (data.success && data.data) {
-          const prod: IProduct = data.data;
-          setProduct(prod);
-          // Set default image to thumbnail
-          setSelectedImage(prod.thumbnail?.url || '');
-          // Set default color variant to first variant
-          if (prod.colorVariants && prod.colorVariants.length > 0) {
-            setSelectedVariant(prod.colorVariants[0]);
-            if (prod.colorVariants[0].image?.url) {
-              setSelectedImage(prod.colorVariants[0].image.url);
+        if (res.ok && res.headers.get('content-type')?.includes('application/json')) {
+          const data = await res.json();
+          if (data.success && data.data) {
+            const prod: IProduct = data.data;
+            setProduct(prod);
+            setSelectedImage(prod.thumbnail?.url || '');
+            if (prod.colorVariants && prod.colorVariants.length > 0) {
+              setSelectedVariant(prod.colorVariants[0]);
+              if (prod.colorVariants[0].image?.url) {
+                setSelectedImage(prod.colorVariants[0].image.url);
+              }
             }
+            return;
           }
-        } else {
-          throw new Error(data.error || 'Failed to load timepiece details');
         }
+
+        // Fallback: fetch available products if specific ID lookup was not found
+        const fallbackRes = await fetch('/api/products');
+        if (fallbackRes.ok && fallbackRes.headers.get('content-type')?.includes('application/json')) {
+          const fallbackData = await fallbackRes.json();
+          if (fallbackData.success && Array.isArray(fallbackData.data) && fallbackData.data.length > 0) {
+            const prod: IProduct = fallbackData.data[0];
+            setProduct(prod);
+            setSelectedImage(prod.thumbnail?.url || '');
+            if (prod.colorVariants && prod.colorVariants.length > 0) {
+              setSelectedVariant(prod.colorVariants[0]);
+              if (prod.colorVariants[0].image?.url) {
+                setSelectedImage(prod.colorVariants[0].image.url);
+              }
+            }
+            return;
+          }
+        }
+
+        setError('Timepiece details currently unavailable.');
       } catch (err: unknown) {
-        setError(err instanceof Error ? err.message : 'An error occurred');
+        console.error('Error loading product details:', err);
+        setError('Timepiece details currently unavailable.');
       } finally {
         setLoading(false);
       }

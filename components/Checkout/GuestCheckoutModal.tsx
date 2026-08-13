@@ -362,125 +362,172 @@ export default function GuestCheckoutModal({
           from { opacity: 0; transform: scale(0.97) translateY(8px); }
           to { opacity: 1; transform: scale(1) translateY(0); }
         }
-        @keyframes gcm-overlay-in {
-          from { opacity: 0; }
-          to { opacity: 1; }
-        }
+        @keyframes gcm-spin { to { transform: rotate(360deg); } }
+
         .gcm-overlay {
           position: fixed; inset: 0; z-index: 9999;
-          background: rgba(10, 6, 2, 0.75);
-          backdrop-filter: blur(6px);
+          background: rgba(10, 6, 2, 0.65);
+          backdrop-filter: blur(8px);
+          -webkit-backdrop-filter: blur(8px);
           display: flex; align-items: center; justify-content: center;
           padding: 16px;
-          animation: gcm-overlay-in 0.25s ease forwards;
         }
+
         .gcm-dialog {
           background: #faf7f0;
-          border: 1px solid rgba(139,105,20,0.22);
-          border-radius: 20px;
-          width: 100%; max-width: 520px;
-          max-height: 92vh;
+          border: 1px solid rgba(184, 142, 60, 0.25);
+          border-radius: 24px;
+          width: 100%; max-width: 480px;
+          max-height: 90vh;
           overflow-y: auto;
-          box-shadow: 0 24px 60px rgba(0,0,0,0.32), 0 0 0 1px rgba(212,175,55,0.08);
+          box-shadow: 0 24px 60px rgba(0,0,0,0.25);
           animation: gcm-fade-in 0.3s cubic-bezier(0.16,1,0.3,1) forwards;
           font-family: 'Jost', sans-serif;
           scrollbar-width: thin;
-          scrollbar-color: rgba(139,105,20,0.3) transparent;
+          scrollbar-color: rgba(184,142,60,0.3) transparent;
+          position: relative;
         }
-        .gcm-dialog::-webkit-scrollbar { width: 4px; }
-        .gcm-dialog::-webkit-scrollbar-thumb { background: rgba(139,105,20,0.3); border-radius: 4px; }
+        .gcm-dialog::-webkit-scrollbar { width: 5px; }
+        .gcm-dialog::-webkit-scrollbar-thumb { background: rgba(184, 142, 60, 0.3); border-radius: 4px; }
+
         .gcm-header {
-          background: linear-gradient(135deg, #1a1209 0%, #2d1f0a 100%);
-          padding: 20px 24px 18px;
-          border-radius: 20px 20px 0 0;
-          display: flex; align-items: center; justify-content: space-between;
-          border-bottom: 1px solid rgba(212,175,55,0.2);
+          padding: 24px 28px 16px;
+          display: flex; align-items: flex-start; justify-content: space-between;
+          position: sticky; top: 0; background: #faf7f0; z-index: 5;
         }
+
         .gcm-header-title {
-          font-family: 'Cormorant Garamond', serif;
-          font-size: 20px; font-weight: 600;
-          color: #f3e3b8; letter-spacing: 0.03em;
-          margin: 0;
+          font-size: 22px; font-weight: 700;
+          color: #1a1209; margin: 0; letter-spacing: -0.01em;
         }
         .gcm-header-sub {
-          font-size: 10.5px; color: rgba(212,175,55,0.7);
-          margin: 3px 0 0; letter-spacing: 0.08em; text-transform: uppercase;
+          font-size: 12px; color: #7a6e5d; margin: 3px 0 0; font-weight: 400;
         }
+
         .gcm-close {
-          background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12);
-          color: rgba(255,255,255,0.7); width: 32px; height: 32px;
-          border-radius: 50%; cursor: pointer;
+          width: 32px; height: 32px; border-radius: 50%;
+          border: 1px solid rgba(184, 142, 60, 0.3);
+          background: #ffffff; color: #6e6354; cursor: pointer;
           display: flex; align-items: center; justify-content: center;
-          font-size: 18px; flex-shrink: 0;
-          transition: all 0.2s ease;
+          font-size: 16px; flex-shrink: 0; transition: all 0.2s ease;
+          box-shadow: 0 2px 6px rgba(0,0,0,0.04);
         }
-        .gcm-close:hover { background: rgba(255,255,255,0.15); color: #fff; }
-        .gcm-body { padding: 24px; }
+        .gcm-close:hover { background: rgba(184, 142, 60, 0.1); color: #1a1209; border-color: #b88e3c; }
+
+        .gcm-stepper-container { padding: 0 28px 16px; }
+        .gcm-stepper-track { display: flex; align-items: center; justify-content: space-between; position: relative; }
+        .gcm-stepper-line { flex: 1; height: 1.5px; background: rgba(184, 142, 60, 0.22); margin: 0 8px; transition: background 0.3s ease; }
+        .gcm-stepper-line.active { background: #b88e3c; height: 2px; }
+
+        .gcm-step-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(184, 142, 60, 0.3); }
+        .gcm-step-dot.completed {
+          width: 24px; height: 24px; border-radius: 50%;
+          background: #b88e3c; display: flex; align-items: center; justify-content: center; color: #fff;
+        }
+        .gcm-step-badge {
+          width: 32px; height: 32px; border-radius: 50%;
+          background: linear-gradient(135deg, #c59b4e 0%, #9e7529 100%);
+          display: flex; align-items: center; justify-content: center;
+          color: #ffffff; box-shadow: 0 3px 10px rgba(184, 142, 60, 0.35);
+        }
+
+        .gcm-body { padding: 0 28px 24px; }
+        .gcm-card {
+          background: #ffffff; border: 1px solid rgba(184, 142, 60, 0.2);
+          border-radius: 14px; padding: 16px 18px; margin-bottom: 14px;
+          box-shadow: 0 2px 6px rgba(0,0,0,0.02); position: relative;
+        }
+
         .gcm-input {
           width: 100%; box-sizing: border-box;
-          background: #fff; border: 1.5px solid rgba(139,105,20,0.2);
+          background: #fff; border: 1.5px solid rgba(184, 142, 60, 0.25);
           border-radius: 10px; padding: 11px 14px;
           font-family: 'Jost', sans-serif; font-size: 13.5px; color: #1a1209;
           outline: none; transition: border-color 0.2s ease;
         }
-        .gcm-input:focus { border-color: rgba(139,105,20,0.6); box-shadow: 0 0 0 3px rgba(139,105,20,0.08); }
+        .gcm-input:focus { border-color: #b88e3c; box-shadow: 0 0 0 3px rgba(184, 142, 60, 0.1); }
         .gcm-input.error { border-color: #c62828; }
         .gcm-label {
-          display: block; font-size: 9.5px; font-weight: 700;
-          color: rgba(26,18,9,0.55); text-transform: uppercase;
-          letter-spacing: 0.1em; margin-bottom: 6px;
+          display: block; font-size: 10.5px; font-weight: 700;
+          color: #8e7c66; text-transform: uppercase;
+          letter-spacing: 0.12em; margin-bottom: 6px;
         }
         .gcm-field { margin-bottom: 14px; }
         .gcm-error { font-size: 10.5px; color: #c62828; margin-top: 4px; }
+
         .gcm-btn-primary {
-          width: 100%; padding: 14px;
-          background: linear-gradient(135deg, #1a1209 0%, #2d1f0a 100%);
-          color: #d4af37; border: none;
-          border-radius: 10px; cursor: pointer;
-          font-family: 'Jost', sans-serif; font-size: 12px;
-          font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
-          transition: all 0.2s ease; margin-top: 8px;
+          width: 100%; height: 48px;
+          background: linear-gradient(135deg, #c59b4e 0%, #936f26 100%);
+          color: #ffffff; border: none; border-radius: 12px;
+          cursor: pointer; font-family: 'Jost', sans-serif;
+          font-size: 12.5px; font-weight: 700; letter-spacing: 0.08em;
+          text-transform: uppercase; transition: all 0.2s ease;
+          display: flex; align-items: center; justify-content: center; gap: 8px;
+          box-shadow: 0 4px 14px rgba(184, 142, 60, 0.28); margin-top: 8px;
         }
-        .gcm-btn-primary:hover:not(:disabled) { background: linear-gradient(135deg, #2d1f0a 0%, #3d2a10 100%); }
-        .gcm-btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+        .gcm-btn-primary:hover:not(:disabled) {
+          background: linear-gradient(135deg, #d4a755 0%, #a47c2d 100%);
+          box-shadow: 0 6px 18px rgba(184, 142, 60, 0.38); transform: translateY(-1px);
+        }
+        .gcm-btn-primary:disabled { opacity: 0.6; cursor: not-allowed; box-shadow: none; }
+
         .gcm-btn-outline {
-          width: 100%; padding: 13px;
-          background: transparent; border: 1.5px solid rgba(139,105,20,0.35);
-          color: #8b6914; border-radius: 10px; cursor: pointer;
-          font-family: 'Jost', sans-serif; font-size: 12px;
-          font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
-          transition: all 0.2s ease;
+          width: 100%; height: 46px; background: transparent;
+          border: 1.5px solid rgba(184, 142, 60, 0.45); color: #9e7529;
+          border-radius: 12px; cursor: pointer; font-family: 'Jost', sans-serif;
+          font-size: 12.5px; font-weight: 700; letter-spacing: 0.08em;
+          text-transform: uppercase; transition: all 0.2s ease;
         }
-        .gcm-btn-outline:hover { background: rgba(139,105,20,0.06); border-color: rgba(139,105,20,0.5); }
+        .gcm-btn-outline:hover { border-color: #b88e3c; background: rgba(184, 142, 60, 0.06); color: #b88e3c; }
+
         .gcm-divider {
-          display: flex; align-items: center; gap: 12px;
-          margin: 16px 0;
-          color: rgba(26,18,9,0.35); font-size: 11px;
+          display: flex; align-items: center; gap: 12px; margin: 16px 0;
+          color: #7a6e5d; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em;
         }
-        .gcm-divider::before, .gcm-divider::after {
-          content: ''; flex: 1; height: 1px;
-          background: rgba(26,18,9,0.1);
+        .gcm-divider::before, .gcm-divider::after { content: ''; flex: 1; height: 1px; background: rgba(184, 142, 60, 0.2); }
+
+        .gcm-corner-ribbon {
+          position: absolute; top: 0; right: 0; width: 28px; height: 28px;
+          background: linear-gradient(135deg, #b88e3c, #9e7529);
+          border-bottom-left-radius: 10px; display: flex; align-items: center;
+          justify-content: center; color: #ffffff; box-shadow: 0 2px 6px rgba(184, 142, 60, 0.3);
         }
-        .gcm-step-indicator {
-          display: flex; align-items: center; justify-content: center;
-          gap: 6px; margin-bottom: 20px;
+
+        .gcm-pay-option {
+          border: 1.5px solid rgba(184, 142, 60, 0.22); border-radius: 14px;
+          padding: 16px 18px; cursor: pointer; transition: all 0.2s ease;
+          background: #ffffff; display: flex; align-items: flex-start;
+          gap: 14px; width: 100%; box-sizing: border-box; margin-bottom: 12px;
+          text-align: left; position: relative; overflow: hidden;
         }
-        .gcm-step-dot {
-          width: 6px; height: 6px; border-radius: 50%;
-          background: rgba(139,105,20,0.2);
-          transition: all 0.2s ease;
+        .gcm-pay-option.active {
+          border-color: #b88e3c; border-width: 2px;
+          box-shadow: 0 4px 14px rgba(184, 142, 60, 0.12);
         }
-        .gcm-step-dot.active {
-          background: #8b6914; width: 20px; border-radius: 3px;
-        }
+        .gcm-pay-option:hover { border-color: rgba(184, 142, 60, 0.6); }
+
         .gcm-summary-item {
           display: flex; gap: 12px; align-items: center;
-          padding: 10px 0; border-bottom: 1px solid rgba(26,18,9,0.06);
+          padding: 10px 0; border-bottom: 1px solid rgba(184, 142, 60, 0.12);
         }
         .gcm-summary-item:last-child { border-bottom: none; }
+
+        .gcm-trust-footer {
+          display: flex; align-items: center; justify-content: space-around;
+          margin-top: 20px; padding-top: 16px; border-top: 1px solid rgba(184, 142, 60, 0.18);
+        }
+        .gcm-trust-item {
+          display: flex; align-items: center; gap: 6px;
+          font-size: 11.5px; font-weight: 600; color: #6e6354;
+        }
+
         @media (max-width: 520px) {
-          .gcm-dialog { max-height: 96vh; border-radius: 16px; }
-          .gcm-body { padding: 18px; }
+          .gcm-dialog { max-height: 92vh; border-radius: 20px; }
+          .gcm-header { padding: 20px 20px 14px; }
+          .gcm-stepper-container { padding: 0 20px 14px; }
+          .gcm-body { padding: 0 20px 20px; }
+          .gcm-header-title { font-size: 20px; }
+          .gcm-trust-footer { flex-wrap: wrap; gap: 10px; justify-content: center; }
         }
       `}</style>
 
@@ -492,30 +539,70 @@ export default function GuestCheckoutModal({
               <h2 className="gcm-header-title">
                 {step === 'choice' && 'Complete Your Purchase'}
                 {step === 'form' && 'Delivery Information'}
-                {step === 'summary' && 'Order Summary'}
+                {step === 'summary' && 'Review Purchase'}
                 {step === 'payment' && 'Select Payment'}
                 {step === 'success' && 'Order Confirmed'}
               </h2>
               <p className="gcm-header-sub">
                 {step === 'choice' && 'Sign in or continue as guest'}
                 {step === 'form' && 'Where shall we deliver your timepiece?'}
-                {step === 'summary' && 'Review your order before confirming'}
+                {step === 'summary' && 'Verify your delivery details'}
                 {step === 'payment' && 'Choose how you would like to pay'}
-                {step === 'success' && 'Your timepiece is on its way'}
+                {step === 'success' && 'Your timepiece order is placed'}
               </p>
             </div>
             <button className="gcm-close" onClick={onClose} aria-label="Close">×</button>
           </div>
 
-          <div className="gcm-body">
-            {/* ── Step indicators ────────────────────────────────────────── */}
-            {step !== 'choice' && step !== 'success' && (
-              <div className="gcm-step-indicator">
-                <div className={`gcm-step-dot ${step === 'form' || step === 'summary' || step === 'payment' ? 'active' : ''}`} />
-                <div className={`gcm-step-dot ${step === 'summary' || step === 'payment' ? 'active' : ''}`} />
-                <div className={`gcm-step-dot ${step === 'payment' ? 'active' : ''}`} />
+          {/* ── Stepper Progress Bar ── */}
+          {step !== 'choice' && step !== 'success' && (
+            <div className="gcm-stepper-container">
+              <div className="gcm-stepper-track">
+                {step === 'form' && (
+                  <>
+                    <div className="gcm-step-badge">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
+                    </div>
+                    <div className="gcm-stepper-line" />
+                    <div className="gcm-step-dot" />
+                    <div className="gcm-stepper-line" />
+                    <div className="gcm-step-dot" />
+                  </>
+                )}
+                {step === 'summary' && (
+                  <>
+                    <div className="gcm-step-dot completed">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="20 6 9 17 4 12" /></svg>
+                    </div>
+                    <div className="gcm-stepper-line active" />
+                    <div className="gcm-step-badge">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
+                    </div>
+                    <div className="gcm-stepper-line" />
+                    <div className="gcm-step-dot" />
+                  </>
+                )}
+                {step === 'payment' && (
+                  <>
+                    <div className="gcm-step-dot completed">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="20 6 9 17 4 12" /></svg>
+                    </div>
+                    <div className="gcm-stepper-line active" />
+                    <div className="gcm-step-dot completed">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="20 6 9 17 4 12" /></svg>
+                    </div>
+                    <div className="gcm-stepper-line active" />
+                    <div className="gcm-step-badge">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
+                    </div>
+                  </>
+                )}
               </div>
-            )}
+            </div>
+          )}
+
+          <div className="gcm-body">
+
 
             {/* ═══════════════════════ STEP 1: CHOICE ═══════════════════════ */}
             {step === 'choice' && (
@@ -802,54 +889,80 @@ export default function GuestCheckoutModal({
             {step === 'payment' && (
               <div>
                 {/* Total bar */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 14px', background: '#fff', border: '1px solid rgba(139,105,20,0.15)', borderRadius: 10, marginBottom: 16 }}>
-                  <span style={{ fontSize: '12px', color: 'rgba(26,18,9,0.55)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Order Total</span>
-                  <span style={{ fontSize: '20px', fontWeight: 700, color: '#8b6914', fontFamily: 'monospace' }}>LKR {subtotal.toLocaleString()}</span>
+                <div className="gcm-card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '14px 18px' }}>
+                  <span style={{ fontSize: '11.5px', color: '#7a6e5d', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Order Total</span>
+                  <span style={{ fontSize: '20px', fontWeight: 800, color: '#b88e3c' }}>LKR {subtotal.toLocaleString()}</span>
                 </div>
 
-                <div style={{ fontSize: '10px', fontWeight: 700, color: 'rgba(26,18,9,0.45)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 10 }}>Payment Method</div>
+                <div style={{ fontSize: '10.5px', fontWeight: 700, color: '#8e7c66', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 10 }}>Payment Method</div>
 
-                {/* PayHere option */}
-                <button type="button" onClick={() => setPayMethod('payhere')}
-                  style={{ border: `2px solid ${payMethod === 'payhere' ? '#8b6914' : 'rgba(139,105,20,0.2)'}`, borderRadius: 12, padding: '14px 16px', cursor: 'pointer', transition: 'all 0.2s ease', background: payMethod === 'payhere' ? 'rgba(139,105,20,0.04)' : '#fff', display: 'flex', alignItems: 'center', gap: 12, width: '100%', boxSizing: 'border-box' as const, marginBottom: 10, textAlign: 'left' as const, boxShadow: payMethod === 'payhere' ? '0 0 0 3px rgba(139,105,20,0.08)' : 'none' }}>
-                  <div style={{ width: 18, height: 18, borderRadius: '50%', border: `2px solid ${payMethod === 'payhere' ? '#8b6914' : 'rgba(139,105,20,0.35)'}`, background: payMethod === 'payhere' ? '#8b6914' : 'transparent', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    {payMethod === 'payhere' && <div style={{ width: 6, height: 6, background: '#fff', borderRadius: '50%' }} />}
+                {/* Option 1: Pay via PayHere */}
+                <div
+                  className={`gcm-pay-option ${payMethod === 'payhere' ? 'active' : ''}`}
+                  onClick={() => setPayMethod('payhere')}
+                >
+                  <div style={{ width: 20, height: 20, borderRadius: '50%', border: '2px solid #b88e3c', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, background: payMethod === 'payhere' ? '#b88e3c' : 'transparent', marginTop: 1 }}>
+                    {payMethod === 'payhere' && <div style={{ width: 7, height: 7, background: '#fff', borderRadius: '50%' }} />}
                   </div>
                   <div style={{ flex: 1 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8b6914" strokeWidth="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2" /><line x1="1" y1="10" x2="23" y2="10" /></svg>
-                      <span style={{ fontWeight: 700, fontSize: '13.5px', color: '#1a1209' }}>Pay via PayHere</span>
-                      <span style={{ fontSize: '9.5px', fontWeight: 700, color: '#2e7d32', background: 'rgba(46,125,50,0.1)', border: '1px solid rgba(46,125,50,0.25)', borderRadius: 4, padding: '2px 8px', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Secure</span>
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#b88e3c" strokeWidth="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2" /><line x1="1" y1="10" x2="23" y2="10" /></svg>
+                      <span style={{ fontWeight: 700, fontSize: '14px', color: '#1a1209' }}>Pay via PayHere</span>
                     </div>
-                    <div style={{ fontSize: '11px', color: 'rgba(26,18,9,0.5)', marginTop: 3 }}>Visa · Mastercard · Amex · eWallet · Bank · USSD</div>
+                    <div style={{ fontSize: '11px', color: '#7a6e5d', marginTop: 3 }}>
+                      Visa · Mastercard · Amex · eWallet · Bank · USSD
+                    </div>
+                    <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap', marginTop: 8 }}>
+                      {['VISA', 'mastercard', 'AMEX', 'eWallets', 'BANK', 'USSD'].map((b) => (
+                        <span key={b} style={{ fontSize: '8.5px', fontWeight: 800, color: '#4a3f31', background: '#f5f0e6', border: '1px solid rgba(184,142,60,0.25)', borderRadius: 3, padding: '1px 5px', textTransform: 'uppercase' }}>
+                          {b}
+                        </span>
+                      ))}
+                    </div>
                   </div>
-                </button>
+                </div>
 
-                {/* Bank Transfer option */}
-                <button type="button" onClick={() => setPayMethod('bank_transfer')}
-                  style={{ border: `2px solid ${payMethod === 'bank_transfer' ? '#8b6914' : 'rgba(139,105,20,0.2)'}`, borderRadius: 12, padding: '14px 16px', cursor: 'pointer', transition: 'all 0.2s ease', background: payMethod === 'bank_transfer' ? 'rgba(139,105,20,0.04)' : '#fff', display: 'flex', alignItems: 'center', gap: 12, width: '100%', boxSizing: 'border-box' as const, marginBottom: 10, textAlign: 'left' as const, boxShadow: payMethod === 'bank_transfer' ? '0 0 0 3px rgba(139,105,20,0.08)' : 'none' }}>
-                  <div style={{ width: 18, height: 18, borderRadius: '50%', border: `2px solid ${payMethod === 'bank_transfer' ? '#8b6914' : 'rgba(139,105,20,0.35)'}`, background: payMethod === 'bank_transfer' ? '#8b6914' : 'transparent', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    {payMethod === 'bank_transfer' && <div style={{ width: 6, height: 6, background: '#fff', borderRadius: '50%' }} />}
-                  </div>
-                  <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8b6914" strokeWidth="2"><line x1="12" y1="1" x2="12" y2="23" /><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" /></svg>
-                      <span style={{ fontWeight: 700, fontSize: '13.5px', color: '#1a1209' }}>Direct Bank Transfer</span>
+                {/* Option 2: Direct Bank Transfer */}
+                <div
+                  className={`gcm-pay-option ${payMethod === 'bank_transfer' ? 'active' : ''}`}
+                  onClick={() => setPayMethod('bank_transfer')}
+                >
+                  {payMethod === 'bank_transfer' && (
+                    <div className="gcm-corner-ribbon" title="Selected">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="20 6 9 17 4 12" /></svg>
                     </div>
-                    <div style={{ fontSize: '11px', color: 'rgba(26,18,9,0.5)', marginTop: 3 }}>Transfer and upload receipt — verified within 24 hrs</div>
+                  )}
+                  <div style={{ width: 20, height: 20, borderRadius: '50%', border: '2px solid #b88e3c', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, background: payMethod === 'bank_transfer' ? '#b88e3c' : 'transparent', marginTop: 1 }}>
+                    {payMethod === 'bank_transfer' && <div style={{ width: 7, height: 7, background: '#fff', borderRadius: '50%' }} />}
                   </div>
-                </button>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#b88e3c" strokeWidth="2"><line x1="3" y1="21" x2="21" y2="21" /><line x1="6" y1="18" x2="6" y2="11" /><line x1="10" y1="18" x2="10" y2="11" /><line x1="14" y1="18" x2="14" y2="11" /><line x1="18" y1="18" x2="18" y2="11" /><polygon points="12 3 2 10 22 10 22 10 12 3" /></svg>
+                      <span style={{ fontWeight: 700, fontSize: '14px', color: '#1a1209' }}>Direct Bank Transfer</span>
+                    </div>
+                    <div style={{ fontSize: '11.5px', color: '#7a6e5d', marginTop: 3 }}>
+                      Transfer and upload receipt – verified within 24 hrs
+                    </div>
+                  </div>
+                </div>
 
                 {payMethod === 'bank_transfer' && (
                   <>
-                    <div style={{ background: 'rgba(139,105,20,0.05)', border: '1px solid rgba(139,105,20,0.18)', borderRadius: 10, padding: '12px 14px', marginBottom: 12 }}>
-                      <div style={{ fontSize: '9.5px', fontWeight: 700, color: 'rgba(26,18,9,0.45)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 8 }}>Bank Transfer Details</div>
+                    <div style={{ background: '#faf7f0', border: '1px solid rgba(184, 142, 60, 0.2)', borderRadius: 12, padding: '14px 16px', marginTop: 12 }}>
+                      <div style={{ fontSize: '9.5px', fontWeight: 700, color: '#8e7c66', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 8 }}>Bank Transfer Details</div>
                       {[['Bank', 'NATIONS TRUST BANK'], ['Account No.', '100460045365'], ['Branch', 'Bankshall Street (PETTAH)'], ['Amount', `LKR ${subtotal.toLocaleString()}`]].map(([label, value], i) => (
-                        <div key={i} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12.5px', borderTop: i > 0 ? '1px solid rgba(139,105,20,0.1)' : undefined, marginTop: i > 0 ? 6 : 0, paddingTop: i > 0 ? 6 : 0, color: '#1a1209' }}>
-                          <span style={{ color: 'rgba(26,18,9,0.5)', fontSize: '11px' }}>{label}</span>
-                          <span style={{ fontWeight: label === 'Amount' ? 700 : 600, color: label === 'Amount' ? '#8b6914' : '#1a1209', fontFamily: label === 'Account No.' ? 'monospace' : undefined }}>{value}</span>
+                        <div key={i} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12.5px', borderTop: i > 0 ? '1px solid rgba(184,142,60,0.12)' : undefined, marginTop: i > 0 ? 6 : 0, paddingTop: i > 0 ? 6 : 0, color: '#1a1209' }}>
+                          <span style={{ color: '#7a6e5d', fontSize: '11.5px' }}>{label}</span>
+                          <span style={{ fontWeight: label === 'Amount' ? 800 : 700, color: label === 'Amount' ? '#b88e3c' : '#1a1209', fontFamily: label === 'Account No.' ? 'monospace' : undefined }}>{value}</span>
                         </div>
                       ))}
+                    </div>
+
+                    <div style={{ background: '#fffbeb', border: '1px solid rgba(245, 158, 11, 0.3)', borderRadius: 10, padding: '12px 14px', marginTop: 12, display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#d97706" strokeWidth="2" style={{ flexShrink: 0, marginTop: 1 }}><circle cx="12" cy="12" r="10" /><line x1="12" y1="16" x2="12" y2="12" /><line x1="12" y1="8" x2="12.01" y2="8" /></svg>
+                      <span style={{ fontSize: '11.5px', color: '#92400e', lineHeight: 1.5 }}>
+                        Please upload your payment receipt after completing the transfer. Your order will be verified within 24 hours.
+                      </span>
                     </div>
 
                     <label style={{ display: 'block', fontSize: '9.5px', fontWeight: 700, color: 'rgba(26,18,9,0.55)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>Upload Transfer Receipt</label>
@@ -917,6 +1030,22 @@ export default function GuestCheckoutModal({
                     Warranty Policy
                   </a>
                   .
+                </div>
+
+                {/* Trust Badges */}
+                <div className="gcm-trust-footer">
+                  <div className="gcm-trust-item">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#b88e3c" strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /><polyline points="9 12 11 14 15 10" /></svg>
+                    <span>100% Authentic</span>
+                  </div>
+                  <div className="gcm-trust-item">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#b88e3c" strokeWidth="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
+                    <span>Secure Payment</span>
+                  </div>
+                  <div className="gcm-trust-item">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#b88e3c" strokeWidth="2"><polyline points="1 4 1 10 7 10" /><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" /></svg>
+                    <span>Easy Returns</span>
+                  </div>
                 </div>
               </div>
             )}

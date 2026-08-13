@@ -1084,6 +1084,192 @@ export default function CartPage() {
           border-color: #8b6914;
         }
 
+        /* LUXURY CHECKOUT MODAL (BNM SYSTEM) */
+        @keyframes bnm-fade-in { from{opacity:0;transform:scale(0.97) translateY(8px)}to{opacity:1;transform:scale(1) translateY(0)} }
+        @keyframes bnm-spin { to{transform:rotate(360deg)} }
+
+        .bnm-overlay {
+          position: fixed; inset: 0; z-index: 10000;
+          background: rgba(10, 6, 2, 0.65);
+          backdrop-filter: blur(8px);
+          -webkit-backdrop-filter: blur(8px);
+          display: flex; align-items: center; justify-content: center;
+          padding: 16px;
+        }
+
+        .bnm-dialog {
+          background: #faf7f0;
+          border: 1px solid rgba(184, 142, 60, 0.25);
+          border-radius: 24px;
+          width: 100%; max-width: 480px;
+          max-height: 90vh;
+          overflow-y: auto;
+          box-shadow: 0 24px 60px rgba(0, 0, 0, 0.25);
+          animation: bnm-fade-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+          font-family: 'Jost', sans-serif;
+          scrollbar-width: thin;
+          scrollbar-color: rgba(184, 142, 60, 0.3) transparent;
+          position: relative;
+        }
+        .bnm-dialog::-webkit-scrollbar { width: 5px; }
+        .bnm-dialog::-webkit-scrollbar-thumb { background: rgba(184, 142, 60, 0.3); border-radius: 4px; }
+
+        .bnm-header {
+          padding: 24px 28px 16px;
+          display: flex; align-items: flex-start; justify-content: space-between;
+          position: sticky; top: 0; background: #faf7f0; z-index: 5;
+        }
+
+        .bnm-title {
+          font-size: 22px; font-weight: 700;
+          color: #1a1209; margin: 0; letter-spacing: -0.01em;
+        }
+        .bnm-subtitle {
+          font-size: 12px; color: #7a6e5d; margin: 3px 0 0; font-weight: 400;
+        }
+
+        .bnm-close {
+          width: 32px; height: 32px; border-radius: 50%;
+          border: 1px solid rgba(184, 142, 60, 0.3);
+          background: #ffffff; color: #6e6354; cursor: pointer;
+          display: flex; align-items: center; justify-content: center;
+          font-size: 16px; flex-shrink: 0; transition: all 0.2s ease;
+          box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+        }
+        .bnm-close:hover { background: rgba(184, 142, 60, 0.1); color: #1a1209; border-color: #b88e3c; }
+
+        .bnm-stepper-container { padding: 0 28px 16px; }
+        .bnm-stepper-track { display: flex; align-items: center; justify-content: space-between; position: relative; }
+        .bnm-stepper-line { flex: 1; height: 1.5px; background: rgba(184, 142, 60, 0.22); margin: 0 8px; transition: background 0.3s ease; }
+        .bnm-stepper-line.active { background: #b88e3c; height: 2px; }
+
+        .bnm-step-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(184, 142, 60, 0.3); }
+        .bnm-step-dot.completed {
+          width: 24px; height: 24px; border-radius: 50%;
+          background: #b88e3c; display: flex; align-items: center; justify-content: center; color: #fff;
+        }
+        .bnm-step-badge {
+          width: 32px; height: 32px; border-radius: 50%;
+          background: linear-gradient(135deg, #c59b4e 0%, #9e7529 100%);
+          display: flex; align-items: center; justify-content: center;
+          color: #ffffff; box-shadow: 0 3px 10px rgba(184, 142, 60, 0.35);
+        }
+
+        .bnm-body { padding: 0 28px 24px; }
+        .bnm-card {
+          background: #ffffff; border: 1px solid rgba(184, 142, 60, 0.2);
+          border-radius: 14px; padding: 16px 18px; margin-bottom: 14px;
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02); position: relative;
+        }
+
+        .bnm-section-label {
+          font-size: 10.5px; font-weight: 700; color: #8e7c66;
+          text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 12px;
+        }
+
+        .bnm-pay-option {
+          border: 1.5px solid rgba(184, 142, 60, 0.22); border-radius: 14px;
+          padding: 16px 18px; cursor: pointer; transition: all 0.2s ease;
+          background: #ffffff; display: flex; align-items: flex-start;
+          gap: 14px; width: 100%; box-sizing: border-box; margin-bottom: 12px;
+          text-align: left; position: relative; overflow: hidden;
+        }
+        .bnm-pay-option.active {
+          border-color: #b88e3c; border-width: 2px;
+          box-shadow: 0 4px 14px rgba(184, 142, 60, 0.12);
+        }
+        .bnm-pay-option:hover { border-color: rgba(184, 142, 60, 0.6); }
+
+        .bnm-corner-ribbon {
+          position: absolute; top: 0; right: 0; width: 28px; height: 28px;
+          background: linear-gradient(135deg, #b88e3c, #9e7529);
+          border-bottom-left-radius: 10px; display: flex; align-items: center;
+          justify-content: center; color: #ffffff; box-shadow: 0 2px 6px rgba(184, 142, 60, 0.3);
+        }
+
+        .bnm-radio {
+          width: 20px; height: 20px; border-radius: 50%;
+          border: 2px solid rgba(184, 142, 60, 0.4); flex-shrink: 0;
+          display: flex; align-items: center; justify-content: center;
+          transition: all 0.2s ease; margin-top: 1px;
+        }
+        .bnm-radio.active { border-color: #b88e3c; background: #b88e3c; }
+        .bnm-radio.active::after { content: ''; width: 7px; height: 7px; background: #ffffff; border-radius: 50%; }
+
+        .bnm-bank-details {
+          background: #faf7f0; border: 1px solid rgba(184, 142, 60, 0.2);
+          border-radius: 12px; padding: 14px 16px; margin-top: 12px;
+        }
+
+        .bnm-bank-row {
+          display: flex; justify-content: space-between; font-size: 12.5px;
+          line-height: 1.7; color: #1a1209;
+        }
+        .bnm-bank-row + .bnm-bank-row {
+          border-top: 1px solid rgba(184, 142, 60, 0.12);
+          margin-top: 6px; padding-top: 6px;
+        }
+
+        .bnm-info-box {
+          background: #fffbeb; border: 1px solid rgba(245, 158, 11, 0.3);
+          border-radius: 10px; padding: 12px 14px; margin-top: 12px;
+          display: flex; gap: 10px; align-items: flex-start;
+        }
+
+        .bnm-receipt-upload {
+          border: 2px dashed rgba(184, 142, 60, 0.35);
+          border-radius: 12px; padding: 16px; text-align: center;
+          cursor: pointer; transition: all 0.2s ease; position: relative;
+          overflow: hidden; margin-top: 12px; background: #ffffff;
+        }
+        .bnm-receipt-upload:hover { border-color: #b88e3c; background: rgba(184, 142, 60, 0.03); }
+        .bnm-receipt-upload input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+
+        .bnm-btn-primary {
+          width: 100%; height: 48px;
+          background: linear-gradient(135deg, #c59b4e 0%, #936f26 100%);
+          color: #ffffff; border: none; border-radius: 12px;
+          cursor: pointer; font-family: 'Jost', sans-serif; font-size: 12.5px;
+          font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+          transition: all 0.2s ease; display: flex; align-items: center;
+          justify-content: center; gap: 8px; box-shadow: 0 4px 14px rgba(184, 142, 60, 0.28);
+          margin-top: 4px;
+        }
+        .bnm-btn-primary:hover:not(:disabled) {
+          background: linear-gradient(135deg, #d4a755 0%, #a47c2d 100%);
+          box-shadow: 0 6px 18px rgba(184, 142, 60, 0.38); transform: translateY(-1px);
+        }
+        .bnm-btn-primary:disabled { opacity: 0.6; cursor: not-allowed; box-shadow: none; }
+
+        .bnm-btn-outline {
+          width: 100%; height: 46px; background: transparent;
+          border: 1.5px solid rgba(184, 142, 60, 0.45); color: #9e7529;
+          border-radius: 12px; cursor: pointer; font-family: 'Jost', sans-serif;
+          font-size: 12.5px; font-weight: 700; letter-spacing: 0.08em;
+          text-transform: uppercase; margin-top: 10px; transition: all 0.2s ease;
+        }
+        .bnm-btn-outline:hover { border-color: #b88e3c; background: rgba(184, 142, 60, 0.06); color: #b88e3c; }
+
+        .bnm-checkbox-row {
+          display: flex; align-items: flex-start; gap: 10px; padding: 10px 0 2px;
+          cursor: pointer; margin-top: 8px;
+        }
+        .bnm-checkbox {
+          width: 18px; height: 18px; border: 2px solid rgba(184, 142, 60, 0.4);
+          border-radius: 4px; flex-shrink: 0; display: flex; align-items: center;
+          justify-content: center; transition: all 0.2s ease; margin-top: 1px;
+        }
+        .bnm-checkbox.checked { background: #b88e3c; border-color: #b88e3c; }
+
+        .bnm-trust-footer {
+          display: flex; align-items: center; justify-content: space-around;
+          margin-top: 20px; padding-top: 16px; border-top: 1px solid rgba(184, 142, 60, 0.18);
+        }
+        .bnm-trust-item {
+          display: flex; align-items: center; gap: 6px; font-size: 11.5px;
+          font-weight: 600; color: #6e6354;
+        }
+
         /* MODALS */
         .modal-overlay {
           position: fixed;
@@ -1816,89 +2002,123 @@ export default function CartPage() {
 
       {/* CONFIRMATION PURCHASE MODAL (2-STEP CHECKOUT FLOW) */}
       {showConfirmModal && (
-        <div className="modal-overlay" onClick={() => setShowConfirmModal(false)}>
-          <div className="modal-box" onClick={e => e.stopPropagation()} style={{ maxWidth: 520 }}>
-            {/* Step Navigation Indicator */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
-              <div style={{ width: 8, height: 8, borderRadius: '50%', background: confirmStep === 'details' ? '#8b6914' : 'rgba(139,105,20,0.3)', transform: confirmStep === 'details' ? 'scale(1.2)' : 'none', transition: 'all 0.2s ease' }} />
-              <div style={{ flex: 1, height: 1, background: 'rgba(139,105,20,0.15)' }} />
-              <div style={{ width: 8, height: 8, borderRadius: '50%', background: confirmStep === 'payment' ? '#8b6914' : 'rgba(139,105,20,0.3)', transform: confirmStep === 'payment' ? 'scale(1.2)' : 'none', transition: 'all 0.2s ease' }} />
+        <div className="bnm-overlay" onClick={() => setShowConfirmModal(false)}>
+          <div className="bnm-dialog" onClick={e => e.stopPropagation()}>
+            {/* Header */}
+            <div className="bnm-header">
+              <div>
+                <h2 className="bnm-title">
+                  {confirmStep === 'details' ? 'Review Purchase' : 'Select Payment'}
+                </h2>
+                <p className="bnm-subtitle">
+                  {confirmStep === 'details' ? 'Verify your delivery details' : 'Choose how you would like to pay'}
+                </p>
+              </div>
+              <button className="bnm-close" onClick={() => setShowConfirmModal(false)} aria-label="Close modal">&#215;</button>
             </div>
 
-            <h3 className="modal-title">
-              {confirmStep === 'details' ? 'Step 1: Delivery & Product Details' : 'Step 2: Select Payment Method'}
-            </h3>
-            <p className="modal-subtitle">
-              {confirmStep === 'details'
-                ? 'Confirm your delivery destination and purchase timepieces.'
-                : 'Select your preferred payment method to complete checkout.'}
-            </p>
+            {/* Stepper Progress Bar */}
+            <div className="bnm-stepper-container">
+              <div className="bnm-stepper-track">
+                {confirmStep === 'details' ? (
+                  <>
+                    <div className="bnm-step-badge">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
+                    </div>
+                    <div className="bnm-stepper-line" />
+                    <div className="bnm-step-dot" />
+                    <div className="bnm-stepper-line" />
+                    <div className="bnm-step-dot" />
+                  </>
+                ) : (
+                  <>
+                    <div className="bnm-step-dot completed">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="20 6 9 17 4 12" /></svg>
+                    </div>
+                    <div className="bnm-stepper-line active" />
+                    <div className="bnm-step-badge">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
+                    </div>
+                    <div className="bnm-stepper-line" />
+                    <div className="bnm-step-dot" />
+                  </>
+                )}
+              </div>
+            </div>
 
-            {/* ── STEP 1: REVIEW DELIVERY & PRODUCT DETAILS ── */}
-            {confirmStep === 'details' && (
-              <>
-                <div style={{ maxHeight: 'calc(90vh - 280px)', overflowY: 'auto', paddingRight: '4px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
-                  {/* Delivery Destination */}
-                  <div className="modal-block" style={{ margin: 0 }}>
-                    <div className="modal-block-header">Delivery Destination</div>
-                    {isProfileComplete ? (
-                      <div>
-                        <p style={{ margin: 0, color: '#1a1209', fontSize: '13px', lineHeight: 1.6 }}>
-                          <strong>{user?.fullName || profile?.name || 'Patron'}</strong><br />
-                          {profile?.address}<br />
-                          {profile?.city}, {profile?.postalCode}<br />
-                          {profile?.country}<br />
-                          <span style={{ color: 'rgba(26,18,9,0.6)', fontSize: '12px' }}>{profile?.mobileCode} {profile?.mobile}</span>
-                        </p>
-                        <div style={{ marginTop: '8px' }}>
-                          <Link href="/profile" onClick={() => setShowConfirmModal(false)} style={{ color: '#8B6914', fontSize: '11.5px', textDecoration: 'underline', fontWeight: 500 }}>
-                            Edit Shipping Profile
-                          </Link>
+            <div className="bnm-body">
+              {/* ── STEP 1: REVIEW PURCHASE ── */}
+              {confirmStep === 'details' && (
+                <>
+                  {/* DELIVERING TO */}
+                  <div className="bnm-section-label">Delivering To</div>
+                  {isProfileComplete ? (
+                    <div className="bnm-card">
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                        <div style={{ fontSize: '14px', color: '#1a1209', fontWeight: 700 }}>
+                          {user?.fullName || profile?.name || 'Patron'}
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#b88e3c" strokeWidth="2" style={{ flexShrink: 0, marginTop: 3 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" /></svg>
+                          <span style={{ fontSize: '13px', color: '#1a1209', lineHeight: 1.5 }}>
+                            {profile?.address}, {profile?.city}, {profile?.postalCode}, {profile?.country}
+                          </span>
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#b88e3c" strokeWidth="2" style={{ flexShrink: 0 }}><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" /></svg>
+                          <span style={{ fontSize: '13px', color: '#1a1209' }}>{profile?.mobileCode} {profile?.mobile}</span>
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 4, paddingTop: 8, borderTop: '1px solid rgba(184,142,60,0.12)' }}>
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#b88e3c" strokeWidth="2" style={{ flexShrink: 0 }}><path d="M12 20h9" /><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" /></svg>
+                          <span style={{ fontSize: '11.5px', color: '#7a6e5d' }}>
+                            To change your address, visit{' '}
+                            <Link href="/profile" onClick={() => setShowConfirmModal(false)} style={{ color: '#b88e3c', fontWeight: 700, textDecoration: 'none' }}>Profile settings.</Link>
+                          </span>
                         </div>
                       </div>
-                    ) : (
-                      <div style={{ background: 'rgba(198,40,40,0.05)', border: '1px solid rgba(198,40,40,0.2)', borderRadius: 8, padding: '12px 14px' }}>
-                        <div style={{ fontSize: '12.5px', color: '#c62828', fontWeight: 600, marginBottom: 4 }}>
-                          Shipping address incomplete
-                        </div>
-                        <div style={{ fontSize: '11.5px', color: 'rgba(26,18,9,0.6)', marginBottom: 8 }}>
-                          Please complete your address in <strong>Profile &rarr; Profile Details</strong> before proceeding.
-                        </div>
-                        <Link href="/profile" onClick={() => setShowConfirmModal(false)} style={{ display: 'inline-block', background: '#c62828', color: '#fff', padding: '6px 12px', borderRadius: 4, fontSize: '11px', fontWeight: 600, textDecoration: 'none' }}>
-                          Complete Profile &rarr;
-                        </Link>
+                    </div>
+                  ) : (
+                    <div style={{ background: 'rgba(198,40,40,0.04)', border: '1px solid rgba(198,40,40,0.2)', borderRadius: 12, padding: '14px 16px', marginBottom: 14 }}>
+                      <div style={{ fontSize: '13px', color: '#c62828', fontWeight: 700, marginBottom: 4 }}>
+                        Shipping address incomplete
                       </div>
-                    )}
-                  </div>
+                      <div style={{ fontSize: '12px', color: '#7a6e5d', marginBottom: 8 }}>
+                        Please complete your address in <strong>Profile &rarr; Profile Details</strong> before purchasing.
+                      </div>
+                      <Link href="/profile" onClick={() => setShowConfirmModal(false)} style={{ display: 'inline-block', background: '#b88e3c', color: '#fff', padding: '6px 14px', borderRadius: 8, fontSize: '11.5px', fontWeight: 700, textDecoration: 'none' }}>
+                        Complete Profile &rarr;
+                      </Link>
+                    </div>
+                  )}
 
-                  {/* Purchase Timepieces */}
-                  <div className="modal-block" style={{ margin: 0, wordBreak: 'break-word', overflowWrap: 'break-word' }}>
-                    <div className="modal-block-header">Purchase Timepieces ({selectedCount})</div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  {/* YOUR ITEMS */}
+                  <div className="bnm-section-label">Your Item{selectedItemsList.length > 1 ? 's' : ''} ({selectedCount})</div>
+                  <div className="bnm-card">
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                       {selectedItemsList.map((item, idx) => {
                         const key = `${item.productId}-${item.colorVariant || ''}`;
                         const gift = giftDetails[key];
                         return (
-                          <div key={idx} style={{ display: 'flex', gap: '12px', alignItems: 'center', borderBottom: idx < selectedItemsList.length - 1 ? '1px dashed rgba(139,105,20,0.1)' : 'none', paddingBottom: idx < selectedItemsList.length - 1 ? '8px' : '0' }}>
+                          <div key={idx} style={{ display: 'flex', gap: 12, alignItems: 'center', borderBottom: idx < selectedItemsList.length - 1 ? '1px dashed rgba(184,142,60,0.15)' : 'none', paddingBottom: idx < selectedItemsList.length - 1 ? '10px' : '0' }}>
                             <img
                               src={item.product?.thumbnail?.url || '/mens-watch-highlight.png'}
                               alt={item.product?.title || 'Watch'}
-                              style={{ width: 44, height: 44, objectFit: 'contain', borderRadius: 6, background: '#faf7f0', flexShrink: 0 }}
+                              style={{ width: 54, height: 54, objectFit: 'contain', borderRadius: 10, background: '#faf7f0', flexShrink: 0, border: '1px solid rgba(184,142,60,0.15)' }}
                             />
                             <div style={{ flex: 1, minWidth: 0 }}>
-                              <div style={{ fontSize: '13px', fontWeight: 600, color: '#1a1209', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                              <div style={{ fontSize: '14px', fontWeight: 700, color: '#1a1209', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                                 {item.product?.title}
                               </div>
-                              <div style={{ fontSize: '11px', color: 'rgba(26,18,9,0.5)', marginTop: 2 }}>
+                              <div style={{ fontSize: '11.5px', color: '#7a6e5d', marginTop: 2 }}>
                                 {item.colorVariant && `${item.colorVariant} · `}Qty {item.quantity}
                               </div>
                               {gift?.isGift && (
-                                <div style={{ fontSize: '10.5px', color: '#8b6914', marginTop: 2 }}>
+                                <div style={{ fontSize: '10.5px', color: '#b88e3c', marginTop: 2, fontWeight: 600 }}>
                                   🎁 Gifting Configured
                                 </div>
                               )}
                             </div>
-                            <div style={{ fontSize: '13px', fontWeight: 700, color: '#8B6914', fontFamily: 'monospace', flexShrink: 0 }}>
+                            <div style={{ fontSize: '15px', fontWeight: 800, color: '#b88e3c', fontFamily: 'monospace', flexShrink: 0 }}>
                               {convertPrice((item.product?.price || 0) * item.quantity)}
                             </div>
                           </div>
@@ -1907,44 +2127,35 @@ export default function CartPage() {
                     </div>
                   </div>
 
-                  {/* Order Subtotal & Total */}
-                  <div style={{ padding: '4px 0 0' }}>
-                    {appliedCoupon ? (
-                      <>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-                          <span style={{ fontSize: '12.5px', color: 'rgba(26,18,9,0.5)' }}>Subtotal:</span>
-                          <span style={{ fontSize: '13.5px', fontWeight: 500, color: 'rgba(26,18,9,0.7)', textDecoration: 'line-through' }}>{convertPrice(selectedSubtotal)}</span>
-                        </div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-                          <span style={{ fontSize: '12.5px', color: '#15803d', fontWeight: 600 }}>
-                            Coupon {appliedCoupon.code} ({appliedCoupon.discountPercent}% off):
-                          </span>
-                          <span style={{ fontSize: '13.5px', fontWeight: 600, color: '#15803d' }}>
-                            - {convertPrice(Math.round((selectedSubtotal * appliedCoupon.discountPercent) / 100))}
-                          </span>
-                        </div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid rgba(26,18,9,0.08)', paddingTop: 8 }}>
-                          <span style={{ fontSize: '13px', fontWeight: 600, color: 'rgba(26,18,9,0.7)' }}>Total Amount:</span>
-                          <span style={{ fontSize: '20px', fontWeight: 700, color: '#8B6914', fontFamily: 'monospace' }}>
-                            {convertPrice(Math.max(0, selectedSubtotal - Math.round((selectedSubtotal * appliedCoupon.discountPercent) / 100)))}
-                          </span>
-                        </div>
-                      </>
-                    ) : (
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <span style={{ fontSize: '13px', fontWeight: 600, color: 'rgba(26,18,9,0.7)' }}>Total Amount:</span>
-                        <span style={{ fontSize: '20px', fontWeight: 700, color: '#8B6914', fontFamily: 'monospace' }}>{convertPrice(selectedSubtotal)}</span>
+                  {/* ORDER TOTAL CARD */}
+                  <div className="bnm-card" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                      <div style={{ width: 38, height: 38, borderRadius: 10, background: 'rgba(184,142,60,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#b88e3c' }}>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="4" y="2" width="16" height="20" rx="2" ry="2" /><line x1="8" y1="6" x2="16" y2="6" /><line x1="8" y1="10" x2="16" y2="10" /><line x1="8" y1="14" x2="12" y2="14" /></svg>
                       </div>
-                    )}
+                      <div>
+                        <div style={{ fontSize: '12px', fontWeight: 800, color: '#1a1209', letterSpacing: '0.06em', textTransform: 'uppercase' }}>Order Total</div>
+                        <div style={{ fontSize: '11px', color: '#7a6e5d' }}>Inclusive of all taxes</div>
+                      </div>
+                    </div>
+                    <div style={{ textAlign: 'right' }}>
+                      {appliedCoupon ? (
+                        <>
+                          <div style={{ fontSize: '11px', color: '#7a6e5d', textDecoration: 'line-through' }}>{convertPrice(selectedSubtotal)}</div>
+                          <div style={{ fontSize: '19px', fontWeight: 800, color: '#b88e3c' }}>
+                            {convertPrice(Math.max(0, selectedSubtotal - Math.round((selectedSubtotal * appliedCoupon.discountPercent) / 100)))}
+                          </div>
+                        </>
+                      ) : (
+                        <div style={{ fontSize: '19px', fontWeight: 800, color: '#b88e3c' }}>
+                          {convertPrice(selectedSubtotal)}
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
 
-                <div className="modal-actions" style={{ marginTop: 18 }}>
-                  <button className="modal-btn cancel" onClick={() => setShowConfirmModal(false)}>
-                    Cancel
-                  </button>
                   <button
-                    className="modal-btn confirm"
+                    className="bnm-btn-primary"
                     onClick={() => {
                       if (!isProfileComplete) {
                         toast.error('Please complete your shipping profile address before proceeding.');
@@ -1953,147 +2164,174 @@ export default function CartPage() {
                       setConfirmStep('payment');
                     }}
                     disabled={!isProfileComplete}
-                    style={{ opacity: !isProfileComplete ? 0.6 : 1, cursor: !isProfileComplete ? 'not-allowed' : 'pointer' }}
                   >
-                    Continue to Payment &rarr;
+                    Continue to Payment &#8594;
                   </button>
-                </div>
-              </>
-            )}
+                  <button className="bnm-btn-outline" onClick={() => setShowConfirmModal(false)}>Cancel</button>
 
-            {/* ── STEP 2: SELECT PAYMENT METHOD ── */}
-            {confirmStep === 'payment' && (
-              <>
-                <div style={{ maxHeight: 'calc(90vh - 280px)', overflowY: 'auto', paddingRight: '4px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
-                  {/* Order Total Bar */}
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 14px', background: '#fff', border: '1px solid rgba(139,105,20,0.15)', borderRadius: 10 }}>
-                    <span style={{ fontSize: '12px', color: 'rgba(26,18,9,0.55)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Amount Payable</span>
-                    <span style={{ fontSize: '20px', fontWeight: 700, color: '#8b6914', fontFamily: 'monospace' }}>
+                  {/* Trust Badges Footer */}
+                  <div className="bnm-trust-footer">
+                    <div className="bnm-trust-item">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#b88e3c" strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /><polyline points="9 12 11 14 15 10" /></svg>
+                      <span>100% Authentic</span>
+                    </div>
+                    <div className="bnm-trust-item">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#b88e3c" strokeWidth="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
+                      <span>Secure Payment</span>
+                    </div>
+                    <div className="bnm-trust-item">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#b88e3c" strokeWidth="2"><polyline points="1 4 1 10 7 10" /><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" /></svg>
+                      <span>Easy Returns</span>
+                    </div>
+                  </div>
+                </>
+              )}
+
+              {/* ── STEP 2: SELECT PAYMENT ── */}
+              {confirmStep === 'payment' && (
+                <>
+                  {/* Total Bar */}
+                  <div className="bnm-card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '14px 18px' }}>
+                    <span style={{ fontSize: '11.5px', color: '#7a6e5d', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Order Total</span>
+                    <span style={{ fontSize: '20px', fontWeight: 800, color: '#b88e3c' }}>
                       {appliedCoupon
                         ? convertPrice(Math.max(0, selectedSubtotal - Math.round((selectedSubtotal * appliedCoupon.discountPercent) / 100)))
                         : convertPrice(selectedSubtotal)}
                     </span>
                   </div>
 
-                  {/* Payment Method Selector */}
-                  <div className="modal-block" style={{ margin: 0 }}>
-                    <div className="modal-block-header">Select Payment Method</div>
+                  <div className="bnm-section-label">Payment Method</div>
 
-                    {/* PayHere Card Option */}
-                    <button type="button" onClick={() => { setPaymentMethod('card'); setBankReceipt(null); setBankReceiptName(''); setBankTransferConfirmed(false); }}
-                      style={{ border: `2px solid ${paymentMethod === 'card' ? '#8b6914' : 'rgba(139,105,20,0.2)'}`, borderRadius: 10, padding: '12px 14px', cursor: 'pointer', transition: 'all 0.2s ease', background: paymentMethod === 'card' ? 'rgba(139,105,20,0.04)' : '#fff', display: 'flex', alignItems: 'center', gap: 10, width: '100%', boxSizing: 'border-box' as const, marginBottom: 8, textAlign: 'left' as const, boxShadow: paymentMethod === 'card' ? '0 0 0 3px rgba(139,105,20,0.08)' : 'none' }}>
-                      <div style={{ width: 16, height: 16, borderRadius: '50%', border: `2px solid ${paymentMethod === 'card' ? '#8b6914' : 'rgba(139,105,20,0.35)'}`, background: paymentMethod === 'card' ? '#8b6914' : 'transparent', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        {paymentMethod === 'card' && <div style={{ width: 5, height: 5, background: '#fff', borderRadius: '50%' }} />}
+                  {/* Option 1: Pay via PayHere */}
+                  <div
+                    className={`bnm-pay-option ${paymentMethod === 'card' ? 'active' : ''}`}
+                    onClick={() => { setPaymentMethod('card'); setBankReceipt(null); setBankReceiptName(''); setBankTransferConfirmed(false); }}
+                  >
+                    <div className={`bnm-radio ${paymentMethod === 'card' ? 'active' : ''}`} />
+                    <div style={{ flex: 1 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#b88e3c" strokeWidth="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2" /><line x1="1" y1="10" x2="23" y2="10" /></svg>
+                        <span style={{ fontWeight: 700, fontSize: '14px', color: '#1a1209' }}>Pay via PayHere</span>
                       </div>
-                      <div style={{ flex: 1 }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8b6914" strokeWidth="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2" /><line x1="1" y1="10" x2="23" y2="10" /></svg>
-                          <span style={{ fontWeight: 700, fontSize: '13px', color: '#1a1209' }}>Pay via PayHere</span>
-                          <span style={{ fontSize: '9px', fontWeight: 700, color: '#2e7d32', background: 'rgba(46,125,50,0.1)', border: '1px solid rgba(46,125,50,0.25)', borderRadius: 3, padding: '1px 6px', textTransform: 'uppercase' as const, letterSpacing: '0.06em' }}>Secure</span>
-                        </div>
-                        <div style={{ fontSize: '11px', color: 'rgba(26,18,9,0.5)', marginTop: 2 }}>Visa &middot; Mastercard &middot; Amex &middot; eWallet &middot; Bank &middot; USSD</div>
+                      <div style={{ fontSize: '11px', color: '#7a6e5d', marginTop: 3 }}>
+                        Visa · Mastercard · Amex · eWallet · Bank · USSD
                       </div>
-                    </button>
+                      <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap', marginTop: 8 }}>
+                        {['VISA', 'mastercard', 'AMEX', 'eWallets', 'BANK', 'USSD'].map((b) => (
+                          <span key={b} style={{ fontSize: '8.5px', fontWeight: 800, color: '#4a3f31', background: '#f5f0e6', border: '1px solid rgba(184,142,60,0.25)', borderRadius: 3, padding: '1px 5px', textTransform: 'uppercase' }}>
+                            {b}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
 
-                    {/* Bank Transfer Option */}
-                    <button type="button" onClick={() => setPaymentMethod('bank_transfer')}
-                      style={{ border: `2px solid ${paymentMethod === 'bank_transfer' ? '#8b6914' : 'rgba(139,105,20,0.2)'}`, borderRadius: 10, padding: '12px 14px', cursor: 'pointer', transition: 'all 0.2s ease', background: paymentMethod === 'bank_transfer' ? 'rgba(139,105,20,0.04)' : '#fff', display: 'flex', alignItems: 'center', gap: 10, width: '100%', boxSizing: 'border-box' as const, marginBottom: 0, textAlign: 'left' as const, boxShadow: paymentMethod === 'bank_transfer' ? '0 0 0 3px rgba(139,105,20,0.08)' : 'none' }}>
-                      <div style={{ width: 16, height: 16, borderRadius: '50%', border: `2px solid ${paymentMethod === 'bank_transfer' ? '#8b6914' : 'rgba(139,105,20,0.35)'}`, background: paymentMethod === 'bank_transfer' ? '#8b6914' : 'transparent', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        {paymentMethod === 'bank_transfer' && <div style={{ width: 5, height: 5, background: '#fff', borderRadius: '50%' }} />}
-                      </div>
-                      <div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8b6914" strokeWidth="2"><line x1="12" y1="1" x2="12" y2="23" /><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" /></svg>
-                          <span style={{ fontWeight: 700, fontSize: '13px', color: '#1a1209' }}>Direct Bank Transfer</span>
-                        </div>
-                        <div style={{ fontSize: '11px', color: 'rgba(26,18,9,0.5)', marginTop: 2 }}>Transfer &amp; upload receipt &mdash; verified within 24 hrs</div>
-                      </div>
-                    </button>
-
-                    {/* Bank Transfer Details (conditional) */}
+                  {/* Option 2: Direct Bank Transfer */}
+                  <div
+                    className={`bnm-pay-option ${paymentMethod === 'bank_transfer' ? 'active' : ''}`}
+                    onClick={() => setPaymentMethod('bank_transfer')}
+                  >
                     {paymentMethod === 'bank_transfer' && (
-                      <div style={{ marginTop: 12 }}>
-                        <div style={{ background: 'rgba(139,105,20,0.05)', border: '1px solid rgba(139,105,20,0.18)', borderRadius: 8, padding: '10px 12px', marginBottom: 10 }}>
-                          <div style={{ fontSize: '9px', fontWeight: 700, color: 'rgba(26,18,9,0.45)', textTransform: 'uppercase' as const, letterSpacing: '0.1em', marginBottom: 6 }}>Bank Transfer Details</div>
-                          {[['Bank', 'NATIONS TRUST BANK'], ['Account No.', '100460045365'], ['Branch', 'Bankshall Street (PETTAH)'], ['Amount', appliedCoupon ? `LKR ${Math.max(0, selectedSubtotal - Math.round(selectedSubtotal * appliedCoupon.discountPercent / 100)).toLocaleString()}` : `LKR ${selectedSubtotal.toLocaleString()}`]].map(([label, value], i) => (
-                            <div key={i} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', borderTop: i > 0 ? '1px solid rgba(139,105,20,0.1)' : undefined, marginTop: i > 0 ? 5 : 0, paddingTop: i > 0 ? 5 : 0, color: '#1a1209' }}>
-                              <span style={{ color: 'rgba(26,18,9,0.5)', fontSize: '10.5px' }}>{label}</span>
-                              <span style={{ fontWeight: label === 'Amount' ? 700 : 600, color: label === 'Amount' ? '#8b6914' : '#1a1209', fontFamily: label === 'Account No.' ? 'monospace' : undefined }}>{value}</span>
-                            </div>
-                          ))}
-                        </div>
+                      <div className="bnm-corner-ribbon" title="Selected">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="20 6 9 17 4 12" /></svg>
+                      </div>
+                    )}
+                    <div className={`bnm-radio ${paymentMethod === 'bank_transfer' ? 'active' : ''}`} />
+                    <div style={{ flex: 1 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#b88e3c" strokeWidth="2"><line x1="3" y1="21" x2="21" y2="21" /><line x1="6" y1="18" x2="6" y2="11" /><line x1="10" y1="18" x2="10" y2="11" /><line x1="14" y1="18" x2="14" y2="11" /><line x1="18" y1="18" x2="18" y2="11" /><polygon points="12 3 2 10 22 10 12 3" /></svg>
+                        <span style={{ fontWeight: 700, fontSize: '14px', color: '#1a1209' }}>Direct Bank Transfer</span>
+                      </div>
+                      <div style={{ fontSize: '11.5px', color: '#7a6e5d', marginTop: 3 }}>
+                        Transfer and upload receipt – verified within 24 hrs
+                      </div>
+                    </div>
+                  </div>
 
-                        <label style={{ display: 'block', fontSize: '9px', fontWeight: 700, color: 'rgba(26,18,9,0.55)', textTransform: 'uppercase' as const, letterSpacing: '0.1em', marginBottom: 5 }}>Upload Transfer Receipt</label>
-                        <div style={{ border: '2px dashed rgba(139,105,20,0.3)', borderRadius: 8, padding: '12px', textAlign: 'center', cursor: 'pointer', position: 'relative', overflow: 'hidden', marginBottom: 10 }}>
-                          <input type="file" accept=".jpg,.jpeg,.png,.webp,.pdf" onChange={handleBankReceiptSelect} style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer', width: '100%', height: '100%' }} />
-                          {bankReceiptName ? (
-                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
-                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2e7d32" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg>
-                              <span style={{ fontSize: '12px', color: '#2e7d32', fontWeight: 600 }}>{bankReceiptName}</span>
-                            </div>
-                          ) : (
-                            <div>
-                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(139,105,20,0.5)" strokeWidth="1.5" style={{ marginBottom: 4 }}><polyline points="16 16 12 12 8 16" /><line x1="12" y1="12" x2="12" y2="21" /><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3" /></svg>
-                              <div style={{ fontSize: '12px', color: 'rgba(26,18,9,0.6)', fontWeight: 500 }}>Click to upload receipt</div>
-                              <div style={{ fontSize: '10px', color: 'rgba(26,18,9,0.35)', marginTop: 2 }}>PDF, JPG, PNG, WEBP &middot; Max 10 MB</div>
-                            </div>
-                          )}
-                        </div>
-
-                        <div onClick={() => setBankTransferConfirmed(v => !v)} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, cursor: 'pointer' }}>
-                          <div style={{ width: 16, height: 16, border: `2px solid ${bankTransferConfirmed ? '#8b6914' : 'rgba(139,105,20,0.35)'}`, borderRadius: 3, background: bankTransferConfirmed ? '#8b6914' : 'transparent', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 1, transition: 'all 0.2s ease' }}>
-                            {bankTransferConfirmed && <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3"><polyline points="20 6 9 17 4 12" /></svg>}
-                          </div>
-                          <span style={{ fontSize: '12px', color: 'rgba(26,18,9,0.7)', lineHeight: 1.5 }}>
-                            I confirm I have transferred{' '}
-                            <strong>{appliedCoupon ? `LKR ${Math.max(0, selectedSubtotal - Math.round(selectedSubtotal * appliedCoupon.discountPercent / 100)).toLocaleString()}` : `LKR ${selectedSubtotal.toLocaleString()}`}</strong>{' '}
-                            to the account above.
+                  {paymentMethod === 'bank_transfer' && (
+                    <>
+                      <div className="bnm-bank-details">
+                        <div style={{ fontSize: '9.5px', fontWeight: 700, color: '#8e7c66', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 8 }}>Bank Transfer Details</div>
+                        <div className="bnm-bank-row"><span style={{ color: '#7a6e5d', fontSize: '11.5px' }}>Bank</span><span style={{ fontWeight: 700 }}>NATIONS TRUST BANK</span></div>
+                        <div className="bnm-bank-row"><span style={{ color: '#7a6e5d', fontSize: '11.5px' }}>Account No.</span><span style={{ fontWeight: 700, fontFamily: 'monospace' }}>100460045365</span></div>
+                        <div className="bnm-bank-row"><span style={{ color: '#7a6e5d', fontSize: '11.5px' }}>Branch</span><span style={{ fontWeight: 700 }}>Bankshall Street (PETTAH)</span></div>
+                        <div className="bnm-bank-row">
+                          <span style={{ color: '#7a6e5d', fontSize: '11.5px' }}>Amount</span>
+                          <span style={{ fontWeight: 800, color: '#b88e3c' }}>
+                            {appliedCoupon
+                              ? convertPrice(Math.max(0, selectedSubtotal - Math.round((selectedSubtotal * appliedCoupon.discountPercent) / 100)))
+                              : convertPrice(selectedSubtotal)}
                           </span>
                         </div>
                       </div>
-                    )}
-                  </div>
-                </div>
 
-                <div className="modal-actions" style={{ marginTop: 18 }}>
-                  <button className="modal-btn cancel" onClick={() => setConfirmStep('details')}>
-                    &larr; Back to Details
-                  </button>
+                      <div className="bnm-info-box">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#d97706" strokeWidth="2" style={{ flexShrink: 0, marginTop: 1 }}><circle cx="12" cy="12" r="10" /><line x1="12" y1="16" x2="12" y2="12" /><line x1="12" y1="8" x2="12.01" y2="8" /></svg>
+                        <span style={{ fontSize: '11.5px', color: '#92400e', lineHeight: 1.5 }}>
+                          Please upload your payment receipt after completing the transfer. Your order will be verified within 24 hours.
+                        </span>
+                      </div>
+
+                      <div className="bnm-receipt-upload">
+                        <input type="file" accept=".jpg,.jpeg,.png,.webp,.pdf" onChange={handleBankReceiptSelect} />
+                        {bankReceiptName ? (
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2e7d32" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg>
+                            <span style={{ fontSize: '13px', color: '#2e7d32', fontWeight: 600 }}>{bankReceiptName}</span>
+                          </div>
+                        ) : (
+                          <>
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#b88e3c" strokeWidth="1.5" style={{ margin: '0 auto 6px', display: 'block' }}><polyline points="16 16 12 12 8 16" /><line x1="12" y1="12" x2="12" y2="21" /><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3" /></svg>
+                            <div style={{ fontSize: '12.5px', color: '#1a1209', fontWeight: 600 }}>Click to upload transfer receipt</div>
+                            <div style={{ fontSize: '10.5px', color: '#7a6e5d', marginTop: 3 }}>PDF, JPG, PNG, WEBP · Max 10 MB</div>
+                          </>
+                        )}
+                      </div>
+
+                      <div className="bnm-checkbox-row" onClick={() => setBankTransferConfirmed(v => !v)}>
+                        <div className={`bnm-checkbox ${bankTransferConfirmed ? 'checked' : ''}`}>
+                          {bankTransferConfirmed && <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3"><polyline points="20 6 9 17 4 12" /></svg>}
+                        </div>
+                        <span style={{ fontSize: '12.5px', color: '#1a1209', lineHeight: 1.5 }}>
+                          I confirm I have transferred <strong>{appliedCoupon ? convertPrice(Math.max(0, selectedSubtotal - Math.round(selectedSubtotal * appliedCoupon.discountPercent / 100))) : convertPrice(selectedSubtotal)}</strong> to the account above.
+                        </span>
+                      </div>
+                    </>
+                  )}
+
                   <button
-                    className="modal-btn confirm"
+                    className="bnm-btn-primary"
                     onClick={handlePlaceOrder}
                     disabled={paymentProcessing || bankReceiptUploading || (paymentMethod === 'bank_transfer' && (!bankTransferConfirmed || !bankReceipt))}
-                    style={{ opacity: (paymentProcessing || bankReceiptUploading || (paymentMethod === 'bank_transfer' && (!bankTransferConfirmed || !bankReceipt))) ? 0.6 : 1, cursor: (paymentProcessing || bankReceiptUploading || (paymentMethod === 'bank_transfer' && (!bankTransferConfirmed || !bankReceipt))) ? 'not-allowed' : 'pointer' }}
                   >
                     {(paymentProcessing || bankReceiptUploading) ? (
-                      <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ animation: 'spin 1s linear infinite' }}><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" /></svg>
-                        {bankReceiptUploading ? 'Uploading...' : 'Processing...'}
-                      </span>
+                      <>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ animation: 'bnm-spin 1s linear infinite' }}><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" /></svg>
+                        {bankReceiptUploading ? 'Uploading Receipt...' : 'Processing...'}
+                      </>
                     ) : (
-                      paymentMethod === 'card' ? 'Pay via PayHere' : 'Place Order — Bank Transfer'
+                      <>Confirm &amp; Place Order &#8594;</>
                     )}
                   </button>
-                </div>
+                  <button className="bnm-btn-outline" onClick={() => setConfirmStep('details')}>Back</button>
 
-                {/* Legal Policy Links Notice */}
-                <div style={{ marginTop: '12px', fontSize: '11px', color: 'rgba(26,18,9,0.55)', textAlign: 'center', lineHeight: '1.5' }}>
-                  By placing your order, you agree to Winsor's{' '}
-                  <Link href="/terms" target="_blank" style={{ color: '#8B6914', textDecoration: 'underline', fontWeight: 600 }}>
-                    Terms &amp; Conditions
-                  </Link>
-                  ,{' '}
-                  <Link href="/privacy" target="_blank" style={{ color: '#8B6914', textDecoration: 'underline', fontWeight: 600 }}>
-                    Privacy Policy
-                  </Link>
-                  , and{' '}
-                  <Link href="/warranty" target="_blank" style={{ color: '#8B6914', textDecoration: 'underline', fontWeight: 600 }}>
-                    Warranty Policy
-                  </Link>
-                  .
-                </div>
-              </>
-            )}
+                  <div className="bnm-trust-footer">
+                    <div className="bnm-trust-item">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#b88e3c" strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /><polyline points="9 12 11 14 15 10" /></svg>
+                      <span>100% Authentic</span>
+                    </div>
+                    <div className="bnm-trust-item">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#b88e3c" strokeWidth="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
+                      <span>Secure Payment</span>
+                    </div>
+                    <div className="bnm-trust-item">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#b88e3c" strokeWidth="2"><polyline points="1 4 1 10 7 10" /><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" /></svg>
+                      <span>Easy Returns</span>
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
           </div>
         </div>
       )}

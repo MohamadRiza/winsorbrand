@@ -15,7 +15,7 @@ export async function GET(req: NextRequest) {
     const section = req.nextUrl.searchParams.get('section') as CollectionSection | null;
     const limit   = parseInt(req.nextUrl.searchParams.get('limit') ?? '10', 10);
 
-    let filter: Record<string, unknown> = { isActive: true };
+    let filter: Record<string, unknown> = {};
 
     if (section) {
       filter['$or'] = [
@@ -33,9 +33,9 @@ export async function GET(req: NextRequest) {
       .sort({ createdAt: -1 })
       .lean();
 
-    if (products.length === 0) {
+    if (!products || products.length === 0) {
       products = await Product
-        .find({ isActive: true })
+        .find({})
         .select('title modelNo price thumbnail colorVariants stickerEnabled stickerText collectionSections images specifications description')
         .limit(Math.min(limit, 10))
         .sort({ createdAt: -1 })

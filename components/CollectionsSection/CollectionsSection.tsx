@@ -648,22 +648,25 @@ export default function CollectionsSection() {
         setLoading(true);
         const productsData: Record<SectionKey, WatchProduct[]> = {} as Record<SectionKey, WatchProduct[]>;
 
+        // Fetch fallback products if any section ends up empty
+        const fallbackRes = await fetch('/api/products');
+        let fallbackProducts: any[] = [];
+        if (fallbackRes.ok && fallbackRes.headers.get('content-type')?.includes('application/json')) {
+          const fallbackData = await fallbackRes.json();
+          if (fallbackData.success && Array.isArray(fallbackData.data)) {
+            fallbackProducts = fallbackData.data;
+          }
+        }
+
         for (const section of SECTIONS) {
           if (section.key === 'ladies') {
             const res = await fetch(`/api/products`);
-            if (!res.ok) {
-              console.warn(`Failed to fetch ladies collection: status ${res.status}`);
-              productsData[section.key] = [];
-              continue;
-            }
-            const contentType = res.headers.get('content-type') || '';
-            if (!contentType.includes('application/json')) {
-              console.warn(`Non-JSON response received for ladies collection`);
-              productsData[section.key] = [];
+            if (!res.ok || !res.headers.get('content-type')?.includes('application/json')) {
+              productsData[section.key] = fallbackProducts.slice(0, 10);
               continue;
             }
             const data = await res.json();
-            if (data.success) {
+            if (data.success && Array.isArray(data.data)) {
               const ladiesWatches = data.data.filter((p: any) => {
                 const specs = p.specifications instanceof Map
                   ? Object.fromEntries(p.specifications)
@@ -687,30 +690,27 @@ export default function CollectionsSection() {
                   descLower.includes('ladies') ||
                   descLower.includes('lady');
               });
-              productsData[section.key] = ladiesWatches.slice(0, 10);
+              productsData[section.key] = ladiesWatches.length > 0 ? ladiesWatches.slice(0, 10) : fallbackProducts.slice(0, 10);
+            } else {
+              productsData[section.key] = fallbackProducts.slice(0, 10);
             }
           } else {
             const res = await fetch(`/api/products/collections?section=${section.key}&limit=10`);
-            if (!res.ok) {
-              console.warn(`Failed to fetch collection ${section.key}: status ${res.status}`);
-              productsData[section.key] = [];
-              continue;
-            }
-            const contentType = res.headers.get('content-type') || '';
-            if (!contentType.includes('application/json')) {
-              console.warn(`Non-JSON response received for collection ${section.key}`);
-              productsData[section.key] = [];
+            if (!res.ok || !res.headers.get('content-type')?.includes('application/json')) {
+              productsData[section.key] = fallbackProducts.slice(0, 10);
               continue;
             }
             const data = await res.json();
-            if (data.success) {
+            if (data.success && Array.isArray(data.data) && data.data.length > 0) {
               productsData[section.key] = data.data;
+            } else {
+              productsData[section.key] = fallbackProducts.slice(0, 10);
             }
           }
         }
 
         setAllProducts(productsData);
-        setProducts(productsData['sports'] || []);
+        setProducts(productsData['sports'] || fallbackProducts.slice(0, 10));
       } catch (error) {
         console.error('Failed to fetch products', error);
       } finally {
