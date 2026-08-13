@@ -64,7 +64,7 @@ const FAQ_ITEMS = [
 
 const GOLD = '#8B6914';
 const INK = '#1a1209';
-const CREAM = '#fcfbf8';
+const CREAM = '#FAF7F0';
 const MUTED = 'rgba(26,18,9,0.65)';
 const LINE = 'rgba(26,18,9,0.08)';
 
@@ -128,7 +128,7 @@ export default function FAQPage() {
           opacity: 0.6;
         }
 
-        /* ── Search bar ── */
+        /* ── Search bar (Glassmorphic) ── */
         .faq-search-wrapper {
           position: relative;
           margin-bottom: 36px;
@@ -136,35 +136,39 @@ export default function FAQPage() {
 
         .faq-search-input {
           width: 100%;
-          padding: 14px 20px 14px 48px;
-          border: 1.5px solid rgba(26,18,9,0.1);
+          padding: 16px 20px 16px 52px;
+          border: 1.5px solid rgba(255, 255, 255, 0.85);
           border-radius: 30px;
-          background: #ffffff;
+          background: rgba(255, 255, 255, 0.65);
+          backdrop-filter: blur(16px);
+          -webkit-backdrop-filter: blur(16px);
           font-family: 'Jost', sans-serif;
           font-size: 14px;
           color: ${INK};
           outline: none;
           box-sizing: border-box;
-          transition: all 0.25s ease;
-          box-shadow: 0 4px 20px rgba(26,18,9,0.02);
+          transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+          box-shadow: 0 8px 32px rgba(26, 18, 9, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.9), inset 0 -1px 0 rgba(184, 142, 60, 0.1);
         }
 
         .faq-search-input:focus {
-          border-color: ${GOLD};
-          box-shadow: 0 4px 24px rgba(139,105,20,0.08);
+          background: rgba(255, 255, 255, 0.85);
+          border-color: #B88E3C;
+          box-shadow: 0 12px 36px rgba(184, 142, 60, 0.15), 0 0 0 3.5px rgba(184, 142, 60, 0.12), inset 0 1px 0 #ffffff;
         }
 
         .faq-search-icon {
           position: absolute;
-          left: 18px;
+          left: 20px;
           top: 50%;
           transform: translateY(-50%);
-          color: ${GOLD};
+          color: #B88E3C;
           display: flex;
           align-items: center;
+          pointer-events: none;
         }
 
-        /* ── Categories ── */
+        /* ── Categories (Glass Pills) ── */
         .faq-categories {
           display: flex;
           justify-content: center;
@@ -174,31 +178,36 @@ export default function FAQPage() {
         }
 
         .faq-category-btn {
-          background: transparent;
-          border: 1.5px solid rgba(26,18,9,0.1);
+          background: rgba(255, 255, 255, 0.55);
+          backdrop-filter: blur(12px);
+          -webkit-backdrop-filter: blur(12px);
+          border: 1px solid rgba(255, 255, 255, 0.75);
           border-radius: 20px;
-          padding: 8px 18px;
+          padding: 9px 20px;
           font-family: 'Jost', sans-serif;
           font-size: 12.5px;
-          font-weight: 550;
+          font-weight: 600;
           color: ${MUTED};
           cursor: pointer;
           transition: all 0.25s ease;
+          box-shadow: 0 4px 15px rgba(26, 18, 9, 0.03), inset 0 1px 0 rgba(255, 255, 255, 0.8);
         }
 
         .faq-category-btn.active {
-          background: ${GOLD};
-          border-color: ${GOLD};
+          background: linear-gradient(135deg, #c59b4e 0%, #9e7529 100%);
+          border-color: #b88e3c;
           color: #ffffff;
-          box-shadow: 0 4px 12px rgba(139,105,20,0.2);
+          box-shadow: 0 6px 20px rgba(184, 142, 60, 0.32);
         }
 
         .faq-category-btn:hover:not(.active) {
-          border-color: ${GOLD};
-          color: ${GOLD};
+          border-color: #b88e3c;
+          color: #b88e3c;
+          background: rgba(255, 255, 255, 0.85);
+          transform: translateY(-1px);
         }
 
-        /* ── Accordion List ── */
+        /* ── Accordion List (Glass Cards) ── */
         .faq-list {
           display: flex;
           flex-direction: column;
@@ -206,21 +215,31 @@ export default function FAQPage() {
         }
 
         .faq-item {
-          background: #ffffff;
-          border: 1px solid rgba(26,18,9,0.05);
-          border-radius: 12px;
+          background: rgba(255, 255, 255, 0.65);
+          backdrop-filter: blur(16px);
+          -webkit-backdrop-filter: blur(16px);
+          border: 1.5px solid rgba(255, 255, 255, 0.8);
+          border-radius: 16px;
           overflow: hidden;
-          transition: all 0.25s ease;
-          box-shadow: 0 4px 20px rgba(26,18,9,0.02);
+          transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+          box-shadow: 0 8px 32px rgba(26, 18, 9, 0.03), inset 0 1px 0 rgba(255, 255, 255, 0.9);
         }
 
         .faq-item:hover {
-          border-color: rgba(139,105,20,0.2);
+          border-color: rgba(184, 142, 60, 0.35);
+          box-shadow: 0 12px 36px rgba(26, 18, 9, 0.06), inset 0 1px 0 #ffffff;
+          transform: translateY(-2px);
+        }
+
+        .faq-item.expanded {
+          background: rgba(255, 255, 255, 0.82);
+          border-color: rgba(184, 142, 60, 0.45);
+          box-shadow: 0 14px 40px rgba(184, 142, 60, 0.12), inset 0 1px 0 #ffffff;
         }
 
         .faq-question-btn {
           width: 100%;
-          padding: 20px 24px;
+          padding: 22px 26px;
           background: transparent;
           border: none;
           display: flex;
@@ -228,8 +247,8 @@ export default function FAQPage() {
           align-items: center;
           text-align: left;
           font-family: 'Jost', sans-serif;
-          font-size: 15px;
-          font-weight: 600;
+          font-size: 15.5px;
+          font-weight: 650;
           color: ${INK};
           cursor: pointer;
           gap: 16px;
@@ -240,53 +259,73 @@ export default function FAQPage() {
         }
 
         .faq-arrow {
-          color: ${GOLD};
-          transition: transform 0.25s ease;
+          width: 30px;
+          height: 30px;
+          border-radius: 50%;
+          background: rgba(184, 142, 60, 0.1);
+          border: 1px solid rgba(184, 142, 60, 0.2);
+          color: #b88e3c;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
           flex-shrink: 0;
         }
 
         .faq-item.expanded .faq-arrow {
           transform: rotate(180deg);
+          background: #b88e3c;
+          color: #ffffff;
+          border-color: #b88e3c;
+          box-shadow: 0 4px 12px rgba(184, 142, 60, 0.3);
         }
 
         .faq-answer-panel {
           max-height: 0;
           overflow: hidden;
-          transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-          background: rgba(139,105,20,0.02);
+          transition: max-height 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+          background: rgba(250, 247, 240, 0.5);
+          border-top: 1px solid rgba(184, 142, 60, 0.12);
         }
 
         .faq-item.expanded .faq-answer-panel {
-          max-height: 250px; /* ample height for answers */
+          max-height: 300px;
         }
 
         .faq-answer-content {
-          padding: 0 24px 20px;
+          padding: 18px 26px 24px;
           font-size: 14px;
-          line-height: 1.7;
-          color: rgba(26,18,9,0.72);
+          line-height: 1.75;
+          color: rgba(26, 18, 9, 0.78);
         }
 
         .faq-empty {
           text-align: center;
-          padding: 40px 20px;
+          padding: 48px 20px;
           color: ${MUTED};
           font-size: 14px;
+          background: rgba(255, 255, 255, 0.5);
+          backdrop-filter: blur(12px);
+          border-radius: 16px;
+          border: 1px dashed rgba(184, 142, 60, 0.25);
         }
 
-        /* ── Help Desk ── */
+        /* ── Help Desk (Glass Card) ── */
         .faq-footer {
           margin-top: 60px;
           text-align: center;
-          padding: 30px;
-          background: rgba(139,105,20,0.03);
-          border: 1px dashed rgba(139,105,20,0.18);
-          border-radius: 12px;
+          padding: 36px 28px;
+          background: rgba(255, 255, 255, 0.55);
+          backdrop-filter: blur(16px);
+          -webkit-backdrop-filter: blur(16px);
+          border: 1.5px dashed rgba(184, 142, 60, 0.3);
+          border-radius: 20px;
+          box-shadow: 0 10px 32px rgba(26, 18, 9, 0.03), inset 0 1px 0 rgba(255, 255, 255, 0.9);
         }
 
         .faq-footer h3 {
           font-family: 'Cormorant Garamond', Georgia, serif;
-          font-size: 22px;
+          font-size: 24px;
           font-weight: 600;
           color: ${INK};
           margin: 0 0 8px 0;
@@ -295,27 +334,28 @@ export default function FAQPage() {
         .faq-footer p {
           font-size: 13.5px;
           color: ${MUTED};
-          margin: 0 0 16px 0;
+          margin: 0 0 20px 0;
         }
 
         .faq-contact-btn {
           display: inline-block;
-          background: ${GOLD};
+          background: linear-gradient(135deg, #c59b4e 0%, #9e7529 100%);
           color: #ffffff;
-          padding: 10px 24px;
-          border-radius: 20px;
+          padding: 12px 28px;
+          border-radius: 24px;
           text-decoration: none;
           font-size: 11.5px;
           font-weight: 700;
           letter-spacing: 0.1em;
           text-transform: uppercase;
           transition: all 0.25s ease;
-          box-shadow: 0 4px 12px rgba(139,105,20,0.25);
+          box-shadow: 0 6px 18px rgba(184, 142, 60, 0.28);
         }
 
         .faq-contact-btn:hover {
-          background: ${INK};
-          box-shadow: 0 4px 12px rgba(26,18,9,0.2);
+          background: linear-gradient(135deg, #d4a755 0%, #a47c2d 100%);
+          box-shadow: 0 8px 22px rgba(184, 142, 60, 0.38);
+          transform: translateY(-1px);
         }
 
         @keyframes fadeUp {

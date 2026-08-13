@@ -10,20 +10,20 @@ const formatRelativeTime = (dateStr: string) => {
     const date = new Date(dateStr);
     const now = new Date();
     const diffMs = now.getTime() - date.getTime();
-    
+
     if (diffMs < 0) return 'Just now';
-    
+
     const diffMins = Math.floor(diffMs / 60000);
     if (diffMins < 1) return 'Just now';
     if (diffMins < 60) return `${diffMins} min${diffMins > 1 ? 's' : ''} ago`;
-    
+
     const diffHours = Math.floor(diffMins / 60);
     if (diffHours < 24) return `${diffHours} hr${diffHours > 1 ? 's' : ''} ago`;
-    
+
     const diffDays = Math.floor(diffHours / 24);
     if (diffDays === 1) return 'Yesterday';
     if (diffDays < 7) return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
-    
+
     return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
   } catch (e) {
     return 'Recently';
@@ -44,10 +44,10 @@ const StatCard = ({ title, value, icon, href, color = 'gold', isRevenue = false 
   const [hovered, setHovered] = useState(false);
   const strVal = String(value);
   const fontSize = strVal.length > 9 ? '20px' : strVal.length > 7 ? '22px' : '28px';
-  
+
   if (isRevenue) {
     return (
-      <div 
+      <div
         style={{
           background: 'linear-gradient(135deg, #ffffff 0%, #faf7f0 100%)',
           border: hovered ? '1px solid #8B6914' : '1px solid rgba(139,105,20,0.25)',
@@ -113,7 +113,7 @@ const StatCard = ({ title, value, icon, href, color = 'gold', isRevenue = false 
             </p>
           </div>
         </div>
-        
+
         <p style={{
           fontSize: '11px',
           color: '#2ecc71',
@@ -141,7 +141,7 @@ const StatCard = ({ title, value, icon, href, color = 'gold', isRevenue = false 
   const colors = colorMap[color] || colorMap.gold;
 
   return (
-    <div 
+    <div
       style={{
         background: '#fff',
         border: hovered ? `1px solid ${colors.text}` : `1px solid rgba(26,18,9,0.08)`,
@@ -209,7 +209,7 @@ const StatCard = ({ title, value, icon, href, color = 'gold', isRevenue = false 
           </p>
         </div>
       </div>
-      
+
       {href && (
         <div style={{
           borderTop: '1px solid rgba(26,18,9,0.04)',
@@ -253,7 +253,7 @@ const ActivityItem = ({ activity }: { activity: Activity }): React.JSX.Element =
   const [hovered, setHovered] = useState(false);
 
   return (
-    <div 
+    <div
       style={{
         display: 'flex',
         gap: '16px',
@@ -395,7 +395,7 @@ export default function AdminDashboard(): React.JSX.Element {
       }
     };
     fetchStats();
-    
+
     // Refresh stats every 60 seconds
     const interval = setInterval(fetchStats, 60000);
     return () => clearInterval(interval);
@@ -459,7 +459,7 @@ export default function AdminDashboard(): React.JSX.Element {
 
   return (
     <div style={{ fontFamily: "'Jost', sans-serif", padding: '10px 0', color: '#1a1209' }}>
-      
+
       {/* Executive Welcome Banner */}
       <div style={{
         background: 'linear-gradient(135deg, rgba(255,255,255,0.96) 0%, rgba(250,247,240,0.98) 100%)',
@@ -491,9 +491,9 @@ export default function AdminDashboard(): React.JSX.Element {
             alignItems: 'center',
             justifyContent: 'center',
           }}>
-            <img 
-              src="/Sport_Watch.webp" 
-              alt="Maison timepiece" 
+            <img
+              src="/winsor_hero_backgroundremoved.webp"
+              alt="Maison timepiece"
               style={{
                 height: '140%',
                 objectFit: 'contain',
@@ -601,42 +601,42 @@ export default function AdminDashboard(): React.JSX.Element {
         <StatCard
           title="Total Products"
           value={stats.totalProducts}
-          icon={<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>}
+          icon={<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>}
           href="/admin/products"
           color="gold"
         />
         <StatCard
           title="Registered Customers"
           value={stats.totalCustomers}
-          icon={<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>}
+          icon={<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /></svg>}
           href="/admin/customers"
           color="blue"
         />
         <StatCard
           title="Pending Orders"
           value={stats.pendingOrders}
-          icon={<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>}
+          icon={<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" /><line x1="3" y1="6" x2="21" y2="6" /><path d="M16 10a4 4 0 0 1-8 0" /></svg>}
           href="/admin/orders"
           color="red"
         />
         <StatCard
           title="Low Stock Items"
           value={stats.lowStockItems}
-          icon={<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/></svg>}
+          icon={<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" /><polyline points="3.27 6.96 12 12.01 20.73 6.96" /></svg>}
           href="/admin/inventory"
           color="gold"
         />
         <StatCard
           title="Pending Careers"
           value={stats.jobApplications}
-          icon={<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>}
+          icon={<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="2" y="7" width="20" height="14" rx="2" ry="2" /><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" /></svg>}
           href="/admin/careers/applications"
           color="purple"
         />
         <StatCard
           title="Unread Messages"
           value={stats.newMessages}
-          icon={<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>}
+          icon={<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /></svg>}
           href="/admin/messages"
           color="gold"
         />
@@ -662,7 +662,7 @@ export default function AdminDashboard(): React.JSX.Element {
         alignItems: 'start',
         marginBottom: '32px',
       }}>
-        
+
         {/* Recent Activities */}
         <div style={{
           background: '#fff',
@@ -683,14 +683,14 @@ export default function AdminDashboard(): React.JSX.Element {
             }}>
               Live Recent Activities
             </h3>
-            <span style={{ 
-              fontSize: '9px', 
+            <span style={{
+              fontSize: '9px',
               fontWeight: 600,
               backgroundColor: 'rgba(139,105,20,0.08)',
-              color: '#8B6914', 
+              color: '#8B6914',
               padding: '4px 10px',
               borderRadius: '20px',
-              letterSpacing: '0.05em' 
+              letterSpacing: '0.05em'
             }}>
               DATABASE SYNCED
             </span>
@@ -723,7 +723,7 @@ export default function AdminDashboard(): React.JSX.Element {
 
         {/* Sales Overview + Quick Actions Column */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
-          
+
           {/* Sales Chart Card */}
           <div style={{
             background: '#fff',
@@ -776,7 +776,7 @@ export default function AdminDashboard(): React.JSX.Element {
                     <stop offset="100%" stopColor="#c9a14a" stopOpacity="0.0" />
                   </linearGradient>
                 </defs>
-                
+
                 {/* Gridlines */}
                 <line x1="40" y1="20" x2="480" y2="20" stroke="rgba(26,18,9,0.04)" strokeWidth="1" strokeDasharray="4 4" />
                 <line x1="40" y1="65" x2="480" y2="65" stroke="rgba(26,18,9,0.04)" strokeWidth="1" strokeDasharray="4 4" />
@@ -790,13 +790,13 @@ export default function AdminDashboard(): React.JSX.Element {
 
                 {/* Core Line */}
                 {chartData.linePath && (
-                  <path 
-                    d={chartData.linePath} 
-                    fill="none" 
-                    stroke="#c9a14a" 
-                    strokeWidth="2.5" 
-                    strokeLinecap="round" 
-                    strokeLinejoin="round" 
+                  <path
+                    d={chartData.linePath}
+                    fill="none"
+                    stroke="#c9a14a"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
                   />
                 )}
 
@@ -805,12 +805,12 @@ export default function AdminDashboard(): React.JSX.Element {
                   if (i % 4 !== 0 && i !== stats.salesOverview.length - 1) return null;
                   const x = 40 + (i * (440 / (stats.salesOverview.length - 1)));
                   return (
-                    <text 
-                      key={i} 
-                      x={x} 
-                      y="145" 
-                      textAnchor="middle" 
-                      fill="rgba(26,18,9,0.4)" 
+                    <text
+                      key={i}
+                      x={x}
+                      y="145"
+                      textAnchor="middle"
+                      fill="rgba(26,18,9,0.4)"
                       fontSize="9px"
                       fontFamily="'Jost', sans-serif"
                     >
@@ -843,38 +843,38 @@ export default function AdminDashboard(): React.JSX.Element {
             }}>
               Quick Actions
             </h3>
-            
+
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               {[
-                { 
-                  label: 'Add New Product', 
-                  href: '/admin/products/new', 
-                  color: '#8B6914', 
-                  icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg> 
+                {
+                  label: 'Add New Product',
+                  href: '/admin/products/new',
+                  color: '#8B6914',
+                  icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
                 },
-                { 
-                  label: 'Process Orders', 
-                  href: '/admin/orders', 
-                  color: '#3498db', 
-                  icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3498db" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg> 
+                {
+                  label: 'Process Orders',
+                  href: '/admin/orders',
+                  color: '#3498db',
+                  icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3498db" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" /><line x1="3" y1="6" x2="21" y2="6" /><path d="M16 10a4 4 0 0 1-8 0" /></svg>
                 },
-                { 
-                  label: 'Review Applications', 
-                  href: '/admin/careers/applications', 
-                  color: '#9b59b6', 
-                  icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9b59b6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg> 
+                {
+                  label: 'Review Applications',
+                  href: '/admin/careers/applications',
+                  color: '#9b59b6',
+                  icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9b59b6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2" /><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" /></svg>
                 },
-                { 
-                  label: 'Manage Inventory', 
-                  href: '/admin/inventory', 
-                  color: '#2ecc71', 
-                  icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2ecc71" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/></svg> 
+                {
+                  label: 'Manage Inventory',
+                  href: '/admin/inventory',
+                  color: '#2ecc71',
+                  icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2ecc71" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" /><polyline points="3.27 6.96 12 12.01 20.73 6.96" /></svg>
                 },
-                { 
-                  label: 'View Messages', 
-                  href: '/admin/messages', 
-                  color: '#e74c3c', 
-                  icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#e74c3c" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> 
+                {
+                  label: 'View Messages',
+                  href: '/admin/messages',
+                  color: '#e74c3c',
+                  icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#e74c3c" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /></svg>
                 },
               ].map((action) => (
                 <Link
@@ -920,7 +920,7 @@ export default function AdminDashboard(): React.JSX.Element {
         gap: '28px',
         alignItems: 'start',
       }}>
-        
+
         {/* Orders Overview (Donut Chart) */}
         <div style={{
           background: '#fff',
@@ -949,41 +949,41 @@ export default function AdminDashboard(): React.JSX.Element {
             <div style={{ width: '100px', height: '100px', position: 'relative', flexShrink: 0 }}>
               <svg viewBox="0 0 36 36" style={{ width: '100%', height: '100%' }}>
                 <circle cx="18" cy="18" r="15.915" fill="none" stroke="rgba(26,18,9,0.03)" strokeWidth="3" />
-                
+
                 {/* Completed Arc */}
-                <circle 
-                  cx="18" 
-                  cy="18" 
-                  r="15.915" 
-                  fill="none" 
-                  stroke="#2ecc71" 
-                  strokeWidth="3.2" 
-                  strokeDasharray={`${completedPct} ${100 - completedPct}`} 
-                  strokeDashoffset="25" 
+                <circle
+                  cx="18"
+                  cy="18"
+                  r="15.915"
+                  fill="none"
+                  stroke="#2ecc71"
+                  strokeWidth="3.2"
+                  strokeDasharray={`${completedPct} ${100 - completedPct}`}
+                  strokeDashoffset="25"
                 />
-                
+
                 {/* Processing Arc */}
-                <circle 
-                  cx="18" 
-                  cy="18" 
-                  r="15.915" 
-                  fill="none" 
-                  stroke="#e67e22" 
-                  strokeWidth="3.2" 
-                  strokeDasharray={`${processingPct} ${100 - processingPct}`} 
-                  strokeDashoffset={25 - completedPct} 
+                <circle
+                  cx="18"
+                  cy="18"
+                  r="15.915"
+                  fill="none"
+                  stroke="#e67e22"
+                  strokeWidth="3.2"
+                  strokeDasharray={`${processingPct} ${100 - processingPct}`}
+                  strokeDashoffset={25 - completedPct}
                 />
 
                 {/* Pending Arc */}
-                <circle 
-                  cx="18" 
-                  cy="18" 
-                  r="15.915" 
-                  fill="none" 
-                  stroke="#c9a14a" 
-                  strokeWidth="3.2" 
-                  strokeDasharray={`${pendingPct} ${100 - pendingPct}`} 
-                  strokeDashoffset={25 - completedPct - processingPct} 
+                <circle
+                  cx="18"
+                  cy="18"
+                  r="15.915"
+                  fill="none"
+                  stroke="#c9a14a"
+                  strokeWidth="3.2"
+                  strokeDasharray={`${pendingPct} ${100 - pendingPct}`}
+                  strokeDashoffset={25 - completedPct - processingPct}
                 />
               </svg>
               <div style={{
@@ -1129,7 +1129,7 @@ export default function AdminDashboard(): React.JSX.Element {
               <span style={{ color: 'rgba(26,18,9,0.5)' }}>Server</span>
               <span style={{ color: '#2ecc71', fontWeight: 600 }}>Online</span>
             </div>
-            
+
             {/* Storage Progress Bar */}
             <div style={{ marginTop: '6px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', marginBottom: '4px' }}>
