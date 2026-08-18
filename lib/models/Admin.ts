@@ -81,7 +81,6 @@ AdminSchema.methods.comparePassword = async function (candidatePassword: string)
 };
 
 // Indexes for performance
-AdminSchema.index({ username: 1 }, { unique: true });
 AdminSchema.index({ role: 1, isActive: 1 });
 
 // Clear cached model in dev
