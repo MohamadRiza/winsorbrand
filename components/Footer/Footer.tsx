@@ -194,34 +194,34 @@ function PaymentBadgesRow({ size = '22px', isMobile = false }: { size?: string; 
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', justifyContent: isMobile ? 'center' : 'flex-start' }}>
       {/* Visa */}
-      <img 
-        src="https://cdn.jsdelivr.net/gh/datatrans/payment-logos@master/assets/cards/visa.svg" 
-        alt="Visa" 
-        style={{ height: size, width: 'auto', display: 'block', objectFit: 'contain' }} 
+      <img
+        src="https://cdn.jsdelivr.net/gh/datatrans/payment-logos@master/assets/cards/visa.svg"
+        alt="Visa"
+        style={{ height: size, width: 'auto', display: 'block', objectFit: 'contain' }}
       />
       {/* Mastercard */}
-      <img 
-        src="https://cdn.jsdelivr.net/gh/datatrans/payment-logos@master/assets/cards/mastercard.svg" 
-        alt="Mastercard" 
-        style={{ height: size, width: 'auto', display: 'block', objectFit: 'contain' }} 
+      <img
+        src="https://cdn.jsdelivr.net/gh/datatrans/payment-logos@master/assets/cards/mastercard.svg"
+        alt="Mastercard"
+        style={{ height: size, width: 'auto', display: 'block', objectFit: 'contain' }}
       />
       {/* Amex */}
-      <img 
-        src="https://cdn.jsdelivr.net/gh/aaronfagan/svg-credit-card-payment-icons@master/flat/amex.svg" 
-        alt="American Express" 
-        style={{ height: size, width: 'auto', display: 'block', objectFit: 'contain' }} 
+      <img
+        src="https://cdn.jsdelivr.net/gh/aaronfagan/svg-credit-card-payment-icons@master/flat/amex.svg"
+        alt="American Express"
+        style={{ height: size, width: 'auto', display: 'block', objectFit: 'contain' }}
       />
       {/* Apple Pay */}
-      <img 
-        src="https://cdn.jsdelivr.net/gh/datatrans/payment-logos@master/assets/wallets/apple-pay.svg" 
-        alt="Apple Pay" 
-        style={{ height: size, width: 'auto', display: 'block', objectFit: 'contain' }} 
+      <img
+        src="https://cdn.jsdelivr.net/gh/datatrans/payment-logos@master/assets/wallets/apple-pay.svg"
+        alt="Apple Pay"
+        style={{ height: size, width: 'auto', display: 'block', objectFit: 'contain' }}
       />
       {/* Google Pay */}
-      <img 
-        src="https://cdn.jsdelivr.net/gh/datatrans/payment-logos@master/assets/wallets/google-pay.svg" 
-        alt="Google Pay" 
-        style={{ height: size, width: 'auto', display: 'block', objectFit: 'contain' }} 
+      <img
+        src="https://cdn.jsdelivr.net/gh/datatrans/payment-logos@master/assets/wallets/google-pay.svg"
+        alt="Google Pay"
+        style={{ height: size, width: 'auto', display: 'block', objectFit: 'contain' }}
       />
       {/* Bank Transfer */}
       <div style={{
@@ -640,7 +640,7 @@ export default function Footer() {
                 style={{ marginTop: '24px', paddingTop: '18px', borderTop: '1px solid rgba(26,18,9,0.07)', flexDirection: 'column', alignItems: 'flex-start', gap: '12px' }}
               >
                 <CurrencySelectorCompact />
-                
+
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', width: '100%' }}>
                   <span style={{ fontSize: '10.5px', letterSpacing: '0.12em', color: 'rgba(26,18,9,0.5)', textTransform: 'uppercase', fontWeight: 600 }}>
                     We Accept
@@ -721,7 +721,7 @@ export default function Footer() {
                 </p>
                 <span className="ft-dot-separator" style={{ fontSize: '9px', color: 'rgba(26,18,9,0.3)' }}>•</span>
                 <a
-                  href="https://nexasoft.site"
+                  href="https://nexasoft.uk"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="ft-a"
