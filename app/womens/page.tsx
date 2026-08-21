@@ -186,7 +186,7 @@ function WomensCollectionContent() {
   }, [products, searchQuery, selectedSection, selectedGift, priceSort]);
 
   return (
-    <div style={{ backgroundColor: '#faf7f0', color: '#1a1209', minHeight: '100vh', fontFamily: "'Jost', sans-serif" }}>
+    <div style={{ backgroundColor: '#faf7f0', color: '#1a1209', minHeight: '100vh', fontFamily: "'Jost', sans-serif", paddingBottom: '20px' }}>
       <style>{`
         .womens-hero-grid {
           display: grid;

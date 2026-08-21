@@ -11,17 +11,17 @@ const WatchShowcase = () => {
       {/* Heading */}
       <div className="mx-auto max-w-3xl px-4 text-center sm:px-6">
         <h2 className="font-serif text-[28px] font-normal leading-tight tracking-tight sm:text-3xl md:text-[40px] md:leading-tight" style={{ color: '#1a1209' }}>
-          HYDROCONQUEST Exclusive Edition
+          Winsor Royal Steel 42mm Edition
         </h2>
         <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed sm:mt-6 md:text-base" style={{ color: '#555555' }}>
-          A captivating edition, available in 39-mm and 42-mm, offered in distinctive variants that stand apart from the core collection while maintaining the sporty elegance and technical excellence that define it.
+          Forged from surgical-grade 316L stainless steel with an engraved caseback, sapphire crystal glass, and Japanese precision movement engineered for everyday prestige.
         </p>
       </div>
 
       {/* Hero block: product card + large lifestyle image */}
       <div className="mx-auto mt-8 grid max-w-7xl grid-cols-1 gap-6 px-4 sm:mt-14 sm:gap-8 sm:px-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,2.2fr)] lg:gap-10">
         {/* Product card */}
-        <article className="group flex flex-col cursor-pointer">
+        <Link href="/collections" className="group flex flex-col cursor-pointer no-underline">
           <div className="relative overflow-hidden bg-[#faf7f0] p-4 sm:p-5 rounded-2xl border border-[rgba(26,18,9,0.06)] flex flex-col justify-between h-full shadow-[0_4px_20px_rgba(0,0,0,0.02)] transition-all duration-300 hover:shadow-[0_12px_32px_rgba(26,18,9,0.06)] hover:border-[#8B6914]/40">
             <span className="absolute left-6 top-6 z-10 bg-[#1a1209] text-white px-3 py-1 text-[10px] tracking-widest uppercase font-medium">
               Exclusive
@@ -36,14 +36,14 @@ const WatchShowcase = () => {
             />
             <div className="mt-5 space-y-1">
               <h3 className="text-sm font-medium tracking-[0.08em] uppercase transition-colors duration-300 group-hover:text-[#8B6914]" style={{ color: '#1a1209' }}>
-                HYDROCONQUEST EXCLUSIVE EDITION
+                WINSOR ROYAL STEEL 42MM EDITION
               </h3>
               <p className="text-xs sm:text-sm leading-relaxed" style={{ color: '#666666' }}>
-                42 mm - Automatic watch - Stainless steel and ceramic bezel
+                42 mm — Stainless steel case & bracelet — Japanese movement
               </p>
             </div>
           </div>
-        </article>
+        </Link>
 
         {/* Large lifestyle video */}
         <div className="overflow-hidden rounded-2xl border border-[rgba(26,18,9,0.06)] shadow-[0_4px_20px_rgba(0,0,0,0.02)]">

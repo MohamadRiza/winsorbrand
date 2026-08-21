@@ -136,14 +136,14 @@ export default function RootLayout({
 
   return (
     <ClerkProvider afterSignOutUrl="/">
-      <html lang="en">
+      <html lang="en" style={{ backgroundColor: '#FAF7F0' }}>
         <head>
           <script
             type="application/ld+json"
             dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
           />
         </head>
-        <body>
+        <body style={{ backgroundColor: '#FAF7F0', color: '#1a1209' }}>
           <CurrencyProvider>
             <CartProvider>
               <LayoutShell>

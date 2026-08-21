@@ -147,7 +147,7 @@ function LimitedEditionContent() {
   }, [products, searchQuery, selectedSection, priceSort]);
 
   return (
-    <div style={{ backgroundColor: '#faf7f0', color: '#1a1209', minHeight: '100vh', fontFamily: "'Jost', sans-serif" }}>
+    <div style={{ backgroundColor: '#faf7f0', color: '#1a1209', minHeight: '100vh', fontFamily: "'Jost', sans-serif", paddingBottom: '20px' }}>
       <style>{`
         .limited-hero-grid {
           display: grid;

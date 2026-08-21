@@ -312,6 +312,7 @@ export default function CollectionsPage() {
           min-height: 100vh;
           font-family: 'Jost', sans-serif;
           color: #1a1209;
+          padding-bottom: 20px;
         }
 
         /* ── HERO BANNER ── */

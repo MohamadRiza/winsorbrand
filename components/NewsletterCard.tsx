@@ -49,7 +49,7 @@ export default function NewsletterCard({
   };
 
   return (
-    <div className="w-full relative my-16">
+    <div className="w-full relative pt-6 pb-12" style={{ backgroundColor: '#FAF7F0' }}>
       <style>{`
         @keyframes newsletter-marquee {
           0% { transform: translate3d(0, 0, 0); }
