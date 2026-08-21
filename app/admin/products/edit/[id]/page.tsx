@@ -731,7 +731,6 @@ export default function EditProductPage() {
                 <option value="3_months">3 Months</option>
                 <option value="6_months">6 Months</option>
                 <option value="1_year">1 Year</option>
-                <option value="2_years">2 Years</option>
               </select>
             </div>
 

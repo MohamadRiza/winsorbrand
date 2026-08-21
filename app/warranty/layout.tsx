@@ -3,8 +3,8 @@ import { Metadata } from 'next';
 const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://winsorbrand.com';
 
 export const metadata: Metadata = {
-  title: 'Horology Care & Guarantee — 2-Year International Warranty',
-  description: 'Learn about Winsor Maison’s 2-year international mechanical movement guarantee, servicing guidelines, and timepiece care instructions.',
+  title: 'Horology Care & Guarantee — 1-Year International Warranty',
+  description: 'Learn about Winsor Maison’s 1-year international mechanical movement guarantee, servicing guidelines, and timepiece care instructions.',
   keywords: [
     'Winsor warranty',
     'watch care guide',
@@ -14,7 +14,7 @@ export const metadata: Metadata = {
   ],
   openGraph: {
     title: 'Winsor Warranty & Horology Care',
-    description: 'Learn about our 2-year international mechanical warranty and timepiece maintenance.',
+    description: 'Learn about our 1-year international mechanical warranty and timepiece maintenance.',
     url: `${baseUrl}/warranty`,
     type: 'website',
   },
@@ -36,7 +36,7 @@ export default function WarrantyLayout({
     },
     'serviceType': 'Watch Maintenance & Guarantee',
     'areaServed': 'Worldwide',
-    'description': '2-Year mechanical movement guarantee and precision servicing for Winsor automatic timepieces.',
+    'description': '1-Year mechanical movement guarantee and precision servicing for Winsor automatic timepieces.',
   };
 
   return (

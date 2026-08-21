@@ -593,7 +593,7 @@ export default function AddProductPage() {
             <div>
               <label className="block text-[11px] font-semibold tracking-[0.2em] uppercase text-[#1a1209]/70 mb-2">Warranty</label>
               <select value={formData.warranty} onChange={(e) => setFormData(prev => ({ ...prev, warranty: e.target.value as WarrantyOption }))} className="w-full px-4 py-2.5 bg-[#fbf9f4] border border-[#1a1209]/15 rounded-lg text-[#1a1209] focus:outline-none focus:border-[#8B6914] focus:ring-2 focus:ring-[#8B6914]/20 transition font-['Jost'] text-sm">
-                <option value="no_warranty">No Warranty</option><option value="3_months">3 Months</option><option value="6_months">6 Months</option><option value="1_year">1 Year</option><option value="2_years">2 Years</option>
+                <option value="no_warranty">No Warranty</option><option value="3_months">3 Months</option><option value="6_months">6 Months</option><option value="1_year">1 Year</option>
               </select>
             </div>
             <div className="md:col-span-2">

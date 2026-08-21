@@ -1,4 +1,4 @@
-// app/privacy/page.tsx
+// app/return/page.tsx
 'use client';
 
 import Link from 'next/link';
@@ -11,21 +11,21 @@ const MUTED = 'rgba(26,18,9,0.65)';
 const BORDER = 'rgba(184, 142, 60, 0.22)';
 const CARD_BG = '#FAF7F0';
 
-export default function PrivacyPolicyPage() {
-  const [activeSection, setActiveSection] = useState('introduction');
+export default function ReturnPolicyPage() {
+  const [activeSection, setActiveSection] = useState('guarantee');
 
   useEffect(() => {
     const handleScroll = () => {
       const sections = [
-        'introduction',
-        'collection',
-        'usage',
-        'sharing',
-        'security',
-        'retention',
-        'rights',
-        'cookies',
-        'contact',
+        'guarantee',
+        'eligibility',
+        'non-returnable',
+        'process',
+        'inspection',
+        'refunds',
+        'exchanges',
+        'transit',
+        'concierge',
       ];
       const scrollPos = window.scrollY + 200;
       for (const section of sections) {
@@ -351,7 +351,54 @@ export default function PrivacyPolicyPage() {
           color: ${INK};
         }
 
-        /* ── Contact Details Grid ── */
+        /* ── Step Grid ── */
+        .step-timeline-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+          gap: 16px;
+          margin: 24px 0 10px;
+        }
+
+        .step-item-card {
+          background: rgba(255, 255, 255, 0.6);
+          border: 1px solid rgba(184, 142, 60, 0.2);
+          border-radius: 12px;
+          padding: 22px 18px;
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+          position: relative;
+          transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .step-item-card:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 6px 20px rgba(139, 105, 20, 0.08);
+        }
+
+        .step-badge-num {
+          font-family: 'Cormorant Garamond', Georgia, serif;
+          font-size: 26px;
+          font-weight: 700;
+          color: ${GOLD};
+          line-height: 1;
+        }
+
+        .step-card-heading {
+          font-size: 13.5px;
+          font-weight: 600;
+          color: ${INK};
+          margin: 0;
+          letter-spacing: 0.01em;
+        }
+
+        .step-card-desc {
+          font-size: 12px;
+          color: ${MUTED};
+          line-height: 1.6;
+          margin: 0;
+        }
+
+        /* ── Contact Info Box ── */
         .concierge-details-grid {
           display: grid;
           grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -404,368 +451,388 @@ export default function PrivacyPolicyPage() {
           <span>/</span>
           <Link href="/collections">Maison</Link>
           <span>/</span>
-          <span>Privacy Policy</span>
+          <span>Return Policy</span>
         </nav>
 
         {/* Hero Header */}
         <header className="legal-hero">
           <div className="legal-tag-badge">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-              <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
             </svg>
-            Patron Confidentiality & Data Charter
+            Winsor Brand Quality Guarantee
           </div>
-          <h1 className="legal-hero-title">Privacy Policy</h1>
+          <h1 className="legal-hero-title">Return & Refund Policy</h1>
           <p className="legal-hero-subtitle">
-            Our comprehensive data protection charter ensures that your personal information, timepiece acquisitions, and patron profile remain completely confidential.
+            Our 14-day boutique return and exchange guarantee ensures every handcrafted timepiece acquisition delivers uncompromising satisfaction.
           </p>
           <div className="legal-meta-pills">
-            <span>Policy Reference: WB-PRIV-2026</span>
+            <span>Official Policy Reference: WB-RET-2026</span>
             <span>•</span>
             <span>Effective: August 2026</span>
             <span>•</span>
-            <span>Global GDPR & Data Protection Compliance</span>
+            <span>Worldwide Coverage</span>
           </div>
         </header>
 
         {/* Content Layout */}
         <div className="legal-layout-grid">
-          {/* Sticky Sidebar */}
+          {/* Sticky Sidebar Navigation */}
           <aside className="legal-sidebar">
-            <div className="sidebar-title">Privacy Index</div>
+            <div className="sidebar-title">Policy Index</div>
             <button
-              onClick={() => scrollToSection('introduction')}
-              className={`sidebar-nav-btn ${activeSection === 'introduction' ? 'active' : ''}`}
+              onClick={() => scrollToSection('guarantee')}
+              className={`sidebar-nav-btn ${activeSection === 'guarantee' ? 'active' : ''}`}
             >
-              1. Introduction & Scope
+              1. 14-Day Guarantee
             </button>
             <button
-              onClick={() => scrollToSection('collection')}
-              className={`sidebar-nav-btn ${activeSection === 'collection' ? 'active' : ''}`}
+              onClick={() => scrollToSection('eligibility')}
+              className={`sidebar-nav-btn ${activeSection === 'eligibility' ? 'active' : ''}`}
             >
-              2. Information We Collect
+              2. Eligibility Criteria
             </button>
             <button
-              onClick={() => scrollToSection('usage')}
-              className={`sidebar-nav-btn ${activeSection === 'usage' ? 'active' : ''}`}
+              onClick={() => scrollToSection('non-returnable')}
+              className={`sidebar-nav-btn ${activeSection === 'non-returnable' ? 'active' : ''}`}
             >
-              3. Purpose of Processing
+              3. Non-Returnable Items
             </button>
             <button
-              onClick={() => scrollToSection('sharing')}
-              className={`sidebar-nav-btn ${activeSection === 'sharing' ? 'active' : ''}`}
+              onClick={() => scrollToSection('process')}
+              className={`sidebar-nav-btn ${activeSection === 'process' ? 'active' : ''}`}
             >
-              4. Sharing & Disclosure
+              4. Return Step-by-Step
             </button>
             <button
-              onClick={() => scrollToSection('security')}
-              className={`sidebar-nav-btn ${activeSection === 'security' ? 'active' : ''}`}
+              onClick={() => scrollToSection('inspection')}
+              className={`sidebar-nav-btn ${activeSection === 'inspection' ? 'active' : ''}`}
             >
-              5. Security & Encryption
+              5. Horology Inspection
             </button>
             <button
-              onClick={() => scrollToSection('retention')}
-              className={`sidebar-nav-btn ${activeSection === 'retention' ? 'active' : ''}`}
+              onClick={() => scrollToSection('refunds')}
+              className={`sidebar-nav-btn ${activeSection === 'refunds' ? 'active' : ''}`}
             >
-              6. Data Retention
+              6. Refunds & Reimbursement
             </button>
             <button
-              onClick={() => scrollToSection('rights')}
-              className={`sidebar-nav-btn ${activeSection === 'rights' ? 'active' : ''}`}
+              onClick={() => scrollToSection('exchanges')}
+              className={`sidebar-nav-btn ${activeSection === 'exchanges' ? 'active' : ''}`}
             >
-              7. Your Privacy Rights
+              7. Model Exchanges
             </button>
             <button
-              onClick={() => scrollToSection('cookies')}
-              className={`sidebar-nav-btn ${activeSection === 'cookies' ? 'active' : ''}`}
+              onClick={() => scrollToSection('transit')}
+              className={`sidebar-nav-btn ${activeSection === 'transit' ? 'active' : ''}`}
             >
-              8. Cookies & Telemetry
+              8. Transit Discrepancies
             </button>
             <button
-              onClick={() => scrollToSection('contact')}
-              className={`sidebar-nav-btn ${activeSection === 'contact' ? 'active' : ''}`}
+              onClick={() => scrollToSection('concierge')}
+              className={`sidebar-nav-btn ${activeSection === 'concierge' ? 'active' : ''}`}
             >
-              9. Compliance Office
+              9. Concierge Assistance
             </button>
 
             <div className="sidebar-concierge-card">
-              <div className="sidebar-concierge-title">Data Inquiries?</div>
+              <div className="sidebar-concierge-title">Need Immediate Help?</div>
               <p className="sidebar-concierge-text">
-                Submit a data access, correction, or account deletion request to our compliance officer.
+                Our client relations specialists can initiate your return or arrange a courier pickup.
               </p>
               <Link href="/customer-care" className="sidebar-concierge-btn">
-                Contact Office
+                Contact Concierge
               </Link>
             </div>
           </aside>
 
-          {/* Main Content */}
+          {/* Main Legal Sections */}
           <main className="legal-main-content">
-            {/* 1. Introduction */}
-            <section id="introduction" className="legal-section-card">
+            {/* Section 1: Guarantee */}
+            <section id="guarantee" className="legal-section-card">
               <div className="legal-section-header">
                 <div className="legal-icon-box">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                     <circle cx="12" cy="12" r="10" />
-                    <line x1="12" y1="16" x2="12" y2="12" />
-                    <line x1="12" y1="8" x2="12.01" y2="8" />
+                    <polyline points="12 6 12 12 16 14" />
                   </svg>
                 </div>
-                <h2 className="legal-section-title">1. Introduction & Scope</h2>
+                <h2 className="legal-section-title">1. 14-Day Boutique Return Guarantee</h2>
               </div>
               <p className="legal-paragraph">
-                Welcome to <strong>Winsor Brand</strong> ("Winsor", "we", "us", or "our"). We hold the privacy and trust of our patrons in the highest regard. This Privacy Policy details how our luxury watch maison collects, uses, safeguards, and manages personal data when you interact with our digital boutique, reserve timepieces, register an international warranty, or visit authorized showroom locations.
+                At <strong>Winsor Brand</strong>, we are committed to delivering horological perfection in every timepiece we assemble and finish. We understand that acquiring a luxury watch is an intimate decision. If your timepiece does not meet your personal preferences or expectations, you may return or exchange it within <strong>14 calendar days</strong> from the official delivery date.
               </p>
               <div className="legal-callout">
-                <strong>Confidentiality Guarantee:</strong> We apply bank-grade encryption protocols and strict internal governance to ensure that your personal records and collector histories remain secure and private at all times.
+                <strong>Quality Assurance Commitment:</strong> Every returned timepiece is handled with white-glove care and undergoes a comprehensive inspection at our regional atelier by certified horologists before a refund or exchange is authorized.
               </div>
             </section>
 
-            {/* 2. Collection */}
-            <section id="collection" className="legal-section-card">
+            {/* Section 2: Eligibility */}
+            <section id="eligibility" className="legal-section-card">
               <div className="legal-section-header">
                 <div className="legal-icon-box">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                    <polyline points="14 2 14 8 20 8" />
-                    <line x1="16" y1="13" x2="8" y2="13" />
-                    <line x1="16" y1="17" x2="8" y2="17" />
-                    <polyline points="10 9 9 9 8 9" />
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                    <polyline points="22 4 12 14.01 9 11.01" />
                   </svg>
                 </div>
-                <h2 className="legal-section-title">2. Information We Collect</h2>
+                <h2 className="legal-section-title">2. Return Eligibility Criteria</h2>
               </div>
               <p className="legal-paragraph">
-                In order to provide our patrons with bespoke horology services and white-glove delivery, we collect the following categories of data:
+                To qualify for an authorized return, exchange, or refund, your timepiece must strictly fulfill the following conditions:
               </p>
               <ul className="legal-list">
                 <li className="legal-list-item">
                   <span className="legal-bullet" />
                   <span>
-                    <strong>Patron Profile & Identity Data:</strong> Full name, email address, direct phone number, and single-sign-on credentials securely synchronized via Clerk.
+                    <strong>Pristine, Unworn Condition:</strong> The timepiece must be completely unworn, free from any surface micro-scratches, scuffs, strap crease lines, or link pin alterations.
                   </span>
                 </li>
                 <li className="legal-list-item">
                   <span className="legal-bullet" />
                   <span>
-                    <strong>Order & Delivery Logistics:</strong> Delivery destination address, billing contact details, gift packaging messages, and courier tracking identifiers.
+                    <strong>Protective Seals & Stickers Intact:</strong> All factory protective plastics on the front sapphire crystal, exhibition caseback, bracelet links, and crown guard must remain untampered with.
                   </span>
                 </li>
                 <li className="legal-list-item">
                   <span className="legal-bullet" />
                   <span>
-                    <strong>Payment Transaction Logs:</strong> Merchant settlement references, timestamps, and verification proofs. Raw credit/debit card numbers are tokenized by PCI-DSS Level 1 payment processors; Winsor Brand does not store credit card numbers on its servers.
+                    <strong>Complete Presentation Suite:</strong> The watch must be accompanied by its original handcrafted outer box, inner presentation case, leather travel pouch, user instruction booklet, warranty card, and certificate of authenticity.
                   </span>
                 </li>
                 <li className="legal-list-item">
                   <span className="legal-bullet" />
                   <span>
-                    <strong>Timepiece Ownership Records:</strong> Serial numbers, reference model numbers, 1-Year International Warranty registrations, and boutique service histories.
-                  </span>
-                </li>
-                <li className="legal-list-item">
-                  <span className="legal-bullet" />
-                  <span>
-                    <strong>Technical & Browsing Telemetry:</strong> Device identifiers, browser type, regional location, currency preference, and interaction analytics.
+                    <strong>All Sizing Components:</strong> If the stainless steel or titanium bracelet was adjusted prior to dispatch, all removed links and pins must be returned in their original packaging pouch.
                   </span>
                 </li>
               </ul>
             </section>
 
-            {/* 3. Usage */}
-            <section id="usage" className="legal-section-card">
-              <div className="legal-section-header">
-                <div className="legal-icon-box">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                    <polygon points="12 2 2 7 12 12 22 7 12 2" />
-                    <polyline points="2 17 12 22 22 17" />
-                    <polyline points="2 12 12 17 22 12" />
-                  </svg>
-                </div>
-                <h2 className="legal-section-title">3. Purpose & Legal Basis of Processing</h2>
-              </div>
-              <p className="legal-paragraph">
-                We process your information strictly for legitimate commercial, operational, and fulfillment requirements:
-              </p>
-              <ul className="legal-list">
-                <li className="legal-list-item">
-                  <span className="legal-bullet" />
-                  <span><strong>Timepiece Fulfillment:</strong> Verifying acquisitions, assembling custom box sets, and dispatching orders via insured luxury courier.</span>
-                </li>
-                <li className="legal-list-item">
-                  <span className="legal-bullet" />
-                  <span><strong>Patron Portal Management:</strong> Maintaining your Patron account, computing loyalty status, saving wishlist selections, and managing saved delivery addresses.</span>
-                </li>
-                <li className="legal-list-item">
-                  <span className="legal-bullet" />
-                  <span><strong>Warranty Registry:</strong> Validating watch authenticity and maintaining service records under our 1-Year International Guarantee.</span>
-                </li>
-                <li className="legal-list-item">
-                  <span className="legal-bullet" />
-                  <span><strong>Client Concierge Relations:</strong> Assisting with bespoke order inquiries, transit status updates, and authorized boutique fittings.</span>
-                </li>
-              </ul>
-            </section>
-
-            {/* 4. Sharing */}
-            <section id="sharing" className="legal-section-card">
-              <div className="legal-section-header">
-                <div className="legal-icon-box">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
-                    <polyline points="16 6 12 2 8 6" />
-                    <line x1="12" y1="2" x2="12" y2="15" />
-                  </svg>
-                </div>
-                <h2 className="legal-section-title">4. Data Sharing & Third-Party Disclosure</h2>
-              </div>
-              <p className="legal-paragraph">
-                <strong>Winsor Brand does not sell, rent, or monetize your personal data.</strong> Information is shared exclusively with vetted operational service providers bound by strict confidentiality agreements:
-              </p>
-              <ul className="legal-list">
-                <li className="legal-list-item">
-                  <span className="legal-bullet" />
-                  <span><strong>Authentication:</strong> Clerk handles end-to-end user identity verification and multi-factor authentication.</span>
-                </li>
-                <li className="legal-list-item">
-                  <span className="legal-bullet" />
-                  <span><strong>Payment Gateways:</strong> Authorized acquiring banks and payment gateways (e.g., PayHere, Stripe) for secure checkout processing.</span>
-                </li>
-                <li className="legal-list-item">
-                  <span className="legal-bullet" />
-                  <span><strong>Logistics Partners:</strong> Certified luxury freight and express couriers to fulfill delivery and obtain signature on delivery.</span>
-                </li>
-                <li className="legal-list-item">
-                  <span className="legal-bullet" />
-                  <span><strong>Cloud Infrastructure:</strong> MongoDB Atlas encrypted cloud database clusters with automated geo-replicated backups.</span>
-                </li>
-              </ul>
-            </section>
-
-            {/* 5. Security */}
-            <section id="security" className="legal-section-card">
-              <div className="legal-section-header">
-                <div className="legal-icon-box">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-                    <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-                  </svg>
-                </div>
-                <h2 className="legal-section-title">5. Security & Encryption Protocols</h2>
-              </div>
-              <p className="legal-paragraph">
-                We implement comprehensive physical, electronic, and procedural safeguards:
-              </p>
-              <ul className="legal-list">
-                <li className="legal-list-item">
-                  <span className="legal-bullet" />
-                  <span><strong>256-Bit SSL/TLS Encryption:</strong> All communications between your browser and our infrastructure are encrypted in transit.</span>
-                </li>
-                <li className="legal-list-item">
-                  <span className="legal-bullet" />
-                  <span><strong>Role-Based Access Control:</strong> Strict administrative permission boundaries ensuring only authorized personnel have access to fulfillment records.</span>
-                </li>
-                <li className="legal-list-item">
-                  <span className="legal-bullet" />
-                  <span><strong>Encrypted Database Storage:</strong> All database volumes utilize AES-256 encryption at rest.</span>
-                </li>
-              </ul>
-            </section>
-
-            {/* 6. Retention */}
-            <section id="retention" className="legal-section-card">
-              <div className="legal-section-header">
-                <div className="legal-icon-box">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
-                    <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
-                    <line x1="12" y1="22.08" x2="12" y2="12" />
-                  </svg>
-                </div>
-                <h2 className="legal-section-title">6. Data Retention & Archival</h2>
-              </div>
-              <p className="legal-paragraph">
-                Personal records are retained only for as long as required to maintain your active timepiece registry and fulfill statutory requirements:
-              </p>
-              <ul className="legal-list">
-                <li className="legal-list-item">
-                  <span className="legal-bullet" />
-                  <span><strong>Patron Profiles & Warranties:</strong> Retained for the lifetime of your active profile to guarantee perpetual timepiece support.</span>
-                </li>
-                <li className="legal-list-item">
-                  <span className="legal-bullet" />
-                  <span><strong>Tax & Commercial Records:</strong> Maintained for up to 7 years in compliance with international commercial accounting legislation.</span>
-                </li>
-              </ul>
-            </section>
-
-            {/* 7. Rights */}
-            <section id="rights" className="legal-section-card">
-              <div className="legal-section-header">
-                <div className="legal-icon-box">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-                    <circle cx="8.5" cy="7.5" r="4" />
-                    <polyline points="17 11 19 13 23 9" />
-                  </svg>
-                </div>
-                <h2 className="legal-section-title">7. Your Privacy Rights</h2>
-              </div>
-              <p className="legal-paragraph">
-                You retain statutory rights over your personal information:
-              </p>
-              <ul className="legal-list">
-                <li className="legal-list-item">
-                  <span className="legal-bullet" />
-                  <span><strong>Right to Access & Rectify:</strong> You can view and edit your profile, saved addresses, and preferences at any time in your <Link href="/profile" style={{ color: GOLD, textDecoration: 'underline' }}>Patron Dashboard</Link>.</span>
-                </li>
-                <li className="legal-list-item">
-                  <span className="legal-bullet" />
-                  <span><strong>Right to Erasure:</strong> You may submit an account and data erasure request by contacting our compliance office.</span>
-                </li>
-                <li className="legal-list-item">
-                  <span className="legal-bullet" />
-                  <span><strong>Marketing Opt-Out:</strong> Unsubscribe from marketing dispatches with a single click at the bottom of any email.</span>
-                </li>
-              </ul>
-            </section>
-
-            {/* 8. Cookies */}
-            <section id="cookies" className="legal-section-card">
+            {/* Section 3: Non-Returnable */}
+            <section id="non-returnable" className="legal-section-card">
               <div className="legal-section-header">
                 <div className="legal-icon-box">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                     <circle cx="12" cy="12" r="10" />
-                    <path d="M12 2a10 10 0 0 1 10 10" />
-                    <circle cx="12" cy="12" r="4" />
+                    <line x1="4.93" y1="4.93" x2="19.07" y2="19.07" />
                   </svg>
                 </div>
-                <h2 className="legal-section-title">8. Cookies & Local Storage</h2>
+                <h2 className="legal-section-title">3. Non-Returnable & Final Sale Items</h2>
               </div>
               <p className="legal-paragraph">
-                We use cookies and browser storage strictly to preserve cart contents, currency selections, and session security. For complete details on managing cookie preferences, consult our <Link href="/cookies" style={{ color: GOLD, textDecoration: 'underline' }}>Cookie Policy</Link>.
+                The following product categories and bespoke services cannot be returned or refunded:
               </p>
+              <ul className="legal-list">
+                <li className="legal-list-item">
+                  <span className="legal-bullet" />
+                  <span>
+                    <strong>Bespoke Custom Engravings:</strong> Timepieces that have undergone personalized laser caseback engraving, custom dial initials, or monogramming.
+                  </span>
+                </li>
+                <li className="legal-list-item">
+                  <span className="legal-bullet" />
+                  <span>
+                    <strong>Special Commission Tourbillons:</strong> Numbered collectors’ editions or specially commissioned unique pieces designated as final sale upon order confirmation.
+                  </span>
+                </li>
+                <li className="legal-list-item">
+                  <span className="legal-bullet" />
+                  <span>
+                    <strong>Worn or Modified Watches:</strong> Any timepiece that exhibits signs of wear, perfume/lotion absorption into leather straps, or internal movement work performed by non-authorized technicians.
+                  </span>
+                </li>
+                <li className="legal-list-item">
+                  <span className="legal-bullet" />
+                  <span>
+                    <strong>Digital & Physical Gift Cards:</strong> Winsor gift vouchers and promotional credits are non-refundable and non-redeemable for physical cash.
+                  </span>
+                </li>
+              </ul>
             </section>
 
-            {/* 9. Contact */}
-            <section id="contact" className="legal-section-card">
+            {/* Section 4: Process */}
+            <section id="process" className="legal-section-card">
               <div className="legal-section-header">
                 <div className="legal-icon-box">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-                    <circle cx="12" cy="10" r="3" />
+                    <polyline points="9 11 12 14 22 4" />
+                    <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
                   </svg>
                 </div>
-                <h2 className="legal-section-title">9. Compliance & Data Protection Office</h2>
+                <h2 className="legal-section-title">4. Step-by-Step Return Process</h2>
               </div>
               <p className="legal-paragraph">
-                For questions, concerns, or data rights requests, contact our Compliance Office:
+                To initiate an insured return, please follow these four simple steps:
+              </p>
+
+              <div className="step-timeline-grid">
+                <div className="step-item-card">
+                  <div className="step-badge-num">01</div>
+                  <h3 className="step-card-heading">Submit Request</h3>
+                  <p className="step-card-desc">
+                    Log in to your <Link href="/profile" style={{ color: GOLD, textDecoration: 'underline' }}>Patron Dashboard</Link> or email our Concierge at <strong>support@winsorbrand.com</strong> with your Order Reference ID.
+                  </p>
+                </div>
+
+                <div className="step-item-card">
+                  <div className="step-badge-num">02</div>
+                  <h3 className="step-card-heading">Receive RMA Label</h3>
+                  <p className="step-card-desc">
+                    Our team will issue a Return Merchandise Authorization (RMA) along with a pre-paid, fully insured luxury courier shipping label.
+                  </p>
+                </div>
+
+                <div className="step-item-card">
+                  <div className="step-badge-num">03</div>
+                  <h3 className="step-card-heading">Secure Packaging</h3>
+                  <p className="step-card-desc">
+                    Place the timepiece inside its presentation case and package within a sturdy outer box with protective cushioning.
+                  </p>
+                </div>
+
+                <div className="step-item-card">
+                  <div className="step-badge-num">04</div>
+                  <h3 className="step-card-heading">Insured Dispatch</h3>
+                  <p className="step-card-desc">
+                    Hand over the sealed parcel to the scheduled courier partner. Retain the tracking handover slip for real-time transit insurance tracking.
+                  </p>
+                </div>
+              </div>
+            </section>
+
+            {/* Section 5: Inspection */}
+            <section id="inspection" className="legal-section-card">
+              <div className="legal-section-header">
+                <div className="legal-icon-box">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="11" cy="11" r="8" />
+                    <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                  </svg>
+                </div>
+                <h2 className="legal-section-title">5. Horology Quality Inspection</h2>
+              </div>
+              <p className="legal-paragraph">
+                Upon delivery at our distribution facility, your returned timepiece is inspected within <strong>48 to 72 business hours</strong>:
+              </p>
+              <ul className="legal-list">
+                <li className="legal-list-item">
+                  <span className="legal-bullet" />
+                  <span><strong>Optical & Surface Inspection:</strong> Evaluation under high magnification to confirm zero signs of scratches, dents, or strap wear.</span>
+                </li>
+                <li className="legal-list-item">
+                  <span className="legal-bullet" />
+                  <span><strong>Timegrapher Mechanical Audit:</strong> Precision calibration testing of the mechanical automatic movement to ensure baseline factory amplitude and rate accuracy.</span>
+                </li>
+                <li className="legal-list-item">
+                  <span className="legal-bullet" />
+                  <span><strong>Serial Matching & Authentication:</strong> Verification of case serial number matching against the warranty card and original order registry.</span>
+                </li>
+              </ul>
+            </section>
+
+            {/* Section 6: Refunds */}
+            <section id="refunds" className="legal-section-card">
+              <div className="legal-section-header">
+                <div className="legal-icon-box">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
+                    <line x1="1" y1="10" x2="23" y2="10" />
+                  </svg>
+                </div>
+                <h2 className="legal-section-title">6. Refunds & Reimbursement Timelines</h2>
+              </div>
+              <p className="legal-paragraph">
+                Once the returned timepiece successfully passes horological inspection:
+              </p>
+              <ul className="legal-list">
+                <li className="legal-list-item">
+                  <span className="legal-bullet" />
+                  <span><strong>Payment Settlement:</strong> Refunds are credited directly back to the original method of payment (Visa, Mastercard, American Express, Apple Pay, Google Pay, or direct Bank Wire).</span>
+                </li>
+                <li className="legal-list-item">
+                  <span className="legal-bullet" />
+                  <span><strong>Settlement Window:</strong> Financial reimbursement is processed within <strong>5 to 7 business days</strong> following inspection approval.</span>
+                </li>
+                <li className="legal-list-item">
+                  <span className="legal-bullet" />
+                  <span><strong>Zero Restocking Fees:</strong> Winsor Brand does not charge restocking fees on approved returns meeting all condition standards.</span>
+                </li>
+              </ul>
+            </section>
+
+            {/* Section 7: Exchanges */}
+            <section id="exchanges" className="legal-section-card">
+              <div className="legal-section-header">
+                <div className="legal-icon-box">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="17 1 21 5 17 9" />
+                    <path d="M3 11V9a4 4 0 0 1 4-4h14" />
+                    <polyline points="7 23 3 19 7 15" />
+                    <path d="M21 13v2a4 4 0 0 1-4 4H3" />
+                  </svg>
+                </div>
+                <h2 className="legal-section-title">7. Model & Dial Color Exchanges</h2>
+              </div>
+              <p className="legal-paragraph">
+                If you prefer an alternative watch dial color, strap material, or different model family, our concierge team can organize an exchange:
+              </p>
+              <ul className="legal-list">
+                <li className="legal-list-item">
+                  <span className="legal-bullet" />
+                  <span>Exchanges for products of equal value are dispatched with complimentary priority shipping immediately after the returned item passes inspection.</span>
+                </li>
+                <li className="legal-list-item">
+                  <span className="legal-bullet" />
+                  <span>For models of different value, any price difference will be invoiced or refunded prior to shipment of the replacement timepiece.</span>
+                </li>
+              </ul>
+            </section>
+
+            {/* Section 8: Transit Discrepancies */}
+            <section id="transit" className="legal-section-card">
+              <div className="legal-section-header">
+                <div className="legal-icon-box">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                    <line x1="12" y1="9" x2="12" y2="13" />
+                    <line x1="12" y1="17" x2="12.01" y2="17" />
+                  </svg>
+                </div>
+                <h2 className="legal-section-title">8. Transit Discrepancies & Courier Damages</h2>
+              </div>
+              <p className="legal-paragraph">
+                In the unlikely event that your timepiece package arrives with visible transit box damage or missing accessories:
+              </p>
+              <ul className="legal-list">
+                <li className="legal-list-item">
+                  <span className="legal-bullet" />
+                  <span>Please notify our Client Care team within <strong>48 hours</strong> of courier handover, attaching clear photographs of the packaging condition.</span>
+                </li>
+                <li className="legal-list-item">
+                  <span className="legal-bullet" />
+                  <span>Winsor Brand will arrange immediate priority courier recovery and dispatch a replacement timepiece without delay.</span>
+                </li>
+              </ul>
+            </section>
+
+            {/* Section 9: Concierge Assistance */}
+            <section id="concierge" className="legal-section-card">
+              <div className="legal-section-header">
+                <div className="legal-icon-box">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+                  </svg>
+                </div>
+                <h2 className="legal-section-title">9. Concierge & Boutique Assistance</h2>
+              </div>
+              <p className="legal-paragraph">
+                Our client relations specialists are at your disposal to facilitate an effortless return or model exchange:
               </p>
 
               <div className="concierge-details-grid">
                 <div className="concierge-detail-item">
-                  <span className="concierge-detail-label">Legal Inquiries Email</span>
+                  <span className="concierge-detail-label">Client Support Emails</span>
                   <div className="concierge-detail-val">
                     support@winsorbrand.com<br />
                     winsorwatches@gmail.com
@@ -773,7 +840,7 @@ export default function PrivacyPolicyPage() {
                 </div>
 
                 <div className="concierge-detail-item">
-                  <span className="concierge-detail-label">Corporate Contact</span>
+                  <span className="concierge-detail-label">Direct Phone Lines</span>
                   <div className="concierge-detail-val">
                     +94 77 071 6212<br />
                     +94 77 877 8555
@@ -781,18 +848,18 @@ export default function PrivacyPolicyPage() {
                 </div>
 
                 <div className="concierge-detail-item">
-                  <span className="concierge-detail-label">Showroom Location</span>
+                  <span className="concierge-detail-label">Boutique Showroom</span>
                   <div className="concierge-detail-val">
                     Kandy City Centre (Level 3)<br />
-                    Sri Lanka
+                    +94 77 977 9666
                   </div>
                 </div>
 
                 <div className="concierge-detail-item">
-                  <span className="concierge-detail-label">Response Timeframe</span>
+                  <span className="concierge-detail-label">Service Hours</span>
                   <div className="concierge-detail-val">
-                    Within 30 Calendar Days<br />
-                    Formal Written Resolution
+                    Monday – Saturday<br />
+                    9:00 AM – 7:00 PM (IST)
                   </div>
                 </div>
               </div>

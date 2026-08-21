@@ -215,6 +215,7 @@ export default function Navbar() {
       pathname === '/orders' ||
       (pathname.startsWith('/orders/') && pathname !== '/orders/track') ||
       pathname === '/contact' ||
+      pathname === '/return' ||
       pathname === '/terms' ||
       pathname === '/privacy' ||
       pathname === '/cookies';
@@ -267,6 +268,7 @@ export default function Navbar() {
       pathname === '/orders' ||
       (pathname.startsWith('/orders/') && pathname !== '/orders/track') ||
       pathname === '/contact' ||
+      pathname === '/return' ||
       pathname === '/terms' ||
       pathname === '/privacy' ||
       pathname === '/cookies';

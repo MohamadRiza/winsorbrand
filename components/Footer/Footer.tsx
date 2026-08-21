@@ -82,14 +82,15 @@ const FOOTER_LINKS = {
   support: [
     { label: 'Track Order', href: '/orders/track' },
     { label: 'Customer Care', href: '/customer-care' },
-    { label: 'Shipping & Returns', href: '/shipping' },
-    { label: 'Warranty', href: '/warranty' },
+    { label: 'Return & Refund Policy', href: '/return' },
+    { label: 'Warranty & Care', href: '/warranty' },
     { label: 'FAQ', href: '/faq' },
     { label: 'Contact Us', href: '/customer-care' },
   ],
   legal: [
     { label: 'Privacy Policy', href: '/privacy' },
-    { label: 'Terms of Service', href: '/terms' },
+    { label: 'Terms & Conditions', href: '/terms' },
+    { label: 'Return Policy', href: '/return' },
     { label: 'Cookie Policy', href: '/cookies' },
   ],
 };
