@@ -3,6 +3,7 @@ import { connectDB } from '@/lib/db';
 import Vacancy from '@/lib/models/Vacancy';
 import JobApplication from '@/lib/models/JobApplication';
 import { uploadToCloudinary } from '@/lib/models/uploadToCloudinary';
+import { verifyTurnstileToken } from '@/lib/turnstile';
 
 export async function POST(req: NextRequest) {
   try {
@@ -61,21 +62,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const turnstileResponse = await fetch(
-      'https://challenges.cloudflare.com/turnstile/v0/siteverify',
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          secret: process.env.TURNSTILE_SECRET_KEY,
-          response: turnstileToken,
-          remoteip: ip,
-        }),
-      }
-    );
-
-    const turnstileData = await turnstileResponse.json();
-    if (!turnstileData.success) {
+    const turnstileResult = await verifyTurnstileToken(turnstileToken, ip);
+    if (!turnstileResult.success) {
+      console.warn('🔐 [CAREERS APPLY] Turnstile verification failed:', turnstileResult.errorCodes);
       return NextResponse.json(
         { success: false, error: 'Security verification failed. Please try again.' },
         { status: 400 }

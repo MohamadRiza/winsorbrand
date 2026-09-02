@@ -5,6 +5,7 @@ import Admin from '@/lib/models/Admin';
 import AdminLoginAttempt from '@/lib/models/AdminLoginAttempt';
 import { generateAccessToken, generateRefreshToken, verifyAccessToken } from '@/lib/jwt';
 import { RateLimiterMemory } from 'rate-limiter-flexible';
+import { verifyTurnstileToken } from '@/lib/turnstile';
 
 // 🔐 RATE LIMITER: 5 attempts per 15 minutes per IP
 const loginLimiter = new RateLimiterMemory({
@@ -202,24 +203,9 @@ export async function POST(req: NextRequest) {
     }
 
     console.log('🔐 [LOGIN] Verifying Turnstile token...');
-    const turnstileResponse = await fetch(
-      'https://challenges.cloudflare.com/turnstile/v0/siteverify',
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          secret: process.env.TURNSTILE_SECRET_KEY,
-          response: turnstileToken,
-          remoteip: ip,
-        }),
-      }
-    );
-
-    const turnstileData = await turnstileResponse.json();
-    if (!turnstileData.success) {
-      console.warn('🔐 [LOGIN] Turnstile verification failed');
+    const turnstileResult = await verifyTurnstileToken(turnstileToken, ip);
+    if (!turnstileResult.success) {
+      console.warn('🔐 [LOGIN] Turnstile verification failed:', turnstileResult.errorCodes);
       return NextResponse.json(
         { success: false, error: 'Security verification failed. Please try again.' },
         { status: 400 }

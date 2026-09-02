@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAuth } from '@clerk/nextjs/server';
 import { connectDB } from '@/lib/db';
 import ContactMessage from '@/lib/models/ContactMessage';
+import { verifyTurnstileToken } from '@/lib/turnstile';
 
 export async function POST(req: NextRequest) {
   try {
@@ -79,24 +80,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const turnstileResponse = await fetch(
-      'https://challenges.cloudflare.com/turnstile/v0/siteverify',
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          secret: process.env.TURNSTILE_SECRET_KEY,
-          response: turnstileToken,
-          remoteip: ip,
-        }),
-      }
-    );
-
-    const turnstileData = await turnstileResponse.json();
-
-    if (!turnstileData.success) {
+    const turnstileResult = await verifyTurnstileToken(turnstileToken, ip);
+    if (!turnstileResult.success) {
+      console.warn('🔐 [CUSTOMER CARE] Turnstile verification failed:', turnstileResult.errorCodes);
       return NextResponse.json(
         { success: false, error: 'Security verification failed. Please try again.' },
         { status: 400 }
