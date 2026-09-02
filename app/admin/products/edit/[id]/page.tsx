@@ -246,6 +246,9 @@ export default function EditProductPage() {
           warranty: formData.warranty,
           specifications: formData.specifications,
           targetGender: targetGender,
+          colorVariants: formData.colorVariants.map(c => c.colorName).filter(Boolean),
+          collectionSections: formData.collectionSections,
+          giftCategories: formData.giftCategories,
           thumbnailUrl: thumbnailItem.previewUrl || thumbnailItem.asset.url || '',
         }),
       });
