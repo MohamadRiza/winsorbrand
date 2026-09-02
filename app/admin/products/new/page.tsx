@@ -160,6 +160,9 @@ export default function AddProductPage() {
           modelNo: formData.modelNo,
           watchShape: formData.watchShape,
           price: formData.price,
+          warranty: formData.warranty,
+          specifications: formData.specifications,
+          targetGender: targetGender,
           thumbnailUrl: thumbnailItem.previewUrl || thumbnailItem.asset.url || '',
         }),
       });
