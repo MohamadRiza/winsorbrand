@@ -1085,49 +1085,91 @@ export default function EditProductPage() {
 
         {/* Specifications */}
         <div className="bg-white rounded-xl border border-[#1a1209]/10 p-6">
-          <h3 className="font-['Jost'] font-semibold text-[#1a1209] mb-4">Specifications</h3>
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h3 className="font-['Jost'] font-semibold text-[#1a1209]">Specifications</h3>
+              <p className="text-xs text-[#1a1209]/50 mt-0.5">Add technical details such as case dimensions, materials, and water resistance</p>
+            </div>
+            {Object.keys(formData.specifications).length > 0 && (
+              <span className="text-xs font-semibold px-2.5 py-1 bg-[#8B6914]/10 text-[#8B6914] rounded-full">
+                {Object.keys(formData.specifications).length} custom spec{Object.keys(formData.specifications).length === 1 ? '' : 's'}
+              </span>
+            )}
+          </div>
+
+          {/* Quick suggestion chips */}
+          <div className="mb-4">
+            <span className="text-[11px] font-semibold text-[#1a1209]/60 uppercase tracking-wider block mb-2">Quick Suggestions:</span>
+            <div className="flex flex-wrap gap-1.5">
+              {['Case Size', 'Case Material', 'Strap Material', 'Movement', 'Water Resistance', 'Glass Type', 'Dial Color'].map((suggestion) => (
+                <button
+                  key={suggestion}
+                  type="button"
+                  onClick={() => setSpecKey(suggestion)}
+                  className={`text-xs px-2.5 py-1 rounded-full border transition-all cursor-pointer ${
+                    specKey === suggestion
+                      ? 'bg-[#8B6914] text-white border-[#8B6914]'
+                      : 'bg-[#faf7f0] text-[#1a1209]/70 border-[#1a1209]/10 hover:border-[#8B6914]/40 hover:text-[#8B6914]'
+                  }`}
+                >
+                  + {suggestion}
+                </button>
+              ))}
+            </div>
+          </div>
           
-          <div className="flex gap-2 mb-4">
+          <div className="flex flex-col sm:flex-row gap-2 mb-4">
             <input
               type="text"
               value={specKey}
               onChange={(e) => setSpecKey(e.target.value)}
-              placeholder="Key (e.g., Case Size)"
-              className="flex-1 px-3 py-2 bg-[#fbf9f4] border border-[#1a1209]/15 rounded text-sm text-[#1a1209] placeholder-[#1a1209]/50"
+              placeholder="Specification Name (e.g., Case Size)"
+              className="flex-1 px-3 py-2.5 bg-[#fbf9f4] border border-[#1a1209]/15 rounded-lg text-sm text-[#1a1209] placeholder-[#1a1209]/40 focus:outline-none focus:border-[#8B6914] focus:ring-2 focus:ring-[#8B6914]/20 transition"
             />
             <input
               type="text"
               value={specValue}
               onChange={(e) => setSpecValue(e.target.value)}
-              placeholder="Value (e.g., 42mm)"
-              className="flex-1 px-3 py-2 bg-[#fbf9f4] border border-[#1a1209]/15 rounded text-sm text-[#1a1209] placeholder-[#1a1209]/50"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  addSpecification();
+                }
+              }}
+              placeholder="Value (e.g., 40mm)"
+              className="flex-1 px-3 py-2.5 bg-[#fbf9f4] border border-[#1a1209]/15 rounded-lg text-sm text-[#1a1209] placeholder-[#1a1209]/40 focus:outline-none focus:border-[#8B6914] focus:ring-2 focus:ring-[#8B6914]/20 transition"
             />
             <button
               type="button"
               onClick={addSpecification}
-              className="px-4 py-2 bg-[#8B6914] text-white rounded text-sm hover:bg-[#6f5410] font-medium"
+              className="px-5 py-2.5 bg-[#8B6914] text-white rounded-lg text-sm hover:bg-[#6f5410] font-medium transition-colors shadow-sm cursor-pointer whitespace-nowrap"
             >
-              Add
+              Add Spec
             </button>
           </div>
 
-          <div className="space-y-2">
-            {Object.entries(formData.specifications).map(([key, value]) => (
-              <div key={key} className="flex items-center justify-between p-3 bg-[#faf7f0] rounded border border-[#1a1209]/10">
-                <div>
-                  <span className="font-semibold text-sm text-[#1a1209]">{key}:</span>
-                  <span className="text-sm text-[#1a1209]/80 ml-2">{value}</span>
+          {Object.keys(formData.specifications).length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              {Object.entries(formData.specifications).map(([key, value]) => (
+                <div key={key} className="flex items-center justify-between p-3 bg-[#faf7f0] rounded-lg border border-[#1a1209]/10">
+                  <div className="overflow-hidden">
+                    <span className="font-semibold text-xs text-[#8B6914] uppercase tracking-wider block">{key}</span>
+                    <span className="text-sm font-medium text-[#1a1209] truncate block">{value}</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => removeSpecification(key)}
+                    className="text-red-500 hover:text-red-700 font-bold text-lg p-1 transition-colors cursor-pointer"
+                    title={`Remove ${key}`}
+                  >
+                    ×
+                  </button>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => removeSpecification(key)}
-                  className="text-red-600 hover:text-red-700 font-bold text-lg"
-                >
-                  ×
-                </button>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-xs text-[#1a1209]/40 italic">No custom specifications added yet. Add attributes above to enrich the product page.</p>
+          )}
         </div>
 
         {/* Display Settings */}
