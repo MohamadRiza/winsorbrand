@@ -27,7 +27,11 @@ export default function Watch3DAssembly() {
     // Lazy load and play/pause the 35MB video only when Slide 3 is requested
     if (activeSlide === 2) {
       setVideoLoaded(true);
-      videoRef.current?.play().catch(() => {});
+      if (videoRef.current) {
+        videoRef.current.defaultMuted = true;
+        videoRef.current.muted = true;
+        videoRef.current.play().catch(() => {});
+      }
     } else {
       videoRef.current?.pause();
     }
@@ -106,6 +110,7 @@ export default function Watch3DAssembly() {
       {/* Slide 3 Video (Cinematic Dark Mode Backdrop - Loaded On-Demand) */}
       <video
         ref={videoRef}
+        autoPlay
         loop
         muted
         playsInline
