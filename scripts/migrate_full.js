@@ -4,7 +4,7 @@ const { v2: cloudinary } = require('cloudinary');
 const SOURCE_MONGO_URI = 'mongodb+srv://79PVwwUBqB9X8Yx7:9pqAcTSC1gXQUQqw@nexasoft.mg01pcv.mongodb.net/?appName=winsor';
 const TARGET_MONGO_URI = 'mongodb+srv://winsorbrandonline_db_user:683ain2QDe0fwQhg@winsor.mqbzfvh.mongodb.net/?appName=winsor';
 
-// Configure Target Cloudinary Account
+// Configure Target Cloudinary Accountt
 cloudinary.config({
   cloud_name: 'dux9i7yt',
   api_key: '232652146382734',
@@ -12,13 +12,13 @@ cloudinary.config({
   secure: true,
 });
 
-// Cache for uploaded image/video URLs to avoid duplicate uploads
+// Cache for uploadedd image/video URLs to avoid duplicate uploads
 const urlMap = new Map();
 
 async function uploadToTargetCloudinary(oldUrl) {
   if (!oldUrl || typeof oldUrl !== 'string') return oldUrl;
   if (!oldUrl.includes('cloudinary.com') && !oldUrl.includes('http')) return oldUrl;
-  
+
   // If already mapped, return cached new URL
   if (urlMap.has(oldUrl)) {
     return urlMap.get(oldUrl);
@@ -93,7 +93,7 @@ async function runMigration() {
 
     console.log(`\n--------------------------------------------------`);
     console.log(`📦 Processing Collection: "${colName}"`);
-    
+
     const sourceCol = sourceConn.db.collection(colName);
     const targetCol = targetConn.db.collection(colName);
 
