@@ -107,44 +107,12 @@ function CurrencyPanel({ onClose }: { onClose: () => void }) {
   );
 }
 
-function MegaMenu({ visible, activeKey, showCurrency, onClose }: { visible: boolean; activeKey: string | null; showCurrency: boolean; onClose: () => void }) {
-  const group = COLLECTIONS.find(c => c.key === activeKey);
-  const show = visible && (!!group || showCurrency);
+function MegaMenu({ visible, showCurrency, onClose }: { visible: boolean; showCurrency: boolean; onClose: () => void }) {
+  const show = visible && showCurrency;
+  if (!show) return null;
   return (
     <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: 'rgba(250,247,240,0.98)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', borderTop: '1px solid rgba(26,18,9,0.07)', borderBottom: '1px solid rgba(26,18,9,0.07)', boxShadow: '0 16px 48px rgba(26,18,9,0.07)', opacity: show ? 1 : 0, transform: show ? 'translateY(0)' : 'translateY(-8px)', pointerEvents: show ? 'auto' : 'none', transition: 'opacity 0.25s ease, transform 0.25s ease', zIndex: 10 }}>
       {showCurrency && <CurrencyPanel onClose={onClose} />}
-      {group && (
-        <div key={group.key} style={{ maxWidth: '1400px', margin: '0 auto', padding: '36px 40px' }}>
-          <div style={{ display: 'flex', gap: '56px', alignItems: 'flex-start' }}>
-            <div style={{ minWidth: '160px' }}>
-              <p style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: '26px', fontWeight: 600, color: '#1a1209', letterSpacing: '0.05em', marginBottom: '8px', textTransform: 'uppercase' }}>{group.label}</p>
-              <div style={{ width: '24px', height: '1px', background: '#8B6914' }} />
-            </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-              <p style={{ fontFamily: "'Jost',sans-serif", fontSize: '9px', letterSpacing: '0.25em', color: 'rgba(26,18,9,0.38)', marginBottom: '10px', textTransform: 'uppercase', fontWeight: 600 }}>FEATURED CATEGORIES</p>
-              {group.items.map(item => (
-                <Link key={item.label} href={item.href}
-                  style={{ fontFamily: "'Jost',sans-serif", fontSize: '12px', letterSpacing: '0.12em', color: 'rgba(26,18,9,0.68)', padding: '8px 0', borderBottom: '1px solid rgba(26,18,9,0.04)', display: 'block', textDecoration: 'none', transition: 'color 0.18s ease' }}
-                  onMouseEnter={e => (e.currentTarget.style.color = '#8B6914')}
-                  onMouseLeave={e => (e.currentTarget.style.color = 'rgba(26,18,9,0.68)')}>
-                  {item.label}
-                </Link>
-              ))}
-              <Link href={group.href} style={{ fontFamily: "'Jost',sans-serif", fontSize: '10px', letterSpacing: '0.2em', color: '#8B6914', marginTop: '16px', textDecoration: 'none', fontWeight: 600 }}>
-                EXPLORE ALL {group.label} →
-              </Link>
-            </div>
-
-            <div style={{ marginLeft: 'auto', minWidth: '200px' }}>
-              <p style={{ fontFamily: "'Jost',sans-serif", fontSize: '9px', letterSpacing: '0.25em', color: 'rgba(26,18,9,0.38)', marginBottom: '10px', textTransform: 'uppercase', fontWeight: 600 }}>QUICK LINKS</p>
-              <Link href="/collections" style={{ display: 'block', fontFamily: "'Jost',sans-serif", fontSize: '11.5px', letterSpacing: '0.08em', color: 'rgba(26,18,9,0.6)', padding: '6px 0', textDecoration: 'none' }}>Full Collection Catalog</Link>
-              <Link href="/gifts" style={{ display: 'block', fontFamily: "'Jost',sans-serif", fontSize: '11.5px', letterSpacing: '0.08em', color: 'rgba(26,18,9,0.6)', padding: '6px 0', textDecoration: 'none' }}>Gift Timepieces</Link>
-              <Link href="/retailers" style={{ display: 'block', fontFamily: "'Jost',sans-serif", fontSize: '11.5px', letterSpacing: '0.08em', color: 'rgba(26,18,9,0.6)', padding: '6px 0', textDecoration: 'none' }}>Find Retailers</Link>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
@@ -177,7 +145,6 @@ export default function Navbar() {
     }).slice(0, 5)
     : [];
 
-  const [activeKey, setActiveKey] = useState<string | null>(null);
   const [showCurrency, setShowCurrency] = useState(false);
   const [megaVisible, setMegaVisible] = useState(false);
   const [mobileCurrencyOpen, setMobileCurrencyOpen] = useState(false);
@@ -370,20 +337,15 @@ export default function Navbar() {
     };
   }, [searchOpen]);
 
-  const openCollection = useCallback((key: string) => {
-    if (closeTimer.current) clearTimeout(closeTimer.current);
-    setActiveKey(key); setShowCurrency(false); setMegaVisible(true);
-  }, []);
-
   const openCurrency = useCallback(() => {
     if (closeTimer.current) clearTimeout(closeTimer.current);
-    setActiveKey(null); setShowCurrency(true); setMegaVisible(true);
+    setShowCurrency(true); setMegaVisible(true);
   }, []);
 
   const scheduleClose = useCallback(() => {
     closeTimer.current = setTimeout(() => {
       setMegaVisible(false);
-      setTimeout(() => { setActiveKey(null); setShowCurrency(false); }, 280);
+      setTimeout(() => { setShowCurrency(false); }, 280);
     }, 110);
   }, []);
 
@@ -426,6 +388,10 @@ export default function Navbar() {
       <style>{`
         .wn-a{text-decoration:none;transition:color 0.2s ease;}
         .wn-a:hover{color:#8B6914!important;}
+        .wn-col-btn{text-decoration:none;position:relative;transition:color 0.22s ease;}
+        .wn-col-btn:hover{color:#8B6914!important;}
+        .wn-col-btn .wn-underline{position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:0;height:1px;background:#8B6914;transition:width 0.25s ease;display:block;}
+        .wn-col-btn:hover .wn-underline, .wn-col-btn.active .wn-underline{width:100%!important;}
         .wn-ib:hover{opacity:0.55;}
         
         /* Desktop only */
@@ -696,52 +662,43 @@ export default function Navbar() {
         </div>
 
         {/* BOTTOM ROW - Desktop Collections */}
-        <div className="wn-desk-only" onMouseLeave={scheduleClose}>
+        <div className="wn-desk-only">
           <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '0 40px', height: '42px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '48px' }}>
-            {COLLECTIONS.map(col => (
-              <Link
-                key={col.key}
-                href={col.href}
-                onMouseEnter={() => { cancelClose(); openCollection(col.key); }}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  padding: '0 0 4px',
-                  fontFamily: "'Jost',sans-serif",
-                  fontSize: '11.5px',
-                  fontWeight: 500,
-                  letterSpacing: '0.2em',
-                  color: activeKey === col.key && megaVisible ? '#8B6914' : tc,
-                  transition: 'color 0.22s ease',
-                  position: 'relative',
-                  textDecoration: 'none'
-                }}
-                className="wn-a"
-              >
-                {col.label}
-                <span
+            {COLLECTIONS.map(col => {
+              const isActive = pathname === col.href;
+              return (
+                <Link
+                  key={col.key}
+                  href={col.href}
+                  className={`wn-col-btn ${isActive ? 'active' : ''}`}
                   style={{
-                    position: 'absolute',
-                    bottom: 0,
-                    left: '50%',
-                    transform: 'translateX(-50%)',
-                    width: activeKey === col.key && megaVisible ? '100%' : '0',
-                    height: '1px',
-                    background: '#8B6914',
-                    transition: 'width 0.3s ease',
-                    display: 'block'
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer',
+                    padding: '0 0 4px',
+                    fontFamily: "'Jost',sans-serif",
+                    fontSize: '11.5px',
+                    fontWeight: 500,
+                    letterSpacing: '0.2em',
+                    color: isActive ? '#8B6914' : tc,
+                    position: 'relative',
+                    textDecoration: 'none'
                   }}
-                />
-              </Link>
-            ))}
+                >
+                  {col.label}
+                  <span className="wn-underline" />
+                </Link>
+              );
+            })}
           </div>
         </div>
 
-        {/* MEGA MENU */}
-        <div onMouseEnter={cancelClose} onMouseLeave={scheduleClose}>
-          <MegaMenu visible={megaVisible} activeKey={activeKey} showCurrency={showCurrency} onClose={() => setMegaVisible(false)} />
-        </div>
+        {/* CURRENCY PANEL (IF ACTIVE) */}
+        {showCurrency && (
+          <div onMouseEnter={cancelClose} onMouseLeave={scheduleClose}>
+            <MegaMenu visible={megaVisible} showCurrency={showCurrency} onClose={() => setMegaVisible(false)} />
+          </div>
+        )}
       </header>
 
       {/* ── MOBILE OVERLAY (GLASS BACKDROP) ── */}
