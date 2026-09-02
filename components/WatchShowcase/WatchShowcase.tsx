@@ -1,13 +1,38 @@
+'use client';
+
+import { useRef, useState, useEffect } from 'react';
 import Link from 'next/link';
 
-const watchHero = "/Home1.webp";
-const watchCard = "/watch-card.jpg";
-const watchConquest = "/Winsor_Premium.webp";
-const watchGmt = "/Sport_Watch.webp";
-
 const WatchShowcase = () => {
+  const sectionRef = useRef<HTMLElement>(null);
+  const video360Ref = useRef<HTMLVideoElement>(null);
+  const videoSpaceRef = useRef<HTMLVideoElement>(null);
+  const [inView, setInView] = useState(false);
+
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setInView(entry.isIntersecting);
+        if (entry.isIntersecting) {
+          video360Ref.current?.play().catch(() => {});
+          videoSpaceRef.current?.play().catch(() => {});
+        } else {
+          video360Ref.current?.pause();
+          videoSpaceRef.current?.pause();
+        }
+      },
+      { rootMargin: '200px', threshold: 0.05 }
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
   return (
-    <section className="py-12 sm:py-16 lg:py-28" style={{ background: '#faf7f0', color: '#1a1209' }}>
+    <section ref={sectionRef} className="py-12 sm:py-16 lg:py-28" style={{ background: '#faf7f0', color: '#1a1209' }}>
       {/* Heading */}
       <div className="mx-auto max-w-3xl px-4 text-center sm:px-6">
         <h2 className="font-serif text-[28px] font-normal leading-tight tracking-tight sm:text-3xl md:text-[40px] md:leading-tight" style={{ color: '#1a1209' }}>
@@ -27,12 +52,13 @@ const WatchShowcase = () => {
               Exclusive
             </span>
             <video
-              autoPlay
+              ref={video360Ref}
               loop
               muted
               playsInline
+              preload="none"
               className="aspect-[4/5] w-full object-cover rounded-xl transition-transform duration-700 hover:scale-[1.03]"
-              src="/watch360rotate.webm"
+              src={inView ? "/watch360rotate.webm" : undefined}
             />
             <div className="mt-5 space-y-1">
               <h3 className="text-sm font-medium tracking-[0.08em] uppercase transition-colors duration-300 group-hover:text-[#8B6914]" style={{ color: '#1a1209' }}>
@@ -48,12 +74,13 @@ const WatchShowcase = () => {
         {/* Large lifestyle video */}
         <div className="overflow-hidden rounded-2xl border border-[rgba(26,18,9,0.06)] shadow-[0_4px_20px_rgba(0,0,0,0.02)]">
           <video
-            autoPlay
+            ref={videoSpaceRef}
             loop
             muted
             playsInline
+            preload="none"
             className="aspect-[4/3] h-full max-h-[720px] w-full object-cover transition-transform duration-700 hover:scale-[1.02] sm:aspect-auto"
-            src="/watch_space_vid.webm"
+            src={inView ? "/watch_space_vid.webm" : undefined}
           />
         </div>
       </div>

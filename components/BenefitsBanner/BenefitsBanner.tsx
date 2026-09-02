@@ -71,7 +71,7 @@ export default function BenefitsBanner() {
   const duplicatedBenefits = [...benefits, ...benefits];
 
   return (
-    <section className="bg-[#FAF4E8] border-y border-[#8B6914]/20 py-4 select-none overflow-hidden">
+    <section className="bg-[#FAF4E8] border-y border-[#8B6914]/20 py-4 overflow-hidden">
       <style>{`
         @keyframes marquee {
           0% { transform: translateX(0); }

@@ -1,10 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 export default function Watch3DAssembly() {
   const [activeSlide, setActiveSlide] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
+  const [videoLoaded, setVideoLoaded] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   // Auto-advance slides with dynamic intervals (5s for image slides, 20s for video slide)
   useEffect(() => {
@@ -20,6 +22,14 @@ export default function Watch3DAssembly() {
     if (typeof window !== 'undefined') {
       const event = new CustomEvent('winsor-hero-slide-change', { detail: { activeSlide } });
       window.dispatchEvent(event);
+    }
+
+    // Lazy load and play/pause the 35MB video only when Slide 3 is requested
+    if (activeSlide === 2) {
+      setVideoLoaded(true);
+      videoRef.current?.play().catch(() => {});
+    } else {
+      videoRef.current?.pause();
     }
   }, [activeSlide]);
 
@@ -83,7 +93,7 @@ export default function Watch3DAssembly() {
   return (
     <div
       id="hero"
-      className="relative w-full overflow-hidden"
+      className="relative w-full overflow-clip"
       style={{
         height: isMobile ? '380px' : '100vh',
         backgroundColor: isDarkSlide ? '#050302' : '#faf7f0',
@@ -93,14 +103,15 @@ export default function Watch3DAssembly() {
     >
       {/* BACKGROUND GRAPHICS */}
 
-      {/* Slide 3 Video (Cinematic Dark Mode Backdrop) */}
+      {/* Slide 3 Video (Cinematic Dark Mode Backdrop - Loaded On-Demand) */}
       <video
-        autoPlay
+        ref={videoRef}
         loop
         muted
         playsInline
+        preload="none"
         className="absolute inset-0 w-full h-full object-cover"
-        src="/watch_smoke_vid.webm"
+        src={videoLoaded ? "/watch_smoke_vid.webm" : undefined}
         style={{
           opacity: isDarkSlide ? 0.75 : 0,
           visibility: isDarkSlide ? 'visible' : 'hidden',

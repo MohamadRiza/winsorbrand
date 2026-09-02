@@ -277,38 +277,52 @@ export default function Navbar() {
       setIsTransparent(false);
     }
 
+    let ticking = false;
+    let rafId: number | null = null;
+
     const onScroll = () => {
-      if (isNonHeroPage) {
-        setIsTransparent(false);
-        if (window.scrollY > lastScrollY.current && window.scrollY > 120) { 
-          setIsVisible(false); 
-          setMegaVisible(false); 
-        } else { 
-          setIsVisible(true); 
+      if (ticking) return;
+      ticking = true;
+
+      rafId = window.requestAnimationFrame(() => {
+        ticking = false;
+        const cur = window.scrollY;
+
+        if (isNonHeroPage) {
+          setIsTransparent(prev => (prev !== false ? false : prev));
+          if (cur > lastScrollY.current && cur > 120) { 
+            setIsVisible(prev => (prev !== false ? false : prev)); 
+            setMegaVisible(prev => (prev !== false ? false : prev)); 
+          } else { 
+            setIsVisible(prev => (prev !== true ? true : prev)); 
+          }
+          lastScrollY.current = cur;
+          return;
         }
-        lastScrollY.current = window.scrollY;
-        return;
-      }
 
-      const cur = window.scrollY;
-      const h = heroHeight.current > 150 ? heroHeight.current : 450;
-      const threshold = h - 80;
-      
-      setIsTransparent(cur < threshold);
+        const h = heroHeight.current > 150 ? heroHeight.current : 450;
+        const threshold = h - 80;
+        const nextTransparent = cur < threshold;
+        
+        setIsTransparent(prev => (prev !== nextTransparent ? nextTransparent : prev));
 
-      if (cur > lastScrollY.current && cur > 120) { 
-        setIsVisible(false); 
-        setMegaVisible(false); 
-      } else { 
-        setIsVisible(true); 
-      }
-      lastScrollY.current = cur;
+        if (cur > lastScrollY.current && cur > 120) { 
+          setIsVisible(prev => (prev !== false ? false : prev)); 
+          setMegaVisible(prev => (prev !== false ? false : prev)); 
+        } else { 
+          setIsVisible(prev => (prev !== true ? true : prev)); 
+        }
+        lastScrollY.current = cur;
+      });
     };
 
     onScroll();
 
     window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      if (rafId) window.cancelAnimationFrame(rafId);
+    };
   }, [pathname]);
 
   useEffect(() => {
@@ -410,7 +424,6 @@ export default function Navbar() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600;700&family=Jost:wght@300;400;500&display=swap');
         .wn-a{text-decoration:none;transition:color 0.2s ease;}
         .wn-a:hover{color:#8B6914!important;}
         .wn-ib:hover{opacity:0.55;}
@@ -452,6 +465,7 @@ export default function Navbar() {
           left: 0,
           right: 0,
           zIndex: 9990,
+          willChange: 'transform',
           transform: isVisible ? 'translateY(0)' : 'translateY(-100%)',
           transition: 'transform 0.42s cubic-bezier(0.25,0.46,0.45,0.94), background 0.35s ease, border-color 0.35s ease',
           background: useSolidSurface

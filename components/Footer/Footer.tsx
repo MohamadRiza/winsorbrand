@@ -266,8 +266,6 @@ export default function Footer() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600;700&family=Jost:wght@300;400;500&display=swap');
-
         .ft-a {
           text-decoration: none;
           transition: color 0.2s ease;

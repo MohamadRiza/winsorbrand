@@ -81,16 +81,22 @@ const Ourdetaills = () => {
   const [activeIndex, setActiveIndex] = useState(0);
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  const scrollRaf = useRef<number | null>(null);
+
   const handleScroll = () => {
-    if (!scrollRef.current) return;
-    const width = scrollRef.current.clientWidth;
-    const scrollLeft = scrollRef.current.scrollLeft;
-    const index = Math.min(items.length - 1, Math.max(0, Math.round(scrollLeft / width)));
-    setActiveIndex(index);
+    if (scrollRaf.current) return;
+    scrollRaf.current = window.requestAnimationFrame(() => {
+      scrollRaf.current = null;
+      if (!scrollRef.current) return;
+      const width = scrollRef.current.clientWidth;
+      const scrollLeft = scrollRef.current.scrollLeft;
+      const index = Math.min(items.length - 1, Math.max(0, Math.round(scrollLeft / width)));
+      setActiveIndex(prev => (prev !== index ? index : prev));
+    });
   };
 
   return (
-    <section className="py-16 sm:py-20 lg:py-28 select-none" style={{ background: '#faf7f0', color: '#1a1209' }}>
+    <section className="py-16 sm:py-20 lg:py-28" style={{ background: '#faf7f0', color: '#1a1209' }}>
       <div className="mx-auto max-w-3xl px-4 text-center sm:px-6">
         <span className="text-[9px] tracking-[0.35em] text-[#8B6914] uppercase font-semibold mb-3 block">
           THE WINSOR EXPERIENCE

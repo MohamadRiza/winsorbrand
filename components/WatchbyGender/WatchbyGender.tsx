@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 interface GenderSectionProps {
   gender: string;
@@ -132,11 +133,19 @@ function GenderSection({
           style={{
             position: 'absolute',
             inset: 0,
-            background: `url(${image}) ${objectPosition}/cover no-repeat`,
             opacity: isVideoLoaded && (shouldPlayVideo || isHovered) ? 0 : 1,
             transition: 'opacity 0.6s ease-in-out',
           }}
-        />
+        >
+          <Image
+            src={image}
+            alt={title}
+            fill
+            sizes="(max-width: 768px) 100vw, 33vw"
+            style={{ objectFit: 'cover', objectPosition }}
+            loading="lazy"
+          />
+        </div>
 
         {/* Video */}
         {video && (
@@ -146,7 +155,7 @@ function GenderSection({
             muted
             loop
             playsInline
-            preload="auto"
+            preload="none"
             onLoadedData={handleVideoLoad}
             style={{
               position: 'absolute',

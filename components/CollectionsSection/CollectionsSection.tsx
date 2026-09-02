@@ -728,22 +728,32 @@ export default function CollectionsSection() {
     }
   }, [activeSection, allProducts]);
 
+  const scrollRafRef = useRef<number | null>(null);
+
   // Track scrolling to update progress indicator bar
   const handleScroll = useCallback(() => {
-    if (scrollContainerRef.current) {
-      const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
-      const maxScroll = scrollWidth - clientWidth;
-      const progress = maxScroll > 0 ? (scrollLeft / maxScroll) * 100 : 0;
-      setScrollProgress(progress);
-    }
+    if (scrollRafRef.current) return;
+
+    scrollRafRef.current = window.requestAnimationFrame(() => {
+      scrollRafRef.current = null;
+      if (scrollContainerRef.current) {
+        const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
+        const maxScroll = scrollWidth - clientWidth;
+        const progress = maxScroll > 0 ? (scrollLeft / maxScroll) * 100 : 0;
+        setScrollProgress(progress);
+      }
+    });
   }, []);
 
   useEffect(() => {
     const el = scrollContainerRef.current;
     if (el) {
-      el.addEventListener('scroll', handleScroll);
+      el.addEventListener('scroll', handleScroll, { passive: true });
     }
-    return () => el?.removeEventListener('scroll', handleScroll);
+    return () => {
+      el?.removeEventListener('scroll', handleScroll);
+      if (scrollRafRef.current) window.cancelAnimationFrame(scrollRafRef.current);
+    };
   }, [products, handleScroll]);
 
   // Scroll left/right handlers for product carousel

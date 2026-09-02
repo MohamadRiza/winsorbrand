@@ -18,6 +18,17 @@
   font-feature-settings: "lnum" 1 !important;
 }
 
+html {
+  -webkit-text-size-adjust: 100%;
+  overflow-x: clip;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  :root:has(:target) {
+    scroll-behavior: smooth;
+  }
+}
+
 html, body {
   background-color: #faf7f0 !important;
   color: #1a1209;
@@ -25,6 +36,17 @@ html, body {
   font-variant-numeric: lining-nums;
   margin: 0;
   padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  overflow-x: clip;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+}
+
+/* Hardware accelerated video and image layers */
+video, img {
+  transform: translateZ(0);
 }
 
 @keyframes spin {
