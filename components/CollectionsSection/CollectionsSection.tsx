@@ -68,7 +68,9 @@ const formatWatchSpecs = (product: WatchProduct) => {
       if (clean.length <= 75) {
         return clean;
       }
-      return clean.slice(0, 72) + '...';
+      const truncated = clean.slice(0, 72);
+      const lastSpace = truncated.lastIndexOf(' ');
+      return (lastSpace > 30 ? truncated.slice(0, lastSpace) : truncated) + '...';
     }
   }
 
