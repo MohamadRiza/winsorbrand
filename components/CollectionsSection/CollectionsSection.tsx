@@ -47,7 +47,9 @@ const formatWatchSpecs = (product: WatchProduct) => {
   if (product.specifications) {
     const specs = product.specifications instanceof Map
       ? Object.fromEntries(product.specifications)
-      : product.specifications;
+      : (typeof product.specifications === 'string'
+          ? (() => { try { return JSON.parse(product.specifications); } catch { return {}; } })()
+          : product.specifications);
 
     const diameter = specs['Case Size'] || specs['Diameter'] || specs['caseSize'] || specs['diameter'];
     const movement = specs['MovementType'] || specs['Movement'] || specs['movement'];
@@ -60,11 +62,21 @@ const formatWatchSpecs = (product: WatchProduct) => {
   }
 
   if (product.description) {
-    const desc = product.description.split('.')[0];
-    if (desc && desc.length < 80) return desc;
+    const firstSentence = product.description.split('.')[0]?.trim();
+    if (firstSentence) {
+      const clean = firstSentence.replace(/^Introducing\s+(the\s+)?/i, '').trim();
+      if (clean.length <= 75) {
+        return clean;
+      }
+      return clean.slice(0, 72) + '...';
+    }
   }
 
-  return 'Automatic watch - Premium Japan Movement';
+  if (product.modelNo) {
+    return `Model: ${product.modelNo}`;
+  }
+
+  return '';
 };
 
 // ── Skeleton Card ──────────────────────────────────────────────────────────
@@ -190,21 +202,17 @@ function WatchCard({ product, index }: { product: WatchProduct; index: number })
     };
   }, [product._id]);
 
-  // Compute average rating and count
+  // Compute average rating and count (only real reviews)
   const ratingStats = useMemo(() => {
     if (!reviews || reviews.length === 0) {
-      // Return stable mock fallback based on product ID
-      const charCodeSum = product._id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-      const mockCount = (charCodeSum % 120) + 30; // 30 - 150
-      const mockAverage = (charCodeSum % 2) === 0 ? 5 : 4; // 4 or 5 stars
-      return { count: mockCount, average: mockAverage };
+      return { count: 0, average: 0 };
     }
     const sum = reviews.reduce((acc, r) => acc + r.rating, 0);
     return {
       count: reviews.length,
       average: Math.round(sum / reviews.length),
     };
-  }, [reviews, product._id]);
+  }, [reviews]);
 
   // Sync wishlist state
   useEffect(() => {
@@ -559,31 +567,33 @@ function WatchCard({ product, index }: { product: WatchProduct; index: number })
             {convertPrice(product.price).replace('.00', '')}
           </p>
 
-          {/* Rating Stars */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginTop: '2px' }}>
-            <div style={{ display: 'flex', gap: '2px' }}>
-              {Array.from({ length: 5 }).map((_, i) => (
-                <span
-                  key={i}
-                  style={{
-                    color: i < ratingStats.average ? '#c9a14a' : 'rgba(26,18,9,0.12)',
-                    fontSize: '12px',
-                    lineHeight: 1
-                  }}
-                >
-                  ★
-                </span>
-              ))}
+          {/* Rating Stars - Only displayed if real reviews exist */}
+          {ratingStats.count > 0 && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginTop: '2px' }}>
+              <div style={{ display: 'flex', gap: '2px' }}>
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <span
+                    key={i}
+                    style={{
+                      color: i < ratingStats.average ? '#c9a14a' : 'rgba(26,18,9,0.12)',
+                      fontSize: '12px',
+                      lineHeight: 1
+                    }}
+                  >
+                    ★
+                  </span>
+                ))}
+              </div>
+              <span style={{
+                fontSize: '10.5px',
+                fontWeight: 500,
+                color: 'rgba(26,18,9,0.4)',
+                fontFamily: "'Jost', sans-serif"
+              }}>
+                ({ratingStats.count})
+              </span>
             </div>
-            <span style={{
-              fontSize: '10.5px',
-              fontWeight: 500,
-              color: 'rgba(26,18,9,0.4)',
-              fontFamily: "'Jost', sans-serif"
-            }}>
-              ({ratingStats.count})
-            </span>
-          </div>
+          )}
         </div>
       </Link>
     </div>
