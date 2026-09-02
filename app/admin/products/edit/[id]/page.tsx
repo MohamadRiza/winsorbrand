@@ -765,8 +765,18 @@ export default function EditProductPage() {
                   )}
                 </button>
               </div>
-              <textarea value={formData.description} onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))} placeholder="Describe the product features, materials, craftsmanship... or click AI Generate" required rows={5} className="w-full px-4 py-2.5 bg-[#fbf9f4] border border-[#1a1209]/15 rounded-lg text-[#1a1209] placeholder-[#1a1209]/30 focus:outline-none focus:border-[#8B6914] focus:ring-2 focus:ring-[#8B6914]/20 transition font-['Jost'] text-sm resize-none" />
-              <p className="text-xs text-[#1a1209]/40 mt-1">AI-powered description generation using Gemini (Server-side)</p>
+              <textarea 
+                value={formData.description} 
+                onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))} 
+                placeholder="Describe the product features, materials, craftsmanship... or click AI Generate" 
+                required 
+                rows={8} 
+                className="w-full min-h-[160px] px-4 py-3 bg-[#fbf9f4] border border-[#1a1209]/15 rounded-lg text-[#1a1209] placeholder-[#1a1209]/30 focus:outline-none focus:border-[#8B6914] focus:ring-2 focus:ring-[#8B6914]/20 transition font-['Jost'] text-sm resize-y leading-relaxed" 
+              />
+              <div className="flex justify-between items-center mt-1">
+                <p className="text-xs text-[#1a1209]/40">AI-powered description generation using Gemini (Server-side)</p>
+                <span className="text-[11px] text-[#1a1209]/40 italic">Drag bottom-right corner ↘ to expand box size</span>
+              </div>
             </div>
           </div>
         </div>
