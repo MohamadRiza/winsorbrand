@@ -74,10 +74,8 @@ const FOOTER_LINKS = {
   ],
   company: [
     { label: 'Our Story', href: '/our-story' },
-    { label: 'Craftsmanship', href: '/craftsmanship' },
-    { label: 'Sustainability', href: '/sustainability' },
     { label: 'Careers', href: '/careers' },
-    { label: 'Press', href: '/press' },
+    { label: 'Authorized Retailers', href: '/retailers' },
   ],
   support: [
     { label: 'Track Order', href: '/orders/track' },
@@ -85,7 +83,6 @@ const FOOTER_LINKS = {
     { label: 'Return & Refund Policy', href: '/return' },
     { label: 'Warranty & Care', href: '/warranty' },
     { label: 'FAQ', href: '/faq' },
-    { label: 'Contact Us', href: '/customer-care' },
   ],
   legal: [
     { label: 'Privacy Policy', href: '/privacy' },
