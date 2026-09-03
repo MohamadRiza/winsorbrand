@@ -845,46 +845,22 @@ export default function CollectionsSection() {
 
         {/* Category Cards Selector Grid - Floating Over Hero Section */}
         <div style={{
-          marginTop: isMobile ? '-40px' : '-90px',
-          padding: isMobile ? '0 12px 18px' : '0 40px 28px',
+          marginTop: isMobile ? '-24px' : '-90px',
+          padding: isMobile ? '0 12px 12px' : '0 40px 28px',
           width: '100%',
           boxSizing: 'border-box',
           position: 'relative',
           background: 'transparent',
         }}>
-          {/* Section title 'SHOP BY COLLECTION' on mobile only */}
-          {isMobile && (
-            <div style={{
-              textAlign: 'center',
-              marginBottom: '10px',
-            }}>
-              <span style={{
-                fontFamily: "'Jost', sans-serif",
-                fontSize: '11px',
-                fontWeight: 700,
-                textTransform: 'uppercase',
-                letterSpacing: '0.14em',
-                color: '#8b6914',
-                background: 'rgba(250, 247, 240, 0.95)',
-                padding: '3px 14px',
-                borderRadius: '12px',
-                display: 'inline-block',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
-              }}>
-                Shop by Collection
-              </span>
-            </div>
-          )}
-
           <div
             style={{
               display: 'flex',
-              gap: isMobile ? '10px' : '18px',
+              gap: isMobile ? '8px' : '18px',
               overflowX: isMobile ? 'auto' : 'visible',
               scrollBehavior: 'smooth',
-              paddingBottom: isMobile ? '8px' : '6px',
-              paddingLeft: isMobile ? '4px' : '0',
-              paddingRight: isMobile ? '4px' : '0',
+              paddingBottom: isMobile ? '6px' : '6px',
+              paddingLeft: isMobile ? '8px' : '0',
+              paddingRight: isMobile ? '8px' : '0',
               justifyContent: isMobile ? 'flex-start' : 'center',
               alignItems: 'stretch',
               width: '100%',
@@ -908,28 +884,29 @@ export default function CollectionsSection() {
                       : 'rgba(250, 247, 240, 0.65)',
                     backdropFilter: 'blur(16px)',
                     WebkitBackdropFilter: 'blur(16px)',
-                    borderRadius: isMobile ? '14px' : '16px',
+                    borderRadius: isMobile ? '12px' : '16px',
                     border: isActive ? '2px solid #8B6914' : '1px solid rgba(139, 105, 20, 0.2)',
                     boxShadow: isActive
                       ? '0 12px 32px rgba(139, 105, 20, 0.22), 0 4px 12px rgba(0,0,0,0.06)'
                       : '0 8px 24px rgba(0, 0, 0, 0.06), 0 2px 6px rgba(0,0,0,0.03)',
-                    padding: isMobile ? '12px 8px 10px' : '18px 12px 14px',
+                    padding: isMobile ? '8px 4px 7px' : '18px 12px 14px',
                     cursor: 'pointer',
                     outline: 'none',
-                    flex: isMobile ? '0 0 115px' : '1 1 0px',
-                    maxWidth: isMobile ? '120px' : '220px',
-                    minWidth: isMobile ? '110px' : '180px',
-                    minHeight: isMobile ? '135px' : '210px',
+                    flex: isMobile ? '0 0 92px' : '1 1 0px',
+                    maxWidth: isMobile ? '92px' : '220px',
+                    minWidth: isMobile ? '92px' : '180px',
+                    minHeight: isMobile ? '118px' : '210px',
+                    height: isMobile ? '118px' : 'auto',
                     boxSizing: 'border-box',
                     transition: 'all 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-                    transform: isActive ? 'translateY(-4px)' : 'translateY(0)',
+                    transform: (!isMobile && isActive) ? 'translateY(-4px)' : 'none',
                   }}
                   className="wn-cat-card"
                 >
                   {/* Watch Image Area */}
                   <div style={{
                     width: '100%',
-                    height: isMobile ? '70px' : '120px',
+                    height: isMobile ? '62px' : '120px',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -952,7 +929,7 @@ export default function CollectionsSection() {
 
                   {/* Card Titles Inside at Bottom */}
                   <div style={{
-                    marginTop: isMobile ? '6px' : '10px',
+                    marginTop: isMobile ? '4px' : '10px',
                     textAlign: 'center',
                     width: '100%',
                     display: 'flex',
@@ -963,23 +940,23 @@ export default function CollectionsSection() {
                     <span style={{
                       display: 'block',
                       fontFamily: "'Jost', sans-serif",
-                      fontSize: isMobile ? '9.5px' : '12px',
+                      fontSize: isMobile ? '8.5px' : '12px',
                       fontWeight: 600,
                       textTransform: 'uppercase',
-                      letterSpacing: isMobile ? '0.04em' : '0.08em',
+                      letterSpacing: isMobile ? '0.02em' : '0.08em',
                       color: isActive ? '#8B6914' : '#1a1209',
                       transition: 'color 0.3s ease',
-                      lineHeight: 1.2,
+                      lineHeight: 1.15,
                     }}>
                       {cat.label}
                     </span>
                     <span style={{
                       display: 'block',
                       fontFamily: "'Jost', sans-serif",
-                      fontSize: isMobile ? '7.5px' : '9px',
+                      fontSize: isMobile ? '7px' : '9px',
                       fontWeight: 500,
                       textTransform: 'uppercase',
-                      letterSpacing: '0.12em',
+                      letterSpacing: '0.1em',
                       color: isActive ? '#8B6914' : 'rgba(26, 18, 9, 0.5)',
                       transition: 'color 0.3s ease',
                     }}>
