@@ -251,7 +251,7 @@ export default function AdminRetailersPage() {
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
                 file: base64,
-                type: 'thumbnail',
+                type: 'retailer',
                 name: file.name,
               }),
             });
