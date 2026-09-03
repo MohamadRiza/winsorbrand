@@ -23,15 +23,35 @@ export default function AIAssistant() {
   const [isListening, setIsListening] = useState(false);
   const [voiceEnabled, setVoiceEnabled] = useState(false);
   const [currentUtterance, setCurrentUtterance] = useState<SpeechSynthesisUtterance | null>(null);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const recognitionRef = useRef<any>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
 
   // Auto-scroll to bottom of messages
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, loading]);
+
+  // Close drop-up speed dial when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        isMenuOpen &&
+        menuRef.current &&
+        !menuRef.current.contains(event.target as Node) &&
+        triggerRef.current &&
+        !triggerRef.current.contains(event.target as Node)
+      ) {
+        setIsMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isMenuOpen]);
 
   // Auto-focus input when chat window opens
   useEffect(() => {
@@ -320,9 +340,72 @@ export default function AIAssistant() {
           pointer-events: auto;
         }
 
+        /* ── DROP-UP SPEED DIAL CONCIERGE MENU ── */
+        .wn-concierge-dropup {
+          position: fixed;
+          right: 28px;
+          bottom: 96px;
+          width: 260px;
+          background: rgba(250, 247, 240, 0.98);
+          border: 1px solid rgba(139, 105, 20, 0.25);
+          border-radius: 18px;
+          box-shadow: 0 20px 48px rgba(26, 18, 9, 0.22), 0 4px 14px rgba(139, 105, 20, 0.08);
+          backdrop-filter: blur(20px);
+          -webkit-backdrop-filter: blur(20px);
+          padding: 8px;
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+          z-index: 9991;
+          opacity: 0;
+          transform: translateY(14px) scale(0.94);
+          pointer-events: none;
+          transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .wn-concierge-dropup.open {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+          pointer-events: auto;
+        }
+
+        .wn-concierge-item {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          padding: 10px 12px;
+          border-radius: 12px;
+          text-decoration: none;
+          background: transparent;
+          border: 1px solid transparent;
+          cursor: pointer;
+          width: 100%;
+          box-sizing: border-box;
+          transition: all 0.2s ease;
+          text-align: left;
+        }
+        .wn-concierge-item:hover {
+          background: rgba(26, 18, 9, 0.04);
+          border-color: rgba(139, 105, 20, 0.15);
+          transform: translateX(-2px);
+        }
+        .wn-concierge-item.whatsapp-item:hover {
+          background: rgba(37, 211, 102, 0.08);
+          border-color: rgba(37, 211, 102, 0.3);
+        }
+        .wn-concierge-item.ai-item:hover {
+          background: rgba(139, 105, 20, 0.08);
+          border-color: rgba(139, 105, 20, 0.3);
+        }
+
+        .ai-widget-trigger.menu-active {
+          background: #1a1209;
+          border-color: #8b6914;
+        }
+
         /* ── HIDE AI WIDGET BEHIND MOBILE SIDEBAR DRAWER WHEN OPEN ── */
         body.wn-mobile-menu-open .ai-widget-trigger,
-        body.wn-mobile-menu-open .ai-chat-window {
+        body.wn-mobile-menu-open .ai-chat-window,
+        body.wn-mobile-menu-open .wn-concierge-dropup {
           z-index: 100 !important;
           opacity: 0 !important;
           pointer-events: none !important;
@@ -568,26 +651,185 @@ export default function AIAssistant() {
             width: 52px;
             height: 52px;
           }
+          .wn-concierge-dropup {
+            right: 20px;
+            bottom: 86px;
+            width: 250px;
+          }
         }
       `}</style>
 
-      {/* FLOATING TRIGGER BUTTON */}
-      <button 
-        className={`ai-widget-trigger ${isOpen ? 'open' : ''}`}
-        onClick={() => {
-          if (isOpen && currentUtterance) {
-            window.speechSynthesis.cancel();
-            setCurrentUtterance(null);
-            setMessages(prev => prev.map(m => ({ ...m, isAudioPlaying: false })));
-          }
-          setIsOpen(!isOpen);
-        }}
-        aria-label="Open Winsi AI Assistant"
+      {/* DROP-UP CONCIERGE SPEED DIAL (WHATSAPP / AI) */}
+      <div 
+        ref={menuRef}
+        className={`wn-concierge-dropup ${isMenuOpen && !isOpen ? 'open' : ''}`}
+        role="dialog"
+        aria-label="Winsor Concierge Options"
       >
-        {isOpen ? (
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        <div style={{
+          padding: '6px 8px 6px',
+          borderBottom: '1px solid rgba(139, 105, 20, 0.12)',
+          marginBottom: '2px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+        }}>
+          <span style={{
+            fontFamily: "'Jost', sans-serif",
+            fontSize: '9.5px',
+            fontWeight: 700,
+            textTransform: 'uppercase',
+            letterSpacing: '0.14em',
+            color: '#8B6914',
+          }}>
+            Winsor Concierge
+          </span>
+          <span style={{
+            width: '6px',
+            height: '6px',
+            borderRadius: '50%',
+            background: '#10b981',
+            display: 'inline-block',
+          }} />
+        </div>
+
+        {/* Option 1: WhatsApp Support */}
+        <a
+          href="https://wa.me/94770716212?text=Hello%20Winsor%20Brand%2C%20I%20would%20like%20to%20inquire%20about%20your%20luxury%20timepieces."
+          target="_blank"
+          rel="noopener noreferrer"
+          className="wn-concierge-item whatsapp-item"
+          onClick={() => setIsMenuOpen(false)}
+        >
+          <div style={{
+            width: '38px',
+            height: '38px',
+            borderRadius: '50%',
+            background: '#25D366',
+            boxShadow: '0 4px 12px rgba(37, 211, 102, 0.3)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexShrink: 0,
+            color: '#fff',
+          }}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="#ffffff">
+              <path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0 0 12.04 2zm5.79 14.12c-.24.68-1.4 1.25-1.92 1.33-.5.08-1.14.12-3.66-.92-3.04-1.26-5-4.34-5.15-4.55-.15-.2-1.23-1.64-1.23-3.13 0-1.49.78-2.22 1.06-2.52.28-.3.61-.37.82-.37.21 0 .42.01.6.02.19.01.45-.07.7.54.26.63.89 2.16.97 2.32.08.16.13.35.03.55-.1.2-.15.33-.3.51-.15.18-.32.4-.46.54-.15.15-.31.31-.13.62.18.31.8 1.32 1.72 2.13 1.18 1.05 2.17 1.38 2.48 1.53.31.15.49.13.67-.08.18-.21.78-.91.99-1.22.21-.31.42-.26.7-.16.28.1.1.78 2.22.92 2.37.14.15.23.23.26.28.03.05.03.29-.21.97z"/>
+            </svg>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <span style={{
+              fontFamily: "'Jost', sans-serif",
+              fontSize: '13px',
+              fontWeight: 600,
+              color: '#1a1209',
+              lineHeight: 1.2,
+            }}>
+              WhatsApp
+            </span>
+            <span style={{
+              fontFamily: "'Jost', sans-serif",
+              fontSize: '11px',
+              color: '#4b5563',
+              marginTop: '2px',
+            }}>
+              Direct chat with specialist
+            </span>
+          </div>
+        </a>
+
+        {/* Option 2: AI Concierge */}
+        <button
+          type="button"
+          className="wn-concierge-item ai-item"
+          onClick={() => {
+            setIsMenuOpen(false);
+            setIsOpen(true);
+          }}
+        >
+          <div style={{
+            position: 'relative',
+            width: '38px',
+            height: '38px',
+            borderRadius: '50%',
+            border: '2px solid #8B6914',
+            overflow: 'hidden',
+            flexShrink: 0,
+            boxShadow: '0 4px 12px rgba(139, 105, 20, 0.25)',
+          }}>
+            <Image
+              src="/winsi_dp.jpg"
+              alt="Winsi AI"
+              fill
+              sizes="38px"
+              style={{ objectFit: 'cover' }}
+            />
+            <div style={{
+              position: 'absolute',
+              bottom: '0px',
+              right: '0px',
+              width: '8px',
+              height: '8px',
+              borderRadius: '50%',
+              background: '#10b981',
+              border: '1.5px solid #1a1209',
+            }} />
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <span style={{
+              fontFamily: "'Jost', sans-serif",
+              fontSize: '13px',
+              fontWeight: 600,
+              color: '#1a1209',
+              lineHeight: 1.2,
+            }}>
+              Winsi AI Concierge
+            </span>
+            <span style={{
+              fontFamily: "'Jost', sans-serif",
+              fontSize: '11px',
+              color: '#8B6914',
+              marginTop: '2px',
+            }}>
+              Instant horology guidance
+            </span>
+          </div>
+        </button>
+      </div>
+
+      {/* FLOATING TRIGGER BUTTON (SHOWS WINSOR LOGO FIRST) */}
+      <button 
+        ref={triggerRef}
+        className={`ai-widget-trigger ${isOpen ? 'open' : ''} ${isMenuOpen ? 'menu-active' : ''}`}
+        onClick={() => {
+          if (isOpen) {
+            if (currentUtterance) {
+              window.speechSynthesis.cancel();
+              setCurrentUtterance(null);
+              setMessages(prev => prev.map(m => ({ ...m, isAudioPlaying: false })));
+            }
+            setIsOpen(false);
+          } else {
+            setIsMenuOpen(!isMenuOpen);
+          }
+        }}
+        aria-label="Open Winsor Concierge Options"
+        title={isMenuOpen ? "Close Menu" : "Winsor Concierge"}
+      >
+        {isMenuOpen ? (
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         ) : (
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275Z"/><path d="m5 3 1 2.5L8.5 6 6 7 5 9.5 4 7 1.5 6 4 5Z"/><path d="m19 17 1 2.5 2.5.5-2.5 1-1 2.5-1-2.5-2.5-1 2.5-1Z"/></svg>
+          <img
+            src="/winsor_crest.webp"
+            alt="Winsor Concierge"
+            style={{
+              width: '28px',
+              height: '24px',
+              objectFit: 'contain',
+              filter: 'brightness(0) invert(1) drop-shadow(0 2px 4px rgba(0,0,0,0.3))',
+              transition: 'transform 0.3s ease'
+            }}
+          />
         )}
       </button>
 
