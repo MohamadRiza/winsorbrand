@@ -1,11 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { uploadToCloudinary } from '@/lib/models/uploadToCloudinary';
 
-export const maxDuration = 60;
-export const dynamic = 'force-dynamic';
-
 // POST /api/upload
-// Body: { file: base64string, type: "thumbnail"|"gallery"|"colorImage"|"retailer"|"video"|"document", name: string }
+// Body: { file: base64string, type: "thumbnail"|"gallery"|"colorImage"|"video", name: string }
 export async function POST(req: NextRequest) {
   try {
     const { file, type, name } = await req.json();
@@ -14,7 +11,6 @@ export async function POST(req: NextRequest) {
       thumbnail:  'winsor/thumbnails',
       gallery:    'winsor/gallery',
       colorImage: 'winsor/colors',
-      retailer:   'winsor/retailers',
       video:      'winsor/videos',
       document:   'winsor/documents',
     };
