@@ -602,48 +602,6 @@ export default function AddProductPage() {
                 <option value="no_warranty">No Warranty</option><option value="3_months">3 Months</option><option value="6_months">6 Months</option><option value="1_year">1 Year</option>
               </select>
             </div>
-            <div className="md:col-span-2">
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-2">
-                  <label className="block text-[11px] font-semibold tracking-[0.2em] uppercase text-[#1a1209]/70">Description *</label>
-                  {formData.description.trim() && (
-                    <button
-                      type="button"
-                      onClick={() => checkSpelling('description', formData.description)}
-                      disabled={checkingSpelling['description']}
-                      className="text-[10px] text-[#8B6914] hover:text-[#1a1209] transition font-semibold flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
-                    >
-                      {checkingSpelling['description'] ? 'Checking...' : '✨ AI Check'}
-                    </button>
-                  )}
-                </div>
-                <button 
-                  type="button" 
-                  onClick={generateDescription} 
-                  disabled={isGenerateDisabled}
-                  suppressHydrationWarning={true}
-                  className="px-3 py-1.5 bg-gradient-to-r from-[#8B6914] to-[#a07d1a] text-white text-xs rounded-lg hover:from-[#6f5410] hover:to-[#8B6914] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 font-['Jost']"
-                >
-                  {generatingDescription ? (
-                    <><svg className="animate-spin h-4 w-4" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>Generating...</>
-                  ) : (
-                    <><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>AI Generate</>
-                  )}
-                </button>
-              </div>
-              <textarea 
-                value={formData.description} 
-                onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))} 
-                placeholder="Describe the product features, materials, craftsmanship... or click AI Generate" 
-                required 
-                rows={8} 
-                className="w-full min-h-[160px] px-4 py-3 bg-[#fbf9f4] border border-[#1a1209]/15 rounded-lg text-[#1a1209] placeholder-[#1a1209]/30 focus:outline-none focus:border-[#8B6914] focus:ring-2 focus:ring-[#8B6914]/20 transition font-['Jost'] text-sm resize-y leading-relaxed" 
-              />
-              <div className="flex justify-between items-center mt-1">
-                <p className="text-xs text-[#1a1209]/40">AI-powered description generation using Gemini (Server-side)</p>
-                <span className="text-[11px] text-[#1a1209]/40 italic">Drag bottom-right corner ↘ to expand box size</span>
-              </div>
-            </div>
           </div>
         </div>
 
@@ -1029,6 +987,55 @@ export default function AddProductPage() {
           ) : (
             <p className="text-xs text-[#1a1209]/40 italic">No custom specifications added yet. Add attributes above to enrich the product page.</p>
           )}
+        </div>
+
+        {/* Product Description */}
+        <div className="bg-white rounded-xl border border-[#1a1209]/10 p-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+            <div>
+              <h3 className="font-['Jost'] font-semibold text-[#1a1209]">Product Description *</h3>
+              <p className="text-xs text-[#1a1209]/50 mt-0.5">
+                Click AI Generate to compose a luxury narrative using the colors, category, collections, and specifications filled above
+              </p>
+            </div>
+            <div className="flex items-center gap-2 self-start sm:self-auto">
+              {formData.description.trim() && (
+                <button
+                  type="button"
+                  onClick={() => checkSpelling('description', formData.description)}
+                  disabled={checkingSpelling['description']}
+                  className="px-3 py-1.5 bg-[#1a1209]/5 hover:bg-[#1a1209]/10 text-[#1a1209] text-xs rounded-lg transition font-semibold flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                >
+                  {checkingSpelling['description'] ? 'Checking...' : '✨ AI Check'}
+                </button>
+              )}
+              <button 
+                type="button" 
+                onClick={generateDescription} 
+                disabled={isGenerateDisabled}
+                suppressHydrationWarning={true}
+                className="px-3.5 py-1.5 bg-gradient-to-r from-[#8B6914] to-[#a07d1a] text-white text-xs font-medium rounded-lg hover:from-[#6f5410] hover:to-[#8B6914] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 font-['Jost'] shadow-sm cursor-pointer whitespace-nowrap"
+              >
+                {generatingDescription ? (
+                  <><svg className="animate-spin h-4 w-4" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>Generating...</>
+                ) : (
+                  <><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>AI Generate Description</>
+                )}
+              </button>
+            </div>
+          </div>
+          <textarea 
+            value={formData.description} 
+            onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))} 
+            placeholder="Describe the product features, materials, and craftsmanship... or click 'AI Generate Description' to automatically compose a luxury narrative from all the details above..." 
+            required 
+            rows={8} 
+            className="w-full min-h-[180px] px-4 py-3 bg-[#fbf9f4] border border-[#1a1209]/15 rounded-lg text-[#1a1209] placeholder-[#1a1209]/30 focus:outline-none focus:border-[#8B6914] focus:ring-2 focus:ring-[#8B6914]/20 transition font-['Jost'] text-sm resize-y leading-relaxed" 
+          />
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 mt-1.5">
+            <p className="text-xs text-[#1a1209]/40">Synthesizes color variants, category, collections, occasions, and specifications into fluid paragraphs</p>
+            <span className="text-[11px] text-[#1a1209]/40 italic">Drag bottom-right corner ↘ to expand box size</span>
+          </div>
         </div>
 
         {/* Display Settings */}
