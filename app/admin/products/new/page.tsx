@@ -364,11 +364,16 @@ export default function AddProductPage() {
     });
   };
 
-  const getTotalStock = () => formData.colorVariants.reduce((sum, v) => sum + v.qty, 0);
+  const getTotalStock = () => formData.colorVariants.reduce((sum, v) => sum + (Number(v.qty) || 0), 0);
 
   useEffect(() => {
+    // If at least one variant has qty >= 2 (or any positive stock), default sold out to TURNED OFF
+    const hasStock = formData.colorVariants.some(v => Number(v.qty) >= 2 || Number(v.qty) > 0);
     const totalStock = getTotalStock();
-    if (totalStock === 0 && formData.colorVariants.length > 0) {
+
+    if (hasStock) {
+      setFormData(prev => ({ ...prev, isSoldOut: false }));
+    } else if (totalStock === 0 && formData.colorVariants.length > 0) {
       setFormData(prev => ({ ...prev, isSoldOut: true }));
     }
   }, [formData.colorVariants]);
@@ -505,8 +510,10 @@ export default function AddProductPage() {
       }
 
       // 3. Submit payload to API
+      const hasStock = finalVariants.some(v => Number(v.qty) >= 2 || Number(v.qty) > 0);
       const payload = {
         ...formData,
+        isSoldOut: hasStock ? formData.isSoldOut : true,
         specifications: {
           ...formData.specifications,
           Gender: targetGender,
@@ -1046,9 +1053,29 @@ export default function AddProductPage() {
               <input type="checkbox" checked={formData.isActive} onChange={(e) => setFormData(prev => ({ ...prev, isActive: e.target.checked }))} className="w-4 h-4 text-[#8B6914] border-[#1a1209]/20 rounded focus:ring-[#8B6914]" />
               <span className="text-sm font-['Jost'] font-medium text-[#1a1209]">Active (Visible on website)</span>
             </label>
-            <label className="flex items-center gap-3 cursor-pointer p-3 bg-red-50 rounded-lg border border-red-200">
-              <input type="checkbox" checked={formData.isSoldOut || getTotalStock() === 0} onChange={(e) => setFormData(prev => ({ ...prev, isSoldOut: e.target.checked }))} disabled={getTotalStock() === 0} className="w-4 h-4 text-red-600 border-red-300 rounded focus:ring-red-600 disabled:opacity-50" />
-              <div><span className="text-sm font-['Jost'] font-semibold text-red-700">SOLD OUT</span><p className="text-xs text-red-600">Product visible but cannot be purchased</p></div>
+            <label className={`flex items-center gap-3 cursor-pointer p-3 rounded-lg border transition-all ${
+              formData.isSoldOut ? 'bg-red-50 border-red-200' : 'bg-[#faf7f0] border-[#1a1209]/10'
+            }`}>
+              <input 
+                type="checkbox" 
+                checked={formData.isSoldOut} 
+                onChange={(e) => setFormData(prev => ({ ...prev, isSoldOut: e.target.checked }))} 
+                className="w-4 h-4 text-red-600 border-red-300 rounded focus:ring-red-600 cursor-pointer" 
+              />
+              <div>
+                <span className={`text-sm font-['Jost'] font-semibold ${
+                  formData.isSoldOut ? 'text-red-700' : 'text-[#1a1209]'
+                }`}>
+                  {formData.isSoldOut ? 'SOLD OUT (Active)' : 'Sold Out Status (Turned Off)'}
+                </span>
+                <p className="text-xs text-[#1a1209]/60">
+                  {formData.isSoldOut 
+                    ? 'Product is marked as Sold Out and cannot be purchased by customers' 
+                    : formData.colorVariants.some(v => Number(v.qty) >= 2 || Number(v.qty) > 0)
+                    ? 'In stock — Default turned off because stock quantity is available'
+                    : 'Default turned off for new products'}
+                </p>
+              </div>
             </label>
             <label className="flex items-center gap-3 cursor-pointer">
               <input type="checkbox" checked={formData.showOnHome} onChange={(e) => setFormData(prev => ({ ...prev, showOnHome: e.target.checked }))} className="w-4 h-4 text-[#8B6914] border-[#1a1209]/20 rounded focus:ring-[#8B6914]" />

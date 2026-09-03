@@ -71,6 +71,7 @@ export default function EditProductPage() {
     collectionSections: [] as CollectionSection[],
     giftCategories: [] as string[],
     isActive: false,
+    isSoldOut: false,
     showOnHome: false,
     stickerEnabled: false,
     stickerText: '',
@@ -170,6 +171,7 @@ export default function EditProductPage() {
         collectionSections: product.collectionSections || [],
         giftCategories: product.giftCategories || [],
         isActive: product.isActive,
+        isSoldOut: product.isSoldOut ?? false,
         showOnHome: product.showOnHome,
         stickerEnabled: product.stickerEnabled,
         stickerText: product.stickerText || '',
@@ -431,6 +433,8 @@ export default function EditProductPage() {
       return { ...prev, specifications: newSpecs };
     });
   };
+
+  const getTotalStock = () => formData.colorVariants.reduce((sum, v) => sum + (Number(v.qty) || 0), 0);
 
   const toggleCollectionSection = (section: CollectionSection) => {
     setFormData(prev => {
@@ -1191,6 +1195,31 @@ export default function EditProductPage() {
                 className="w-4 h-4 text-[#8B6914] border-[#1a1209]/20 rounded focus:ring-[#8B6914]"
               />
               <span className="text-sm font-['Jost'] font-medium text-[#1a1209]">Active (Visible on website)</span>
+            </label>
+
+            <label className={`flex items-center gap-3 cursor-pointer p-3 rounded-lg border transition-all ${
+              formData.isSoldOut ? 'bg-red-50 border-red-200' : 'bg-[#faf7f0] border-[#1a1209]/10'
+            }`}>
+              <input 
+                type="checkbox" 
+                checked={formData.isSoldOut} 
+                onChange={(e) => setFormData(prev => ({ ...prev, isSoldOut: e.target.checked }))} 
+                className="w-4 h-4 text-red-600 border-red-300 rounded focus:ring-red-600 cursor-pointer" 
+              />
+              <div>
+                <span className={`text-sm font-['Jost'] font-semibold ${
+                  formData.isSoldOut ? 'text-red-700' : 'text-[#1a1209]'
+                }`}>
+                  {formData.isSoldOut ? 'SOLD OUT (Active)' : 'Sold Out Status (Turned Off)'}
+                </span>
+                <p className="text-xs text-[#1a1209]/60">
+                  {formData.isSoldOut 
+                    ? 'Product is marked as Sold Out and cannot be purchased by customers' 
+                    : formData.colorVariants.some(v => Number(v.qty) >= 2 || Number(v.qty) > 0)
+                    ? 'In stock — Default turned off because stock quantity is available'
+                    : 'Turned off by default'}
+                </p>
+              </div>
             </label>
             
             <label className="flex items-center gap-3 cursor-pointer">
