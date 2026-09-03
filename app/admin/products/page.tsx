@@ -658,7 +658,7 @@ export default function ProductsPage() {
                         {product._id && (
                           <>
                             <Link
-                              href={`/products/${product._id}`}
+                              href={`/collections/${product._id}`}
                               target="_blank"
                               rel="noopener noreferrer"
                               style={{

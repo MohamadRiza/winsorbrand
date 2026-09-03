@@ -44,6 +44,15 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  async redirects() {
+    return [
+      {
+        source: '/products/:id',
+        destination: '/collections/:id',
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default nextConfig;
