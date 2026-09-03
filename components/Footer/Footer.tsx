@@ -377,17 +377,58 @@ export default function Footer() {
 
           .ft-social-row { gap: 10px !important; flex-wrap: wrap !important; }
         }
+
+        .ft-watermark-bg {
+          position: absolute;
+          top: 40%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          width: 520px;
+          max-width: 85vw;
+          pointer-events: none;
+          user-select: none;
+          z-index: 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          opacity: 0.045;
+        }
+
+        @media (max-width: 640px) {
+          .ft-watermark-bg {
+            width: 270px;
+            max-width: 78vw;
+            top: 42%;
+            opacity: 0.055;
+          }
+        }
       `}</style>
 
       <footer style={{
+        position: 'relative',
+        overflow: 'hidden',
         background: '#faf7f0',
         borderTop: '1px solid rgba(26,18,9,0.07)',
         fontFamily: "'Jost',sans-serif",
         color: '#1a1209'
       }}>
 
+        {/* Faded Luxury Winsor Logo Watermark in Background */}
+        <div className="ft-watermark-bg" aria-hidden="true">
+          <img
+            src="/winsor_watermark_centered.webp"
+            alt=""
+            style={{
+              width: '100%',
+              height: 'auto',
+              objectFit: 'contain',
+              filter: 'grayscale(25%)',
+            }}
+          />
+        </div>
+
         {/* ───────── MAIN FOOTER CONTENT ───────── */}
-        <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '64px 48px 40px' }}>
+        <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '64px 48px 40px', position: 'relative', zIndex: 1 }}>
           <div className="ft-main-grid">
 
             {/* ── COL 1: BRAND / CONTACT / SOCIAL ── */}
@@ -653,7 +694,9 @@ export default function Footer() {
         <div style={{
           borderTop: '1px solid rgba(26,18,9,0.07)',
           background: 'rgba(26,18,9,0.02)',
-          padding: '20px 48px'
+          padding: '20px 48px',
+          position: 'relative',
+          zIndex: 1
         }}>
           <div
             className="ft-bottom-bar"
