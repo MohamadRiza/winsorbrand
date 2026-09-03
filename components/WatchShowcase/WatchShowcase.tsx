@@ -17,7 +17,7 @@ const WatchShowcase = () => {
       if (v) {
         v.defaultMuted = true;
         v.muted = true;
-        v.play().catch(() => {});
+        v.play().catch(() => { });
       }
     });
 
@@ -27,8 +27,8 @@ const WatchShowcase = () => {
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          v1?.play().catch(() => {});
-          v2?.play().catch(() => {});
+          v1?.play().catch(() => { });
+          v2?.play().catch(() => { });
         } else {
           v1?.pause();
           v2?.pause();
@@ -92,14 +92,14 @@ const WatchShowcase = () => {
             playsInline
             preload="metadata"
             className="aspect-[4/3] h-full max-h-[720px] w-full object-cover transition-transform duration-700 hover:scale-[1.02] sm:aspect-auto"
-            src="/watch_space_vid.webm"
+            src="/winsor_video.webm"
           />
         </div>
       </div>
 
       {/* Two Horizontal Banners (Slim, Ultra-Luxury Img 2 Match) */}
       <div className="mx-auto mt-10 max-w-7xl px-4 sm:mt-14 sm:px-6 space-y-5 sm:space-y-6">
-        
+
         {/* Banner 1: ABOUT WINSOR */}
         <div className="group relative overflow-hidden rounded-xl sm:rounded-2xl bg-[#faf7f0] border border-[rgba(26,18,9,0.08)] shadow-[0_4px_20px_rgba(0,0,0,0.03)] grid grid-cols-[1.3fr_1fr] md:grid-cols-2 items-center md:h-[220px] lg:h-[240px]">
           {/* Left Text Content */}
