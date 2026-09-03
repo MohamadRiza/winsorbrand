@@ -311,6 +311,43 @@ export default function AIAssistant() {
           transform: rotate(90deg) scale(0.9);
         }
 
+        /* ── LUXURY PING RADAR ANIMATION ── */
+        .ai-trigger-ping {
+          position: absolute;
+          inset: -3px;
+          border-radius: 50%;
+          border: 2px solid #8B6914;
+          pointer-events: none;
+          animation: wn-radar-ping 2.6s cubic-bezier(0.16, 0.8, 0.36, 1) infinite;
+          opacity: 0;
+          z-index: -1;
+        }
+        .ai-trigger-ping-subtle {
+          position: absolute;
+          inset: -3px;
+          border-radius: 50%;
+          border: 1.5px solid rgba(201, 161, 74, 0.6);
+          pointer-events: none;
+          animation: wn-radar-ping 2.6s cubic-bezier(0.16, 0.8, 0.36, 1) infinite;
+          animation-delay: 0.9s;
+          opacity: 0;
+          z-index: -1;
+        }
+
+        @keyframes wn-radar-ping {
+          0% {
+            transform: scale(0.98);
+            opacity: 0.8;
+          }
+          60% {
+            opacity: 0.35;
+          }
+          100% {
+            transform: scale(1.6);
+            opacity: 0;
+          }
+        }
+
         /* ── CHAT PANEL WINDOW ── */
         .ai-chat-window {
           position: fixed;
@@ -797,7 +834,7 @@ export default function AIAssistant() {
         </button>
       </div>
 
-      {/* FLOATING TRIGGER BUTTON (SHOWS WINSOR LOGO FIRST) */}
+      {/* FLOATING TRIGGER BUTTON (SHOWS WINSOR LOGO FIRST WITH PING ANIMATION) */}
       <button 
         ref={triggerRef}
         className={`ai-widget-trigger ${isOpen ? 'open' : ''} ${isMenuOpen ? 'menu-active' : ''}`}
@@ -816,6 +853,30 @@ export default function AIAssistant() {
         aria-label="Open Winsor Concierge Options"
         title={isMenuOpen ? "Close Menu" : "Winsor Concierge"}
       >
+        {/* Luxury Gold Radar Ping Animation & Crisp Vector Status Dot (Zero Pixelation) */}
+        {!isMenuOpen && !isOpen && (
+          <>
+            <span className="ai-trigger-ping" />
+            <span className="ai-trigger-ping-subtle" />
+            {/* Crisp Anti-Aliased Vector Online Dot */}
+            <svg
+              width="12"
+              height="12"
+              viewBox="0 0 12 12"
+              style={{
+                position: 'absolute',
+                top: '3px',
+                right: '3px',
+                zIndex: 3,
+                pointerEvents: 'none',
+                filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.5))',
+              }}
+            >
+              <circle cx="6" cy="6" r="4.5" fill="#10b981" stroke="#1a1209" strokeWidth="1.5" />
+            </svg>
+          </>
+        )}
+
         {isMenuOpen ? (
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         ) : (

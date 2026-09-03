@@ -8,45 +8,6 @@ export default function Watch3DAssembly() {
   const [videoLoaded, setVideoLoaded] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  // Auto-advance slides with dynamic intervals (5s for image slides, 20s for video slide)
-  useEffect(() => {
-    const delay = activeSlide === 2 ? 20000 : 5000;
-    const timer = setInterval(() => {
-      setActiveSlide((prev) => (prev + 1) % 3);
-    }, delay);
-    return () => clearInterval(timer);
-  }, [activeSlide]); // Reset interval whenever slide changes manually
-
-  // Dispatch custom window event when slide changes to allow Navbar to sync contrast
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const event = new CustomEvent('winsor-hero-slide-change', { detail: { activeSlide } });
-      window.dispatchEvent(event);
-    }
-
-    // Lazy load and play/pause the 35MB video only when Slide 3 is requested
-    if (activeSlide === 2) {
-      setVideoLoaded(true);
-      if (videoRef.current) {
-        videoRef.current.defaultMuted = true;
-        videoRef.current.muted = true;
-        videoRef.current.play().catch(() => {});
-      }
-    } else {
-      videoRef.current?.pause();
-    }
-  }, [activeSlide]);
-
-  // Detect mobile viewport
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
-
   interface SlideData {
     preTitle: string;
     titleLine1: string;
@@ -92,7 +53,143 @@ export default function Watch3DAssembly() {
     }
   ];
 
+  // Typewriter effect state for slide headings
+  const [charIndex, setCharIndex] = useState(0);
+  const [phase, setPhase] = useState<'typing' | 'pausing' | 'deleting'>('typing');
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Synchronized Typewriter & Slide Transition State Machine
+  const currentSlide = slides[activeSlide];
+  const totalChars = currentSlide.titleLine1.length + currentSlide.titleLine2.length + currentSlide.titleLine3.length;
+
+  useEffect(() => {
+    let timeoutId: NodeJS.Timeout;
+
+    if (phase === 'typing') {
+      if (charIndex < totalChars) {
+        timeoutId = setTimeout(() => {
+          setCharIndex((c) => c + 1);
+        }, 40); // 40ms typing pace per char
+      } else {
+        // Pause after fully typing: 14s for video slide, 2.6s for image slides
+        const pauseTime = activeSlide === 2 ? 14000 : 2600;
+        timeoutId = setTimeout(() => {
+          setPhase('deleting');
+        }, pauseTime);
+      }
+    } else if (phase === 'deleting') {
+      if (charIndex > 0) {
+        timeoutId = setTimeout(() => {
+          setCharIndex((c) => c - 1);
+        }, 38); // Slower, smooth and readable deletion pace (relaxed backspace)
+      } else {
+        // Gentle pause on blank before smoothly advancing to the next slide
+        timeoutId = setTimeout(() => {
+          setActiveSlide((prev) => (prev + 1) % 3);
+          setCharIndex(0);
+          setPhase('typing');
+        }, 220);
+      }
+    }
+
+    return () => clearTimeout(timeoutId);
+  }, [phase, charIndex, totalChars, activeSlide]);
+
+  const handleSelectSlide = (idx: number) => {
+    if (idx === activeSlide) return;
+    setActiveSlide(idx);
+    setCharIndex(0);
+    setPhase('typing');
+  };
+
+  // Dispatch custom window event when slide changes to allow Navbar to sync contrast
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const event = new CustomEvent('winsor-hero-slide-change', { detail: { activeSlide } });
+      window.dispatchEvent(event);
+    }
+
+    // Lazy load and play/pause the 35MB video only when Slide 3 is requested
+    if (activeSlide === 2) {
+      setVideoLoaded(true);
+      if (videoRef.current) {
+        videoRef.current.defaultMuted = true;
+        videoRef.current.muted = true;
+        videoRef.current.play().catch(() => {});
+      }
+    } else {
+      videoRef.current?.pause();
+    }
+  }, [activeSlide]);
+
+  // Detect mobile viewport
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   const isDarkSlide = activeSlide === 2;
+
+  // Helper to render title with typing & backspace animation
+  const renderTypedTitle = (slide: SlideData, count: number, isCurrentActive: boolean) => {
+    if (!isCurrentActive) {
+      return (
+        <>
+          {slide.titleLine1}<br />
+          {slide.titleLine2} <span style={{ color: isDarkSlide ? '#dfb15b' : '#8b6914', fontStyle: 'italic' }}>{slide.titleLine3}</span>
+        </>
+      );
+    }
+
+    const l1 = slide.titleLine1;
+    const l2 = slide.titleLine2;
+    const l3 = slide.titleLine3;
+    const len1 = l1.length;
+    const len2 = l2.length;
+    const len3 = l3.length;
+
+    const t1 = l1.slice(0, Math.min(count, len1));
+    const isCursorInLine1 = count <= len1;
+
+    let t2 = '';
+    let isCursorInLine2 = false;
+    if (count > len1) {
+      const rem1 = count - len1;
+      t2 = l2.slice(0, Math.min(rem1, len2));
+      isCursorInLine2 = rem1 <= len2;
+    }
+
+    let t3 = '';
+    let isCursorInLine3 = false;
+    if (count > len1 + len2) {
+      const rem2 = count - (len1 + len2);
+      t3 = l3.slice(0, Math.min(rem2, len3));
+      isCursorInLine3 = true;
+    }
+
+    return (
+      <>
+        {t1}
+        {isCursorInLine1 && <span className="wn-type-cursor" style={{ color: isDarkSlide ? '#dfb15b' : '#8b6914' }}>|</span>}
+        {count > len1 && <br />}
+        {t2}
+        {isCursorInLine2 && <span className="wn-type-cursor" style={{ color: isDarkSlide ? '#dfb15b' : '#8b6914' }}>|</span>}
+        {count > len1 + len2 && ' '}
+        <span style={{ color: isDarkSlide ? '#dfb15b' : '#8b6914', fontStyle: 'italic' }}>
+          {t3}
+        </span>
+        {isCursorInLine3 && <span className="wn-type-cursor" style={{ color: isDarkSlide ? '#dfb15b' : '#8b6914' }}>|</span>}
+      </>
+    );
+  };
 
   return (
     <div
@@ -240,18 +337,30 @@ export default function Watch3DAssembly() {
                   {slide.preTitle}
                 </p>
 
-                {/* Big Serif Heading */}
+                {/* Big Serif Heading with Synchronized Typewriter Effect */}
                 <h1
                   className="mb-2 font-normal"
                   style={{
                     fontFamily: "'Cormorant Garamond', serif",
                     fontSize: isMobile ? '20px' : '62px',
                     lineHeight: 1.15,
-                    color: isDarkSlide ? '#ffffff' : '#1a1209'
+                    color: isDarkSlide ? '#ffffff' : '#1a1209',
+                    minHeight: isMobile ? '48px' : '145px',
                   }}
                 >
-                  {slide.titleLine1}<br />
-                  {slide.titleLine2} <span style={{ color: isDarkSlide ? '#dfb15b' : '#8b6914', fontStyle: 'italic' }}>{slide.titleLine3}</span>
+                  <span className="sr-only">
+                    {slide.titleLine1} {slide.titleLine2} {slide.titleLine3}
+                  </span>
+                  <span aria-hidden="true">
+                    {!mounted ? (
+                      <>
+                        {slide.titleLine1}<br />
+                        {slide.titleLine2} <span style={{ color: isDarkSlide ? '#dfb15b' : '#8b6914', fontStyle: 'italic' }}>{slide.titleLine3}</span>
+                      </>
+                    ) : (
+                      renderTypedTitle(slide, charIndex, isActive)
+                    )}
+                  </span>
                 </h1>
 
                 {/* Tagline Description */}
@@ -306,7 +415,7 @@ export default function Watch3DAssembly() {
                       return (
                         <button
                           key={slideIdx}
-                          onClick={() => setActiveSlide(slideIdx)}
+                          onClick={() => handleSelectSlide(slideIdx)}
                           style={{
                             width: isDotActive ? '18px' : '6px',
                             height: '2.5px',
@@ -390,7 +499,7 @@ export default function Watch3DAssembly() {
           return (
             <button
               key={idx}
-              onClick={() => setActiveSlide(idx)}
+              onClick={() => handleSelectSlide(idx)}
               style={{
                 background: 'none',
                 border: 'none',
@@ -495,6 +604,19 @@ export default function Watch3DAssembly() {
           0% { opacity: 0; top: 5px; }
           30% { opacity: 1; }
           100% { opacity: 0; top: 15px; }
+        }
+        .wn-type-cursor {
+          display: inline-block;
+          margin-left: 2px;
+          font-weight: 200;
+          line-height: 0.9;
+          animation: wn-type-blink 0.85s infinite;
+          user-select: none;
+          pointer-events: none;
+        }
+        @keyframes wn-type-blink {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0; }
         }
       `}</style>
     </div>
