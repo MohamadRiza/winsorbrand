@@ -35,7 +35,11 @@ const FullscreenIcon = () => (
   </svg>
 );
 
-export default function VideoPlayer() {
+interface VideoPlayerProps {
+  src?: string;
+}
+
+export default function VideoPlayer({ src = "/winsor_video.webm" }: VideoPlayerProps = {}) {
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -119,14 +123,16 @@ export default function VideoPlayer() {
     >
       <video
         ref={videoRef}
-        src="/winsor_Automatic_vid.webm"
+        src={src}
         loop
         playsInline
         muted
         preload="metadata"
         className="w-full h-full object-cover"
         aria-label="Winsor Horology Craftsmanship Film"
-      />
+      >
+        <source src={src} type="video/webm" />
+      </video>
 
       {/* Luxury Cinematic Gradient Overlay */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/20 pointer-events-none" />

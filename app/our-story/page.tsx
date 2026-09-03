@@ -345,7 +345,7 @@ export default function OurStoryPage() {
 
           {/* Client-Side Video Player */}
           <div className="max-w-4xl mx-auto">
-            <VideoPlayer />
+            <VideoPlayer src="/winsor_video.webm" />
           </div>
 
           <div className="text-center mt-6">
