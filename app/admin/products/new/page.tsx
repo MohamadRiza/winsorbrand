@@ -37,6 +37,10 @@ export default function AddProductPage() {
     totalFiles: 1,
     loadedBytes: 0,
     totalBytes: 0,
+    estimatedSecondsRemaining: null,
+    uploadSpeedBytesPerSec: null,
+    stage: 'uploading',
+    statusMessage: '',
   });
 
   // Staged Media States for Zero-Delay Local Previews
@@ -451,19 +455,24 @@ export default function AddProductPage() {
     setLoading(true);
 
     try {
-      // 2. Perform uploads with XHR byte progress modal if files exist
+      // 2. Perform uploads with stage-aware telemetry progress and countdown
       if (tasks.length > 0) {
         const totalBytes = tasks.reduce((sum, t) => sum + t.file.size, 0);
         let completedPreviousBytes = 0;
+        const uploadStartTime = Date.now();
 
         setUploadProgress({
           isOpen: true,
-          overallPercent: 0,
+          overallPercent: 2,
           currentFileName: tasks[0].file.name,
           currentIndex: 1,
           totalFiles: tasks.length,
           loadedBytes: 0,
           totalBytes,
+          estimatedSecondsRemaining: Math.max(3, Math.ceil(totalBytes / 300000) + tasks.length),
+          uploadSpeedBytesPerSec: 0,
+          stage: 'uploading',
+          statusMessage: `Uploading file 1 of ${tasks.length}: ${tasks[0].file.name}`,
         });
 
         for (let i = 0; i < tasks.length; i++) {
@@ -473,6 +482,8 @@ export default function AddProductPage() {
             ...prev,
             currentFileName: task.file.name,
             currentIndex: i + 1,
+            stage: 'uploading',
+            statusMessage: `Uploading file ${i + 1} of ${tasks.length}: ${task.file.name}`,
           }));
 
           const asset = await uploadSingleFileWithXHR(
@@ -480,11 +491,25 @@ export default function AddProductPage() {
             task.type,
             (fileLoadedBytes) => {
               const currentTotal = completedPreviousBytes + Math.min(fileLoadedBytes, task.file.size);
-              const pct = Math.min(99, Math.round((currentTotal / totalBytes) * 100));
+              // Byte upload covers 0% to 75% of overall process
+              const byteFraction = totalBytes > 0 ? currentTotal / totalBytes : 0;
+              const bytePct = Math.min(75, Math.max(2, Math.round(byteFraction * 75)));
+              
+              // Calculate transfer speed and countdown
+              const elapsedSecs = Math.max(0.2, (Date.now() - uploadStartTime) / 1000);
+              const speed = currentTotal / elapsedSecs;
+              const remainingBytes = Math.max(0, totalBytes - currentTotal);
+              const remainingSecs = speed > 1024 ? remainingBytes / speed : 0;
+              const totalEstSecs = Math.max(1, Math.ceil(remainingSecs + (tasks.length - i) * 0.8 + 1));
+
               setUploadProgress(prev => ({
                 ...prev,
                 loadedBytes: currentTotal,
-                overallPercent: pct,
+                overallPercent: bytePct,
+                uploadSpeedBytesPerSec: speed,
+                estimatedSecondsRemaining: totalEstSecs,
+                stage: 'uploading',
+                statusMessage: `Uploading file ${i + 1} of ${tasks.length}: ${task.file.name}`,
               }));
             }
           );
@@ -492,21 +517,45 @@ export default function AddProductPage() {
           task.applyResult(asset);
           completedPreviousBytes += task.file.size;
 
-          const fileDonePct = Math.min(99, Math.round((completedPreviousBytes / totalBytes) * 100));
+          // File completed on cloud storage — stage: processing (75% to 92%)
+          const cloudProcessedPct = 75 + Math.round(((i + 1) / tasks.length) * 17);
+          const remainingTasks = tasks.length - (i + 1);
           setUploadProgress(prev => ({
             ...prev,
             loadedBytes: completedPreviousBytes,
-            overallPercent: fileDonePct,
+            overallPercent: cloudProcessedPct,
+            stage: remainingTasks > 0 ? 'processing' : 'saving',
+            statusMessage: remainingTasks > 0 
+              ? `Optimized ${i + 1} of ${tasks.length} cloud assets...` 
+              : 'Cloud assets optimized. Preparing database listing...',
+            estimatedSecondsRemaining: Math.max(1, Math.ceil(remainingTasks * 0.8 + 1)),
           }));
         }
 
+        // Advance to database saving stage (94%)
         setUploadProgress(prev => ({
           ...prev,
           loadedBytes: totalBytes,
-          overallPercent: 100,
+          overallPercent: 94,
+          stage: 'saving',
+          statusMessage: 'Saving product details and inventory to database...',
+          estimatedSecondsRemaining: 1,
         }));
-
-        await new Promise(r => setTimeout(r, 400));
+      } else {
+        // Fast modal for database creation when no new files need uploading
+        setUploadProgress({
+          isOpen: true,
+          overallPercent: 88,
+          currentFileName: '',
+          currentIndex: 1,
+          totalFiles: 0,
+          loadedBytes: 0,
+          totalBytes: 0,
+          stage: 'saving',
+          statusMessage: 'Saving product details to database...',
+          estimatedSecondsRemaining: 1,
+          uploadSpeedBytesPerSec: 0,
+        });
       }
 
       // 3. Submit payload to API
@@ -538,6 +587,17 @@ export default function AddProductPage() {
 
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Failed to create product');
+
+      // 4. Hit 100% and show complete
+      setUploadProgress(prev => ({
+        ...prev,
+        overallPercent: 100,
+        stage: 'complete',
+        statusMessage: 'Product created and listed successfully!',
+        estimatedSecondsRemaining: 0,
+      }));
+
+      await new Promise(r => setTimeout(r, 650));
 
       toast.success('Product created successfully!');
       router.push('/admin/products');
