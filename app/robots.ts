@@ -11,6 +11,8 @@ export default function robots(): MetadataRoute.Robots {
         disallow: [
           '/admin/',
           '/api/admin/',
+          '/api/customer/',
+          '/api/payment/',
           '/profile',
           '/orders',
           '/cart',
@@ -18,14 +20,17 @@ export default function robots(): MetadataRoute.Robots {
         ],
       },
       {
-        userAgent: 'Googlebot',
+        userAgent: ['Googlebot', 'Bingbot'],
         allow: '/',
         disallow: [
           '/admin/',
           '/api/admin/',
+          '/api/customer/',
+          '/api/payment/',
           '/profile',
           '/orders',
           '/cart',
+          '/staff/',
         ],
       },
     ],

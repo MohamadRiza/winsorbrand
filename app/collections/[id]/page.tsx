@@ -21,7 +21,7 @@ export async function generateMetadata({
     const title = `${product.title} (Ref. ${product.modelNo}) — Winsor Luxury Timepiece`;
     const description = product.description
       ? product.description.slice(0, 160)
-      : `Acquire the ${product.title} (Model #${product.modelNo}) by Winsor Maison. Hand-crafted precision Swiss-engineered automatic timepiece with priority shipping.`;
+      : `Discover the ${product.title} (Model #${product.modelNo}) by Winsor. Precision Japan movement timepiece crafted across Dubai, India, and Sri Lanka with 1-year international warranty & nationwide fixed MRP.`;
 
     const imageUrl = product.thumbnail?.url || '/mens-watch-highlight.png';
 
@@ -66,13 +66,17 @@ export default async function ProductPage({
         '@type': 'Product',
         'name': product.title,
         'image': [product.thumbnail?.url || `${baseUrl}/mens-watch-highlight.png`],
-        'description': product.description,
+        'description':
+          product.description ||
+          `Hand-crafted luxury watch featuring high-precision Japan movement, crafted across Dubai, India, and Sri Lanka with a 1-year international warranty.`,
         'sku': product.modelNo,
         'mpn': product.modelNo,
+        'category': 'Watches',
         'brand': {
           '@type': 'Brand',
           'name': 'Winsor',
         },
+        'countryOfAssembly': ['AE', 'IN', 'LK'],
         'offers': {
           '@type': 'Offer',
           'url': `${baseUrl}/collections/${id}`,
@@ -84,6 +88,12 @@ export default async function ProductPage({
           'seller': {
             '@type': 'Organization',
             'name': 'Winsor Maison',
+          },
+          'hasMerchantReturnPolicy': {
+            '@type': 'MerchantReturnPolicy',
+            'applicableCountry': 'LK',
+            'returnPolicyCategory': 'https://schema.org/MerchantReturnFiniteReturnWindow',
+            'merchantReturnDays': 7,
           },
         },
       };

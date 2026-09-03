@@ -24,21 +24,28 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),
   title: {
-    default: 'Winsor — Luxury Timepieces & Horology Maison',
+    default: 'Winsor — Luxury Timepieces | Japan Movement & Dubai Atelier',
     template: '%s | Winsor Maison',
   },
-  description: 'Discover luxury Swiss-engineered timepieces, automatic chronographs, and haute horologie collections by Winsor Maison.',
+  description:
+    'Discover luxury Winsor timepieces powered by precision Japan movements. Registered in Dubai, meticulously crafted across Dubai, India, and Sri Lanka. Fixed MRP & 1-year international warranty.',
   keywords: [
     'Winsor watches',
-    'luxury timepieces',
-    'automatic watches',
-    'Swiss horology',
-    'limited edition watches',
+    'Japan movement watch',
+    'Japanese movement watch Sri Lanka',
+    'Dubai watch brand',
+    'luxury watches Sri Lanka',
+    'buy watches online Sri Lanka',
     'mens luxury watch',
     'womens luxury watch',
-    'chronograph watch',
-    'luxury watch Sri Lanka',
-    'haute horologie',
+    'sports chronograph',
+    'automatic watch Japan movement',
+    'fixed MRP watch',
+    'Winsor brand',
+    '1 year warranty watch Sri Lanka',
+    'Dubai luxury timepieces',
+    'gents watch Sri Lanka',
+    'ladies watch Sri Lanka',
   ],
   authors: [{ name: 'Winsor Maison' }],
   creator: 'Winsor Maison',
@@ -59,8 +66,9 @@ export const metadata: Metadata = {
     locale: 'en_US',
     url: baseUrl,
     siteName: 'Winsor Maison — Fine Horology',
-    title: 'Winsor — Luxury Timepieces & Horology Maison',
-    description: 'Explore hand-assembled automatic watches, prestige chronographs, and haute horology collections by Winsor Maison.',
+    title: 'Winsor — Luxury Timepieces | Japan Movement & Dubai Atelier',
+    description:
+      'Explore hand-assembled Japan movement watches, prestige chronographs, and limited edition horology collections by Winsor Maison. Nationwide fixed MRP & 1-year international warranty.',
     images: [
       {
         url: '/hero_bg_marble.jpg',
@@ -72,8 +80,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Winsor — Luxury Timepieces & Horology Maison',
-    description: 'Explore hand-assembled automatic watches and prestige chronographs by Winsor Maison.',
+    title: 'Winsor — Luxury Timepieces | Japan Movement & Dubai Atelier',
+    description:
+      'Explore hand-assembled Japan movement watches, prestige chronographs, and limited edition horology by Winsor Maison.',
     images: ['/hero_bg_marble.jpg'],
     creator: '@winsorbrand',
   },
@@ -98,16 +107,22 @@ export default function RootLayout({
         '@type': 'Organization',
         '@id': `${baseUrl}/#organization`,
         'name': 'Winsor Maison',
-        'alternateName': 'Winsor Brand',
+        'alternateName': ['Winsor Brand', 'WINSOR'],
         'url': baseUrl,
         'logo': `${baseUrl}/icon.png`,
-        'description': 'Prestige Swiss-engineered horology maison, crafting luxury automatic timepieces since 2020.',
-        'foundingDate': '2020',
+        'description':
+          'Dubai-registered luxury watch brand crafting accessible luxury timepieces powered by high-precision Japan movements, meticulously crafted and assembled across Dubai, India, and Sri Lanka.',
+        'foundingDate': '2023',
+        'foundingLocation': {
+          '@type': 'Place',
+          'name': 'Dubai, United Arab Emirates',
+        },
+        'areaServed': ['LK', 'AE', 'Worldwide'],
         'contactPoint': {
           '@type': 'ContactPoint',
           'telephone': '+94-77-123-4567',
           'contactType': 'customer service',
-          'availableLanguage': ['English', 'French'],
+          'availableLanguage': ['English', 'Sinhala', 'Tamil', 'Arabic'],
         },
       },
       {
@@ -129,7 +144,8 @@ export default function RootLayout({
         '@id': `${baseUrl}/#brand`,
         'name': 'Winsor',
         'logo': `${baseUrl}/icon.png`,
-        'description': 'Luxury timepiece manufacturer specializing in sports chronographs, automatic dress watches, and limited edition horology.',
+        'description':
+          'Luxury timepiece maison specializing in precision Japan movement sports chronographs, automatic dress watches, and limited edition horology crafted across Dubai, India, and Sri Lanka.',
       },
     ],
   };
