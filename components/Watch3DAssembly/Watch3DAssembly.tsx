@@ -437,10 +437,10 @@ export default function Watch3DAssembly() {
       <div
         style={{
           position: 'absolute',
-          bottom: '24px',
+          bottom: isMobile ? '35px' : '105px',
           left: '50%',
           transform: 'translateX(-50%)',
-          display: 'flex',
+          display: isMobile ? 'none' : 'flex',
           flexDirection: 'column',
           alignItems: 'center',
           gap: '6px',

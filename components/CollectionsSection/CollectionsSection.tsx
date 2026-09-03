@@ -623,16 +623,15 @@ interface CategoryCard {
   key: SectionKey;
   label: string;
   image: string;
-  bgImage: string;
-  exploreText: string;
+  subLabel: string;
 }
 
 const CATEGORIES: CategoryCard[] = [
-  { key: 'sports', label: 'Sports', image: '/category_HomeS/sport_bg.webp', bgImage: '/category_HomeS/sport_bg.webp', exploreText: 'EXPLORE →' },
-  { key: 'luxury', label: 'Classic', image: '/category_HomeS/classic_bg.webp', bgImage: '/category_HomeS/classic_bg.webp', exploreText: 'EXPLORE →' },
-  { key: 'limited', label: 'Limited Edition', image: '/category_HomeS/limitted_bg.webp', bgImage: '/category_HomeS/limitted_bg.webp', exploreText: 'EXPLORE →' },
-  { key: 'new', label: 'New Arrivals', image: '/category_HomeS/new_arrivals_bg.webp', bgImage: '/category_HomeS/new_arrivals_bg.webp', exploreText: 'EXPLORE →' },
-  { key: 'ladies', label: 'Ladies', image: '/category_HomeS/ladies_bg.webp', bgImage: '/category_HomeS/ladies_bg.webp', exploreText: 'EXPLORE →' },
+  { key: 'sports', label: 'SPORTS', image: '/category_HomeS/sport_nobg.webp', subLabel: 'COLLECTION' },
+  { key: 'luxury', label: 'CLASSIC', image: '/category_HomeS/classic_nobg.webp', subLabel: 'COLLECTION' },
+  { key: 'limited', label: 'LIMITED EDITION', image: '/category_HomeS/limitted_nobg.webp', subLabel: 'COLLECTION' },
+  { key: 'new', label: 'NEW ARRIVALS', image: '/category_HomeS/new_arrivals_nobg.webp', subLabel: 'COLLECTION' },
+  { key: 'ladies', label: 'LADIES', image: '/category_HomeS/ladies_nobg.webp', subLabel: 'COLLECTION' },
 ];
 
 export default function CollectionsSection() {
@@ -822,12 +821,17 @@ export default function CollectionsSection() {
             transform: none !important;
           }
         }
+        .wn-cat-card {
+          transition: all 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
         .wn-cat-card:hover {
+          background: rgba(201, 161, 74, 0.12) !important;
           border-color: #8B6914 !important;
-          box-shadow: 0 8px 24px rgba(139,105,20,0.08) !important;
+          box-shadow: 0 14px 36px rgba(139,105,20,0.22), 0 4px 12px rgba(0,0,0,0.06) !important;
+          transform: translateY(-6px) !important;
         }
         .wn-cat-card:hover .wn-cat-img {
-          transform: scale(1.05) !important;
+          transform: scale(1.08) !important;
         }
         .wn-wishlist-btn:hover {
           transform: scale(1.08) !important;
@@ -837,20 +841,22 @@ export default function CollectionsSection() {
         }
       `}</style>
 
-      <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
+      <div style={{ maxWidth: '1400px', margin: '0 auto', position: 'relative', zIndex: 30 }}>
 
-        {/* Category Cards Selector Grid */}
+        {/* Category Cards Selector Grid - Floating Over Hero Section */}
         <div style={{
-          padding: isMobile ? '20px 12px 12px' : '60px 80px 30px',
-          background: '#faf7f0',
+          marginTop: isMobile ? '-40px' : '-90px',
+          padding: isMobile ? '0 12px 18px' : '0 40px 28px',
           width: '100%',
           boxSizing: 'border-box',
+          position: 'relative',
+          background: 'transparent',
         }}>
           {/* Section title 'SHOP BY COLLECTION' on mobile only */}
           {isMobile && (
             <div style={{
               textAlign: 'center',
-              marginBottom: '16px',
+              marginBottom: '10px',
             }}>
               <span style={{
                 fontFamily: "'Jost', sans-serif",
@@ -859,6 +865,11 @@ export default function CollectionsSection() {
                 textTransform: 'uppercase',
                 letterSpacing: '0.14em',
                 color: '#8b6914',
+                background: 'rgba(250, 247, 240, 0.95)',
+                padding: '3px 14px',
+                borderRadius: '12px',
+                display: 'inline-block',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
               }}>
                 Shop by Collection
               </span>
@@ -868,14 +879,14 @@ export default function CollectionsSection() {
           <div
             style={{
               display: 'flex',
-              gap: isMobile ? '6px' : '24px',
+              gap: isMobile ? '10px' : '18px',
               overflowX: isMobile ? 'auto' : 'visible',
               scrollBehavior: 'smooth',
-              paddingBottom: isMobile ? '6px' : '16px',
+              paddingBottom: isMobile ? '8px' : '6px',
               paddingLeft: isMobile ? '4px' : '0',
               paddingRight: isMobile ? '4px' : '0',
-              justifyContent: isMobile ? 'space-between' : 'center',
-              alignItems: 'flex-start',
+              justifyContent: isMobile ? 'flex-start' : 'center',
+              alignItems: 'stretch',
               width: '100%',
               boxSizing: 'border-box',
             }}
@@ -891,102 +902,89 @@ export default function CollectionsSection() {
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'center',
-                    background: 'none',
-                    border: 'none',
-                    padding: 0,
+                    justifyContent: 'space-between',
+                    background: isActive
+                      ? 'rgba(201, 161, 74, 0.14)'
+                      : 'rgba(250, 247, 240, 0.65)',
+                    backdropFilter: 'blur(16px)',
+                    WebkitBackdropFilter: 'blur(16px)',
+                    borderRadius: isMobile ? '14px' : '16px',
+                    border: isActive ? '2px solid #8B6914' : '1px solid rgba(139, 105, 20, 0.2)',
+                    boxShadow: isActive
+                      ? '0 12px 32px rgba(139, 105, 20, 0.22), 0 4px 12px rgba(0,0,0,0.06)'
+                      : '0 8px 24px rgba(0, 0, 0, 0.06), 0 2px 6px rgba(0,0,0,0.03)',
+                    padding: isMobile ? '12px 8px 10px' : '18px 12px 14px',
                     cursor: 'pointer',
                     outline: 'none',
-                    flex: isMobile ? '1 1 0px' : '0 0 auto',
-                    maxWidth: isMobile ? '64px' : '200px',
-                    minWidth: isMobile ? '52px' : '200px',
+                    flex: isMobile ? '0 0 115px' : '1 1 0px',
+                    maxWidth: isMobile ? '120px' : '220px',
+                    minWidth: isMobile ? '110px' : '180px',
+                    minHeight: isMobile ? '135px' : '210px',
                     boxSizing: 'border-box',
+                    transition: 'all 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+                    transform: isActive ? 'translateY(-4px)' : 'translateY(0)',
                   }}
+                  className="wn-cat-card"
                 >
-                  {/* Card Image Area (Circle on Mobile, Square on Desktop) */}
+                  {/* Watch Image Area */}
                   <div style={{
                     width: '100%',
-                    aspectRatio: '1/1',
-                    borderRadius: isMobile ? '50%' : '16px',
-                    background: isMobile ? 'rgba(26,18,9,0.03)' : '#faf7f0',
-                    border: isActive ? '2px solid #8B6914' : '1px solid rgba(26,18,9,0.1)',
+                    height: isMobile ? '70px' : '120px',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     position: 'relative',
                     overflow: 'hidden',
-                    transition: 'all 0.35s ease',
-                    boxShadow: isActive ? '0 4px 16px rgba(139,105,20,0.2)' : 'none',
-                    boxSizing: 'border-box',
-                  }}
-                    className="wn-cat-card"
-                  >
-                    {/* Desktop View: Show background image with watch included */}
-                    {!isMobile && (
-                      <img
-                        src={cat.bgImage}
-                        alt={cat.label}
-                        style={{
-                          position: 'absolute',
-                          inset: 0,
-                          width: '100%',
-                          height: '100%',
-                          objectFit: 'cover',
-                          transform: isActive ? 'scale(1.05)' : 'scale(1)',
-                          transition: 'transform 0.4s ease',
-                        }}
-                        className="wn-cat-img"
-                      />
-                    )}
-
-                    {/* Mobile View: Show circular watch image */}
-                    {isMobile && (
-                      <img
-                        src={cat.image}
-                        alt={cat.label}
-                        style={{
-                          width: '100%',
-                          height: '100%',
-                          objectFit: 'cover',
-                          transform: isActive ? 'scale(1.05)' : 'scale(1)',
-                          transition: 'transform 0.4s ease',
-                        }}
-                        className="wn-cat-img"
-                      />
-                    )}
+                  }}>
+                    <img
+                      src={cat.image}
+                      alt={cat.label}
+                      style={{
+                        maxHeight: '100%',
+                        maxWidth: '100%',
+                        objectFit: 'contain',
+                        transform: isActive ? 'scale(1.08)' : 'scale(1)',
+                        transition: 'transform 0.4s ease',
+                      }}
+                      className="wn-cat-img"
+                    />
                   </div>
 
-                  {/* Card Titles Below */}
-                  <div style={{ marginTop: isMobile ? '6px' : '12px', textAlign: 'center', width: '100%' }}>
+                  {/* Card Titles Inside at Bottom */}
+                  <div style={{
+                    marginTop: isMobile ? '6px' : '10px',
+                    textAlign: 'center',
+                    width: '100%',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: isMobile ? '1px' : '3px',
+                  }}>
                     <span style={{
                       display: 'block',
                       fontFamily: "'Jost', sans-serif",
-                      fontSize: isMobile ? '8.5px' : '13px',
+                      fontSize: isMobile ? '9.5px' : '12px',
                       fontWeight: 600,
                       textTransform: 'uppercase',
-                      letterSpacing: isMobile ? '0.02em' : '0.1em',
+                      letterSpacing: isMobile ? '0.04em' : '0.08em',
                       color: isActive ? '#8B6914' : '#1a1209',
                       transition: 'color 0.3s ease',
                       lineHeight: 1.2,
-                      wordBreak: 'break-word',
                     }}>
                       {cat.label}
                     </span>
-                    {!isMobile && (
-                      <span style={{
-                        display: 'block',
-                        fontFamily: "'Jost', sans-serif",
-                        fontSize: '9px',
-                        fontWeight: 500,
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.08em',
-                        color: '#8B6914',
-                        marginTop: '4px',
-                        opacity: isActive ? 1 : 0.65,
-                        transition: 'opacity 0.3s ease',
-                      }}>
-                        {cat.exploreText}
-                      </span>
-                    )}
+                    <span style={{
+                      display: 'block',
+                      fontFamily: "'Jost', sans-serif",
+                      fontSize: isMobile ? '7.5px' : '9px',
+                      fontWeight: 500,
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.12em',
+                      color: isActive ? '#8B6914' : 'rgba(26, 18, 9, 0.5)',
+                      transition: 'color 0.3s ease',
+                    }}>
+                      {cat.subLabel}
+                    </span>
                   </div>
                 </button>
               );
