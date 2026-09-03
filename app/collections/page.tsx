@@ -1698,6 +1698,7 @@ export default function CollectionsPage() {
                   style={{ objectFit: 'cover', objectPosition: 'center 15%' }}
                   className="gender-card-img"
                   priority
+                  unoptimized
                 />
               </div>
               <div className="gender-header-overlay" />
@@ -1728,6 +1729,7 @@ export default function CollectionsPage() {
                   style={{ objectFit: 'cover', objectPosition: 'center 10%' }}
                   className="gender-card-img"
                   priority
+                  unoptimized
                 />
               </div>
               <div className="gender-header-overlay" />
@@ -1754,6 +1756,7 @@ export default function CollectionsPage() {
                   style={{ objectFit: 'cover', objectPosition: 'center center' }}
                   className="gender-card-img"
                   priority
+                  unoptimized
                 />
               </div>
               <div className="gender-header-overlay" />
@@ -1777,13 +1780,14 @@ export default function CollectionsPage() {
             >
               <div className="gender-card-img-wrapper">
                 <Image
-                  src="/watch-hero.jpg"
+                  src="/category_HomeS/limitted_bg.webp"
                   alt="Limited Edition"
                   fill
                   sizes="(max-width: 768px) 50vw, 350px"
-                  style={{ objectFit: 'cover', objectPosition: 'center 40%' }}
+                  style={{ objectFit: 'cover', objectPosition: 'center center' }}
                   className="gender-card-img"
                   priority
+                  unoptimized
                 />
               </div>
               <div className="gender-header-overlay" />
