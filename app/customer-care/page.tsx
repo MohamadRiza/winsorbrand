@@ -1114,8 +1114,8 @@ export default function CustomerCarePage() {
               <div>
                 <div className="quick-card-tag">Official Concierge Emails</div>
                 <div className="quick-card-title" style={{ fontSize: '13px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                  <a href="mailto:winsorwatches@gmail.com" style={{ color: '#8b6914', textDecoration: 'underline' }}>winsorwatches@gmail.com</a>
-                  <a href="mailto:support@winsorbrand.com" style={{ color: 'inherit', textDecoration: 'underline' }}>support@winsorbrand.com</a>
+                  <a href="mailto:support@winsorbrand.com" style={{ color: '#8b6914', textDecoration: 'underline', fontWeight: 600 }}>support@winsorbrand.com</a>
+                  <a href="mailto:winsorwatches@gmail.com" style={{ color: 'inherit', textDecoration: 'underline' }}>winsorwatches@gmail.com</a>
                 </div>
                 <div className="quick-card-sub" style={{ marginTop: '4px' }}>
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#8b6914" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" /></svg>
@@ -1194,8 +1194,8 @@ export default function CustomerCarePage() {
                       <div>
                         <div className="info-label">Official Emails</div>
                         <div className="info-value">
-                          <a href="mailto:winsorwatches@gmail.com" className="contact-link">winsorwatches@gmail.com</a><br />
-                          <a href="mailto:support@winsorbrand.com" className="contact-link">support@winsorbrand.com</a>
+                          <a href="mailto:support@winsorbrand.com" className="contact-link" style={{ fontWeight: 600, color: '#8b6914' }}>support@winsorbrand.com</a><br />
+                          <a href="mailto:winsorwatches@gmail.com" className="contact-link">winsorwatches@gmail.com</a>
                         </div>
                       </div>
                     </div>
