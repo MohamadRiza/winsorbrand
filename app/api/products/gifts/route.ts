@@ -11,25 +11,19 @@ export async function GET(req: NextRequest) {
     const category = req.nextUrl.searchParams.get('category');
     const limit    = Math.min(parseInt(req.nextUrl.searchParams.get('limit') ?? '10'), 10);
 
-    const filter: Record<string, unknown> = { isActive: true };
+    const filter: Record<string, unknown> = {
+      isActive: true,
+      showOnGiftHome: true,
+    };
     if (category) filter['giftCategories'] = category;
     else filter['giftCategories'] = { $exists: true, $not: { $size: 0 } };
 
-    let products = await Product
+    const products = await Product
       .find(filter)
-      .select('title modelNo price thumbnail colorVariants stickerEnabled stickerText giftCategories')
+      .select('title modelNo price thumbnail colorVariants stickerEnabled stickerText giftCategories showOnGiftHome')
       .limit(limit)
       .sort({ createdAt: -1 })
       .lean();
-
-    if (products.length === 0) {
-      products = await Product
-        .find({ isActive: true })
-        .select('title modelNo price thumbnail colorVariants stickerEnabled stickerText giftCategories')
-        .limit(limit)
-        .sort({ createdAt: -1 })
-        .lean();
-    }
 
     return NextResponse.json({ success: true, data: products });
   } catch (error) {

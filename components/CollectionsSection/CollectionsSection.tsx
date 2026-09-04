@@ -659,8 +659,8 @@ export default function CollectionsSection() {
         setLoading(true);
         const productsData: Record<SectionKey, WatchProduct[]> = {} as Record<SectionKey, WatchProduct[]>;
 
-        // Fetch fallback products if any section ends up empty
-        const fallbackRes = await fetch('/api/products');
+        // Fetch fallback products if any section ends up empty (only products marked for homepage)
+        const fallbackRes = await fetch('/api/products?home=true');
         let fallbackProducts: any[] = [];
         if (fallbackRes.ok && fallbackRes.headers.get('content-type')?.includes('application/json')) {
           const fallbackData = await fallbackRes.json();
@@ -671,7 +671,7 @@ export default function CollectionsSection() {
 
         for (const section of SECTIONS) {
           if (section.key === 'ladies') {
-            const res = await fetch(`/api/products`);
+            const res = await fetch(`/api/products?home=true`);
             if (!res.ok || !res.headers.get('content-type')?.includes('application/json')) {
               productsData[section.key] = fallbackProducts.slice(0, 10);
               continue;

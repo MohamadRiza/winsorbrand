@@ -72,6 +72,7 @@ const ProductSchema = new Schema<IProduct & Document>(
     isActive:       { type: Boolean, default: true },
     isSoldOut:      { type: Boolean, default: false }, // ✅ NEW FIELD
     showOnHome:     { type: Boolean, default: false },
+    showOnGiftHome: { type: Boolean, default: false }, // ✅ Celebrate Moments Gift Section Homepage Toggle
     stickerEnabled: { type: Boolean, default: false },
     stickerText:    { type: String,  default: '', trim: true, maxlength: 40 },
 
@@ -92,7 +93,7 @@ const ProductSchema = new Schema<IProduct & Document>(
 ProductSchema.index({ showOnHome: 1, isActive: 1, isSoldOut: 1 });
 ProductSchema.index({ brand: 1 });
 ProductSchema.index({ collectionSections: 1, isActive: 1, showOnHome: 1 });
-ProductSchema.index({ giftCategories: 1, isActive: 1 });
+ProductSchema.index({ giftCategories: 1, isActive: 1, showOnGiftHome: 1 });
 
 delete (mongoose.models as any).Product;
 

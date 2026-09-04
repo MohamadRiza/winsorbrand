@@ -71,6 +71,7 @@ export interface IProduct {
   isActive:       boolean;
   isSoldOut:      boolean; // ✅ NEW: Sold out status
   showOnHome:     boolean;
+  showOnGiftHome?: boolean; // ✅ NEW: Celebrate Moments Gift section homepage toggle
   stickerEnabled: boolean;
   stickerText:    string;
 

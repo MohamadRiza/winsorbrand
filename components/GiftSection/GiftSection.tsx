@@ -29,6 +29,7 @@ interface GiftProduct {
   stickerEnabled: boolean;
   stickerText: string;
   giftCategories: string[];
+  showOnGiftHome?: boolean;
 }
 
 // ── Fallback backgrounds (used only if a category has no heroBackground) ──
@@ -49,8 +50,35 @@ const OCCASION_BACKGROUNDS: Record<string, string> = {
   'fathers-day': '/gift_categories/fathers_day.png',
   'thai-pongal': '/gift_categories/taippongal.png',
   'sinhala-tamil-new-year': '/gift_categories/sinhala_tamil_new_year.jpg',
-  'esala-perahera': '/gift_categories/esala_perahara.png',
 };
+
+// ── Winsor Watch Craftsmanship Highlights ─────────────────────────────────
+const CRAFTSMANSHIP_PILLARS = [
+  {
+    title: 'Sapphire Crystal Glass',
+    badge: 'SCRATCH RESISTANT',
+    description: 'Durable scratch-resistant crystal offering lasting clarity and dial protection.',
+    image: '/craftsmanship/sapphire_crystal.webp',
+  },
+  {
+    title: 'Precision Machine',
+    badge: 'AUTOMATIC & QUARTZ',
+    description: 'Equipped with reliable Japanese movements ensuring accurate and dependable timekeeping.',
+    image: '/craftsmanship/precision_movement.webp',
+  },
+  {
+    title: 'Water Resistant',
+    badge: 'DAILY RESISTANCE',
+    description: 'Engineered to withstand daily splashes, rain, and everyday routines with ease.',
+    image: '/craftsmanship/water_resistant.webp',
+  },
+  {
+    title: 'Premium Craft',
+    badge: 'PREMIUM QUALITY',
+    description: 'Crafted with durable stainless steel and elegant finishes built for lasting comfort.',
+    image: '/craftsmanship/premium_craft.webp',
+  },
+];
 
 // ── Occasion Vibe SVG Icons ───────────────────────────────────────────────
 const SnowflakeIcon = ({ size = 20, color = '#ffffff' }: { size?: number; color?: string }) => (
@@ -388,7 +416,9 @@ function HeroStage({
       style={{
         position: 'relative',
         width: '100%',
-        minHeight: 'clamp(460px, 72vh, 680px)',
+        minHeight: 'clamp(360px, 58vh, 560px)',
+        height: '100%',
+        flex: 1,
         overflow: 'hidden',
         userSelect: 'none',
         cursor: products.length > 1 ? 'grab' : 'default',
@@ -467,7 +497,7 @@ function HeroStage({
             fontWeight: 700,
             letterSpacing: '0.04em',
             textTransform: 'uppercase',
-            fontSize: 'clamp(32px, 7.5vw, 105px)',
+            fontSize: 'clamp(26px, 4.5vw, 68px)',
             color: 'rgba(255,255,255,0.18)',
             whiteSpace: 'nowrap',
             mixBlendMode: 'overlay',
@@ -493,11 +523,11 @@ function HeroStage({
         <div
           style={{
             position: 'absolute',
-            width: 'min(450px, 75vw)',
-            height: 'min(450px, 75vw)',
+            width: 'min(320px, 50vw)',
+            height: 'min(320px, 50vw)',
             borderRadius: '50%',
             background: 'radial-gradient(circle, rgba(139, 105, 20, 0.22) 0%, rgba(139, 105, 20, 0.06) 50%, rgba(0, 0, 0, 0) 70%)',
-            filter: 'blur(30px)',
+            filter: 'blur(28px)',
             pointerEvents: 'none',
             mixBlendMode: 'screen',
           }}
@@ -508,17 +538,17 @@ function HeroStage({
             className="hero-watch-in"
             data-dir={direction === 1 ? 'right' : 'left'}
             style={{
-              width: 'min(360px, 50vw)',
-              height: 'min(460px, 50vh)',
+              width: 'min(280px, 42vw)',
+              height: 'min(380px, 42vh)',
               position: 'relative',
-              filter: 'drop-shadow(0 35px 55px rgba(0,0,0,0.55))',
+              filter: 'drop-shadow(0 30px 48px rgba(0,0,0,0.55))',
             }}
           >
             <Image
-              src={active.heroImage?.url || active.thumbnail.url}
-              alt={active.title}
+              src={active.heroImage?.url || active.thumbnail?.url || (typeof active.thumbnail === 'string' ? active.thumbnail : '') || '/placeholder.png'}
+              alt={active.title || 'Winsor Timepiece'}
               fill
-              sizes="(max-width: 768px) 80vw, 420px"
+              sizes="(max-width: 768px) 80vw, 360px"
               style={{ objectFit: 'contain' }}
               priority
             />
@@ -530,11 +560,11 @@ function HeroStage({
       <div
         style={{
           position: 'absolute',
-          left: 'clamp(20px, 5vw, 64px)',
-          bottom: 'clamp(20px, 5vh, 60px)',
+          left: 'clamp(18px, 3.5vw, 36px)',
+          bottom: 'clamp(18px, 3.5vh, 36px)',
           color: '#fff',
-          maxWidth: '520px',
-          textShadow: '0 2px 12px rgba(0,0,0,0.4)',
+          maxWidth: 'calc(100% - 36px)',
+          textShadow: '0 2px 12px rgba(0,0,0,0.5)',
           zIndex: 3,
         }}
       >
@@ -542,7 +572,7 @@ function HeroStage({
           style={{
             fontFamily: "'Jost', sans-serif",
             fontWeight: 600,
-            fontSize: 'clamp(22px, 3vw, 36px)',
+            fontSize: 'clamp(18px, 2.2vw, 28px)',
             margin: 0,
             letterSpacing: '0.01em',
           }}
@@ -715,17 +745,45 @@ export default function GiftSection() {
       setProducts([]);
       setActiveIndex(0);
       try {
-        const res = await fetch(
-          `/api/products/gifts?category=${activeSlug.toLowerCase()}&limit=20`,
-        );
-        if (!res.ok || !res.headers.get('content-type')?.includes('application/json')) {
-          setProducts([]);
-          return;
+        let prods: GiftProduct[] = [];
+        let endpointSucceeded = false;
+
+        try {
+          const res = await fetch(
+            `/api/products/gifts?category=${activeSlug.toLowerCase()}&limit=20`,
+          );
+          if (res.ok && res.headers.get('content-type')?.includes('application/json')) {
+            const data = await res.json();
+            if (data.success && Array.isArray(data.data)) {
+              prods = data.data;
+              endpointSucceeded = true;
+            }
+          }
+        } catch {
+          endpointSucceeded = false;
         }
-        const data = await res.json();
-        if (data.success && Array.isArray(data.data)) {
-          setProducts(data.data);
+
+        // Only in the rare event that the dedicated gifts endpoint had a network/server crash,
+        // use an emergency fallback from /api/products, still requiring showOnGiftHome !== false
+        if (!endpointSucceeded) {
+          const fallbackRes = await fetch('/api/products');
+          if (fallbackRes.ok && fallbackRes.headers.get('content-type')?.includes('application/json')) {
+            const fallbackData = await fallbackRes.json();
+            if (fallbackData.success && Array.isArray(fallbackData.data)) {
+              const matched = fallbackData.data.filter((p: any) =>
+                p.isActive &&
+                p.showOnGiftHome !== false &&
+                Array.isArray(p.giftCategories) &&
+                p.giftCategories.some(
+                  (gc: string) => gc.toLowerCase() === activeSlug.toLowerCase()
+                )
+              );
+              prods = matched;
+            }
+          }
         }
+
+        setProducts(prods);
       } catch (error) {
         console.error('Error fetching products:', error);
         setProducts([]);
@@ -824,6 +882,209 @@ export default function GiftSection() {
           .gift-tab-btn {
             padding: 6px 14px;
             font-size: 11px;
+          }
+        }
+
+        /* ── CELEBRATE DUAL 50/50 CONTAINER ── */
+        .celebrate-dual-container {
+          max-width: 1540px;
+          margin: 28px auto 0;
+          padding: 0 28px;
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 24px;
+          align-items: stretch;
+          box-sizing: border-box;
+        }
+
+        .celebrate-left-col {
+          display: flex;
+          flex-direction: column;
+          border-radius: 18px;
+          overflow: hidden;
+          background: #0a0a0a;
+          box-shadow: 0 16px 45px rgba(26, 18, 9, 0.12);
+          border: 1px solid rgba(139, 105, 20, 0.2);
+          position: relative;
+          min-height: 600px;
+        }
+
+        .celebrate-left-status {
+          padding: 14px 24px;
+          background: #120e0a;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          border-top: 1px solid rgba(139, 105, 20, 0.2);
+          font-family: 'Jost', sans-serif;
+          font-size: 12.5px;
+          color: rgba(255, 255, 255, 0.85);
+          letter-spacing: 0.04em;
+        }
+
+        .celebrate-left-link {
+          color: #dfb15b;
+          text-decoration: none;
+          font-weight: 500;
+          letter-spacing: 0.06em;
+          text-transform: uppercase;
+          transition: color 0.2s, transform 0.2s;
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+        }
+        .celebrate-left-link:hover {
+          color: #ffffff;
+          transform: translateX(3px);
+        }
+
+        /* ── RIGHT COLUMN: 4 CRAFTSMANSHIP PILLARS ── */
+        .celebrate-right-col {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          grid-template-rows: repeat(2, 1fr);
+          gap: 16px;
+          height: 100%;
+          min-height: 600px;
+        }
+
+        .craft-card {
+          position: relative;
+          border-radius: 16px;
+          overflow: hidden;
+          background: #0c0805;
+          border: 1px solid rgba(139, 105, 20, 0.22);
+          box-shadow: 0 10px 30px rgba(26, 18, 9, 0.08);
+          transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+          padding: 20px;
+          min-height: 285px;
+          box-sizing: border-box;
+        }
+
+        .craft-card:hover {
+          transform: translateY(-4px);
+          border-color: rgba(201, 161, 74, 0.55);
+          box-shadow: 0 18px 40px rgba(139, 105, 20, 0.22);
+        }
+
+        .craft-card-img {
+          object-fit: cover;
+          transition: transform 0.7s cubic-bezier(0.25, 1, 0.5, 1);
+          z-index: 0;
+        }
+
+        .craft-card:hover .craft-card-img {
+          transform: scale(1.08);
+        }
+
+        .craft-card-overlay {
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(
+            180deg,
+            rgba(12, 8, 5, 0.25) 0%,
+            rgba(12, 8, 5, 0.5) 45%,
+            rgba(12, 8, 5, 0.94) 100%
+          );
+          z-index: 1;
+          transition: opacity 0.3s ease;
+        }
+
+        .craft-card:hover .craft-card-overlay {
+          background: linear-gradient(
+            180deg,
+            rgba(12, 8, 5, 0.15) 0%,
+            rgba(12, 8, 5, 0.4) 40%,
+            rgba(12, 8, 5, 0.9) 100%
+          );
+        }
+
+        .craft-card-content {
+          position: relative;
+          z-index: 2;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+          height: 100%;
+        }
+
+        .craft-card-badge {
+          align-self: flex-start;
+          display: inline-flex;
+          align-items: center;
+          gap: 5px;
+          background: rgba(14, 10, 6, 0.78);
+          backdrop-filter: blur(10px);
+          -webkit-backdrop-filter: blur(10px);
+          border: 1px solid rgba(201, 161, 74, 0.4);
+          color: #dfb15b;
+          font-family: 'Jost', sans-serif;
+          font-size: 9.5px;
+          font-weight: 600;
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
+          padding: 4px 10px;
+          border-radius: 20px;
+        }
+
+        .craft-card-title {
+          font-family: 'Cormorant Garamond', serif;
+          font-size: clamp(19px, 1.7vw, 24px);
+          font-weight: 600;
+          color: #ffffff;
+          letter-spacing: 0.02em;
+          margin: 0 0 6px 0;
+          line-height: 1.15;
+          text-shadow: 0 2px 10px rgba(0, 0, 0, 0.6);
+        }
+
+        .craft-card-desc {
+          font-family: 'Jost', sans-serif;
+          font-size: clamp(11.5px, 0.9vw, 13px);
+          color: rgba(255, 255, 255, 0.82);
+          line-height: 1.45;
+          margin: 0;
+          letter-spacing: 0.02em;
+          text-shadow: 0 1px 6px rgba(0, 0, 0, 0.5);
+        }
+
+        /* ── RESPONSIVE MOBILE VIEW ── */
+        @media (max-width: 1023px) {
+          .celebrate-dual-container {
+            grid-template-columns: 1fr;
+            gap: 20px;
+            padding: 0 16px;
+            margin-top: 20px;
+          }
+          .celebrate-left-col {
+            min-height: 400px;
+            height: auto;
+          }
+          .celebrate-right-col {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            min-height: auto;
+          }
+          .craft-card {
+            min-height: 220px;
+            padding: 16px;
+          }
+        }
+
+        @media (max-width: 640px) {
+          .celebrate-right-col {
+            grid-template-columns: 1fr;
+            gap: 12px;
+          }
+          .craft-card {
+            min-height: 195px;
+            padding: 16px;
+          }
+          .celebrate-left-col {
+            min-height: 350px;
           }
         }
       `}</style>
@@ -941,51 +1202,60 @@ export default function GiftSection() {
         </div>
       </div>
 
-      {/* Hero stage with swipeable watch */}
-      {activeCat && (
-        <HeroStage
-          background={background}
-          products={products}
-          activeIndex={activeIndex}
-          setActiveIndex={setActiveIndex}
-          categoryLabel={activeCat.label}
-          categoryTagline={`Gift Ideas for ${activeCat.label}`}
-          categorySlug={activeCat.slug}
-        />
-      )}
+      {/* 50/50 Dual Showcase: Left = Celebrate Moments Gift Stage, Right = 4 Horological Pillars */}
+      <div className="celebrate-dual-container">
+        {/* LEFT COLUMN: Celebrate Moments Gift Hero Stage */}
+        <div className="celebrate-left-col">
+          {activeCat && (
+            <HeroStage
+              background={background}
+              products={products}
+              activeIndex={activeIndex}
+              setActiveIndex={setActiveIndex}
+              categoryLabel={activeCat.label}
+              categoryTagline={`Gift Ideas for ${activeCat.label}`}
+              categorySlug={activeCat.slug}
+            />
+          )}
 
-      {/* Loading / empty states under the stage */}
-      {loadingProds && (
-        <div
-          style={{
-            textAlign: 'center',
-            padding: '24px',
-            fontFamily: "'Jost', sans-serif",
-            color: '#666',
-            fontSize: 13,
-            letterSpacing: '0.1em',
-            textTransform: 'uppercase',
-          }}
-        >
-          Loading {activeCat?.label} selection…
-        </div>
-      )}
-      {!loadingProds && products.length === 0 && activeCat && (
-        <div
-          style={{
-            textAlign: 'center',
-            padding: '40px 20px',
-            fontFamily: "'Jost', sans-serif",
-          }}
-        >
-          <div style={{ color: '#1a1a1a', fontSize: 16, fontWeight: 500 }}>
-            Selections for {activeCat.label}
-          </div>
-          <div style={{ color: '#888', fontSize: 13, marginTop: 4 }}>
-            Coming soon
+          {/* Under stage footer status bar */}
+          <div className="celebrate-left-status">
+            <span>
+              {loadingProds
+                ? `Curating ${activeCat?.label || 'Gift'} Timepieces…`
+                : products.length === 0 && activeCat
+                ? `Selections for ${activeCat.label} — Coming Soon`
+                : `Featured ${activeCat?.label || 'Gift'} Selections (${products.length})`}
+            </span>
+            <Link href="/gifts" className="celebrate-left-link">
+              Explore Gifts ›
+            </Link>
           </div>
         </div>
-      )}
+
+        {/* RIGHT COLUMN: 4 Pillars of Winsor Watch Craftsmanship */}
+        <div className="celebrate-right-col">
+          {CRAFTSMANSHIP_PILLARS.map((pillar, idx) => (
+            <div key={idx} className="craft-card">
+              <Image
+                src={pillar.image}
+                alt={pillar.title}
+                fill
+                sizes="(max-width: 640px) 100vw, (max-width: 1023px) 50vw, 25vw"
+                className="craft-card-img"
+              />
+              <div className="craft-card-overlay" />
+              <div className="craft-card-content">
+                <span className="craft-card-badge">{pillar.badge}</span>
+                <div>
+                  <h3 className="craft-card-title">{pillar.title}</h3>
+                  <p className="craft-card-desc">{pillar.description}</p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
 
       {/* View All */}
       <div style={{ textAlign: 'center', padding: '32px 20px 64px' }}>

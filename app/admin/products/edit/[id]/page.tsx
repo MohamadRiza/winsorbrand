@@ -77,6 +77,7 @@ export default function EditProductPage() {
     isActive: false,
     isSoldOut: false,
     showOnHome: false,
+    showOnGiftHome: false,
     stickerEnabled: false,
     stickerText: '',
   });
@@ -176,7 +177,8 @@ export default function EditProductPage() {
         giftCategories: product.giftCategories || [],
         isActive: product.isActive,
         isSoldOut: product.isSoldOut ?? false,
-        showOnHome: product.showOnHome,
+        showOnHome: Boolean(product.showOnHome),
+        showOnGiftHome: Boolean(product.showOnGiftHome),
         stickerEnabled: product.stickerEnabled,
         stickerText: product.stickerText || '',
       });
@@ -452,7 +454,9 @@ export default function EditProductPage() {
     setFormData(prev => {
       const categories = prev.giftCategories;
       const updated = categories.includes(slug) ? categories.filter(c => c !== slug) : [...categories, slug];
-      return { ...prev, giftCategories: updated };
+      // If at least one gift category is selected, default to true unless explicitly toggled
+      const showOnGiftHome = updated.length === 0 ? false : (prev.showOnGiftHome ?? true);
+      return { ...prev, giftCategories: updated, showOnGiftHome };
     });
   };
 
@@ -1103,6 +1107,26 @@ export default function EditProductPage() {
                   </label>
                 ))}
               </div>
+              {formData.giftCategories.length > 0 && (
+                <div className="mt-3 p-3 bg-[#8B6914]/8 border border-[#8B6914]/30 rounded-lg">
+                  <label className="flex items-start gap-3 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={formData.showOnGiftHome}
+                      onChange={(e) => setFormData(prev => ({ ...prev, showOnGiftHome: e.target.checked }))}
+                      className="w-4 h-4 mt-0.5 text-[#8B6914] border-[#1a1209]/20 rounded focus:ring-[#8B6914] cursor-pointer"
+                    />
+                    <div>
+                      <span className="text-xs font-['Jost'] font-semibold text-[#1a1209] block">
+                        Show in &quot;Celebrate Moments with Elegance&quot; on Homepage
+                      </span>
+                      <p className="text-[11px] text-[#1a1209]/65 font-['Jost'] mt-0.5 leading-snug">
+                        Display this watch in the homepage Celebrate Moments gift stage for selected occasions. If unchecked, it will only appear on the full /gifts catalogue page.
+                      </p>
+                    </div>
+                  </label>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -1293,6 +1317,20 @@ export default function EditProductPage() {
               />
               <span className="text-sm font-['Jost'] font-medium text-[#1a1209]">Show on Homepage Collections</span>
             </label>
+
+            {formData.giftCategories.length > 0 && (
+              <label className="flex items-center gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={formData.showOnGiftHome}
+                  onChange={(e) => setFormData(prev => ({ ...prev, showOnGiftHome: e.target.checked }))}
+                  className="w-4 h-4 text-[#8B6914] border-[#1a1209]/20 rounded focus:ring-[#8B6914]"
+                />
+                <span className="text-sm font-['Jost'] font-medium text-[#1a1209]">
+                  Show in &quot;Celebrate Moments with Elegance&quot; on Homepage
+                </span>
+              </label>
+            )}
 
             <div className="flex items-center gap-3 pt-2">
               <input
