@@ -45,11 +45,10 @@ export default function RetailersMap({
     // Add zoom control in top right
     L.control.zoom({ position: 'topright' }).addTo(map);
 
-    // CartoDB Positron - Beautiful light-gray/cream clean map
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-      attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
-      subdomains: 'abcd',
-      maxZoom: 20,
+    // OpenStreetMap - 100% Free & Open (No API key required, zero watermarks)
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> contributors',
+      maxZoom: 19,
     }).addTo(map);
 
     mapRef.current = map;
@@ -243,5 +242,23 @@ export default function RetailersMap({
     }
   }, [userCoords]);
 
-  return <div ref={mapContainerRef} style={{ width: '100%', height: '100%' }} />;
+  return (
+    <div className="retailers-map-wrapper" style={{ width: '100%', height: '100%', position: 'relative' }}>
+      <div ref={mapContainerRef} style={{ width: '100%', height: '100%' }} />
+      <style jsx global>{`
+        .retailers-map-wrapper .leaflet-tile-pane {
+          filter: saturate(0.85) contrast(1.02) brightness(1.01);
+        }
+        .retailers-map-wrapper .leaflet-popup-content-wrapper {
+          border-radius: 14px;
+          box-shadow: 0 10px 25px rgba(26, 18, 9, 0.18);
+          border: 1px solid rgba(139, 105, 20, 0.25);
+          background: #ffffff;
+        }
+        .retailers-map-wrapper .leaflet-popup-tip {
+          background: #ffffff;
+        }
+      `}</style>
+    </div>
+  );
 }
