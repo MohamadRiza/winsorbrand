@@ -38,9 +38,22 @@ interface StatCardProps {
   href?: string;
   color?: 'gold' | 'blue' | 'green' | 'red' | 'purple';
   isRevenue?: boolean;
+  alert?: boolean;
+  alertColor?: 'red' | 'amber';
+  alertBadge?: string;
 }
 
-const StatCard = ({ title, value, icon, href, color = 'gold', isRevenue = false }: StatCardProps): React.JSX.Element => {
+const StatCard = ({
+  title,
+  value,
+  icon,
+  href,
+  color = 'gold',
+  isRevenue = false,
+  alert = false,
+  alertColor = 'red',
+  alertBadge,
+}: StatCardProps): React.JSX.Element => {
   const [hovered, setHovered] = useState(false);
   const strVal = String(value);
   const fontSize = strVal.length > 9 ? '20px' : strVal.length > 7 ? '22px' : '28px';
@@ -139,12 +152,23 @@ const StatCard = ({ title, value, icon, href, color = 'gold', isRevenue = false 
     purple: { bg: 'rgba(155,89,182,0.06)', border: 'rgba(155,89,182,0.12)', text: '#9b59b6' },
   };
   const colors = colorMap[color] || colorMap.gold;
+  const isAlertRed = alert && alertColor === 'red';
+  const isAlertAmber = alert && alertColor === 'amber';
 
   return (
     <div
+      className={`stat-card-box ${isAlertRed ? 'stat-card-alert-red' : isAlertAmber ? 'stat-card-alert-amber' : ''}`}
       style={{
-        background: '#fff',
-        border: hovered ? `1px solid ${colors.text}` : `1px solid rgba(26,18,9,0.08)`,
+        background: isAlertRed 
+          ? 'linear-gradient(145deg, #ffffff 0%, #fff8f7 100%)' 
+          : isAlertAmber 
+            ? 'linear-gradient(145deg, #ffffff 0%, #fffdf5 100%)' 
+            : '#fff',
+        border: hovered 
+          ? `1px solid ${colors.text}` 
+          : alert 
+            ? `1px solid ${isAlertRed ? 'rgba(239,68,68,0.45)' : 'rgba(245,158,11,0.45)'}` 
+            : '1px solid rgba(26,18,9,0.08)',
         borderRadius: '14px',
         padding: '18px 16px',
         display: 'flex',
@@ -153,37 +177,97 @@ const StatCard = ({ title, value, icon, href, color = 'gold', isRevenue = false 
         height: '145px',
         position: 'relative',
         overflow: 'hidden',
-        transition: 'all 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+        transition: 'border-color 0.25s, box-shadow 0.25s, transform 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
         cursor: href ? 'pointer' : 'default',
-        transform: hovered ? 'translateY(-4px)' : 'translateY(0)',
-        boxShadow: hovered ? '0 12px 28px rgba(26,18,9,0.05)' : '0 2px 8px rgba(0,0,0,0.01)',
+        transform: hovered ? 'translateY(-4px)' : undefined,
+        boxShadow: hovered 
+          ? (alert 
+              ? `0 14px 30px ${isAlertRed ? 'rgba(239,68,68,0.18)' : 'rgba(245,158,11,0.18)'}` 
+              : '0 12px 28px rgba(26,18,9,0.05)') 
+          : (alert 
+              ? undefined 
+              : '0 2px 8px rgba(0,0,0,0.01)'),
       }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       onClick={() => href && (window.location.href = href)}
     >
+      {/* Alert Radar Beacon Badge */}
+      {alert && (
+        <div
+          style={{
+            position: 'absolute',
+            top: '12px',
+            right: '12px',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '6px',
+            padding: '3px 8px',
+            borderRadius: '20px',
+            background: isAlertRed ? 'rgba(239, 68, 68, 0.1)' : 'rgba(245, 158, 11, 0.12)',
+            border: `1px solid ${isAlertRed ? 'rgba(239, 68, 68, 0.28)' : 'rgba(245, 158, 11, 0.3)'}`,
+            zIndex: 2,
+          }}
+        >
+          <span style={{ position: 'relative', display: 'flex', width: '8px', height: '8px', alignItems: 'center', justifyContent: 'center' }}>
+            <span
+              style={{
+                position: 'absolute',
+                width: '100%',
+                height: '100%',
+                borderRadius: '50%',
+                backgroundColor: isAlertRed ? '#ef4444' : '#f59e0b',
+                animation: 'adminRadarPing 1.6s cubic-bezier(0, 0, 0.2, 1) infinite',
+              }}
+            />
+            <span
+              style={{
+                position: 'relative',
+                width: '7px',
+                height: '7px',
+                borderRadius: '50%',
+                backgroundColor: isAlertRed ? '#dc2626' : '#d97706',
+              }}
+            />
+          </span>
+          <span
+            style={{
+              fontFamily: "'Jost', sans-serif",
+              fontSize: '9px',
+              fontWeight: 700,
+              letterSpacing: '0.06em',
+              color: isAlertRed ? '#dc2626' : '#b45309',
+              textTransform: 'uppercase',
+              lineHeight: 1,
+            }}
+          >
+            {alertBadge || 'ACTION'}
+          </span>
+        </div>
+      )}
+
       <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
         <div style={{
           width: '36px',
           height: '36px',
           borderRadius: '9px',
-          background: colors.bg,
+          background: alert ? (isAlertRed ? 'rgba(239, 68, 68, 0.12)' : 'rgba(245, 158, 11, 0.14)') : colors.bg,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          color: colors.text,
+          color: alert ? (isAlertRed ? '#dc2626' : '#d97706') : colors.text,
           flexShrink: 0,
-          border: `1px solid ${colors.border}`,
+          border: `1px solid ${alert ? (isAlertRed ? 'rgba(239, 68, 68, 0.25)' : 'rgba(245, 158, 11, 0.25)') : colors.border}`,
         }}>
           {icon}
         </div>
-        <div style={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
+        <div style={{ flex: 1, minWidth: 0, overflow: 'hidden', paddingRight: alert ? '76px' : '0px' }}>
           <p style={{
             fontFamily: "'Jost', sans-serif",
             fontSize: '10px',
             fontWeight: 600,
             letterSpacing: '0.1em',
-            color: 'rgba(26,18,9,0.5)',
+            color: alert ? (isAlertRed ? '#b91c1c' : '#92400e') : 'rgba(26,18,9,0.5)',
             margin: 0,
             textTransform: 'uppercase',
             whiteSpace: 'nowrap',
@@ -197,7 +281,7 @@ const StatCard = ({ title, value, icon, href, color = 'gold', isRevenue = false 
             fontSize,
             fontWeight: 700,
             letterSpacing: '-0.02em',
-            color: '#1a1209',
+            color: alert ? (isAlertRed ? '#dc2626' : '#b45309') : '#1a1209',
             margin: '4px 0 0',
             lineHeight: 1.1,
             fontFeatureSettings: '"tnum"',
@@ -219,12 +303,13 @@ const StatCard = ({ title, value, icon, href, color = 'gold', isRevenue = false 
           alignItems: 'center',
           justifyContent: 'space-between',
           fontSize: '11px',
-          color: hovered ? colors.text : 'rgba(26,18,9,0.45)',
+          color: alert ? (isAlertRed ? '#dc2626' : '#b45309') : hovered ? colors.text : 'rgba(26,18,9,0.45)',
           fontFamily: "'Jost', sans-serif",
+          fontWeight: alert ? 600 : 400,
           transition: 'color 0.2s',
         }}>
           <span>{`View ${title.toLowerCase().split(' ')[1] || 'details'}`}</span>
-          <span>→</span>
+          <span style={{ transform: hovered ? 'translateX(2px)' : 'none', transition: 'transform 0.2s' }}>→</span>
         </div>
       )}
     </div>
@@ -618,6 +703,9 @@ export default function AdminDashboard(): React.JSX.Element {
           icon={<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" /><line x1="3" y1="6" x2="21" y2="6" /><path d="M16 10a4 4 0 0 1-8 0" /></svg>}
           href="/admin/orders"
           color="red"
+          alert={Number(stats.pendingOrders) >= 1}
+          alertColor="red"
+          alertBadge="Action Required"
         />
         <StatCard
           title="Low Stock Items"
@@ -625,6 +713,9 @@ export default function AdminDashboard(): React.JSX.Element {
           icon={<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" /><polyline points="3.27 6.96 12 12.01 20.73 6.96" /></svg>}
           href="/admin/inventory"
           color="gold"
+          alert={Number(stats.lowStockItems) >= 1}
+          alertColor="amber"
+          alertBadge="Low Stock"
         />
         <StatCard
           title="Pending Careers"
@@ -639,6 +730,9 @@ export default function AdminDashboard(): React.JSX.Element {
           icon={<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /></svg>}
           href="/admin/messages"
           color="gold"
+          alert={Number(stats.newMessages) >= 1}
+          alertColor="amber"
+          alertBadge="Unread"
         />
         <StatCard
           title="New Users (24h)"
@@ -1156,6 +1250,74 @@ export default function AdminDashboard(): React.JSX.Element {
           transform: translateX(4px);
         }
         @keyframes arrowSlide { 0% { opacity: 0; transform: translateX(-4px); } 100% { opacity: 1; transform: translateX(0); } }
+
+        @keyframes adminCardJump {
+          0%, 100% {
+            transform: translateY(0);
+          }
+          7% {
+            transform: translateY(-9px);
+          }
+          15% {
+            transform: translateY(0);
+          }
+          22% {
+            transform: translateY(-4px);
+          }
+          29% {
+            transform: translateY(0);
+          }
+        }
+
+        @keyframes adminBoxPingRed {
+          0%, 100% {
+            border-color: rgba(239, 68, 68, 0.35);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02), 0 0 0 0 rgba(239, 68, 68, 0);
+          }
+          50% {
+            border-color: rgba(239, 68, 68, 0.85);
+            box-shadow: 0 8px 24px rgba(239, 68, 68, 0.22), 0 0 0 4px rgba(239, 68, 68, 0.18);
+          }
+        }
+
+        @keyframes adminBoxPingAmber {
+          0%, 100% {
+            border-color: rgba(245, 158, 11, 0.35);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02), 0 0 0 0 rgba(245, 158, 11, 0);
+          }
+          50% {
+            border-color: rgba(245, 158, 11, 0.85);
+            box-shadow: 0 8px 24px rgba(245, 158, 11, 0.22), 0 0 0 4px rgba(245, 158, 11, 0.18);
+          }
+        }
+
+        @keyframes adminRadarPing {
+          0% {
+            transform: scale(0.95);
+            opacity: 0.9;
+          }
+          70%, 100% {
+            transform: scale(2.6);
+            opacity: 0;
+          }
+        }
+
+        .stat-card-alert-red {
+          animation: adminCardJump 2.4s cubic-bezier(0.28, 0.84, 0.42, 1) infinite, adminBoxPingRed 2.4s ease-in-out infinite !important;
+        }
+        .stat-card-alert-red:hover {
+          animation: adminBoxPingRed 2.4s ease-in-out infinite !important;
+          transform: translateY(-4px) !important;
+        }
+
+        .stat-card-alert-amber {
+          animation: adminCardJump 2.4s cubic-bezier(0.28, 0.84, 0.42, 1) infinite, adminBoxPingAmber 2.4s ease-in-out infinite !important;
+          animation-delay: 0.35s;
+        }
+        .stat-card-alert-amber:hover {
+          animation: adminBoxPingAmber 2.4s ease-in-out infinite !important;
+          transform: translateY(-4px) !important;
+        }
       `}</style>
     </div>
   );
