@@ -7,7 +7,7 @@ import { verifyPermissions } from '@/lib/authHelper';
 // ─── GET /api/admin/coupons — List all coupons ───────────────
 export async function GET(req: NextRequest) {
   try {
-    const auth = await verifyPermissions(req, []);
+    const auth = await verifyPermissions(req, ['coupons_read', 'coupons_manage'], 'any');
     if (!auth.authorized) {
       return NextResponse.json({ success: false, error: auth.error }, { status: auth.status });
     }
@@ -24,7 +24,7 @@ export async function GET(req: NextRequest) {
 // ─── POST /api/admin/coupons — Create a new coupon ───────────
 export async function POST(req: NextRequest) {
   try {
-    const auth = await verifyPermissions(req, []);
+    const auth = await verifyPermissions(req, ['coupons_manage']);
     if (!auth.authorized) {
       return NextResponse.json({ success: false, error: auth.error }, { status: auth.status });
     }
@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
     await connectDB();
 
     const body = await req.json();
-    const { code, discountPercent, expiresAt, usageLimit } = body;
+    const { code, discountPercent, expiresAt, usageLimit, adminPassword } = body;
 
     // ── Server-side validation ────────────────────────────────
     if (!code || typeof code !== 'string') {
@@ -47,6 +47,46 @@ export async function POST(req: NextRequest) {
 
     if (!discountPercent || typeof discountPercent !== 'number' || discountPercent < 1 || discountPercent > 100) {
       return NextResponse.json({ success: false, error: 'Discount must be between 1% and 100%' }, { status: 400 });
+    }
+
+    // ── High discount security check (> 10%) ──────────────────
+    if (discountPercent > 10) {
+      if (!adminPassword || typeof adminPassword !== 'string' || !adminPassword.trim()) {
+        return NextResponse.json({
+          success: false,
+          error: 'Admin password is required to approve discounts exceeding 10%',
+          requiresPassword: true,
+        }, { status: 400 });
+      }
+
+      // Verify password against logged-in admin or active admin accounts
+      const Admin = (await import('@/lib/models/Admin')).default;
+      let isPasswordValid = false;
+
+      // 1. Check logged-in user's password
+      const currentUser = await Admin.findById(auth.payload!.adminId).select('+password');
+      if (currentUser && typeof currentUser.comparePassword === 'function') {
+        isPasswordValid = await currentUser.comparePassword(adminPassword);
+      }
+
+      // 2. If not matched, also check any active admin
+      if (!isPasswordValid) {
+        const adminAccounts = await Admin.find({ role: 'admin', isActive: true }).select('+password');
+        for (const adm of adminAccounts) {
+          if (typeof adm.comparePassword === 'function' && await adm.comparePassword(adminPassword)) {
+            isPasswordValid = true;
+            break;
+          }
+        }
+      }
+
+      if (!isPasswordValid) {
+        return NextResponse.json({
+          success: false,
+          error: 'Incorrect admin password. Authorization failed for discounts over 10%.',
+          requiresPassword: true,
+        }, { status: 403 });
+      }
     }
 
     if (!expiresAt) {

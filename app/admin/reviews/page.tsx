@@ -3,6 +3,7 @@
 import { useEffect, useState, useMemo } from 'react';
 import toast from 'react-hot-toast';
 import Image from 'next/image';
+import PermissionGate from '@/components/Admin/PermissionGate';
 
 interface ProductInfo {
   _id: string;
@@ -30,6 +31,7 @@ interface Review {
 }
 
 export default function AdminReviewsPage() {
+  const [currentUser, setCurrentUser] = useState<{ role?: string; permissions?: string[] } | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [products, setProducts] = useState<ProductInfo[]>([]);
   const [loading, setLoading] = useState(true);
@@ -48,6 +50,17 @@ export default function AdminReviewsPage() {
   const [attachedImages, setAttachedImages] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    fetch('/api/admin/me', { credentials: 'include' })
+      .then(res => res.ok ? res.json() : null)
+      .then(data => { if (data) setCurrentUser(data); })
+      .catch(err => console.error('Failed to load user permissions:', err));
+  }, []);
+
+  const canManageFake = currentUser?.role === 'admin' || (currentUser?.permissions || []).includes('reviews_fake_manage');
+  const canModerate = currentUser?.role === 'admin' || (currentUser?.permissions || []).includes('reviews_moderate');
+  const canDelete = currentUser?.role === 'admin' || (currentUser?.permissions || []).includes('reviews_delete');
 
   useEffect(() => {
     fetchReviews();
@@ -267,37 +280,40 @@ export default function AdminReviewsPage() {
   }, [reviews, searchQuery, filterType]);
 
   return (
-    <div 
-      className="min-h-screen font-['Jost'] text-[#1a1209] p-4 sm:p-8 select-none"
-      style={{
-        backgroundImage: `linear-gradient(rgba(250, 247, 240, 0.93), rgba(250, 247, 240, 0.93)), url('/hero_bg_marble.jpg')`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundAttachment: 'fixed',
-      }}
-    >
-      <div className="max-w-7xl mx-auto space-y-6">
+    <PermissionGate permissions={['reviews_read', 'reviews_moderate', 'reviews_fake_manage', 'reviews_delete']} mode="any">
+      <div 
+        className="min-h-screen font-['Jost'] text-[#1a1209] p-4 sm:p-8 select-none"
+        style={{
+          backgroundImage: `linear-gradient(rgba(250, 247, 240, 0.93), rgba(250, 247, 240, 0.93)), url('/hero_bg_marble.jpg')`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundAttachment: 'fixed',
+        }}
+      >
+        <div className="max-w-7xl mx-auto space-y-6">
 
-        {/* ── Page Header ── */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#8B6914]/20 pb-5">
-          <div>
-            <h1 className="font-['Cormorant_Garamond'] text-3xl font-semibold text-[#8B6914] tracking-wide">
-              PRODUCT REVIEWS MODERATION
-            </h1>
-            <p className="text-sm text-[#1a1209]/60 mt-0.5">
-              Approve customer feedback, inspect ratings, and inject promotional mock reviews.
-            </p>
+          {/* ── Page Header ── */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#8B6914]/20 pb-5">
+            <div>
+              <h1 className="font-['Cormorant_Garamond'] text-3xl font-semibold text-[#8B6914] tracking-wide">
+                PRODUCT REVIEWS MODERATION
+              </h1>
+              <p className="text-sm text-[#1a1209]/60 mt-0.5">
+                Approve customer feedback, inspect ratings, and inject promotional mock reviews.
+              </p>
+            </div>
+            {canManageFake && (
+              <button
+                onClick={() => setIsModalOpen(true)}
+                className="self-start sm:self-center px-4 py-2.5 bg-[#1a1209] hover:bg-[#8B6914] text-[#faf7f0] text-xs font-bold uppercase tracking-wider rounded-xl transition-all shadow-md flex items-center gap-2 cursor-pointer"
+              >
+                <svg className="w-4 h-4 text-[#8B6914] group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+                Add Mock Review
+              </button>
+            )}
           </div>
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="self-start sm:self-center px-4 py-2.5 bg-[#1a1209] hover:bg-[#8B6914] text-[#faf7f0] text-xs font-bold uppercase tracking-wider rounded-xl transition-all shadow-md flex items-center gap-2 cursor-pointer"
-          >
-            <svg className="w-4 h-4 text-[#8B6914] group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
-            Add Mock Review
-          </button>
-        </div>
 
         {/* ── Professional Tabular Metrics Cards ── */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -464,7 +480,7 @@ export default function AdminReviewsPage() {
 
                   {/* Actions Grid */}
                   <div className="flex items-center gap-2 pt-2">
-                    {!review.isFake && review.status === 'pending' && (
+                    {canModerate && !review.isFake && review.status === 'pending' && (
                       <>
                         <button
                           onClick={() => handleUpdateStatus(review._id, 'approved')}
@@ -480,7 +496,7 @@ export default function AdminReviewsPage() {
                         </button>
                       </>
                     )}
-                    {review.status !== 'pending' && !review.isFake && (
+                    {canModerate && review.status !== 'pending' && !review.isFake && (
                       <button
                         onClick={() => handleUpdateStatus(review._id, review.status === 'approved' ? 'rejected' : 'approved')}
                         className="px-3 py-1.5 border border-[#1a1209]/20 hover:border-[#8B6914] text-xs font-semibold text-[#1a1209] rounded-lg transition-all cursor-pointer"
@@ -488,12 +504,14 @@ export default function AdminReviewsPage() {
                         Change to {review.status === 'approved' ? 'Reject' : 'Approve'}
                       </button>
                     )}
-                    <button
-                      onClick={() => handleDeleteReview(review._id)}
-                      className="px-3 py-1.5 border border-red-200 text-red-600 hover:bg-red-50 text-xs font-semibold rounded-lg transition-all cursor-pointer ml-auto"
-                    >
-                      Delete
-                    </button>
+                    {canDelete && (
+                      <button
+                        onClick={() => handleDeleteReview(review._id)}
+                        className="px-3 py-1.5 border border-red-200 text-red-600 hover:bg-red-50 text-xs font-semibold rounded-lg transition-all cursor-pointer ml-auto"
+                      >
+                        Delete
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
@@ -683,5 +701,6 @@ export default function AdminReviewsPage() {
         )}
       </div>
     </div>
+    </PermissionGate>
   );
 }

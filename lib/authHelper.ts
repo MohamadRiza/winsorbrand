@@ -19,7 +19,8 @@ export interface VerifyAuthResult {
  */
 export async function verifyPermissions(
   req: NextRequest,
-  requiredPermissions: string[] = []
+  requiredPermissions: string[] = [],
+  mode: 'all' | 'any' = 'all'
 ): Promise<VerifyAuthResult> {
   try {
     const accessToken = req.cookies.get('admin_access_token')?.value;
@@ -59,7 +60,9 @@ export async function verifyPermissions(
 
       // Check permissions if any are required
       if (requiredPermissions.length > 0) {
-        const hasPermission = requiredPermissions.every(p => user.permissions.includes(p));
+        const hasPermission = mode === 'any'
+          ? requiredPermissions.some(p => user.permissions.includes(p))
+          : requiredPermissions.every(p => user.permissions.includes(p));
         if (!hasPermission) {
           return { authorized: false, error: 'Access Denied: Insufficient permissions.', status: 403 };
         }

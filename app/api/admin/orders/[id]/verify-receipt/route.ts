@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db';
 import Order from '@/lib/models/Order';
+import { verifyPermissions } from '@/lib/authHelper';
 
 // ──────────────────────────────────────────────────────────────────────────────
 // PATCH /api/admin/orders/[id]/verify-receipt
@@ -15,6 +16,11 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const auth = await verifyPermissions(req, ['orders_manage']);
+    if (!auth.authorized) {
+      return NextResponse.json({ success: false, error: auth.error }, { status: auth.status });
+    }
+
     await connectDB();
     const { id } = await params;
 

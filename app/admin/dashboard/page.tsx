@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { toast } from 'react-hot-toast';
+import PermissionGate from '@/components/Admin/PermissionGate';
 
 // ── Date Relative Formatter ────────────────────────────────────────────────
 const formatRelativeTime = (dateStr: string) => {
@@ -543,7 +544,8 @@ export default function AdminDashboard(): React.JSX.Element {
   const pendingPct = totalOrders ? Math.round((pendingCount / totalOrders) * 100) : 0;
 
   return (
-    <div style={{ fontFamily: "'Jost', sans-serif", padding: '10px 0', color: '#1a1209' }}>
+    <PermissionGate permission="dashboard_view">
+      <div style={{ fontFamily: "'Jost', sans-serif", padding: '10px 0', color: '#1a1209' }}>
 
       {/* Executive Welcome Banner */}
       <div style={{
@@ -1320,5 +1322,6 @@ export default function AdminDashboard(): React.JSX.Element {
         }
       `}</style>
     </div>
+    </PermissionGate>
   );
 }

@@ -7,6 +7,7 @@ interface PermissionGateProps {
   children: ReactNode;
   permission?: string;
   permissions?: string[];
+  mode?: 'all' | 'any';
 }
 
 interface ProfileData {
@@ -21,6 +22,7 @@ export default function PermissionGate({
   children,
   permission,
   permissions,
+  mode = 'all',
 }: PermissionGateProps) {
   const [loading, setLoading] = useState(true);
   const [authorized, setAuthorized] = useState(false);
@@ -83,7 +85,9 @@ export default function PermissionGate({
             }
             
             if (permissions && permissions.length > 0) {
-              isPermitted = permissions.every((p: string) => data.permissions.includes(p));
+              isPermitted = mode === 'any'
+                ? permissions.some((p: string) => data.permissions.includes(p))
+                : permissions.every((p: string) => data.permissions.includes(p));
             }
             
             setAuthorized(isPermitted);
@@ -98,7 +102,7 @@ export default function PermissionGate({
     };
 
     checkAuth();
-  }, [permission, permissions, pathname, router]);
+  }, [permission, permissions, mode, pathname, router]);
 
   // 1. Loading State (Premium Luxury Gold Spinner)
   if (loading) {

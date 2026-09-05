@@ -7,14 +7,14 @@ import AIAssistant from '@/components/AIAssistant/AIAssistant';
 
 export default function LayoutShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const isAdmin = pathname?.startsWith('/admin');
+  const hideChrome = pathname?.startsWith('/admin') || pathname?.startsWith('/staff');
 
   return (
     <>
-      {!isAdmin && <Navbar />}
+      {!hideChrome && <Navbar />}
       {children}
-      {!isAdmin && <Footer />}
-      {!isAdmin && <AIAssistant />}
+      {!hideChrome && <Footer />}
+      {!hideChrome && <AIAssistant />}
     </>
   );
 }

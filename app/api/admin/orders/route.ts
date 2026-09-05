@@ -5,7 +5,7 @@ import { verifyPermissions } from '@/lib/authHelper';
 
 export async function GET(req: NextRequest) {
   try {
-    const auth = await verifyPermissions(req, ['orders_manage']);
+    const auth = await verifyPermissions(req, ['orders_read', 'orders_manage'], 'any');
     if (!auth.authorized) {
       return NextResponse.json({ success: false, error: auth.error }, { status: auth.status });
     }

@@ -3,6 +3,7 @@
 import { useEffect, useState, useMemo } from 'react';
 import { toast } from 'react-hot-toast';
 import { IOrder, OrderStatus } from '@/types';
+import PermissionGate from '@/components/Admin/PermissionGate';
 
 export default function AdminOrdersPage() {
   const [orders, setOrders] = useState<IOrder[]>([]);
@@ -170,7 +171,8 @@ export default function AdminOrdersPage() {
   }
 
   return (
-    <div className="space-y-6 font-['Jost'] select-none">
+    <PermissionGate permissions={['orders_read', 'orders_manage']} mode="any">
+      <div className="space-y-6 font-['Jost'] select-none">
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -860,5 +862,6 @@ export default function AdminOrdersPage() {
         </div>
       </div>
     </div>
+    </PermissionGate>
   );
 }

@@ -260,11 +260,11 @@ export default function Sidebar({
     
     switch (itemLabel) {
       case 'Dashboard':
-        return false; // Staff never gets access to dashboard
+        return userPermissions.includes('dashboard_view');
       case 'Staff Management':
         return false; // Staff never gets access to staff management page
       case 'Products':
-        return userPermissions.some(p => ['products_read', 'products_create', 'categories_manage'].includes(p));
+        return userPermissions.some(p => ['products_read', 'products_create', 'products_update', 'products_delete', 'categories_manage'].includes(p));
       case 'All Products':
         return userPermissions.includes('products_read');
       case 'Add New':
@@ -272,7 +272,7 @@ export default function Sidebar({
       case 'Categories':
         return userPermissions.includes('categories_manage');
       case 'Orders':
-        return userPermissions.includes('orders_manage');
+        return userPermissions.some(p => ['orders_read', 'orders_manage'].includes(p));
       case 'Customers':
         return userPermissions.includes('customers_read');
       case 'Messages':
@@ -285,6 +285,10 @@ export default function Sidebar({
         return userPermissions.includes('careers_vacancies');
       case 'Inventory':
         return userPermissions.includes('inventory_manage');
+      case 'Coupons':
+        return userPermissions.some(p => ['coupons_read', 'coupons_manage'].includes(p));
+      case 'Reviews':
+        return userPermissions.some(p => ['reviews_read', 'reviews_moderate', 'reviews_fake_manage', 'reviews_delete'].includes(p));
       case 'Retailers':
         return userPermissions.includes('retailers_manage');
       case 'Settings':

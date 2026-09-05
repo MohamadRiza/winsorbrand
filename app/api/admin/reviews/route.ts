@@ -7,7 +7,7 @@ import { verifyPermissions } from '@/lib/authHelper';
 // GET: List all reviews (with filters for fake vs real)
 export async function GET(req: NextRequest) {
   try {
-    const auth = await verifyPermissions(req, ['products_manage']);
+    const auth = await verifyPermissions(req, ['reviews_read', 'reviews_moderate', 'reviews_fake_manage', 'reviews_delete'], 'any');
     if (!auth.authorized) {
       return NextResponse.json({ success: false, error: auth.error }, { status: auth.status });
     }
@@ -44,7 +44,7 @@ export async function GET(req: NextRequest) {
 // POST: Create a fake/mock review
 export async function POST(req: NextRequest) {
   try {
-    const auth = await verifyPermissions(req, ['products_manage']);
+    const auth = await verifyPermissions(req, ['reviews_fake_manage']);
     if (!auth.authorized) {
       return NextResponse.json({ success: false, error: auth.error }, { status: auth.status });
     }
@@ -98,7 +98,7 @@ export async function POST(req: NextRequest) {
 // PUT: Approve / reject customer reviews
 export async function PUT(req: NextRequest) {
   try {
-    const auth = await verifyPermissions(req, ['products_manage']);
+    const auth = await verifyPermissions(req, ['reviews_moderate']);
     if (!auth.authorized) {
       return NextResponse.json({ success: false, error: auth.error }, { status: auth.status });
     }
@@ -137,7 +137,7 @@ export async function PUT(req: NextRequest) {
 // DELETE: Delete a review (fake or real)
 export async function DELETE(req: NextRequest) {
   try {
-    const auth = await verifyPermissions(req, ['products_manage']);
+    const auth = await verifyPermissions(req, ['reviews_delete']);
     if (!auth.authorized) {
       return NextResponse.json({ success: false, error: auth.error }, { status: auth.status });
     }

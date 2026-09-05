@@ -16,20 +16,59 @@ interface StaffAccount {
   createdAt: string;
 }
 
-const AVAILABLE_PERMISSIONS = [
-  { key: 'products_read', label: 'View Products list', category: 'Products' },
-  { key: 'products_create', label: 'Create new Products', category: 'Products' },
-  { key: 'products_update', label: 'Edit/Update Products', category: 'Products' },
-  { key: 'products_delete', label: 'Delete Products', category: 'Products' },
-  { key: 'categories_manage', label: 'Manage Categories (CRUD)', category: 'Categories' },
-  { key: 'orders_manage', label: 'Manage Orders & Resolutions', category: 'Orders' },
-  { key: 'customers_read', label: 'View Customer details', category: 'Customers' },
-  { key: 'messages_manage', label: 'View & Manage Support Messages', category: 'Messages' },
-  { key: 'careers_applications', label: 'View Job Applications', category: 'Careers' },
-  { key: 'careers_vacancies', label: 'Manage Job Vacancies (CRUD)', category: 'Careers' },
-  { key: 'inventory_manage', label: 'Manage Stocks & Inventory levels', category: 'Inventory' },
-  { key: 'retailers_manage', label: 'Manage Store Locator (CRUD)', category: 'Retailers' },
-  { key: 'settings_manage', label: 'Access Settings page (Self Expiry/Update)', category: 'Settings' },
+interface PermissionItem {
+  key: string;
+  label: string;
+  category: string;
+  badge?: string;
+  description?: string;
+}
+
+const AVAILABLE_PERMISSIONS: PermissionItem[] = [
+  // 1. Dashboard
+  { key: 'dashboard_view', label: 'View Executive Dashboard & Analytics', category: 'Dashboard', description: 'Live revenue stats, visitor volume & executive KPIs' },
+
+  // 2. Products
+  { key: 'products_read', label: 'View Products Catalog', category: 'Products', description: 'Browse and inspect luxury watch collection' },
+  { key: 'products_create', label: 'Create New Products', category: 'Products', description: 'Publish new timepiece models with specs & pricing' },
+  { key: 'products_update', label: 'Edit / Update Products', category: 'Products', description: 'Modify watch details, pricing, variants, and imagery' },
+  { key: 'products_delete', label: 'Delete Products', category: 'Products', description: 'Permanently remove timepiece records' },
+
+  // 3. Categories
+  { key: 'categories_manage', label: 'Manage Categories & Gifting (CRUD)', category: 'Categories', description: 'Create, organize and reorder occasion collections' },
+
+  // 4. Customer Orders
+  { key: 'orders_read', label: 'View Customer Orders List', category: 'Orders', description: 'Inspect orders, shipping addresses & order details' },
+  { key: 'orders_manage', label: 'Manage Orders, Statuses & Receipts', category: 'Orders', description: 'Verify bank slip receipts, dispatch orders & handle refunds' },
+
+  // 5. Customer & Mock Reviews (High Risk / User Highlighted)
+  { key: 'reviews_read', label: 'View Customer & Mock Reviews', category: 'Reviews', description: 'Read submitted ratings, feedback, and customer photos' },
+  { key: 'reviews_moderate', label: 'Approve & Reject Customer Reviews', category: 'Reviews', description: 'Moderate real patron reviews before store display' },
+  { key: 'reviews_fake_manage', label: 'Create & Manage Fake / Mock Reviews', category: 'Reviews', badge: '💎 High Impact', description: 'Inject promotional mock customer reviews for timepiece showcase' },
+  { key: 'reviews_delete', label: 'Delete Customer & Mock Reviews', category: 'Reviews', description: 'Permanently delete reviews from the database' },
+
+  // 6. Coupons & Promotions
+  { key: 'coupons_read', label: 'View Promotional Coupons', category: 'Coupons', description: 'View discount codes, usage limits and redemption rates' },
+  { key: 'coupons_manage', label: 'Manage Coupons (Create, Toggle, Delete)', category: 'Coupons', description: 'Generate coupon codes, activate/deactivate, or delete' },
+
+  // 7. Customers
+  { key: 'customers_read', label: 'View Customer Profiles & History', category: 'Customers', description: 'Inspect client profiles, accounts and purchasing habits' },
+
+  // 8. Support Inquiries
+  { key: 'messages_manage', label: 'View & Manage Support Inquiries', category: 'Messages', description: 'Handle contact messages, customer inquiries & resolutions' },
+
+  // 9. Inventory Control
+  { key: 'inventory_manage', label: 'Manage Stocks & Thresholds', category: 'Inventory', description: 'Adjust stock levels and configure low-stock alerts' },
+
+  // 10. Careers & Recruitment
+  { key: 'careers_applications', label: 'View Job Applications', category: 'Careers', description: 'Review submitted candidate CVs and applications' },
+  { key: 'careers_vacancies', label: 'Manage Job Vacancies (CRUD)', category: 'Careers', description: 'Publish, edit, and close recruitment postings' },
+
+  // 11. Retailers
+  { key: 'retailers_manage', label: 'Manage Store Locator (CRUD)', category: 'Retailers', description: 'Configure boutique stores and authorized retailer coordinates' },
+
+  // 12. Settings
+  { key: 'settings_manage', label: 'Access Operational Settings', category: 'Settings', description: 'Staff self-service credentials and session security' },
 ];
 
 export default function StaffManagementPage() {
@@ -44,6 +83,7 @@ export default function StaffManagementPage() {
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
+  const [viewPrivilegesStaff, setViewPrivilegesStaff] = useState<StaffAccount | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState<'all' | 'active' | 'temporary' | 'inactive'>('all');
@@ -251,6 +291,23 @@ export default function StaffManagementPage() {
     }
   };
 
+  const selectAllPermissions = (isEdit = false) => {
+    const allKeys = AVAILABLE_PERMISSIONS.map(p => p.key);
+    if (isEdit) {
+      setEditSelectedPermissions(allKeys);
+    } else {
+      setSelectedPermissions(allKeys);
+    }
+  };
+
+  const clearAllPermissions = (isEdit = false) => {
+    if (isEdit) {
+      setEditSelectedPermissions(['settings_manage']);
+    } else {
+      setSelectedPermissions(['settings_manage']);
+    }
+  };
+
   // Group permissions by category
   const categoriesMap = useMemo(() => {
     const map: Record<string, typeof AVAILABLE_PERMISSIONS> = {};
@@ -273,7 +330,11 @@ export default function StaffManagementPage() {
     return staffList.filter(s => {
       const matchesSearch = !q ||
         s.username.toLowerCase().includes(q) ||
-        (s.permissions || []).some(p => p.toLowerCase().includes(q));
+        (s.permissions || []).some(p => {
+          if (p.toLowerCase().includes(q)) return true;
+          const permObj = AVAILABLE_PERMISSIONS.find(ap => ap.key === p);
+          return permObj && (permObj.label.toLowerCase().includes(q) || permObj.category.toLowerCase().includes(q));
+        });
 
       let matchesTab = true;
       if (activeTab === 'active') {
@@ -483,14 +544,51 @@ export default function StaffManagementPage() {
                           </div>
                         </td>
 
-                        {/* Permissions Pill */}
+                        {/* Permissions Pill & Badges */}
                         <td className="px-6 py-4">
-                          <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#faf7f0] border border-[#8B6914]/30 rounded-lg text-xs font-mono font-bold text-[#8B6914]">
-                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                            </svg>
-                            {account.permissions?.length || 0} Privileges
-                          </span>
+                          <div className="space-y-1.5">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <button
+                                type="button"
+                                onClick={() => setViewPrivilegesStaff(account)}
+                                className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-[#faf7f0] border border-[#8B6914]/30 hover:border-[#8B6914] rounded-lg text-xs font-mono font-bold text-[#8B6914] transition cursor-pointer"
+                                title="Click to inspect all granted privileges"
+                              >
+                                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                                </svg>
+                                {account.permissions?.length || 0} Privileges
+                              </button>
+
+                              {account.permissions?.includes('reviews_fake_manage') && (
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-100 text-amber-900 border border-amber-300 rounded text-[10px] font-bold shadow-2xs">
+                                  💎 Fake Reviews
+                                </span>
+                              )}
+                            </div>
+
+                            {/* Quick Category Chips */}
+                            <div className="flex items-center gap-1 flex-wrap">
+                              {Array.from(new Set(
+                                (account.permissions || [])
+                                  .map(p => AVAILABLE_PERMISSIONS.find(ap => ap.key === p)?.category)
+                                  .filter(Boolean)
+                              )).slice(0, 4).map(cat => (
+                                <span key={cat} className="text-[10px] px-1.5 py-0.2 bg-[#1a1209]/5 text-[#1a1209]/70 rounded font-medium">
+                                  {cat}
+                                </span>
+                              ))}
+                              {(account.permissions || []).length > 0 && (
+                                <button
+                                  type="button"
+                                  onClick={() => setViewPrivilegesStaff(account)}
+                                  className="text-[10px] text-[#8B6914] hover:underline font-semibold ml-1 cursor-pointer"
+                                >
+                                  View all
+                                </button>
+                              )}
+                            </div>
+                          </div>
                         </td>
 
                         {/* Status */}
@@ -674,18 +772,44 @@ export default function StaffManagementPage() {
 
                   {/* Granular Access Control Checklist grouped by Category */}
                   <div className="space-y-3">
-                    <label className="block text-[10px] font-bold tracking-wider text-[#8B6914] uppercase">
-                      GRANULAR ACCESS PRIVILEGES CHECKLIST
-                    </label>
+                    <div className="flex items-center justify-between border-b border-[#1a1209]/10 pb-2">
+                      <div>
+                        <label className="block text-[10px] font-bold tracking-wider text-[#8B6914] uppercase">
+                          GRANULAR ACCESS PRIVILEGES CHECKLIST
+                        </label>
+                        <span className="text-[10px] text-[#1a1209]/60 font-mono">
+                          {selectedPermissions.length} of {AVAILABLE_PERMISSIONS.length} privileges granted
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => selectAllPermissions(false)}
+                          className="px-2.5 py-1 bg-amber-50 hover:bg-amber-100 border border-amber-200 text-[#8B6914] text-[10px] font-bold rounded-lg transition cursor-pointer"
+                        >
+                          Select All
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => clearAllPermissions(false)}
+                          className="px-2.5 py-1 bg-white hover:bg-rose-50 border border-[#1a1209]/15 hover:border-rose-200 text-[#1a1209]/70 hover:text-rose-600 text-[10px] font-bold rounded-lg transition cursor-pointer"
+                        >
+                          Clear
+                        </button>
+                      </div>
+                    </div>
                     
                     <div className="space-y-3">
                       {Object.entries(categoriesMap).map(([category, permItems]) => {
                         const allSelected = permItems.every(p => selectedPermissions.includes(p.key));
                         
                         return (
-                          <div key={category} className="bg-white border border-[#1a1209]/10 rounded-xl p-3.5 space-y-2">
+                          <div key={category} className="bg-white border border-[#1a1209]/10 rounded-xl p-3.5 space-y-2.5 shadow-2xs">
                             <div className="flex justify-between items-center border-b border-[#1a1209]/5 pb-2">
-                              <span className="text-xs font-bold text-[#8B6914] uppercase tracking-wider">{category} Module</span>
+                              <span className="text-xs font-bold text-[#8B6914] uppercase tracking-wider flex items-center gap-1.5">
+                                <span className="w-1.5 h-1.5 rounded-full bg-[#8B6914]" />
+                                {category} Module
+                              </span>
                               <button
                                 type="button"
                                 onClick={() => toggleCategoryPermissions(category, false)}
@@ -694,18 +818,48 @@ export default function StaffManagementPage() {
                                 {allSelected ? 'Deselect Category' : 'Select Category'}
                               </button>
                             </div>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                              {permItems.map(perm => (
-                                <label key={perm.key} className="flex items-center gap-2 text-xs font-medium text-[#1a1209] cursor-pointer">
-                                  <input
-                                    type="checkbox"
-                                    checked={selectedPermissions.includes(perm.key)}
-                                    onChange={() => togglePermission(perm.key, false)}
-                                    className="rounded text-[#8B6914] focus:ring-[#8B6914]/20 cursor-pointer"
-                                  />
-                                  <span>{perm.label}</span>
-                                </label>
-                              ))}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
+                              {permItems.map(perm => {
+                                const isSelected = selectedPermissions.includes(perm.key);
+                                const isFakeReview = perm.key === 'reviews_fake_manage';
+
+                                return (
+                                  <label 
+                                    key={perm.key} 
+                                    className={`flex items-start gap-2.5 p-2 rounded-xl border transition-all cursor-pointer ${
+                                      isSelected
+                                        ? isFakeReview
+                                          ? 'bg-amber-50/80 border-amber-300 shadow-2xs'
+                                          : 'bg-[#faf7f0] border-[#8B6914]/30'
+                                        : 'bg-white border-[#1a1209]/5 hover:bg-[#faf7f0]/40'
+                                    }`}
+                                  >
+                                    <input
+                                      type="checkbox"
+                                      checked={isSelected}
+                                      onChange={() => togglePermission(perm.key, false)}
+                                      className="rounded text-[#8B6914] focus:ring-[#8B6914]/20 cursor-pointer mt-0.5"
+                                    />
+                                    <div className="flex-1 min-w-0">
+                                      <div className="flex items-center gap-1.5 flex-wrap">
+                                        <span className={`text-xs font-semibold ${isSelected ? 'text-[#1a1209]' : 'text-[#1a1209]/80'}`}>
+                                          {perm.label}
+                                        </span>
+                                        {perm.badge && (
+                                          <span className="text-[9px] font-bold px-1.5 py-0.2 bg-amber-100 text-amber-900 border border-amber-300 rounded font-mono">
+                                            {perm.badge}
+                                          </span>
+                                        )}
+                                      </div>
+                                      {perm.description && (
+                                        <p className="text-[10px] text-[#1a1209]/50 leading-tight mt-0.5">
+                                          {perm.description}
+                                        </p>
+                                      )}
+                                    </div>
+                                  </label>
+                                );
+                              })}
                             </div>
                           </div>
                         );
@@ -864,18 +1018,44 @@ export default function StaffManagementPage() {
 
                   {/* Granular Access Control Checklist */}
                   <div className="space-y-3">
-                    <label className="block text-[10px] font-bold tracking-wider text-[#8B6914] uppercase">
-                      GRANULAR ACCESS PRIVILEGES CHECKLIST
-                    </label>
+                    <div className="flex items-center justify-between border-b border-[#1a1209]/10 pb-2">
+                      <div>
+                        <label className="block text-[10px] font-bold tracking-wider text-[#8B6914] uppercase">
+                          GRANULAR ACCESS PRIVILEGES CHECKLIST
+                        </label>
+                        <span className="text-[10px] text-[#1a1209]/60 font-mono">
+                          {editSelectedPermissions.length} of {AVAILABLE_PERMISSIONS.length} privileges granted
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => selectAllPermissions(true)}
+                          className="px-2.5 py-1 bg-amber-50 hover:bg-amber-100 border border-amber-200 text-[#8B6914] text-[10px] font-bold rounded-lg transition cursor-pointer"
+                        >
+                          Select All
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => clearAllPermissions(true)}
+                          className="px-2.5 py-1 bg-white hover:bg-rose-50 border border-[#1a1209]/15 hover:border-rose-200 text-[#1a1209]/70 hover:text-rose-600 text-[10px] font-bold rounded-lg transition cursor-pointer"
+                        >
+                          Clear
+                        </button>
+                      </div>
+                    </div>
                     
                     <div className="space-y-3">
                       {Object.entries(categoriesMap).map(([category, permItems]) => {
                         const allSelected = permItems.every(p => editSelectedPermissions.includes(p.key));
                         
                         return (
-                          <div key={category} className="bg-white border border-[#1a1209]/10 rounded-xl p-3.5 space-y-2">
+                          <div key={category} className="bg-white border border-[#1a1209]/10 rounded-xl p-3.5 space-y-2.5 shadow-2xs">
                             <div className="flex justify-between items-center border-b border-[#1a1209]/5 pb-2">
-                              <span className="text-xs font-bold text-[#8B6914] uppercase tracking-wider">{category} Module</span>
+                              <span className="text-xs font-bold text-[#8B6914] uppercase tracking-wider flex items-center gap-1.5">
+                                <span className="w-1.5 h-1.5 rounded-full bg-[#8B6914]" />
+                                {category} Module
+                              </span>
                               <button
                                 type="button"
                                 onClick={() => toggleCategoryPermissions(category, true)}
@@ -884,18 +1064,48 @@ export default function StaffManagementPage() {
                                 {allSelected ? 'Deselect Category' : 'Select Category'}
                               </button>
                             </div>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                              {permItems.map(perm => (
-                                <label key={perm.key} className="flex items-center gap-2 text-xs font-medium text-[#1a1209] cursor-pointer">
-                                  <input
-                                    type="checkbox"
-                                    checked={editSelectedPermissions.includes(perm.key)}
-                                    onChange={() => togglePermission(perm.key, true)}
-                                    className="rounded text-[#8B6914] focus:ring-[#8B6914]/20 cursor-pointer"
-                                  />
-                                  <span>{perm.label}</span>
-                                </label>
-                              ))}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
+                              {permItems.map(perm => {
+                                const isSelected = editSelectedPermissions.includes(perm.key);
+                                const isFakeReview = perm.key === 'reviews_fake_manage';
+
+                                return (
+                                  <label 
+                                    key={perm.key} 
+                                    className={`flex items-start gap-2.5 p-2 rounded-xl border transition-all cursor-pointer ${
+                                      isSelected
+                                        ? isFakeReview
+                                          ? 'bg-amber-50/80 border-amber-300 shadow-2xs'
+                                          : 'bg-[#faf7f0] border-[#8B6914]/30'
+                                        : 'bg-white border-[#1a1209]/5 hover:bg-[#faf7f0]/40'
+                                    }`}
+                                  >
+                                    <input
+                                      type="checkbox"
+                                      checked={isSelected}
+                                      onChange={() => togglePermission(perm.key, true)}
+                                      className="rounded text-[#8B6914] focus:ring-[#8B6914]/20 cursor-pointer mt-0.5"
+                                    />
+                                    <div className="flex-1 min-w-0">
+                                      <div className="flex items-center gap-1.5 flex-wrap">
+                                        <span className={`text-xs font-semibold ${isSelected ? 'text-[#1a1209]' : 'text-[#1a1209]/80'}`}>
+                                          {perm.label}
+                                        </span>
+                                        {perm.badge && (
+                                          <span className="text-[9px] font-bold px-1.5 py-0.2 bg-amber-100 text-amber-900 border border-amber-300 rounded font-mono">
+                                            {perm.badge}
+                                          </span>
+                                        )}
+                                      </div>
+                                      {perm.description && (
+                                        <p className="text-[10px] text-[#1a1209]/50 leading-tight mt-0.5">
+                                          {perm.description}
+                                        </p>
+                                      )}
+                                    </div>
+                                  </label>
+                                );
+                              })}
                             </div>
                           </div>
                         );
@@ -921,6 +1131,127 @@ export default function StaffManagementPage() {
                     </button>
                   </div>
                 </form>
+              </div>
+            </div>
+          )}
+
+          {/* ── INSPECT PRIVILEGES DETAIL MODAL ── */}
+          {viewPrivilegesStaff && (
+            <div className="fixed inset-0 z-50 overflow-hidden flex items-center justify-center p-4">
+              <div 
+                className="absolute inset-0 bg-[#1a1209]/50 backdrop-blur-sm transition-opacity duration-300" 
+                onClick={() => setViewPrivilegesStaff(null)} 
+              />
+              
+              <div className="bg-[#faf7f0] rounded-2xl shadow-2xl border border-[#1a1209]/10 max-w-xl w-full relative z-10 flex flex-col max-h-[90vh] overflow-hidden">
+                <div className="px-6 py-5 bg-[#1a1209] text-[#f3e3b8] border-b border-[#8B6914]/30 flex justify-between items-center">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-['Cormorant_Garamond'] text-xl font-bold tracking-wider uppercase">
+                        STAFF PRIVILEGES AUDIT
+                      </h3>
+                      <span className="text-[10px] font-mono px-2 py-0.5 bg-[#8B6914]/20 border border-[#8B6914]/40 text-[#f3e3b8] rounded">
+                        @{viewPrivilegesStaff.username}
+                      </span>
+                    </div>
+                    <p className="text-xs text-[#8B6914] font-semibold mt-0.5">
+                      {viewPrivilegesStaff.permissions?.length || 0} of {AVAILABLE_PERMISSIONS.length} system privileges active
+                    </p>
+                  </div>
+                  <button 
+                    onClick={() => setViewPrivilegesStaff(null)} 
+                    className="text-[#f3e3b8]/60 hover:text-[#f3e3b8] text-xl font-bold transition-colors cursor-pointer p-1"
+                  >
+                    ✕
+                  </button>
+                </div>
+
+                <div className="flex-1 overflow-y-auto p-6 space-y-4">
+                  {viewPrivilegesStaff.permissions?.includes('reviews_fake_manage') && (
+                    <div className="bg-amber-50 border border-amber-300 rounded-xl p-3 flex items-center gap-3">
+                      <span className="text-xl">💎</span>
+                      <div>
+                        <h5 className="text-xs font-bold text-amber-900">Fake / Mock Reviews Permission Active</h5>
+                        <p className="text-[10px] text-amber-800/80">
+                          This user is authorized to create and post verified mock customer testimonials into product showcases.
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="space-y-3">
+                    {Object.entries(categoriesMap).map(([category, permItems]) => {
+                      const userHasKeys = permItems.filter(p => viewPrivilegesStaff.permissions?.includes(p.key));
+                      
+                      return (
+                        <div key={category} className="bg-white border border-[#1a1209]/10 rounded-xl p-3.5 space-y-2">
+                          <div className="flex justify-between items-center border-b border-[#1a1209]/5 pb-1.5">
+                            <span className="text-xs font-bold text-[#8B6914] uppercase tracking-wider">
+                              {category} Module
+                            </span>
+                            <span className="text-[10px] font-mono text-[#1a1209]/50">
+                              {userHasKeys.length}/{permItems.length} active
+                            </span>
+                          </div>
+                          <div className="grid grid-cols-1 gap-1.5">
+                            {permItems.map(perm => {
+                              const granted = viewPrivilegesStaff.permissions?.includes(perm.key);
+                              
+                              return (
+                                <div 
+                                  key={perm.key}
+                                  className={`flex items-center justify-between p-2 rounded-lg text-xs ${
+                                    granted 
+                                      ? 'bg-[#faf7f0] border border-[#8B6914]/20 text-[#1a1209] font-medium' 
+                                      : 'text-[#1a1209]/35'
+                                  }`}
+                                >
+                                  <div className="flex items-center gap-2">
+                                    <span className={`w-4 h-4 rounded-full flex items-center justify-center text-[10px] ${
+                                      granted ? 'bg-emerald-100 text-emerald-800 font-bold' : 'bg-gray-100 text-gray-400'
+                                    }`}>
+                                      {granted ? '✓' : '–'}
+                                    </span>
+                                    <span>{perm.label}</span>
+                                    {perm.badge && granted && (
+                                      <span className="text-[9px] font-bold px-1.5 py-0.2 bg-amber-100 text-amber-900 border border-amber-300 rounded font-mono">
+                                        {perm.badge}
+                                      </span>
+                                    )}
+                                  </div>
+                                  <span className="text-[10px] font-mono">
+                                    {granted ? 'Granted' : 'Disabled'}
+                                  </span>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <div className="p-4 bg-[#faf7f0] border-t border-[#1a1209]/10 flex justify-between items-center">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const target = viewPrivilegesStaff;
+                      setViewPrivilegesStaff(null);
+                      handleOpenEdit(target);
+                    }}
+                    className="px-4 py-2 bg-[#8B6914] hover:bg-[#1a1209] text-[#faf7f0] text-xs font-bold rounded-xl transition cursor-pointer"
+                  >
+                    Edit Privileges
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setViewPrivilegesStaff(null)}
+                    className="px-5 py-2 border border-[#1a1209]/20 text-[#1a1209] text-xs font-semibold rounded-xl hover:bg-[#1a1209]/5 transition cursor-pointer"
+                  >
+                    Close
+                  </button>
+                </div>
               </div>
             </div>
           )}

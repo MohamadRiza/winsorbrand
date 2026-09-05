@@ -10,7 +10,7 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const auth = await verifyPermissions(req, []);
+    const auth = await verifyPermissions(req, ['coupons_manage']);
     if (!auth.authorized) {
       return NextResponse.json({ success: false, error: auth.error }, { status: auth.status });
     }
@@ -19,10 +19,52 @@ export async function PATCH(
     await connectDB();
 
     const body = await req.json();
-    const { isActive } = body;
+    const { isActive, adminPassword } = body;
 
     if (typeof isActive !== 'boolean') {
       return NextResponse.json({ success: false, error: 'isActive must be a boolean' }, { status: 400 });
+    }
+
+    const existing = await Coupon.findById(id);
+    if (!existing) {
+      return NextResponse.json({ success: false, error: 'Coupon not found' }, { status: 404 });
+    }
+
+    // High discount security check when activating a coupon with > 10% discount
+    if (isActive && existing.discountPercent > 10) {
+      if (!adminPassword || typeof adminPassword !== 'string' || !adminPassword.trim()) {
+        return NextResponse.json({
+          success: false,
+          error: 'Admin password is required to activate a coupon with discount exceeding 10%',
+          requiresPassword: true,
+        }, { status: 400 });
+      }
+
+      const Admin = (await import('@/lib/models/Admin')).default;
+      let isPasswordValid = false;
+
+      const currentUser = await Admin.findById(auth.payload!.adminId).select('+password');
+      if (currentUser && typeof currentUser.comparePassword === 'function') {
+        isPasswordValid = await currentUser.comparePassword(adminPassword);
+      }
+
+      if (!isPasswordValid) {
+        const adminAccounts = await Admin.find({ role: 'admin', isActive: true }).select('+password');
+        for (const adm of adminAccounts) {
+          if (typeof adm.comparePassword === 'function' && await adm.comparePassword(adminPassword)) {
+            isPasswordValid = true;
+            break;
+          }
+        }
+      }
+
+      if (!isPasswordValid) {
+        return NextResponse.json({
+          success: false,
+          error: 'Incorrect admin password. Authorization failed to activate this coupon.',
+          requiresPassword: true,
+        }, { status: 403 });
+      }
     }
 
     const coupon = await Coupon.findByIdAndUpdate(
@@ -30,10 +72,6 @@ export async function PATCH(
       { isActive },
       { new: true }
     );
-
-    if (!coupon) {
-      return NextResponse.json({ success: false, error: 'Coupon not found' }, { status: 404 });
-    }
 
     return NextResponse.json({ success: true, data: coupon });
 
@@ -48,7 +86,7 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const auth = await verifyPermissions(req, []);
+    const auth = await verifyPermissions(req, ['coupons_manage']);
     if (!auth.authorized) {
       return NextResponse.json({ success: false, error: auth.error }, { status: auth.status });
     }

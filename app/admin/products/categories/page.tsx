@@ -44,6 +44,10 @@ export default function CategoriesPage() {
     isActive: true,
   });
 
+  const [togglingId, setTogglingId] = useState<string | null>(null);
+  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all');
+  const [searchQuery, setSearchQuery] = useState('');
+
   const [checkingSpelling, setCheckingSpelling] = useState<Record<string, boolean>>({});
   const [spellCheckResult, setSpellCheckResult] = useState<{
     field: string;
@@ -157,6 +161,40 @@ export default function CategoriesPage() {
     });
   };
 
+  const toggleStatus = async (category: GiftCategory) => {
+    const newStatus = !category.isActive;
+    const id = category._id;
+
+    // 0ms Optimistic UI update
+    setCategories(prev => prev.map(c => c._id === id ? { ...c, isActive: newStatus } : c));
+    if (editingId === id) {
+      setFormData(prev => ({ ...prev, isActive: newStatus }));
+    }
+    setTogglingId(id);
+
+    try {
+      const res = await fetch(`/api/gift-categories/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isActive: newStatus }),
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Failed to update category status');
+      }
+
+      toast.success(`Category "${category.label}" is now ${newStatus ? 'Active' : 'Inactive'}`);
+    } catch (error: any) {
+      console.error('Toggle status error:', error);
+      toast.error(error.message || 'Failed to update category status');
+      // Revert optimistic update on failure
+      fetchCategories();
+    } finally {
+      setTogglingId(null);
+    }
+  };
+
   const handleDelete = async (id: string, label: string) => {
     if (!confirm(`Delete category "${label}"? This will hide the category from customer pages without deleting products.`)) {
       return;
@@ -195,6 +233,21 @@ export default function CategoriesPage() {
     toast.success(`Occasion preset "${preset.label}" applied!`);
   };
 
+  const activeCount = categories.filter(c => c.isActive).length;
+  const inactiveCount = categories.filter(c => !c.isActive).length;
+
+  const filteredCategories = categories.filter((category) => {
+    if (statusFilter === 'active' && !category.isActive) return false;
+    if (statusFilter === 'inactive' && category.isActive) return false;
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase().trim();
+      const matchLabel = category.label.toLowerCase().includes(q);
+      const matchSlug = category.slug.toLowerCase().includes(q);
+      if (!matchLabel && !matchSlug) return false;
+    }
+    return true;
+  });
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
@@ -230,7 +283,7 @@ export default function CategoriesPage() {
           Gift Categories
         </h1>
         <p className="font-['Jost'] text-[#1a1209]/60 mt-1">
-          Manage gift occasion categories ({categories.length} categories total)
+          Manage gift occasion categories • {categories.length} total ({activeCount} active, {inactiveCount} inactive)
         </p>
       </div>
 
@@ -386,6 +439,58 @@ export default function CategoriesPage() {
         {/* Categories List */}
         <div className="lg:col-span-2">
           <div className="bg-white rounded-xl border border-[#1a1209]/10 overflow-hidden shadow-sm">
+            {/* Search and Status Filter Toolbar */}
+            <div className="p-4 border-b border-[#1a1209]/10 bg-[#faf7f0]/60 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+              <div className="flex items-center gap-1.5 p-1 bg-white border border-[#1a1209]/10 rounded-lg">
+                <button
+                  type="button"
+                  onClick={() => setStatusFilter('all')}
+                  className={`px-3 py-1 text-xs font-['Jost'] font-semibold rounded-md transition-all cursor-pointer ${
+                    statusFilter === 'all'
+                      ? 'bg-[#1a1209] text-white shadow-xs'
+                      : 'text-[#1a1209]/70 hover:text-[#1a1209] hover:bg-[#1a1209]/5'
+                  }`}
+                >
+                  All ({categories.length})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setStatusFilter('active')}
+                  className={`px-3 py-1 text-xs font-['Jost'] font-semibold rounded-md transition-all cursor-pointer ${
+                    statusFilter === 'active'
+                      ? 'bg-emerald-700 text-white shadow-xs'
+                      : 'text-emerald-700 hover:bg-emerald-50'
+                  }`}
+                >
+                  Active ({activeCount})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setStatusFilter('inactive')}
+                  className={`px-3 py-1 text-xs font-['Jost'] font-semibold rounded-md transition-all cursor-pointer ${
+                    statusFilter === 'inactive'
+                      ? 'bg-red-700 text-white shadow-xs'
+                      : 'text-red-700 hover:bg-red-50'
+                  }`}
+                >
+                  Inactive ({inactiveCount})
+                </button>
+              </div>
+
+              <div className="relative flex-1 sm:max-w-xs">
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search categories..."
+                  className="w-full pl-9 pr-3 py-1.5 bg-white border border-[#1a1209]/15 rounded-lg text-xs font-['Jost'] text-[#1a1209] placeholder-[#1a1209]/40 focus:outline-none focus:border-[#8B6914] focus:ring-1 focus:ring-[#8B6914]"
+                />
+                <svg className="w-3.5 h-3.5 absolute left-3 top-2 text-[#1a1209]/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </div>
+            </div>
+
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead className="bg-[#faf7f0] border-b border-[#1a1209]/10">
@@ -408,7 +513,7 @@ export default function CategoriesPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#1a1209]/5">
-                  {categories.map((category) => (
+                  {filteredCategories.map((category) => (
                     <tr key={category._id} className="hover:bg-[#faf7f0]/50 transition-colors">
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
@@ -429,13 +534,37 @@ export default function CategoriesPage() {
                         </span>
                       </td>
                       <td className="px-6 py-4">
-                        <span className={`inline-flex px-3 py-1 rounded-full text-xs font-['Jost'] font-medium ${
-                          category.isActive
-                            ? 'bg-green-50 text-green-700 border border-green-200'
-                            : 'bg-red-50 text-red-700 border border-red-200'
-                        }`}>
-                          {category.isActive ? 'Active' : 'Inactive'}
-                        </span>
+                        {/* Interactive Active/Inactive Toggle Button */}
+                        <button
+                          type="button"
+                          onClick={() => toggleStatus(category)}
+                          disabled={togglingId === category._id}
+                          title={category.isActive ? 'Click to deactivate (hide from customer website)' : 'Click to activate (make visible on customer website)'}
+                          className={`group inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-['Jost'] font-semibold transition-all duration-200 cursor-pointer select-none border disabled:opacity-60 disabled:cursor-wait active:scale-95 shadow-2xs ${
+                            category.isActive
+                              ? 'bg-emerald-50/90 text-emerald-800 border-emerald-300/80 hover:bg-emerald-100 hover:border-emerald-400'
+                              : 'bg-red-50/90 text-red-800 border-red-300/80 hover:bg-red-100 hover:border-red-400'
+                          }`}
+                        >
+                          {/* Mini Toggle Switch Indicator */}
+                          <span className={`relative inline-flex h-4 w-7 shrink-0 items-center rounded-full transition-colors duration-200 ease-in-out ${
+                            category.isActive ? 'bg-emerald-600' : 'bg-red-400'
+                          }`}>
+                            <span className={`inline-block h-3 w-3 transform rounded-full bg-white shadow-xs transition duration-200 ease-in-out ${
+                              category.isActive ? 'translate-x-3.5' : 'translate-x-0.5'
+                            }`} />
+                          </span>
+
+                          <span className="flex items-center gap-1.5">
+                            {category.isActive ? 'Active' : 'Inactive'}
+                            {togglingId === category._id && (
+                              <svg className="animate-spin h-3 w-3 text-current" viewBox="0 0 24 24" fill="none">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                              </svg>
+                            )}
+                          </span>
+                        </button>
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center justify-end gap-2">
@@ -451,7 +580,7 @@ export default function CategoriesPage() {
                           <button
                             onClick={() => handleDelete(category._id, category.label)}
                             className="p-2 text-red-600 hover:bg-red-50 rounded transition-colors"
-                            title="Delete"
+                            title="Hide Category"
                           >
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -465,11 +594,15 @@ export default function CategoriesPage() {
               </table>
             </div>
 
-            {categories.length === 0 && (
+            {filteredCategories.length === 0 && (
               <div className="text-center py-16">
                 <div className="text-4xl mb-3">🎁</div>
-                <p className="text-[#1a1209]/60 font-['Jost'] text-lg">No categories yet</p>
-                <p className="text-[#1a1209]/40 font-['Jost'] text-sm mt-1">Create your first gift category</p>
+                <p className="text-[#1a1209]/60 font-['Jost'] text-lg">
+                  {searchQuery || statusFilter !== 'all' ? 'No matching categories' : 'No categories yet'}
+                </p>
+                <p className="text-[#1a1209]/40 font-['Jost'] text-sm mt-1">
+                  {searchQuery || statusFilter !== 'all' ? 'Try adjusting your search or filter options' : 'Create your first gift category'}
+                </p>
               </div>
             )}
           </div>
