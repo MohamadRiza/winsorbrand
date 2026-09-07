@@ -10,6 +10,96 @@ interface Message {
   isAudioPlaying?: boolean;
 }
 
+function FormattedMessageText({ content }: { content: string }) {
+  const lines = content.split('\n');
+
+  return (
+    <div className="ai-formatted-text">
+      {lines.map((line, lineIdx) => {
+        const trimmed = line.trim();
+        if (!trimmed) {
+          return <div key={lineIdx} style={{ height: '6px' }} />;
+        }
+
+        const isBullet = trimmed.startsWith('* ') || trimmed.startsWith('- ') || trimmed.startsWith('• ');
+        const cleanLine = isBullet ? trimmed.replace(/^[\*\-•]\s+/, '') : trimmed;
+
+        // Split by bold (**...**)
+        const parts = cleanLine.split(/(\*\*.*?\*\*)/g);
+
+        const renderedLine = parts.map((part, pIdx) => {
+          if (part.startsWith('**') && part.endsWith('**')) {
+            const boldText = part.slice(2, -2);
+            return <strong key={pIdx} style={{ color: '#1a1209', fontWeight: 600 }}>{boldText}</strong>;
+          }
+
+          // Split by links, emails, and phone numbers
+          const tokenRegex = /('(?:(?:\/[a-zA-Z0-9\-_]+)+)'|(?:\/(?:[a-zA-Z0-9\-_]+)+)|support@winsorbrand\.com|winsorwatches@gmail\.com|\+94\s*\d{2}\s*\d{3}\s*\d{4}|\b077\s*\d{3}\s*\d{4}\b)/g;
+          const subTokens = part.split(tokenRegex);
+
+          return (
+            <span key={pIdx}>
+              {subTokens.map((token, tIdx) => {
+                const cleanToken = token.replace(/^'|'$/g, '');
+                if (cleanToken.startsWith('/')) {
+                  return (
+                    <a
+                      key={tIdx}
+                      href={cleanToken}
+                      className="ai-chat-link"
+                    >
+                      {token}
+                    </a>
+                  );
+                }
+                if (cleanToken.includes('@')) {
+                  return (
+                    <a
+                      key={tIdx}
+                      href={`mailto:${cleanToken}`}
+                      className="ai-chat-link"
+                    >
+                      {token}
+                    </a>
+                  );
+                }
+                if (cleanToken.startsWith('+94') || cleanToken.startsWith('077')) {
+                  const telDigits = cleanToken.replace(/\s+/g, '');
+                  return (
+                    <a
+                      key={tIdx}
+                      href={`tel:${telDigits}`}
+                      className="ai-chat-link"
+                    >
+                      {token}
+                    </a>
+                  );
+                }
+                return token;
+              })}
+            </span>
+          );
+        });
+
+        if (isBullet) {
+          return (
+            <div key={lineIdx} style={{ display: 'flex', gap: '6px', alignItems: 'flex-start', margin: '2px 0' }}>
+              <span style={{ color: '#8b6914', fontSize: '11px', lineHeight: 1.6, flexShrink: 0 }}>✦</span>
+              <div style={{ flex: 1, minWidth: 0 }}>{renderedLine}</div>
+            </div>
+          );
+        }
+
+        return (
+          <div key={lineIdx} style={{ margin: '1.5px 0' }}>
+            {renderedLine}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 export default function AIAssistant() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
@@ -539,6 +629,24 @@ export default function AIAssistant() {
           box-shadow: 0 4px 14px rgba(26,18,9,0.04);
         }
 
+        .ai-formatted-text {
+          display: flex;
+          flex-direction: column;
+          gap: 3px;
+          font-size: 13px;
+          line-height: 1.55;
+        }
+        .ai-chat-link {
+          color: #8b6914;
+          text-decoration: underline;
+          text-underline-offset: 2px;
+          font-weight: 600;
+          transition: color 0.2s;
+        }
+        .ai-chat-link:hover {
+          color: #b88e3c;
+        }
+
         /* Speak Audio controls */
         .ai-msg-speak-btn {
           position: absolute;
@@ -671,13 +779,16 @@ export default function AIAssistant() {
             left: 0;
             bottom: 0;
             width: 100vw;
-            height: 70vh;
-            border-radius: 20px 20px 0 0;
-            border: 1px solid rgba(139, 105, 20, 0.15);
+            max-width: 100vw;
+            height: 75dvh;
+            max-height: 85dvh;
+            border-radius: 22px 22px 0 0;
+            border: 1px solid rgba(139, 105, 20, 0.22);
             border-bottom: none;
-            box-shadow: 0 -10px 32px rgba(26, 18, 9, 0.12);
+            box-shadow: 0 -12px 40px rgba(26, 18, 9, 0.16);
             transform: translateY(100%);
             transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+            padding-bottom: env(safe-area-inset-bottom, 0px);
           }
           .ai-chat-window.open {
             transform: translateY(0);
@@ -970,7 +1081,7 @@ export default function AIAssistant() {
                   />
                 </div>
                 <div className="ai-msg-bubble assistant" style={{ maxWidth: '100%' }}>
-                  {msg.content}
+                  <FormattedMessageText content={msg.content} />
                   <button 
                     className={`ai-msg-speak-btn ${msg.isAudioPlaying ? 'playing' : ''}`}
                     onClick={() => speakText(msg.content, idx)}

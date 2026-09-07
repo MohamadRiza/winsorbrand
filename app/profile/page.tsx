@@ -565,7 +565,7 @@ export default function ProfilePage() {
           position: absolute; right: -20px; top: 50%;
           transform: translateY(-50%);
           width: 320px; height: auto;
-          opacity: 0.08; pointer-events: none;
+          opacity: 0.10; pointer-events: none;
           mix-blend-mode: luminosity;
         }
         .banner-glow-effect {
@@ -1096,7 +1096,7 @@ export default function ProfilePage() {
         {/* TOP PATRON HEADER BANNER (FUTURISTIC MARBLE HERO) */}
         <div className="portal-header-banner">
           <div className="banner-glow-effect" />
-          <img src="/womens-watch-highlight.png" alt="" className="banner-watermark" />
+          <img src="/winsor_hero_backgroundremoved.webp" alt="Winsor Signature Timepiece" className="banner-watermark" />
 
           <div className="avatar-wrapper">
             {user.imageUrl ? (
