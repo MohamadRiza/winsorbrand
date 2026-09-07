@@ -440,6 +440,7 @@ export default function AdminDashboard(): React.JSX.Element {
     lowStockItems: 0,
     onlineCustomers: 0,
     totalRevenue: 0,
+    pendingApprovals: 0,
     ordersDistribution: {
       total: 0,
       completed: 0,
@@ -735,6 +736,16 @@ export default function AdminDashboard(): React.JSX.Element {
           alert={Number(stats.newMessages) >= 1}
           alertColor="amber"
           alertBadge="Unread"
+        />
+        <StatCard
+          title="Pending Approvals"
+          value={stats.pendingApprovals}
+          icon={<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>}
+          href="/admin/approvals"
+          color="red"
+          alert={Number(stats.pendingApprovals) >= 1}
+          alertColor="red"
+          alertBadge="Review Now"
         />
         <StatCard
           title="New Users (24h)"

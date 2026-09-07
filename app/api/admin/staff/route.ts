@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
 
     await connectDB();
     const body = await req.json();
-    const { username, password, isTemporary, expiresAt, permissions } = body;
+    const { username, password, isTemporary, expiresAt, permissions, requiresApproval } = body;
 
     if (!username || !password) {
       return NextResponse.json(
@@ -69,6 +69,7 @@ export async function POST(req: NextRequest) {
       isTemporary: !!isTemporary,
       expiresAt: isTemporary && expiresAt ? new Date(expiresAt) : undefined,
       permissions: Array.isArray(permissions) ? permissions : [],
+      requiresApproval: !!requiresApproval,
     });
 
     // Don't return the hashed password

@@ -5,6 +5,7 @@ import { useRouter, usePathname } from 'next/navigation';
 
 interface PermissionGateProps {
   children: ReactNode;
+  allowedRoles?: ('admin' | 'staff')[];
   permission?: string;
   permissions?: string[];
   mode?: 'all' | 'any';
@@ -20,6 +21,7 @@ interface ProfileData {
 
 export default function PermissionGate({
   children,
+  allowedRoles,
   permission,
   permissions,
   mode = 'all',
@@ -67,6 +69,15 @@ export default function PermissionGate({
         }
 
         setProfile(data);
+
+        // Role check first if specified
+        if (allowedRoles && allowedRoles.length > 0) {
+          if (!allowedRoles.includes(data.role)) {
+            setAuthorized(false);
+            setLoading(false);
+            return;
+          }
+        }
 
         // Authorization Logic
         if (data.role === 'admin') {
@@ -170,7 +181,10 @@ export default function PermissionGate({
             margin: '0 auto 20px',
             fontSize: '32px'
           }}>
-            ⏳
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#dc3232" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="10" />
+              <polyline points="12 6 12 12 16 14" />
+            </svg>
           </div>
           <h2 style={{
             fontFamily: "'Cormorant Garamond', serif",

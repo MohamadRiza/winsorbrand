@@ -410,9 +410,12 @@ export default function AdminVacanciesPage() {
                 </div>
                 <button 
                   onClick={() => setModalOpen(false)} 
-                  className="text-[#f3e3b8]/60 hover:text-[#f3e3b8] text-xl font-bold transition-colors cursor-pointer p-1"
+                  className="text-[#f3e3b8]/60 hover:text-[#f3e3b8] transition-colors cursor-pointer p-1"
+                  aria-label="Close"
                 >
-                  ✕
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
                 </button>
               </div>
 
@@ -577,9 +580,12 @@ export default function AdminVacanciesPage() {
                 </div>
                 <button 
                   onClick={() => setEditModalOpen(false)} 
-                  className="text-[#f3e3b8]/60 hover:text-[#f3e3b8] text-xl font-bold transition-colors cursor-pointer p-1"
+                  className="text-[#f3e3b8]/60 hover:text-[#f3e3b8] transition-colors cursor-pointer p-1"
+                  aria-label="Close"
                 >
-                  ✕
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
                 </button>
               </div>
 
@@ -600,7 +606,12 @@ export default function AdminVacanciesPage() {
                             : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                         }`}
                       >
-                        ✓ Active (Open)
+                        <span className="inline-flex items-center gap-1">
+                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                          </svg>
+                          Active (Open)
+                        </span>
                       </button>
                       <button
                         type="button"

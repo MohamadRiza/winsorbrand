@@ -85,6 +85,14 @@ const StaffIcon: IconComponent = ({ active }) => (
   </svg>
 );
 
+const ApprovalsIcon: IconComponent = ({ active }) => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={active ? '#8B6914' : '#8d6d1b'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M9 12l2 2 4-4" />
+    <circle cx="12" cy="12" r="9" />
+  </svg>
+);
+
+
 const CouponsIcon: IconComponent = ({ active }) => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={active ? '#8B6914' : '#8d6d1b'} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
     <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" />
@@ -195,6 +203,11 @@ const NAV_ITEMS: NavItem[] = [
     href: '/admin/staff', 
     icon: StaffIcon 
   },
+  { 
+    label: 'Approvals', 
+    href: '/admin/approvals', 
+    icon: ApprovalsIcon
+  },
   { label: 'Settings', href: '/admin/settings', icon: SettingsIcon },
 ];
 
@@ -209,6 +222,7 @@ interface SidebarProps {
     newMessages?: number;
     lowStockItems?: number;
     jobApplications?: number;
+    pendingApprovals?: number;
   };
   isCollapsed?: boolean;
   setIsCollapsed?: (collapsed: boolean) => void;
@@ -263,6 +277,8 @@ export default function Sidebar({
         return userPermissions.includes('dashboard_view');
       case 'Staff Management':
         return false; // Staff never gets access to staff management page
+      case 'Approvals':
+        return false; // Approvals page is admin-only
       case 'Products':
         return userPermissions.some(p => ['products_read', 'products_create', 'products_update', 'products_delete', 'categories_manage'].includes(p));
       case 'All Products':
@@ -408,7 +424,10 @@ export default function Sidebar({
               }}
               aria-label="Close menu"
             >
-              ✕
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
             </button>
 
             {/* Desktop collapse button */}
@@ -451,13 +470,12 @@ export default function Sidebar({
             const active = isActive(item.href);
             const hasChildren = item.children?.length;
             const submenuOpen = openSubmenu === item.label;
-            const badge = item.badge !== undefined ? (
-              item.label === 'Orders' ? stats.pendingOrders :
-              item.label === 'Messages' ? stats.newMessages :
-              item.label === 'Careers' ? stats.jobApplications :
-              item.label === 'Inventory' ? stats.lowStockItems :
-              (stats as any)[item.label.toLowerCase().replace(' ', '') + 's'] ?? item.badge
-            ) : undefined;
+            const badge = item.label === 'Orders' ? (stats.pendingOrders || 0) :
+              item.label === 'Messages' ? (stats.newMessages || 0) :
+              item.label === 'Careers' ? (stats.jobApplications || 0) :
+              item.label === 'Inventory' ? (stats.lowStockItems || 0) :
+              item.label === 'Approvals' ? (stats.pendingApprovals || 0) :
+              undefined;
 
             return (
               <div key={item.href}>
@@ -503,7 +521,7 @@ export default function Sidebar({
                       <span style={{ flex: 1 }}>{item.label}</span>
                       {badge !== undefined && badge > 0 && (
                         <span style={{
-                          background: '#8B6914',
+                          background: item.label === 'Approvals' ? '#dc2626' : '#8B6914',
                           color: '#ffffff',
                           fontSize: '10px',
                           fontWeight: 600,

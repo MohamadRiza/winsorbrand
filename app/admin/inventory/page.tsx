@@ -649,11 +649,19 @@ export default function InventoryManagementPage() {
                             Save Qty
                           </button>
                         ) : item.isSaved ? (
-                          <span className="px-2.5 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-bold rounded-full animate-pulse font-mono">
-                            ✓ Saved
+                          <span className="px-2.5 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-bold rounded-full animate-pulse font-mono inline-flex items-center gap-1">
+                            <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                            </svg>
+                            Saved
                           </span>
                         ) : (
-                          <span className="text-xs text-[#1a1209]/40 font-mono">✓ In Sync</span>
+                          <span className="text-xs text-[#1a1209]/40 font-mono inline-flex items-center gap-1">
+                            <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                            </svg>
+                            In Sync
+                          </span>
                         )}
                       </td>
                     </tr>

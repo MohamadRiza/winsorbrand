@@ -354,9 +354,12 @@ export default function AdminMessagesPage() {
                 </h2>
                 <button 
                   onClick={() => setDrawerOpen(false)} 
-                  className="text-[#f3e3b8]/60 hover:text-[#f3e3b8] text-xl font-bold transition-colors cursor-pointer p-1"
+                  className="text-[#f3e3b8]/60 hover:text-[#f3e3b8] transition-colors cursor-pointer p-1"
+                  aria-label="Close"
                 >
-                  ✕
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
                 </button>
               </div>
 
@@ -470,7 +473,16 @@ export default function AdminMessagesPage() {
                           : 'border-[#8B6914] text-[#8B6914] bg-[#8B6914]/10 hover:bg-[#8B6914] hover:text-white'
                       }`}
                     >
-                      {selectedMessage.read ? 'Mark Unread' : '✓ Mark Read'}
+                      {selectedMessage.read ? (
+                        'Mark Unread'
+                      ) : (
+                        <>
+                          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                          </svg>
+                          Mark Read
+                        </>
+                      )}
                     </button>
                   </div>
                   

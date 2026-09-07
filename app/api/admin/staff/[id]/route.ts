@@ -33,7 +33,7 @@ export async function PUT(
 
     // Prepare update payload
     const body = await req.json();
-    const { username, password, isActive, isTemporary, expiresAt, permissions } = body;
+    const { username, password, isActive, isTemporary, expiresAt, permissions, requiresApproval } = body;
 
     // Security check for self updates
     if (isSelfUpdate) {
@@ -43,7 +43,7 @@ export async function PUT(
           { status: 403 }
         );
       }
-      if (isActive !== undefined || isTemporary !== undefined || expiresAt !== undefined || permissions !== undefined) {
+      if (isActive !== undefined || isTemporary !== undefined || expiresAt !== undefined || permissions !== undefined || requiresApproval !== undefined) {
         return NextResponse.json(
           { success: false, error: 'Access denied: Cannot modify account settings.' },
           { status: 403 }
@@ -92,6 +92,11 @@ export async function PUT(
 
     if (permissions) {
       staff.permissions = Array.isArray(permissions) ? permissions : [];
+    }
+
+    // Only admin can toggle requiresApproval
+    if (!isSelfUpdate && requiresApproval !== undefined) {
+      staff.requiresApproval = !!requiresApproval;
     }
 
     await staff.save();

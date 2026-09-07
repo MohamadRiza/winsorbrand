@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db';
 import Product from '@/lib/models/Product';
 import { verifyPermissions } from '@/lib/authHelper';
+import { checkApprovalGate } from '@/lib/approvalGate';
 
 // GET /api/products?home=true  (home=true returns homepage products only)
 export async function GET(req: NextRequest) {
@@ -31,10 +32,16 @@ export async function POST(req: NextRequest) {
 
     await connectDB();
     const body = await req.json();
+
+    // ── Approval Gate ─────────────────────────────────────────────────────────
+    const gate = await checkApprovalGate(auth, 'product_create', body);
+    if (gate.intercepted) return gate.response!;
+    // ─────────────────────────────────────────────────────────────────────────
+
     const product = await Product.create(body);
     return NextResponse.json({ success: true, data: product }, { status: 201 });
   } catch (error: unknown) {
     const msg = error instanceof Error ? error.message : 'Server error';
     return NextResponse.json({ success: false, error: msg }, { status: 400 });
   }
-}
+}

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db';
 import Product from '@/lib/models/Product';
 import { verifyPermissions } from '@/lib/authHelper';
+import { checkApprovalGate } from '@/lib/approvalGate';
 import { GET as getCollections } from '../collections/route';
 import { GET as getGifts } from '../gifts/route';
 
@@ -61,6 +62,11 @@ export async function PUT(
     await connectDB();
     const body = await req.json();
 
+    // ── Approval Gate ─────────────────────────────────────────────────────────
+    const gate = await checkApprovalGate(auth, 'product_update', body, id);
+    if (gate.intercepted) return gate.response!;
+    // ─────────────────────────────────────────────────────────────────────────
+
     const product = await Product.findByIdAndUpdate(id, body, {
       new: true,
       runValidators: true,
@@ -95,6 +101,13 @@ export async function DELETE(
     const auth = await verifyPermissions(req, ['products_delete']);
     if (!auth.authorized) {
       return NextResponse.json({ success: false, error: auth.error }, { status: auth.status });
+    }
+
+    if (auth.requiresApproval) {
+      return NextResponse.json(
+        { success: false, error: 'Staff accounts subject to approval cannot delete products directly. Please request deletion from an administrator.' },
+        { status: 403 }
+      );
     }
 
     await connectDB();

@@ -86,7 +86,7 @@ export default function SidebarClientWrapper() {
         if (statsRes.ok) {
           const statsData = await statsRes.json();
           if (statsData.success) {
-            setStats(statsData.data || statsData);
+            setStats(statsData.data?.stats || statsData.data || statsData);
           }
         }
       } catch (err) {
@@ -444,7 +444,11 @@ export default function SidebarClientWrapper() {
               boxShadow: '0 8px 20px rgba(220, 50, 50, 0.25)',
               userSelect: 'none',
             }}>
-              ⚠️
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#dc3232" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" />
+                <line x1="12" y1="9" x2="12" y2="13" />
+                <line x1="12" y1="17" x2="12.01" y2="17" />
+              </svg>
             </div>
 
             {/* Header */}

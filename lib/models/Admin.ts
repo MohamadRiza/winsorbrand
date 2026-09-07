@@ -9,6 +9,7 @@ export interface IAdmin extends Document {
   isTemporary: boolean;
   expiresAt?: Date;
   permissions: string[];
+  requiresApproval: boolean;
   lastLogin?: Date;
   createdAt: Date;
   updatedAt: Date;
@@ -51,6 +52,10 @@ const AdminSchema = new Schema<IAdmin>(
     permissions: {
       type: [String],
       default: [],
+    },
+    requiresApproval: {
+      type: Boolean,
+      default: false,
     },
     lastLogin: {
       type: Date,

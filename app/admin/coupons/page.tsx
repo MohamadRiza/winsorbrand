@@ -370,8 +370,11 @@ export default function AdminCouponsPage() {
 
             {!canManageCoupons ? (
               <div className="p-8 text-center bg-[#faf7f0]/60 rounded-xl border border-[#8B6914]/20 space-y-3">
-                <div className="w-12 h-12 rounded-full bg-amber-50 border border-amber-200 text-[#8B6914] flex items-center justify-center mx-auto text-xl">
-                  🔒
+                <div className="w-12 h-12 rounded-full bg-amber-50 border border-amber-200 text-[#8B6914] flex items-center justify-center mx-auto">
+                  <svg className="w-6 h-6 text-[#8B6914]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2" strokeWidth={2} />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 11V7a5 5 0 0 1 10 0v4" />
+                  </svg>
                 </div>
                 <h3 className="text-sm font-bold text-[#1a1209]">Coupon Management Restricted</h3>
                 <p className="text-xs text-[#1a1209]/60 leading-relaxed max-w-sm mx-auto">
@@ -398,9 +401,12 @@ export default function AdminCouponsPage() {
                   <button
                     type="button"
                     onClick={() => setCode(generateCode())}
-                    className="px-3.5 py-2.5 bg-[#faf7f0] border border-[#8B6914]/30 hover:bg-[#8B6914] hover:text-white text-[#8B6914] text-xs font-bold font-mono rounded-xl transition-all shadow-sm cursor-pointer whitespace-nowrap"
+                    className="px-3.5 py-2.5 bg-[#faf7f0] border border-[#8B6914]/30 hover:bg-[#8B6914] hover:text-white text-[#8B6914] text-xs font-bold font-mono rounded-xl transition-all shadow-sm cursor-pointer whitespace-nowrap inline-flex items-center gap-1.5"
                   >
-                    ⚡ Generate
+                    <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+                    </svg>
+                    Generate
                   </button>
                 </div>
                 <p className="text-[10px] text-[#1a1209]/50">
@@ -505,8 +511,12 @@ export default function AdminCouponsPage() {
                           )}
                         </button>
                       </div>
-                      <p className="text-[10px] text-amber-900/70 flex items-center gap-1 font-medium">
-                        <span>🔒</span> Verified securely against administrator credentials.
+                      <p className="text-[10px] text-amber-900/70 flex items-center gap-1.5 font-medium">
+                        <svg className="w-3 h-3 text-amber-800 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <rect x="3" y="11" width="18" height="11" rx="2" ry="2" strokeWidth={2} />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 11V7a5 5 0 0 1 10 0v4" />
+                        </svg>
+                        Verified securely against administrator credentials.
                       </p>
                     </div>
                   </div>
@@ -678,8 +688,12 @@ export default function AdminCouponsPage() {
                             {/* Status Badge */}
                             <td className="px-5 py-4">
                               {expired ? (
-                                <span className="px-2.5 py-0.5 bg-gray-100 text-gray-500 border border-gray-200 text-[10px] font-bold rounded-full">
-                                  ⌛ Expired
+                                <span className="px-2.5 py-0.5 bg-gray-100 text-gray-600 border border-gray-200 text-[10px] font-bold rounded-full inline-flex items-center gap-1">
+                                  <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <circle cx="12" cy="12" r="10" strokeWidth={2} />
+                                    <polyline points="12 6 12 12 16 14" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+                                  </svg>
+                                  Expired
                                 </span>
                               ) : coupon.isActive ? (
                                 <span className="px-2.5 py-0.5 bg-emerald-50 text-emerald-800 border border-emerald-200 text-[10px] font-bold rounded-full inline-flex items-center gap-1">
@@ -687,8 +701,12 @@ export default function AdminCouponsPage() {
                                   Active
                                 </span>
                               ) : (
-                                <span className="px-2.5 py-0.5 bg-amber-50 text-amber-800 border border-amber-200 text-[10px] font-bold rounded-full">
-                                  ⏸ Inactive
+                                <span className="px-2.5 py-0.5 bg-amber-50 text-amber-800 border border-amber-200 text-[10px] font-bold rounded-full inline-flex items-center gap-1">
+                                  <svg className="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 24 24">
+                                    <rect x="6" y="4" width="4" height="16" rx="1" />
+                                    <rect x="14" y="4" width="4" height="16" rx="1" />
+                                  </svg>
+                                  Inactive
                                 </span>
                               )}
                             </td>

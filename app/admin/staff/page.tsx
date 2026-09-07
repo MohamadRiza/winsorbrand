@@ -12,6 +12,7 @@ interface StaffAccount {
   isTemporary: boolean;
   expiresAt?: string;
   permissions: string[];
+  requiresApproval: boolean;
   lastLogin?: string;
   createdAt: string;
 }
@@ -44,7 +45,7 @@ const AVAILABLE_PERMISSIONS: PermissionItem[] = [
   // 5. Customer & Mock Reviews (High Risk / User Highlighted)
   { key: 'reviews_read', label: 'View Customer & Mock Reviews', category: 'Reviews', description: 'Read submitted ratings, feedback, and customer photos' },
   { key: 'reviews_moderate', label: 'Approve & Reject Customer Reviews', category: 'Reviews', description: 'Moderate real patron reviews before store display' },
-  { key: 'reviews_fake_manage', label: 'Create & Manage Fake / Mock Reviews', category: 'Reviews', badge: '💎 High Impact', description: 'Inject promotional mock customer reviews for timepiece showcase' },
+  { key: 'reviews_fake_manage', label: 'Create & Manage Fake / Mock Reviews', category: 'Reviews', badge: 'High Impact', description: 'Inject promotional mock customer reviews for timepiece showcase' },
   { key: 'reviews_delete', label: 'Delete Customer & Mock Reviews', category: 'Reviews', description: 'Permanently delete reviews from the database' },
 
   // 6. Coupons & Promotions
@@ -94,6 +95,7 @@ export default function StaffManagementPage() {
   const [isTemporary, setIsTemporary] = useState(true);
   const [expiryDays, setExpiryDays] = useState(3);
   const [selectedPermissions, setSelectedPermissions] = useState<string[]>(['settings_manage']);
+  const [requiresApproval, setRequiresApproval] = useState(false);
 
   // Form States (Edit)
   const [editId, setEditId] = useState<string | null>(null);
@@ -103,6 +105,7 @@ export default function StaffManagementPage() {
   const [editIsTemporary, setEditIsTemporary] = useState(false);
   const [editExpiryDays, setEditExpiryDays] = useState(3);
   const [editSelectedPermissions, setEditSelectedPermissions] = useState<string[]>([]);
+  const [editRequiresApproval, setEditRequiresApproval] = useState(false);
 
   useEffect(() => {
     fetchProfileAndData();
@@ -145,7 +148,7 @@ export default function StaffManagementPage() {
       setEditPassword(finalPass);
     }
     navigator.clipboard.writeText(finalPass);
-    toast.success('⚡ Secure password generated & copied to clipboard!');
+    toast.success('Secure password generated & copied to clipboard!');
   };
 
   const handleCreateStaff = async (e: FormEvent) => {
@@ -165,6 +168,7 @@ export default function StaffManagementPage() {
           isTemporary,
           expiresAt: isTemporary ? expiresAtDate.toISOString() : undefined,
           permissions: selectedPermissions,
+          requiresApproval,
         }),
       });
 
@@ -178,6 +182,7 @@ export default function StaffManagementPage() {
       setIsTemporary(true);
       setExpiryDays(3);
       setSelectedPermissions(['settings_manage']);
+      setRequiresApproval(false);
       setModalOpen(false);
 
       fetchProfileAndData();
@@ -195,6 +200,7 @@ export default function StaffManagementPage() {
     setEditIsActive(account.isActive);
     setEditIsTemporary(account.isTemporary);
     setEditSelectedPermissions(account.permissions || []);
+    setEditRequiresApproval(!!account.requiresApproval);
     
     if (account.isTemporary && account.expiresAt) {
       const diffTime = new Date(account.expiresAt).getTime() - new Date().getTime();
@@ -225,6 +231,7 @@ export default function StaffManagementPage() {
           isTemporary: editIsTemporary,
           expiresAt: editIsTemporary ? expiresAtDate.toISOString() : undefined,
           permissions: editSelectedPermissions,
+          requiresApproval: editRequiresApproval,
         }),
       });
 
@@ -520,6 +527,15 @@ export default function StaffManagementPage() {
                               <p className="text-[10px] text-[#1a1209]/50 font-mono uppercase tracking-wide">
                                 Role: {account.role}
                               </p>
+                              {account.requiresApproval && (
+                                <span className="inline-flex items-center gap-1 mt-0.5 text-[9px] font-bold px-1.5 py-0.5 bg-red-100 text-red-700 border border-red-300 rounded font-mono">
+                                  <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2" strokeWidth={2} />
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 11V7a5 5 0 0 1 10 0v4" />
+                                  </svg>
+                                  APPROVAL REQUIRED
+                                </span>
+                              )}
                             </div>
                           </div>
                         </td>
@@ -529,16 +545,23 @@ export default function StaffManagementPage() {
                           <div className="flex flex-col text-xs font-mono">
                             {account.isTemporary ? (
                               <>
-                                <span className="font-bold text-[#8B6914] uppercase tracking-wider">
-                                  ⏳ Temporary
+                                <span className="inline-flex items-center gap-1 font-bold text-[#8B6914] uppercase tracking-wider">
+                                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <circle cx="12" cy="12" r="10" strokeWidth={2} />
+                                    <polyline points="12 6 12 12 16 14" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+                                  </svg>
+                                  Temporary
                                 </span>
                                 <span className={`text-[11px] mt-0.5 ${isExpired ? 'text-rose-600 font-bold' : 'text-[#1a1209]/60'}`}>
                                   {isExpired ? 'Expired' : `Expires: ${new Date(account.expiresAt!).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}`}
                                 </span>
                               </>
                             ) : (
-                              <span className="font-bold text-emerald-800 uppercase tracking-wider">
-                                🛡️ Permanent
+                              <span className="inline-flex items-center gap-1 font-bold text-emerald-800 uppercase tracking-wider">
+                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                                </svg>
+                                Permanent
                               </span>
                             )}
                           </div>
@@ -562,7 +585,10 @@ export default function StaffManagementPage() {
 
                               {account.permissions?.includes('reviews_fake_manage') && (
                                 <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-100 text-amber-900 border border-amber-300 rounded text-[10px] font-bold shadow-2xs">
-                                  💎 Fake Reviews
+                                  <svg className="w-2.5 h-2.5 text-amber-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <polygon points="6 3 18 3 22 9 12 22 2 9" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+                                  </svg>
+                                  Fake Reviews
                                 </span>
                               )}
                             </div>
@@ -666,7 +692,15 @@ export default function StaffManagementPage() {
                     </h3>
                     <p className="text-xs text-[#8B6914] font-semibold mt-0.5">Create login credentials & assign role permissions</p>
                   </div>
-                  <button onClick={() => setModalOpen(false)} className="text-[#f3e3b8]/60 hover:text-[#f3e3b8] text-xl font-bold transition-colors cursor-pointer p-1">✕</button>
+                  <button 
+                    onClick={() => setModalOpen(false)} 
+                    className="text-[#f3e3b8]/60 hover:text-[#f3e3b8] transition-colors cursor-pointer p-1"
+                    aria-label="Close"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
                 </div>
 
                 <form onSubmit={handleCreateStaff} className="flex-1 overflow-y-auto p-6 space-y-5">
@@ -703,9 +737,12 @@ export default function StaffManagementPage() {
                         <button
                           type="button"
                           onClick={generatePassword}
-                          className="px-3.5 py-2.5 bg-[#8B6914] hover:bg-[#1a1209] text-white text-xs font-bold font-mono rounded-xl transition-all shadow-sm cursor-pointer whitespace-nowrap"
+                          className="px-3.5 py-2.5 bg-[#8B6914] hover:bg-[#1a1209] text-white text-xs font-bold font-mono rounded-xl transition-all shadow-sm cursor-pointer whitespace-nowrap inline-flex items-center gap-1"
                         >
-                          ⚡ Auto
+                          <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+                          </svg>
+                          Auto
                         </button>
                       </div>
                     </div>
@@ -768,6 +805,42 @@ export default function StaffManagementPage() {
                         <span className="text-[10px] text-[#1a1209]/40 block">Account will automatically deactivate after {expiryDays} days.</span>
                       </div>
                     )}
+                  </div>
+
+                  {/* ── Require Admin Approval Toggle ── */}
+                  <div className={`border rounded-2xl p-4 transition-all ${requiresApproval ? 'bg-red-50/60 border-red-300' : 'bg-white border-[#1a1209]/10'}`}>
+                    <div className="flex items-center justify-between gap-4">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-0.5">
+                          <span className="text-[10px] font-bold tracking-wider text-[#8B6914] uppercase">
+                            REQUIRE ADMIN APPROVAL
+                          </span>
+                          {requiresApproval && (
+                            <span className="text-[9px] font-bold px-1.5 py-0.5 bg-red-100 text-red-700 border border-red-300 rounded font-mono">ENABLED</span>
+                          )}
+                        </div>
+                        <p className="text-[10px] text-[#1a1209]/60 leading-relaxed">
+                          {requiresApproval
+                            ? 'All product & review submissions by this staff will be held for your review before going live.'
+                            : 'When enabled, this staff member\'s content changes will require your approval before going live.'}
+                        </p>
+                      </div>
+                      {/* Toggle Switch */}
+                      <button
+                        type="button"
+                        onClick={() => setRequiresApproval(v => !v)}
+                        className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 transition-colors duration-200 focus:outline-none ${
+                          requiresApproval ? 'bg-red-500 border-red-500' : 'bg-[#1a1209]/15 border-[#1a1209]/15'
+                        }`}
+                        aria-pressed={requiresApproval}
+                      >
+                        <span
+                          className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform duration-200 ${
+                            requiresApproval ? 'translate-x-5' : 'translate-x-0'
+                          }`}
+                        />
+                      </button>
+                    </div>
                   </div>
 
                   {/* Granular Access Control Checklist grouped by Category */}
@@ -902,7 +975,15 @@ export default function StaffManagementPage() {
                     </h3>
                     <p className="text-xs text-[#8B6914] font-semibold mt-0.5">Modify access privileges and account status</p>
                   </div>
-                  <button onClick={() => setEditModalOpen(false)} className="text-[#f3e3b8]/60 hover:text-[#f3e3b8] text-xl font-bold transition-colors cursor-pointer p-1">✕</button>
+                  <button 
+                    onClick={() => setEditModalOpen(false)} 
+                    className="text-[#f3e3b8]/60 hover:text-[#f3e3b8] transition-colors cursor-pointer p-1"
+                    aria-label="Close"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
                 </div>
 
                 <form onSubmit={handleEditStaff} className="flex-1 overflow-y-auto p-6 space-y-5">
@@ -937,9 +1018,12 @@ export default function StaffManagementPage() {
                         <button
                           type="button"
                           onClick={generatePassword}
-                          className="px-3.5 py-2.5 bg-[#8B6914] hover:bg-[#1a1209] text-white text-xs font-bold font-mono rounded-xl transition-all shadow-sm cursor-pointer whitespace-nowrap"
+                          className="px-3.5 py-2.5 bg-[#8B6914] hover:bg-[#1a1209] text-white text-xs font-bold font-mono rounded-xl transition-all shadow-sm cursor-pointer whitespace-nowrap inline-flex items-center gap-1"
                         >
-                          ⚡ Auto
+                          <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+                          </svg>
+                          Auto
                         </button>
                       </div>
                     </div>
@@ -1014,6 +1098,41 @@ export default function StaffManagementPage() {
                         />
                       </div>
                     )}
+                  </div>
+
+                  {/* ── Require Admin Approval Toggle (Edit) ── */}
+                  <div className={`border rounded-2xl p-4 transition-all ${editRequiresApproval ? 'bg-red-50/60 border-red-300' : 'bg-white border-[#1a1209]/10'}`}>
+                    <div className="flex items-center justify-between gap-4">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-0.5">
+                          <span className="text-[10px] font-bold tracking-wider text-[#8B6914] uppercase">
+                            REQUIRE ADMIN APPROVAL
+                          </span>
+                          {editRequiresApproval && (
+                            <span className="text-[9px] font-bold px-1.5 py-0.5 bg-red-100 text-red-700 border border-red-300 rounded font-mono">ENABLED</span>
+                          )}
+                        </div>
+                        <p className="text-[10px] text-[#1a1209]/60 leading-relaxed">
+                          {editRequiresApproval
+                            ? 'All product & review submissions by this staff will be held for your review before going live.'
+                            : "When enabled, this staff member's content changes will require your approval before going live."}
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setEditRequiresApproval(v => !v)}
+                        className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 transition-colors duration-200 focus:outline-none ${
+                          editRequiresApproval ? 'bg-red-500 border-red-500' : 'bg-[#1a1209]/15 border-[#1a1209]/15'
+                        }`}
+                        aria-pressed={editRequiresApproval}
+                      >
+                        <span
+                          className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform duration-200 ${
+                            editRequiresApproval ? 'translate-x-5' : 'translate-x-0'
+                          }`}
+                        />
+                      </button>
+                    </div>
                   </div>
 
                   {/* Granular Access Control Checklist */}
@@ -1160,16 +1279,23 @@ export default function StaffManagementPage() {
                   </div>
                   <button 
                     onClick={() => setViewPrivilegesStaff(null)} 
-                    className="text-[#f3e3b8]/60 hover:text-[#f3e3b8] text-xl font-bold transition-colors cursor-pointer p-1"
+                    className="text-[#f3e3b8]/60 hover:text-[#f3e3b8] transition-colors cursor-pointer p-1"
+                    aria-label="Close"
                   >
-                    ✕
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
                   </button>
                 </div>
 
                 <div className="flex-1 overflow-y-auto p-6 space-y-4">
                   {viewPrivilegesStaff.permissions?.includes('reviews_fake_manage') && (
                     <div className="bg-amber-50 border border-amber-300 rounded-xl p-3 flex items-center gap-3">
-                      <span className="text-xl">💎</span>
+                      <div className="w-9 h-9 rounded-lg bg-amber-100 border border-amber-200 flex items-center justify-center shrink-0">
+                        <svg className="w-5 h-5 text-amber-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <polygon points="6 3 18 3 22 9 12 22 2 9" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                      </div>
                       <div>
                         <h5 className="text-xs font-bold text-amber-900">Fake / Mock Reviews Permission Active</h5>
                         <p className="text-[10px] text-amber-800/80">
@@ -1210,7 +1336,11 @@ export default function StaffManagementPage() {
                                     <span className={`w-4 h-4 rounded-full flex items-center justify-center text-[10px] ${
                                       granted ? 'bg-emerald-100 text-emerald-800 font-bold' : 'bg-gray-100 text-gray-400'
                                     }`}>
-                                      {granted ? '✓' : '–'}
+                                      {granted ? (
+                                        <svg className="w-2.5 h-2.5 text-emerald-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                                        </svg>
+                                      ) : '–'}
                                     </span>
                                     <span>{perm.label}</span>
                                     {perm.badge && granted && (

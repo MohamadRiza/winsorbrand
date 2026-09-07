@@ -121,7 +121,7 @@ export default function AddProductPage() {
       if (!res.ok || !data.success) throw new Error(data.error || 'Request failed');
       
       if (data.warning) {
-        toast(data.warning, { icon: '⚠️', duration: 6000 });
+        toast.error(data.warning, { duration: 6000 });
         return;
       }
       
@@ -179,9 +179,9 @@ export default function AddProductPage() {
       if (!res.ok) throw new Error(data.error || 'Failed to generate description');
 
       if (data.warning) {
-        toast(data.warning, { icon: '⚠️' });
+        toast.error(data.warning);
       } else if (data.cached) {
-        toast.success('Using cached description ✨');
+        toast.success('Using cached description');
       } else {
         toast.success('Description generated successfully!');
       }
@@ -592,17 +592,24 @@ export default function AddProductPage() {
       if (!res.ok) throw new Error(data.error || 'Failed to create product');
 
       // 4. Hit 100% and show complete
+      const isPending = data.pending === true;
       setUploadProgress(prev => ({
         ...prev,
         overallPercent: 100,
         stage: 'complete',
-        statusMessage: 'Product created and listed successfully!',
+        statusMessage: isPending
+          ? 'Submitted for admin approval! Will go live once approved.'
+          : 'Product created and listed successfully!',
         estimatedSecondsRemaining: 0,
       }));
 
       await new Promise(r => setTimeout(r, 650));
 
-      toast.success('Product created successfully!');
+      if (isPending) {
+        toast.success('Submitted for admin approval! It will go live once approved.', { duration: 5000 });
+      } else {
+        toast.success('Product created successfully!');
+      }
       router.push('/admin/products');
     } catch (error: any) {
       console.error('Create error:', error);
@@ -646,7 +653,14 @@ export default function AddProductPage() {
                     disabled={checkingSpelling['title']}
                     className="text-[10px] text-[#8B6914] hover:text-[#1a1209] transition font-semibold flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
                   >
-                    {checkingSpelling['title'] ? 'Checking...' : '✨ AI Check'}
+                    {checkingSpelling['title'] ? 'Checking...' : (
+                      <span className="inline-flex items-center gap-1">
+                        <svg className="w-3 h-3 text-[#8B6914]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.286L13 21l-2.286-6.857L5 12l5.714-2.286L13 3z" />
+                        </svg>
+                        AI Check
+                      </span>
+                    )}
                   </button>
                 )}
               </div>
@@ -875,7 +889,14 @@ export default function AddProductPage() {
                 </span>
               </div>
               {getTotalStock() === 0 && (
-                <p className="text-xs text-red-600 mt-1 font-['Jost']">⚠️ Product will be marked as SOLD OUT</p>
+                <p className="text-xs text-red-600 mt-1 font-['Jost'] flex items-center gap-1">
+                  <svg className="w-3.5 h-3.5 text-red-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="10" strokeWidth={2} />
+                    <line x1="12" y1="8" x2="12" y2="12" strokeWidth={2} strokeLinecap="round" />
+                    <line x1="12" y1="16" x2="12.01" y2="16" strokeWidth={2} strokeLinecap="round" />
+                  </svg>
+                  Product will be marked as SOLD OUT
+                </p>
               )}
             </div>
           )}
@@ -907,7 +928,7 @@ export default function AddProductPage() {
                   onChange={() => setTargetGender('Gents')} 
                   className="w-4 h-4 text-[#8B6914] border-[#1a1209]/20 focus:ring-[#8B6914]" 
                 />
-                <span className="text-sm font-['Jost'] font-medium">👨 Men's Watch (Gents)</span>
+                <span className="text-sm font-['Jost'] font-medium">Men's Watch (Gents)</span>
               </label>
 
               <label className={`flex items-center gap-3 p-3.5 rounded-lg border cursor-pointer transition-all ${
@@ -923,7 +944,7 @@ export default function AddProductPage() {
                   onChange={() => setTargetGender('Ladies')} 
                   className="w-4 h-4 text-[#8B6914] border-[#1a1209]/20 focus:ring-[#8B6914]" 
                 />
-                <span className="text-sm font-['Jost'] font-medium">👩 Women's Watch (Ladies)</span>
+                <span className="text-sm font-['Jost'] font-medium">Women's Watch (Ladies)</span>
               </label>
 
               <label className={`flex items-center gap-3 p-3.5 rounded-lg border cursor-pointer transition-all ${
@@ -939,7 +960,7 @@ export default function AddProductPage() {
                   onChange={() => setTargetGender('Unisex')} 
                   className="w-4 h-4 text-[#8B6914] border-[#1a1209]/20 focus:ring-[#8B6914]" 
                 />
-                <span className="text-sm font-['Jost'] font-medium">👫 Unisex Watch (Both)</span>
+                <span className="text-sm font-['Jost'] font-medium">Unisex Watch (Both)</span>
               </label>
             </div>
           </div>
@@ -1096,7 +1117,14 @@ export default function AddProductPage() {
                   disabled={checkingSpelling['description']}
                   className="px-3 py-1.5 bg-[#1a1209]/5 hover:bg-[#1a1209]/10 text-[#1a1209] text-xs rounded-lg transition font-semibold flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
                 >
-                  {checkingSpelling['description'] ? 'Checking...' : '✨ AI Check'}
+                  {checkingSpelling['description'] ? 'Checking...' : (
+                    <span className="inline-flex items-center gap-1">
+                      <svg className="w-3 h-3 text-[#8B6914]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.286L13 21l-2.286-6.857L5 12l5.714-2.286L13 3z" />
+                      </svg>
+                      AI Check
+                    </span>
+                  )}
                 </button>
               )}
               <button 
@@ -1201,7 +1229,9 @@ export default function AddProductPage() {
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[99999] p-4">
           <div className="bg-white border border-[#8B6914]/30 rounded-xl max-w-md w-full p-6 shadow-2xl animate-in fade-in zoom-in duration-200">
             <div className="flex items-center gap-2 text-[#8B6914] mb-3">
-              <span className="text-xl">✨</span>
+              <svg className="w-5 h-5 text-[#8B6914] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.286L13 21l-2.286-6.857L5 12l5.714-2.286L13 3z" />
+              </svg>
               <h3 className="font-semibold text-lg">AI Spelling Suggestion</h3>
             </div>
             

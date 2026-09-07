@@ -3,6 +3,7 @@ import { connectDB } from '@/lib/db';
 import Review from '@/lib/models/Review';
 import Product from '@/lib/models/Product';
 import { verifyPermissions } from '@/lib/authHelper';
+import { checkApprovalGate } from '@/lib/approvalGate';
 
 // GET: List all reviews (with filters for fake vs real)
 export async function GET(req: NextRequest) {
@@ -52,6 +53,11 @@ export async function POST(req: NextRequest) {
     await connectDB();
     const body = await req.json();
     const { productId, rating, comment, username, userAvatar, images, isAnonymous, createdAt } = body;
+
+    // ── Approval Gate ─────────────────────────────────────────────────────────
+    const gate = await checkApprovalGate(auth, 'fake_review_create', body);
+    if (gate.intercepted) return gate.response!;
+    // ─────────────────────────────────────────────────────────────────────────
 
     if (!productId || rating === undefined || !comment || !username) {
       return NextResponse.json(
@@ -103,6 +109,13 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ success: false, error: auth.error }, { status: auth.status });
     }
 
+    if (auth.requiresApproval) {
+      return NextResponse.json(
+        { success: false, error: 'Staff accounts subject to approval cannot moderate reviews directly. Admin approval required.' },
+        { status: 403 }
+      );
+    }
+
     await connectDB();
     const body = await req.json();
     const { reviewId, status } = body;
@@ -140,6 +153,13 @@ export async function DELETE(req: NextRequest) {
     const auth = await verifyPermissions(req, ['reviews_delete']);
     if (!auth.authorized) {
       return NextResponse.json({ success: false, error: auth.error }, { status: auth.status });
+    }
+
+    if (auth.requiresApproval) {
+      return NextResponse.json(
+        { success: false, error: 'Staff accounts subject to approval cannot delete reviews directly.' },
+        { status: 403 }
+      );
     }
 
     await connectDB();

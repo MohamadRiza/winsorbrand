@@ -318,7 +318,12 @@ export default function AdminApplicationsPage() {
 
                       <td className="px-6 py-4 text-xs font-mono">
                         {app.hasExperience ? (
-                          <span className="font-semibold text-emerald-700">✓ {app.experienceYears} Years</span>
+                          <span className="font-semibold text-emerald-700 inline-flex items-center gap-1">
+                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                            </svg>
+                            {app.experienceYears} Years
+                          </span>
                         ) : (
                           <span className="text-gray-400 font-sans">Entry level</span>
                         )}
@@ -390,9 +395,12 @@ export default function AdminApplicationsPage() {
                   </div>
                   <button 
                     onClick={() => setSelectedApp(null)}
-                    className="text-[#f3e3b8]/60 hover:text-[#f3e3b8] text-xl font-bold transition-colors cursor-pointer p-1"
+                    className="text-[#f3e3b8]/60 hover:text-[#f3e3b8] transition-colors cursor-pointer p-1"
+                    aria-label="Close"
                   >
-                    ✕
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
                   </button>
                 </div>
 
@@ -499,7 +507,12 @@ export default function AdminApplicationsPage() {
                       <div>
                         <span className="text-[#1a1209]/40 block text-[10px] mb-1">PROFESSIONAL EXPERIENCE</span>
                         {selectedApp.hasExperience ? (
-                          <span className="font-bold text-emerald-700 font-mono">✓ {selectedApp.experienceYears} Years Experience</span>
+                          <span className="font-bold text-emerald-700 font-mono inline-flex items-center gap-1">
+                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                            </svg>
+                            {selectedApp.experienceYears} Years Experience
+                          </span>
                         ) : (
                           <span className="text-gray-400 italic">No experience (Entry Level Candidate)</span>
                         )}

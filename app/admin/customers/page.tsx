@@ -101,37 +101,37 @@ export default function AdminCustomersPage() {
       case 'delivered':
         return {
           bg: 'bg-emerald-50 text-emerald-800 border-emerald-200',
-          label: '✓ Delivered',
+          label: 'Delivered',
           isDelivered: true,
         };
       case 'shipped':
         return {
           bg: 'bg-purple-50 text-purple-800 border-purple-200',
-          label: '🚚 Not Delivered Yet (Shipped)',
+          label: 'Not Delivered Yet (Shipped)',
           isDelivered: false,
         };
       case 'processing':
         return {
           bg: 'bg-blue-50 text-blue-800 border-blue-200',
-          label: '⚙️ Not Delivered Yet (Processing)',
+          label: 'Not Delivered Yet (Processing)',
           isDelivered: false,
         };
       case 'pending':
         return {
           bg: 'bg-amber-50 text-amber-800 border-amber-300',
-          label: '⏳ Not Delivered Yet (Pending)',
+          label: 'Not Delivered Yet (Pending)',
           isDelivered: false,
         };
       case 'cancelled':
         return {
           bg: 'bg-rose-50 text-rose-700 border-rose-200',
-          label: '❌ Cancelled',
+          label: 'Cancelled',
           isDelivered: false,
         };
       case 'cancel_requested':
         return {
           bg: 'bg-amber-100 text-amber-900 border-amber-400 animate-pulse',
-          label: '⚠️ Cancel Requested',
+          label: 'Cancel Requested',
           isDelivered: false,
         };
       default:
@@ -293,9 +293,24 @@ export default function AdminCustomersPage() {
                             <span className="px-3 py-1 bg-[#faf7f0] border border-[#8B6914]/30 text-[#8B6914] text-xs font-bold rounded-full font-mono">
                               {custOrders.length} {custOrders.length === 1 ? 'Order' : 'Orders'} ({totalItems} {totalItems === 1 ? 'Item' : 'Items'})
                             </span>
-                            <span className="text-[10px] font-semibold text-[#1a1209]/60">
-                              {hasDelivered && !hasPendingDelivery && <span className="text-emerald-700 font-bold">✓ Delivered</span>}
-                              {hasPendingDelivery && <span className="text-amber-700 font-bold">🚚 In Transit / Pending</span>}
+                            <span className="text-[10px] font-semibold text-[#1a1209]/60 flex items-center gap-2">
+                              {hasDelivered && !hasPendingDelivery && (
+                                <span className="text-emerald-700 font-bold inline-flex items-center gap-1">
+                                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                                  </svg>
+                                  Delivered
+                                </span>
+                              )}
+                              {hasPendingDelivery && (
+                                <span className="text-amber-700 font-bold inline-flex items-center gap-1">
+                                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0" />
+                                  </svg>
+                                  In Transit / Pending
+                                </span>
+                              )}
                             </span>
                           </div>
                         ) : (
@@ -333,9 +348,12 @@ export default function AdminCustomersPage() {
                 </h2>
                 <button 
                   onClick={() => setDrawerOpen(false)} 
-                  className="text-[#f3e3b8]/60 hover:text-[#f3e3b8] text-xl font-bold transition-colors cursor-pointer p-1"
+                  className="text-[#f3e3b8]/60 hover:text-[#f3e3b8] transition-colors cursor-pointer p-1"
+                  aria-label="Close"
                 >
-                  ✕
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
                 </button>
               </div>
 
@@ -421,13 +439,20 @@ export default function AdminCustomersPage() {
                         <span>Delivery Status:</span>
                         <div className="flex gap-2">
                           {selectedDeliveredCount > 0 && (
-                            <span className="px-2.5 py-0.5 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-full font-bold">
-                              ✓ {selectedDeliveredCount} Delivered
+                            <span className="px-2.5 py-0.5 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-full font-bold inline-flex items-center gap-1">
+                              <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                              </svg>
+                              {selectedDeliveredCount} Delivered
                             </span>
                           )}
                           {selectedPendingDeliveryCount > 0 && (
-                            <span className="px-2.5 py-0.5 bg-amber-50 text-amber-800 border border-amber-300 rounded-full font-bold">
-                              🚚 {selectedPendingDeliveryCount} Not Delivered Yet
+                            <span className="px-2.5 py-0.5 bg-amber-50 text-amber-800 border border-amber-300 rounded-full font-bold inline-flex items-center gap-1">
+                              <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z" />
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0" />
+                              </svg>
+                              {selectedPendingDeliveryCount} Not Delivered Yet
                             </span>
                           )}
                         </div>

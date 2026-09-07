@@ -176,7 +176,11 @@ export default function AdminReviewsPage() {
 
       const data = await res.json();
       if (data.success) {
-        toast.success('Mock review added successfully');
+        if (data.pending) {
+          toast.success('Mock review submitted for admin approval! Will go live once approved.', { duration: 5000 });
+        } else {
+          toast.success('Mock review added successfully');
+        }
         setIsModalOpen(false);
         // Reset states
         setSelectedProductId('');
@@ -246,7 +250,15 @@ export default function AdminReviewsPage() {
 
   const renderStars = (count: number) => {
     return Array.from({ length: 5 }).map((_, i) => (
-      <span key={i} className={`text-base ${i < count ? 'text-amber-400' : 'text-gray-300'}`}>★</span>
+      <svg
+        key={i}
+        className={`w-4 h-4 inline-block ${i < count ? 'text-amber-400 fill-amber-400' : 'text-gray-300 fill-gray-200'}`}
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        strokeWidth={1}
+      >
+        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+      </svg>
     ));
   };
 
@@ -423,12 +435,26 @@ export default function AdminReviewsPage() {
 
                     {/* Status Badges */}
                     <div className="flex items-center gap-2">
-                      <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${
+                      <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border inline-flex items-center gap-1 ${
                         review.isFake 
                           ? 'bg-amber-50 text-[#8B6914] border-amber-300' 
                           : 'bg-emerald-50 text-emerald-800 border-emerald-200'
                       }`}>
-                        {review.isFake ? '💎 Admin Mock' : '🛡️ Real Patron'}
+                        {review.isFake ? (
+                          <>
+                            <svg className="w-2.5 h-2.5 text-[#8B6914]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <polygon points="6 3 18 3 22 9 12 22 2 9" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+                            </svg>
+                            Admin Mock
+                          </>
+                        ) : (
+                          <>
+                            <svg className="w-2.5 h-2.5 text-emerald-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                            </svg>
+                            Real Patron
+                          </>
+                        )}
                       </span>
 
                       <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${
@@ -541,9 +567,12 @@ export default function AdminReviewsPage() {
                 </div>
                 <button 
                   onClick={() => setIsModalOpen(false)} 
-                  className="text-[#f3e3b8]/60 hover:text-[#f3e3b8] text-xl font-bold transition-colors cursor-pointer p-1"
+                  className="text-[#f3e3b8]/60 hover:text-[#f3e3b8] transition-colors cursor-pointer p-1"
+                  aria-label="Close"
                 >
-                  ✕
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
                 </button>
               </div>
 
@@ -594,9 +623,17 @@ export default function AdminReviewsPage() {
                         key={num}
                         type="button"
                         onClick={() => setRating(num)}
-                        className={`text-2xl transition-all cursor-pointer ${rating >= num ? 'text-amber-400' : 'text-gray-300'}`}
+                        className="transition-all cursor-pointer p-0.5"
+                        aria-label={`${num} star rating`}
                       >
-                        ★
+                        <svg
+                          className={`w-6 h-6 ${rating >= num ? 'text-amber-400 fill-amber-400' : 'text-gray-300 fill-gray-200'}`}
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                          strokeWidth={1}
+                        >
+                          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                        </svg>
                       </button>
                     ))}
                   </div>
@@ -654,9 +691,12 @@ export default function AdminReviewsPage() {
                           <button
                             type="button"
                             onClick={() => setAttachedImages(prev => prev.filter((_, idx) => idx !== i))}
-                            className="absolute top-1 right-1 bg-black/70 text-white w-4 h-4 rounded-full text-[9px] flex items-center justify-center cursor-pointer"
+                            className="absolute top-1 right-1 bg-black/70 text-white w-4 h-4 rounded-full flex items-center justify-center cursor-pointer hover:bg-red-600 transition-colors"
+                            aria-label="Remove image"
                           >
-                            ✕
+                            <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
                           </button>
                         </div>
                       ))}

@@ -8,6 +8,7 @@ import InventorySettings from '@/lib/models/InventorySettings';
 import Order from '@/lib/models/Order';
 import ContactMessage from '@/lib/models/ContactMessage';
 import Customer from '@/lib/models/Customer';
+import PendingApproval from '@/lib/models/PendingApproval';
 import { verifyAccessToken } from '@/lib/jwt';
 
 export async function GET(req: NextRequest) {
@@ -49,6 +50,7 @@ export async function GET(req: NextRequest) {
       newMessagesCount,
       recentRegistrationsCount,
       hasLowStockOrOutOfStock,
+      pendingApprovalsCount,
     ] = await Promise.all([
       Product.countDocuments({ isActive: true }),
       Customer.countDocuments(),
@@ -75,7 +77,8 @@ export async function GET(req: NextRequest) {
             qty: { $lte: settings.lowStockThreshold }
           }
         }
-      })
+      }),
+      PendingApproval.countDocuments({ status: 'pending' }),
     ]);
 
     // Fetch recent items for live activities feed
@@ -213,6 +216,7 @@ export async function GET(req: NextRequest) {
           alertNotificationsEnabled: settings.alertNotificationsEnabled,
           hasLowStockOrOutOfStock: !!hasLowStockOrOutOfStock,
           totalRevenue,
+          pendingApprovals: pendingApprovalsCount,
           ordersDistribution: {
             total: allOrders.length,
             completed: completedOrders,

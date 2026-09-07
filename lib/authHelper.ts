@@ -6,6 +6,7 @@ import Admin from '@/lib/models/Admin';
 export interface VerifyAuthResult {
   authorized: boolean;
   payload?: JWTPayload;
+  requiresApproval?: boolean;
   error?: string;
   status?: number;
 }
@@ -49,7 +50,7 @@ export async function verifyPermissions(
 
     // Admins bypass all permissions and expiration checks
     if (user.role === 'admin') {
-      return { authorized: true, payload };
+      return { authorized: true, payload, requiresApproval: false };
     }
 
     // For staff members, check expiration and permissions
@@ -68,7 +69,7 @@ export async function verifyPermissions(
         }
       }
 
-      return { authorized: true, payload };
+      return { authorized: true, payload, requiresApproval: !!user.requiresApproval };
     }
 
     return { authorized: false, error: 'Invalid user role.', status: 403 };
