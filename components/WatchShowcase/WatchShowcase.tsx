@@ -2,6 +2,7 @@
 
 import { useRef, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 const WatchShowcase = () => {
   const sectionRef = useRef<HTMLElement>(null);
@@ -111,7 +112,7 @@ const WatchShowcase = () => {
               Crafting timeless elegance since day one.
             </h3>
             <p className="text-[10.5px] sm:text-xs lg:text-sm text-[#666666] leading-relaxed max-w-md hidden xs:block sm:block">
-              Winsor is more than a watch. It's a legacy of precision, craftsmanship and timeless style.
+              Winsor is more than a watch. It&apos;s a legacy of precision, craftsmanship and timeless style.
             </p>
             <div className="pt-1 sm:pt-3">
               <Link
@@ -125,10 +126,12 @@ const WatchShowcase = () => {
 
           {/* Right Image Container */}
           <div className="relative h-full w-full overflow-hidden min-h-[160px] sm:min-h-[220px]">
-            <img
+            <Image
               src="/hmebnr1.webp"
               alt="Crafting timeless elegance"
-              className="h-full w-full object-cover object-center transition-transform duration-700 group-hover:scale-[1.03]"
+              fill
+              sizes="(max-width: 768px) 100vw, 50vw"
+              className="object-cover object-center transition-transform duration-700 group-hover:scale-[1.03]"
             />
             {/* Smooth Left-to-Right gradient fade */}
             <div
@@ -144,10 +147,12 @@ const WatchShowcase = () => {
         <div className="group relative overflow-hidden rounded-xl sm:rounded-2xl bg-[#faf7f0] border border-[rgba(26,18,9,0.08)] shadow-[0_4px_20px_rgba(0,0,0,0.03)] grid grid-cols-[1fr_1.4fr] md:grid-cols-2 items-center md:h-[220px] lg:h-[240px]">
           {/* Left Image Container */}
           <div className="relative h-full w-full overflow-hidden min-h-[160px] sm:min-h-[220px] order-1">
-            <img
+            <Image
               src="/hmebnr2.webp"
               alt="Exclusivity Redefined"
-              className="h-full w-full object-cover object-center transition-transform duration-700 group-hover:scale-[1.03]"
+              fill
+              sizes="(max-width: 768px) 100vw, 50vw"
+              className="object-cover object-center transition-transform duration-700 group-hover:scale-[1.03]"
             />
             {/* Smooth Right-to-Left gradient fade */}
             <div

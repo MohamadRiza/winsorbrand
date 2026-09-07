@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
+import Image from 'next/image';
 
 const items = [
   {
@@ -33,13 +34,12 @@ const Card = ({ item }: { item: (typeof items)[number] }) => (
     style={{ textDecoration: 'none' }}
   >
     {/* Full Cover Background Image */}
-    <img
+    <Image
       src={item.image}
       alt={item.alt}
-      loading="lazy"
-      width={1024}
-      height={1280}
-      className="w-full h-full object-cover transition-transform duration-[1.2s] ease-out group-hover:scale-[1.07]"
+      fill
+      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+      className="object-cover transition-transform duration-[1.2s] ease-out group-hover:scale-[1.07]"
     />
 
     {/* Luxury Dark Gradient Overlay */}

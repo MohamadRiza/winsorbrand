@@ -195,30 +195,45 @@ function PaymentBadgesRow({ size = '22px', isMobile = false }: { size?: string; 
       <img
         src="https://cdn.jsdelivr.net/gh/datatrans/payment-logos@master/assets/cards/visa.svg"
         alt="Visa"
+        width={36}
+        height={22}
+        loading="lazy"
         style={{ height: size, width: 'auto', display: 'block', objectFit: 'contain' }}
       />
       {/* Mastercard */}
       <img
         src="https://cdn.jsdelivr.net/gh/datatrans/payment-logos@master/assets/cards/mastercard.svg"
         alt="Mastercard"
+        width={36}
+        height={22}
+        loading="lazy"
         style={{ height: size, width: 'auto', display: 'block', objectFit: 'contain' }}
       />
       {/* Amex */}
       <img
         src="https://cdn.jsdelivr.net/gh/aaronfagan/svg-credit-card-payment-icons@master/flat/amex.svg"
         alt="American Express"
+        width={36}
+        height={22}
+        loading="lazy"
         style={{ height: size, width: 'auto', display: 'block', objectFit: 'contain' }}
       />
       {/* Apple Pay */}
       <img
         src="https://cdn.jsdelivr.net/gh/datatrans/payment-logos@master/assets/wallets/apple-pay.svg"
         alt="Apple Pay"
+        width={36}
+        height={22}
+        loading="lazy"
         style={{ height: size, width: 'auto', display: 'block', objectFit: 'contain' }}
       />
       {/* Google Pay */}
       <img
         src="https://cdn.jsdelivr.net/gh/datatrans/payment-logos@master/assets/wallets/google-pay.svg"
         alt="Google Pay"
+        width={36}
+        height={22}
+        loading="lazy"
         style={{ height: size, width: 'auto', display: 'block', objectFit: 'contain' }}
       />
       {/* Bank Transfer */}
@@ -415,9 +430,12 @@ export default function Footer() {
 
         {/* Faded Luxury Winsor Logo Watermark in Background */}
         <div className="ft-watermark-bg" aria-hidden="true">
-          <img
+          <Image
             src="/winsor_watermark_centered.webp"
             alt=""
+            width={1200}
+            height={400}
+            loading="lazy"
             style={{
               width: '100%',
               height: 'auto',

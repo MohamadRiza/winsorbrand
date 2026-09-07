@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import Image from 'next/image';
 
 export default function Watch3DAssembly() {
   const [activeSlide, setActiveSlide] = useState(0);
@@ -242,10 +243,13 @@ export default function Watch3DAssembly() {
         }}
       >
         {/* Photorealistic Marble & Gold Backdrop Image */}
-        <img
+        <Image
           src="/hero_bg_marble.jpg"
           alt="Winsor Luxury Marble Backdrop"
-          className="absolute inset-0 w-full h-full object-cover object-center"
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover object-center"
           style={{ opacity: 0.95 }}
         />
 
@@ -462,13 +466,18 @@ export default function Watch3DAssembly() {
                       zIndex: 1,
                     }}
                   />
-                  <img
+                  <Image
                     src={slide.image}
                     alt="Winsor Luxury Watch"
+                    width={520}
+                    height={520}
+                    priority={idx === 0}
+                    sizes="(max-width: 768px) 240px, 520px"
                     className="floating-watch object-contain relative z-10"
                     style={{
                       maxHeight: isMobile ? '160px' : '520px',
-                      width: '100%',
+                      width: 'auto',
+                      height: 'auto',
                       filter: 'drop-shadow(0 20px 30px rgba(26,18,9,0.12))'
                     }}
                   />

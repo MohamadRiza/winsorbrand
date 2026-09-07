@@ -627,11 +627,11 @@ interface CategoryCard {
 }
 
 const CATEGORIES: CategoryCard[] = [
-  { key: 'sports', label: 'SPORTS', image: '/category_HomeS/sport_nobg.webp?v=2', subLabel: 'COLLECTION' },
-  { key: 'luxury', label: 'CLASSIC', image: '/category_HomeS/classic_nobg.webp?v=2', subLabel: 'COLLECTION' },
-  { key: 'limited', label: 'LIMITED EDITION', image: '/category_HomeS/limitted_nobg.webp?v=2', subLabel: 'COLLECTION' },
-  { key: 'new', label: 'NEW ARRIVALS', image: '/category_HomeS/new_arrivals_nobg.webp?v=2', subLabel: 'COLLECTION' },
-  { key: 'ladies', label: 'LADIES', image: '/category_HomeS/ladies_nobg.webp?v=2', subLabel: 'COLLECTION' },
+  { key: 'sports', label: 'SPORTS', image: '/category_HomeS/sport_nobg.webp', subLabel: 'COLLECTION' },
+  { key: 'luxury', label: 'CLASSIC', image: '/category_HomeS/classic_nobg.webp', subLabel: 'COLLECTION' },
+  { key: 'limited', label: 'LIMITED EDITION', image: '/category_HomeS/limitted_nobg.webp', subLabel: 'COLLECTION' },
+  { key: 'new', label: 'NEW ARRIVALS', image: '/category_HomeS/new_arrivals_nobg.webp', subLabel: 'COLLECTION' },
+  { key: 'ladies', label: 'LADIES', image: '/category_HomeS/ladies_nobg.webp', subLabel: 'COLLECTION' },
 ];
 
 export default function CollectionsSection() {
@@ -913,9 +913,11 @@ export default function CollectionsSection() {
                     position: 'relative',
                     overflow: 'hidden',
                   }}>
-                    <img
+                    <Image
                       src={cat.image}
                       alt={cat.label}
+                      width={isMobile ? 80 : 160}
+                      height={isMobile ? 62 : 120}
                       style={{
                         maxHeight: '100%',
                         maxWidth: '100%',

@@ -75,17 +75,36 @@ export async function proxy(req: NextRequest, event: NextFetchEvent) {
   if (pathname.startsWith('/admin') || pathname.startsWith('/api/admin')) {
     const adminRes = await handleAdminAuth(req);
     if (adminRes) return adminRes;
+    return NextResponse.next();
   }
 
-  // ✅ BYPASS Clerk middleware for truly public routes only
-  // IMPORTANT: Do NOT add /api/reviews, /api/customer, /api/cart, /api/wishlist here
-  // Those routes use getAuth() and MUST go through clerkMiddleware
+  // Staff portal routes do not use Clerk
+  if (pathname.startsWith('/staff') || pathname.startsWith('/api/staff')) {
+    return NextResponse.next();
+  }
+
+  // ✅ BYPASS Clerk middleware for truly public routes
   const isPublicPath =
     pathname === '/' ||
     pathname.startsWith('/collections') ||
     pathname.startsWith('/our-story') ||
     pathname.startsWith('/retailers') ||
     pathname.startsWith('/gifts') ||
+    pathname.startsWith('/warranty') ||
+    pathname.startsWith('/cart') ||
+    pathname.startsWith('/orders') ||
+    pathname.startsWith('/contact') ||
+    pathname.startsWith('/faq') ||
+    pathname.startsWith('/customer-care') ||
+    pathname.startsWith('/privacy') ||
+    pathname.startsWith('/terms') ||
+    pathname.startsWith('/return') ||
+    pathname.startsWith('/mens') ||
+    pathname.startsWith('/womens') ||
+    pathname.startsWith('/sports') ||
+    pathname.startsWith('/new') ||
+    pathname.startsWith('/limited') ||
+    pathname.startsWith('/careers') ||
     pathname.startsWith('/_next') ||
     pathname.includes('.') ||
     // Only these specific public API routes bypass Clerk
