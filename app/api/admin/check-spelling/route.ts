@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
 
     if (!apiKey) {
       console.warn('GEMINI_API_KEY not configured. Spell check bypass.');
-      return NextResponse.json({ 
+      return NextResponse.json({
         success: true,
         errorsFound: false,
         originalText: text,
@@ -54,7 +54,7 @@ Return ONLY a JSON object in this exact format, with no markdown code blocks, ba
     if (!res.ok) {
       const errorData = await res.json().catch(() => ({}));
       console.error('Gemini API request failed:', errorData);
-      return NextResponse.json({ 
+      return NextResponse.json({
         success: true,
         errorsFound: false,
         originalText: text,
@@ -66,16 +66,16 @@ Return ONLY a JSON object in this exact format, with no markdown code blocks, ba
 
     const data = await res.json();
     let responseText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-    
+
     // Clean up Markdown JSON wrapper if returned
     if (responseText.includes('```')) {
       responseText = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
     }
-    
+
     try {
       const result = JSON.parse(responseText.trim());
-      return NextResponse.json({ 
-        success: true, 
+      return NextResponse.json({
+        success: true,
         errorsFound: result.errorsFound,
         originalText: result.originalText || text,
         correctedText: result.correctedText || text,
@@ -83,7 +83,7 @@ Return ONLY a JSON object in this exact format, with no markdown code blocks, ba
       });
     } catch (parseErr) {
       console.error('Failed to parse Gemini response:', responseText, parseErr);
-      return NextResponse.json({ 
+      return NextResponse.json({
         success: true,
         errorsFound: false,
         originalText: text,
@@ -95,7 +95,7 @@ Return ONLY a JSON object in this exact format, with no markdown code blocks, ba
 
   } catch (error: any) {
     console.error('Spell check API error:', error);
-    return NextResponse.json({ 
+    return NextResponse.json({
       success: true,
       errorsFound: false,
       originalText: text,

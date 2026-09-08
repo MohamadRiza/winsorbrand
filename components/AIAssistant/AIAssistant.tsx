@@ -34,7 +34,7 @@ function FormattedMessageText({ content }: { content: string }) {
           }
 
           // Split by links, emails, and phone numbers
-          const tokenRegex = /('(?:(?:\/[a-zA-Z0-9\-_]+)+)'|(?:\/(?:[a-zA-Z0-9\-_]+)+)|support@winsorbrand\.com|winsorwatches@gmail\.com|\+94\s*\d{2}\s*\d{3}\s*\d{4}|\b077\s*\d{3}\s*\d{4}\b)/g;
+          const tokenRegex = /('(?:(?:\/[a-zA-Z0-9\-_]+)+)'|(?:\/(?:[a-zA-Z0-9\-_]+)+)|support@winsorbrand\.com|winsorwatches@gmail\.com|\+94\s*\d{2}\s*\d{3}\s*\d{4}|\b(?:077|076|011|081)\s*\d{3}\s*\d{4}\b)/g;
           const subTokens = part.split(tokenRegex);
 
           return (
@@ -63,7 +63,7 @@ function FormattedMessageText({ content }: { content: string }) {
                     </a>
                   );
                 }
-                if (cleanToken.startsWith('+94') || cleanToken.startsWith('077')) {
+                if (cleanToken.startsWith('+94') || cleanToken.startsWith('077') || cleanToken.startsWith('076') || cleanToken.startsWith('011') || cleanToken.startsWith('081')) {
                   const telDigits = cleanToken.replace(/\s+/g, '');
                   return (
                     <a
@@ -105,7 +105,7 @@ export default function AIAssistant() {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
-      content: 'Hello! I am Winsi, your personal Winsor Brand Horology Concierge. How may I assist you with our timepieces today?'
+      content: "Hello! Welcome to WINSOR. I'm WINSI, your WINSOR Watch Assistant.\n\nHow can I help you today?\n• Find a watch\n• Check delivery\n• Warranty information\n• Returns & exchanges\n• Find a store\n• Wholesale enquiries"
     }
   ]);
   const [input, setInput] = useState('');
@@ -319,12 +319,11 @@ export default function AIAssistant() {
     }
   };
 
-  // Submit Text Chat
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!input.trim() || loading) return;
+  // Send User Message (from input form or quick chips)
+  const sendUserMessage = async (text: string) => {
+    if (!text.trim() || loading) return;
 
-    const userMessage = input.trim();
+    const userMessage = text.trim();
     setInput('');
     const newMessages = [...messages, { role: 'user', content: userMessage } as Message];
     setMessages(newMessages);
@@ -366,6 +365,12 @@ export default function AIAssistant() {
       // Re-focus text input so user can type next message without clicking!
       setTimeout(() => inputRef.current?.focus(), 50);
     }
+  };
+
+  // Submit Text Chat
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await sendUserMessage(input);
   };
 
   return (
@@ -645,6 +650,37 @@ export default function AIAssistant() {
         }
         .ai-chat-link:hover {
           color: #b88e3c;
+        }
+
+        /* ── SUGGESTION QUICK CHIPS ── */
+        .ai-quick-chips-container {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 6px;
+          margin-top: -6px;
+          margin-bottom: 4px;
+          padding-left: 36px;
+        }
+        .ai-quick-chip {
+          background: #ffffff;
+          border: 1px solid rgba(139, 105, 20, 0.28);
+          color: #1a1209;
+          font-family: 'Jost', sans-serif;
+          font-size: 11.5px;
+          font-weight: 500;
+          padding: 5px 12px;
+          border-radius: 16px;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          box-shadow: 0 2px 6px rgba(26, 18, 9, 0.03);
+          text-align: left;
+        }
+        .ai-quick-chip:hover {
+          border-color: #8b6914;
+          background: #faf7f0;
+          color: #8b6914;
+          transform: translateY(-1px);
+          box-shadow: 0 4px 10px rgba(139, 105, 20, 0.12);
         }
 
         /* Speak Audio controls */
@@ -1098,6 +1134,29 @@ export default function AIAssistant() {
             )
           ))}
           
+          {/* Quick Suggestion Chips for First-Time Inquiry */}
+          {messages.length === 1 && !loading && (
+            <div className="ai-quick-chips-container">
+              {[
+                'Find a watch',
+                'Check delivery',
+                'Warranty information',
+                'Returns & exchanges',
+                'Find a store',
+                'Wholesale enquiries'
+              ].map((chipText, cIdx) => (
+                <button
+                  key={cIdx}
+                  type="button"
+                  className="ai-quick-chip"
+                  onClick={() => sendUserMessage(chipText)}
+                >
+                  {chipText}
+                </button>
+              ))}
+            </div>
+          )}
+
           {loading && (
             <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-start', alignSelf: 'flex-start' }}>
               <div style={{ position: 'relative', width: '28px', height: '28px', borderRadius: '50%', border: '1.5px solid #8b6914', overflow: 'hidden', flexShrink: 0, marginTop: '2px' }}>
