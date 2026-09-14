@@ -155,15 +155,15 @@ export default function CareersPage() {
         {/* 🌟 STATS COUNTER BANNER (Compact 4-column single-row layout for mobile & desktop) */}
         <div className="py-4 sm:py-6 px-1 sm:px-4 border-t border-b border-[#1a1209]/10 my-4 grid grid-cols-4 divide-x divide-[#1a1209]/10">
           <div className="text-center px-1 sm:px-2 space-y-1">
-            <div className="text-lg sm:text-2xl lg:text-3xl font-light text-[#8B6914] leading-none tracking-wide" style={{ fontFamily: "'Cinzel', serif", fontVariantNumeric: 'lining-nums tabular-nums', fontFeatureSettings: '"lnum" 1, "tnum" 1' }}>100+</div>
-            <div className="text-[9px] sm:text-[10.5px] font-semibold tracking-wider text-[#1a1209] uppercase leading-tight" style={{ fontFamily: "'Jost', sans-serif" }}>Team Members</div>
-            <div className="text-[8px] sm:text-[9.5px] text-[#1a1209]/50 font-light hidden sm:block" style={{ fontFamily: "'Jost', sans-serif" }}>Global Artisans & Professionals</div>
+            <div className="text-lg sm:text-2xl lg:text-3xl font-light text-[#8B6914] leading-none tracking-wide" style={{ fontFamily: "'Cinzel', serif", fontVariantNumeric: 'lining-nums tabular-nums', fontFeatureSettings: '"lnum" 1, "tnum" 1' }}>2023</div>
+            <div className="text-[9px] sm:text-[10.5px] font-semibold tracking-wider text-[#1a1209] uppercase leading-tight" style={{ fontFamily: "'Jost', sans-serif" }}>Registered in Dubai</div>
+            <div className="text-[8px] sm:text-[9.5px] text-[#1a1209]/50 font-light hidden sm:block" style={{ fontFamily: "'Jost', sans-serif" }}>International Maison Foundation</div>
           </div>
 
           <div className="text-center px-1 sm:px-2 space-y-1">
-            <div className="text-lg sm:text-2xl lg:text-3xl font-light text-[#8B6914] leading-none tracking-wide" style={{ fontFamily: "'Cinzel', serif", fontVariantNumeric: 'lining-nums tabular-nums', fontFeatureSettings: '"lnum" 1, "tnum" 1' }}>50+</div>
-            <div className="text-[9px] sm:text-[10.5px] font-semibold tracking-wider text-[#1a1209] uppercase leading-tight" style={{ fontFamily: "'Jost', sans-serif" }}>Locations</div>
-            <div className="text-[8px] sm:text-[9.5px] text-[#1a1209]/50 font-light hidden sm:block" style={{ fontFamily: "'Jost', sans-serif" }}>Boutiques & Regional Hubs</div>
+            <div className="text-lg sm:text-2xl lg:text-3xl font-light text-[#8B6914] leading-none tracking-wide" style={{ fontFamily: "'Cinzel', serif", fontVariantNumeric: 'lining-nums tabular-nums', fontFeatureSettings: '"lnum" 1, "tnum" 1' }}>12+</div>
+            <div className="text-[9px] sm:text-[10.5px] font-semibold tracking-wider text-[#1a1209] uppercase leading-tight" style={{ fontFamily: "'Jost', sans-serif" }}>Boutique Locations</div>
+            <div className="text-[8px] sm:text-[9.5px] text-[#1a1209]/50 font-light hidden sm:block" style={{ fontFamily: "'Jost', sans-serif" }}>Authorized Retail Network</div>
           </div>
 
           <div className="text-center px-1 sm:px-2 space-y-1">
@@ -173,9 +173,9 @@ export default function CareersPage() {
           </div>
 
           <div className="text-center px-1 sm:px-2 space-y-1">
-            <div className="text-lg sm:text-2xl lg:text-3xl font-light text-[#8B6914] leading-none tracking-wide" style={{ fontFamily: "'Cinzel', serif", fontVariantNumeric: 'lining-nums tabular-nums', fontFeatureSettings: '"lnum" 1, "tnum" 1' }}>15+</div>
-            <div className="text-[9px] sm:text-[10.5px] font-semibold tracking-wider text-[#1a1209] uppercase leading-tight" style={{ fontFamily: "'Jost', sans-serif" }}>Years Excellence</div>
-            <div className="text-[8px] sm:text-[9.5px] text-[#1a1209]/50 font-light hidden sm:block" style={{ fontFamily: "'Jost', sans-serif" }}>In Luxury Watchmaking</div>
+            <div className="text-lg sm:text-2xl lg:text-3xl font-light text-[#8B6914] leading-none tracking-wide" style={{ fontFamily: "'Cinzel', serif", fontVariantNumeric: 'lining-nums tabular-nums', fontFeatureSettings: '"lnum" 1, "tnum" 1' }}>1 YEAR</div>
+            <div className="text-[9px] sm:text-[10.5px] font-semibold tracking-wider text-[#1a1209] uppercase leading-tight" style={{ fontFamily: "'Jost', sans-serif" }}>Official Warranty</div>
+            <div className="text-[8px] sm:text-[9.5px] text-[#1a1209]/50 font-light hidden sm:block" style={{ fontFamily: "'Jost', sans-serif" }}>Comprehensive Care & Service</div>
           </div>
         </div>
 
@@ -308,7 +308,7 @@ export default function CareersPage() {
             </h2>
             <div className="w-12 h-0.5 bg-[#8B6914] mx-auto mt-2" />
             <p className="text-xs sm:text-sm text-[#1a1209]/60 font-light leading-relaxed" style={{ fontFamily: "'Jost', sans-serif" }}>
-              At Winsor, we empower our team of 100+ members with an environment dedicated to horological mastery, professional growth, and international prestige.
+              At Winsor, we empower our passionate team with an environment dedicated to horological craftsmanship, professional development, and retail excellence.
             </p>
           </div>
 
@@ -345,24 +345,24 @@ export default function CareersPage() {
             <div className="group bg-[#faf7f0]/60 border border-[#1a1209]/10 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:border-[#8B6914]/40 transition-all duration-300 flex flex-col">
               <div className="relative h-44 w-full overflow-hidden">
                 <Image
-                  src="/careers/global_presence.jpg"
-                  alt="Global Presence"
+                  src="/careers/winsor_boutique.jpg"
+                  alt="Expanding Presence"
                   fill
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
                   className="object-cover group-hover:scale-108 transition-transform duration-500"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                 <span className="absolute bottom-3 left-3 bg-[#8B6914]/90 backdrop-blur-md text-white text-[9px] font-semibold tracking-widest uppercase px-2.5 py-1 rounded-md" style={{ fontFamily: "'Jost', sans-serif" }}>
-                  GLOBAL
+                  EXPANSION
                 </span>
               </div>
               <div className="p-5 lg:p-6 space-y-2 flex-1 flex flex-col justify-between">
                 <div>
                   <h3 className="text-xl font-bold text-[#1a1209] leading-snug" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
-                    Global Presence
+                    Expanding Retail Network
                   </h3>
                   <p className="text-xs text-[#1a1209]/70 font-light leading-relaxed mt-2" style={{ fontFamily: "'Jost', sans-serif" }}>
-                    Experience deployment across 50+ luxury boutique locations, with full rotational travel support and housing perks.
+                    Experience career opportunities across our network of 12+ authorized boutique locations, with structured growth, branch support, and collaborative team culture.
                   </p>
                 </div>
               </div>

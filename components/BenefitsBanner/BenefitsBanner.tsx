@@ -35,7 +35,7 @@ export default function BenefitsBanner() {
     },
     {
       title: 'Easy Returns',
-      subtext: 'Easy return within 7 days',
+      subtext: 'Easy return within 14 days',
       icon: (
         <svg
           className="w-5 h-5 text-[#dfb15b]"

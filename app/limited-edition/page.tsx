@@ -478,7 +478,7 @@ function LimitedEditionContent() {
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" /><path d="M21 3v5h-5" /></svg>
                 <div>
                   <h4>Easy Returns</h4>
-                  <span>Within 7 Days</span>
+                  <span>Within 14 Days</span>
                 </div>
               </div>
               <div className="hero-attached-benefit-item">
@@ -515,7 +515,7 @@ function LimitedEditionContent() {
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" /><path d="M21 3v5h-5" /></svg>
                 <div>
                   <h4>Easy Returns</h4>
-                  <span>Within 7 Days</span>
+                  <span>Within 14 Days</span>
                 </div>
               </div>
               <div className="hero-attached-benefit-item">

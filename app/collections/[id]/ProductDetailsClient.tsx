@@ -1557,7 +1557,7 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
                 </button>
                 {deliveryOpen && (
                   <div className="text-xs text-[#1a1209]/70 pt-1 pb-2 leading-relaxed">
-                    Enjoy FREE island-wide delivery in Sri Lanka on all orders. Returns are accepted within 7 days of delivery in pristine, unworn condition with original packaging.
+                    Enjoy FREE island-wide delivery in Sri Lanka on all orders. Returns are accepted within 14 days of delivery in pristine, unworn condition with original packaging.
                   </div>
                 )}
               </div>
@@ -2243,7 +2243,7 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67" /></svg>
               <div>
                 <h4>Easy Returns</h4>
-                <p>Easy Return Within 7 Days</p>
+                <p>Easy Return Within 14 Days</p>
               </div>
             </div>
 
