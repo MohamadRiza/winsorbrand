@@ -33,14 +33,27 @@ function FormattedMessageText({ content }: { content: string }) {
             return <strong key={pIdx} style={{ color: '#1a1209', fontWeight: 600 }}>{boldText}</strong>;
           }
 
-          // Split by links, emails, and phone numbers
-          const tokenRegex = /('(?:(?:\/[a-zA-Z0-9\-_]+)+)'|(?:\/(?:[a-zA-Z0-9\-_]+)+)|support@winsorbrand\.com|winsorwatches@gmail\.com|\+94\s*\d{2}\s*\d{3}\s*\d{4}|\b(?:077|076|011|081)\s*\d{3}\s*\d{4}\b)/g;
+          // Split by links, URLs, emails, and phone numbers
+          const tokenRegex = /('(?:(?:\/[a-zA-Z0-9\-_]+)+)'|(?:\/(?:[a-zA-Z0-9\-_]+)+)|https?:\/\/[^\s\)\<\>]+|support@winsorbrand\.com|winsorwatches@gmail\.com|\+94\s*\d{2}\s*\d{3}\s*\d{4}|\b(?:077|076|011|081)\s*\d{3}\s*\d{4}\b)/g;
           const subTokens = part.split(tokenRegex);
 
           return (
             <span key={pIdx}>
               {subTokens.map((token, tIdx) => {
                 const cleanToken = token.replace(/^'|'$/g, '');
+                if (cleanToken.startsWith('http://') || cleanToken.startsWith('https://')) {
+                  return (
+                    <a
+                      key={tIdx}
+                      href={cleanToken}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="ai-chat-link"
+                    >
+                      {token}
+                    </a>
+                  );
+                }
                 if (cleanToken.startsWith('/')) {
                   return (
                     <a

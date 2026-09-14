@@ -93,14 +93,12 @@ const FOOTER_LINKS = {
 };
 
 // ─────────────────────────────────────────────────────────────
-// SOCIAL MEDIA LINKS
+// SOCIAL MEDIA LINKS (OFFICIAL)
 // ─────────────────────────────────────────────────────────────
 const SOCIAL_LINKS = [
-  { name: 'Instagram', href: 'https://instagram.com/winsor', icon: <InstagramIcon /> },
-  { name: 'Facebook', href: 'https://facebook.com/winsor', icon: <FacebookIcon /> },
-  { name: 'TikTok', href: 'https://tiktok.com/@winsor', icon: <TikTokIcon /> },
-  { name: 'YouTube', href: 'https://youtube.com/@winsor', icon: <YouTubeIcon /> },
-  { name: 'LinkedIn', href: 'https://linkedin.com/company/winsor', icon: <LinkedInIcon /> },
+  { name: 'Instagram', href: 'https://www.instagram.com/winsorwatches?stkn=Z2UwdzBrZHJuZ2Jw', icon: <InstagramIcon /> },
+  { name: 'Facebook', href: 'https://www.facebook.com/share/1YJWyvfRpW/', icon: <FacebookIcon /> },
+  { name: 'TikTok', href: 'https://www.tiktok.com/@winsor.watches', icon: <TikTokIcon /> },
 ];
 
 // ─────────────────────────────────────────────────────────────

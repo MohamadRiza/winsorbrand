@@ -210,6 +210,10 @@ Official contact channels:
   Phone: 077 977 9666
 - WhatsApp Support Hotline:
   077 071 6212 / 077 877 8555
+- Official Social Media Channels:
+  • Instagram: https://www.instagram.com/winsorwatches?stkn=Z2UwdzBrZHJuZ2Jw
+  • Facebook: https://www.facebook.com/share/1YJWyvfRpW/
+  • TikTok: https://www.tiktok.com/@winsor.watches
 - Online Store & Retail Locator:
   winsorbrand.com | Store Locator: '/retailers'
 
