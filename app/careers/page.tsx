@@ -440,7 +440,7 @@ export default function CareersPage() {
             </h2>
             <div className="w-12 h-0.5 bg-[#8B6914] mx-auto mt-2" />
             <p className="text-xs sm:text-sm text-[#1a1209]/60 font-light leading-relaxed" style={{ fontFamily: "'Jost', sans-serif" }}>
-              Recognized globally for luxury craftsmanship, client satisfaction, and workplace excellence.
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
             </p>
           </div>
 
@@ -448,31 +448,33 @@ export default function CareersPage() {
             
             {/* Award 1 */}
             <div className="group bg-white border border-[#1a1209]/10 rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl hover:border-[#8B6914]/40 transition-all duration-300 flex flex-col">
-              <div className="relative h-56 w-full overflow-hidden bg-[#0a0a0a]">
-                <Image
-                  src="/awards/award_1.jpg"
-                  alt="Excellence in Horology Award"
-                  fill
-                  sizes="(max-width: 768px) 100vw, 33vw"
-                  className="object-cover group-hover:scale-108 transition-transform duration-500 opacity-90"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+              <div
+                role="img"
+                aria-label="Award Image Placeholder — Lorem Ipsum"
+                className="relative h-56 w-full bg-[#16120c] border-b border-[#8B6914]/20 flex flex-col items-center justify-center p-6 text-center select-none"
+              >
+                <div className="w-12 h-12 rounded-full bg-[#8B6914]/15 border border-[#8B6914]/30 flex items-center justify-center mb-2 text-[#8B6914]">
+                  <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                </div>
+                <span className="text-xs text-[#dfb15b] font-semibold tracking-wider uppercase" style={{ fontFamily: "'Jost', sans-serif" }}>
+                  Award Image Placeholder
+                </span>
+                <span className="text-[10px] text-white/40 mt-1" style={{ fontFamily: "'Jost', sans-serif" }}>
+                  Real award image to be added
+                </span>
                 <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between">
                   <span className="text-[10px] font-bold tracking-widest text-[#8B6914] uppercase bg-black/60 backdrop-blur-md px-3 py-1 rounded-md border border-[#8B6914]/30" style={{ fontFamily: "'Jost', sans-serif" }}>
-                    2025 LAUREATE
+                    AWARD PLACEHOLDER
                   </span>
-                  <div className="w-8 h-8 rounded-full bg-[#8B6914]/20 backdrop-blur-md border border-[#8B6914]/40 flex items-center justify-center text-[#8B6914]">
-                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                  </div>
                 </div>
               </div>
               <div className="p-6 lg:p-7 space-y-3 flex-1 flex flex-col justify-between">
                 <div>
                   <h3 className="text-xl font-bold text-[#1a1209] leading-snug" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
-                    Excellence in Horology
+                    Lorem Ipsum Horology Accolade
                   </h3>
                   <p className="text-xs text-[#1a1209]/70 font-light leading-relaxed mt-2" style={{ fontFamily: "'Jost', sans-serif" }}>
-                    Awarded for outstanding precision movement assembly and high-grade Japanese watchmaking craftsmanship.
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio. Praesent libero. Sed cursus ante dapibus diam.
                   </p>
                 </div>
               </div>
@@ -480,31 +482,33 @@ export default function CareersPage() {
 
             {/* Award 2 */}
             <div className="group bg-white border border-[#1a1209]/10 rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl hover:border-[#8B6914]/40 transition-all duration-300 flex flex-col">
-              <div className="relative h-56 w-full overflow-hidden bg-[#0a0a0a]">
-                <Image
-                  src="/awards/award_2.jpg"
-                  alt="Luxury Boutique Retailer Award"
-                  fill
-                  sizes="(max-width: 768px) 100vw, 33vw"
-                  className="object-cover group-hover:scale-108 transition-transform duration-500 opacity-90"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+              <div
+                role="img"
+                aria-label="Award Image Placeholder — Lorem Ipsum"
+                className="relative h-56 w-full bg-[#16120c] border-b border-[#8B6914]/20 flex flex-col items-center justify-center p-6 text-center select-none"
+              >
+                <div className="w-12 h-12 rounded-full bg-[#8B6914]/15 border border-[#8B6914]/30 flex items-center justify-center mb-2 text-[#8B6914]">
+                  <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/></svg>
+                </div>
+                <span className="text-xs text-[#dfb15b] font-semibold tracking-wider uppercase" style={{ fontFamily: "'Jost', sans-serif" }}>
+                  Award Image Placeholder
+                </span>
+                <span className="text-[10px] text-white/40 mt-1" style={{ fontFamily: "'Jost', sans-serif" }}>
+                  Real award image to be added
+                </span>
                 <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between">
                   <span className="text-[10px] font-bold tracking-widest text-[#8B6914] uppercase bg-black/60 backdrop-blur-md px-3 py-1 rounded-md border border-[#8B6914]/30" style={{ fontFamily: "'Jost', sans-serif" }}>
-                    GLOBAL RECOGNITION
+                    AWARD PLACEHOLDER
                   </span>
-                  <div className="w-8 h-8 rounded-full bg-[#8B6914]/20 backdrop-blur-md border border-[#8B6914]/40 flex items-center justify-center text-[#8B6914]">
-                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/></svg>
-                  </div>
                 </div>
               </div>
               <div className="p-6 lg:p-7 space-y-3 flex-1 flex flex-col justify-between">
                 <div>
                   <h3 className="text-xl font-bold text-[#1a1209] leading-snug" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
-                    Luxury Boutique Retailer
+                    Lorem Ipsum Retail Distinction
                   </h3>
                   <p className="text-xs text-[#1a1209]/70 font-light leading-relaxed mt-2" style={{ fontFamily: "'Jost', sans-serif" }}>
-                    Honored for exceptional client concierge standards across our expanding network of 50+ locations.
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum.
                   </p>
                 </div>
               </div>
@@ -512,31 +516,33 @@ export default function CareersPage() {
 
             {/* Award 3 */}
             <div className="group bg-white border border-[#1a1209]/10 rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl hover:border-[#8B6914]/40 transition-all duration-300 flex flex-col">
-              <div className="relative h-56 w-full overflow-hidden bg-[#0a0a0a]">
-                <Image
-                  src="/awards/award_3.jpg"
-                  alt="Premier Employer Workplace Award"
-                  fill
-                  sizes="(max-width: 768px) 100vw, 33vw"
-                  className="object-cover group-hover:scale-108 transition-transform duration-500 opacity-90"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+              <div
+                role="img"
+                aria-label="Award Image Placeholder — Lorem Ipsum"
+                className="relative h-56 w-full bg-[#16120c] border-b border-[#8B6914]/20 flex flex-col items-center justify-center p-6 text-center select-none"
+              >
+                <div className="w-12 h-12 rounded-full bg-[#8B6914]/15 border border-[#8B6914]/30 flex items-center justify-center mb-2 text-[#8B6914]">
+                  <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>
+                </div>
+                <span className="text-xs text-[#dfb15b] font-semibold tracking-wider uppercase" style={{ fontFamily: "'Jost', sans-serif" }}>
+                  Award Image Placeholder
+                </span>
+                <span className="text-[10px] text-white/40 mt-1" style={{ fontFamily: "'Jost', sans-serif" }}>
+                  Real award image to be added
+                </span>
                 <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between">
                   <span className="text-[10px] font-bold tracking-widest text-[#8B6914] uppercase bg-black/60 backdrop-blur-md px-3 py-1 rounded-md border border-[#8B6914]/30" style={{ fontFamily: "'Jost', sans-serif" }}>
-                    EMPLOYER DISTINCTION
+                    AWARD PLACEHOLDER
                   </span>
-                  <div className="w-8 h-8 rounded-full bg-[#8B6914]/20 backdrop-blur-md border border-[#8B6914]/40 flex items-center justify-center text-[#8B6914]">
-                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>
-                  </div>
                 </div>
               </div>
               <div className="p-6 lg:p-7 space-y-3 flex-1 flex flex-col justify-between">
                 <div>
                   <h3 className="text-xl font-bold text-[#1a1209] leading-snug" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
-                    Premier Employer Workplace
+                    Lorem Ipsum Workplace Accolade
                   </h3>
                   <p className="text-xs text-[#1a1209]/70 font-light leading-relaxed mt-2" style={{ fontFamily: "'Jost', sans-serif" }}>
-                    Recognized for employee wellbeing, rotational branch support, housing facilities, and team growth.
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia.
                   </p>
                 </div>
               </div>

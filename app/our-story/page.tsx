@@ -31,8 +31,8 @@ const TIMELINE = [
   {
     year: "2025",
     badge: "HONORS",
-    title: "Crown of Precision & Excellence Awards",
-    text: "Honored with the Crown of Precision Award – Sri Lanka and Excellence in New Business of the Year Award, recognizing WINSOR's commitment to mechanical precision, surgical stainless steel construction, and dependable performance.",
+    title: "Brand Milestones & Accolades",
+    text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
   },
   {
     year: "2026",
@@ -59,34 +59,34 @@ const AWARDS = [
   {
     id: "1",
     year: "2026",
-    title: "Most Trusted Emerging Watch Brand",
-    category: "Consumer Trust & Brand Distinction",
-    desc: "Awarded for price transparency, nationwide fixed MRP, 1-year international warranty, and client trust across Sri Lanka.",
-    image: "/awards/award_1.jpg",
+    title: "Lorem Ipsum Horology Accolade",
+    category: "Lorem Ipsum Accolade",
+    desc: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.",
+    altText: "Award Image Placeholder — Lorem Ipsum",
   },
   {
     id: "2",
     year: "2025",
-    title: "Crown of Precision Award",
-    category: "Watchmaking & Performance",
-    desc: "Recognizing WINSOR for chronometric precision, dependable Japanese movement, and genuine quality standards.",
-    image: "/awards/award_2.jpg",
+    title: "Lorem Ipsum Watchmaker Accolade",
+    category: "Lorem Ipsum Accolade",
+    desc: "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident.",
+    altText: "Award Image Placeholder — Lorem Ipsum",
   },
   {
     id: "3",
     year: "2025",
-    title: "Excellence in New Business",
-    category: "Business Growth & Retail Network",
-    desc: "Celebrating WINSOR as Sri Lanka’s fastest-growing watch brand with an extensive authorized retailer boutique network.",
-    image: "/awards/award_3.jpg",
+    title: "Lorem Ipsum Boutique Accolade",
+    category: "Lorem Ipsum Accolade",
+    desc: "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo.",
+    altText: "Award Image Placeholder — Lorem Ipsum",
   },
   {
     id: "4",
     year: "2023",
-    title: "Dubai Trademark Registration",
-    category: "Maison Heritage & Original Curation",
-    desc: "Marking WINSOR’s official trademark registration in Dubai, establishing the foundation for accessible premium horology.",
-    image: "/awards/award_4.jpg",
+    title: "Lorem Ipsum Heritage Accolade",
+    category: "Lorem Ipsum Accolade",
+    desc: "Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt.",
+    altText: "Award Image Placeholder — Lorem Ipsum",
   },
 ];
 
@@ -404,7 +404,7 @@ export default function OurStoryPage() {
               Recognized Industry Distinction
             </h2>
             <p className="font-serif italic text-xs sm:text-sm text-[#1a1209]/70 max-w-lg mx-auto">
-              Our pledge to chronometric accuracy, client trust, transparent pricing, and nationwide retail leadership has garnered respected industry honors.
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
             </p>
           </div>
 
@@ -414,19 +414,29 @@ export default function OurStoryPage() {
                 key={award.id}
                 className="ws-award-card bg-[#faf7f0] rounded-xl overflow-hidden border border-[#8B6914]/20 shadow-sm flex flex-col"
               >
-                {/* Award Photo */}
-                <div className="relative aspect-[4/3] w-full bg-black overflow-hidden">
-                  <Image
-                    src={award.image}
-                    alt={award.title}
-                    fill
-                    className="ws-award-img object-cover transition-transform duration-500"
-                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                  />
+                {/* Award Photo Placeholder with Alt Text */}
+                <div
+                  role="img"
+                  aria-label={award.altText}
+                  className="relative aspect-[4/3] w-full bg-[#16120c] border-b border-[#8B6914]/20 flex flex-col items-center justify-center p-4 text-center select-none"
+                >
+                  <div className="w-10 h-10 rounded-full bg-[#8B6914]/15 border border-[#8B6914]/30 flex items-center justify-center mb-2 text-[#8B6914]">
+                    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                      <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" />
+                      <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" />
+                      <path d="M4 22h16" />
+                      <path d="M18 2H6v7a6 6 0 0 0 12 0V2z" />
+                    </svg>
+                  </div>
+                  <span className="font-['Jost'] text-[11px] text-[#dfb15b] font-medium tracking-wider uppercase">
+                    {award.altText}
+                  </span>
+                  <span className="font-['Jost'] text-[9px] text-white/40 mt-0.5">
+                    Real award image to be added
+                  </span>
                   <div className="absolute top-2.5 right-2.5 bg-[#8B6914] text-white text-[9px] font-bold font-['Jost'] px-2.5 py-0.5 rounded-full shadow tracking-wider">
                     {award.year}
                   </div>
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none" />
                 </div>
 
                 {/* Award Details */}
