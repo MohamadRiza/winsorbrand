@@ -55,7 +55,7 @@ const DIAL_CODES = [
 ];
 
 const getWatchImageUrl = (p: any): string => {
-  if (!p) return '/mens-watch-highlight.png';
+  if (!p) return '/winsor_hero_backgroundremoved.webp';
   if (p.thumbnail?.url) return p.thumbnail.url;
   if (typeof p.thumbnail === 'string' && p.thumbnail) return p.thumbnail;
   if (Array.isArray(p.images) && p.images.length > 0) {
@@ -71,7 +71,7 @@ const getWatchImageUrl = (p: any): string => {
       if (vImg0?.url) return vImg0.url;
     }
   }
-  return '/mens-watch-highlight.png';
+  return '/winsor_hero_backgroundremoved.webp';
 };
 
 export default function ProfilePage() {
@@ -481,7 +481,7 @@ export default function ProfilePage() {
     status: (o.status || 'pending').toLowerCase(),
     statusLabel: (o.status || 'pending').replace('_', ' ').toUpperCase(),
     productTitle: o.items[0]?.productTitle || 'Winsor Timepiece',
-    productThumbnail: o.items[0]?.productThumbnail || '/mens-watch-highlight.png'
+    productThumbnail: o.items[0]?.productThumbnail || '/winsor_hero_backgroundremoved.webp'
   }));
 
   return (
@@ -2019,7 +2019,7 @@ export default function ProfilePage() {
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1.5px solid rgba(184,142,60,0.15)', paddingBottom: '12px', flexWrap: 'wrap', gap: '10px' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                               <div style={{ width: '48px', height: '48px', position: 'relative', borderRadius: '8px', overflow: 'hidden', border: '1px solid rgba(184,142,60,0.18)', background: 'transparent', padding: '2px', flexShrink: 0 }}>
-                                <img src={rev.productId?.thumbnail?.url || '/mens-watch-highlight.png'} alt={rev.productId?.title || 'Timepiece'} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                                <img src={rev.productId?.thumbnail?.url || '/winsor_hero_backgroundremoved.webp'} alt={rev.productId?.title || 'Timepiece'} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
                               </div>
                               <div>
                                 <h4 style={{ margin: '0 0 2px 0', fontSize: '15px', fontWeight: 650, color: '#1a1209', fontFamily: 'Cormorant Garamond, serif' }}>{rev.productId?.title || 'Timepiece'}</h4>
@@ -2230,7 +2230,7 @@ export default function ProfilePage() {
               {/* Product Item Brief Card */}
               <div style={{ background: '#faf7f0', border: '1px solid rgba(139,105,20,0.18)', borderRadius: '12px', padding: '12px 16px', display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '22px' }}>
                 <div style={{ width: '48px', height: '48px', borderRadius: '8px', background: '#ffffff', border: '1px solid rgba(26,18,9,0.08)', padding: '3px', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <img src={reviewItem.productThumbnail || '/mens-watch-highlight.png'} alt={reviewItem.productTitle} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
+                  <img src={reviewItem.productThumbnail || '/winsor_hero_backgroundremoved.webp'} alt={reviewItem.productTitle} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
                 </div>
                 <div>
                   <h4 style={{ margin: 0, fontSize: '13.5px', fontWeight: 650, color: '#1a1209' }}>{reviewItem.productTitle}</h4>

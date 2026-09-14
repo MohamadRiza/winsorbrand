@@ -615,7 +615,7 @@ export default function GuestCheckoutModal({
                   {items.slice(0, 3).map((item, idx) => (
                     <div key={idx} className="gcm-summary-item">
                       <img
-                        src={item.productThumbnail || '/mens-watch-highlight.png'}
+                        src={item.productThumbnail || '/winsor_hero_backgroundremoved.webp'}
                         alt={item.productTitle}
                         style={{ width: 44, height: 44, objectFit: 'contain', borderRadius: 8, background: '#faf7f0', flexShrink: 0 }}
                       />
@@ -825,7 +825,7 @@ export default function GuestCheckoutModal({
                   {items.map((item, idx) => (
                     <div key={idx} className="gcm-summary-item">
                       <img
-                        src={item.productThumbnail || '/mens-watch-highlight.png'}
+                        src={item.productThumbnail || '/winsor_hero_backgroundremoved.webp'}
                         alt={item.productTitle}
                         style={{ width: 44, height: 44, objectFit: 'contain', borderRadius: 8, background: '#faf7f0', flexShrink: 0 }}
                       />

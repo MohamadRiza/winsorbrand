@@ -23,7 +23,7 @@ export async function generateMetadata({
       ? product.description.slice(0, 160)
       : `Discover the ${product.title} (Model #${product.modelNo}) by Winsor. Precision Japan movement timepiece crafted across Dubai, India, and Sri Lanka with 1-year international warranty & nationwide fixed MRP.`;
 
-    const imageUrl = product.thumbnail?.url || '/mens-watch-highlight.png';
+    const imageUrl = product.thumbnail?.url || '/winsor_hero_backgroundremoved.webp';
 
     return {
       title,
@@ -65,7 +65,7 @@ export default async function ProductPage({
         '@context': 'https://schema.org/',
         '@type': 'Product',
         'name': product.title,
-        'image': [product.thumbnail?.url || `${baseUrl}/mens-watch-highlight.png`],
+        'image': [product.thumbnail?.url || `${baseUrl}/winsor_hero_backgroundremoved.webp`],
         'description':
           product.description ||
           `Hand-crafted luxury watch featuring high-precision Japan movement, crafted across Dubai, India, and Sri Lanka with a 1-year international warranty.`,

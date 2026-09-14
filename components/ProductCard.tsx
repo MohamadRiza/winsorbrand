@@ -26,7 +26,7 @@ export default function ProductCard({
   const reviewCount = ratingData?.reviewCount || 0;
 
   // Determine watch thumbnail image
-  let imageSrc = '/mens-watch-highlight.png';
+  let imageSrc = '/winsor_hero_backgroundremoved.webp';
   if (product.thumbnail?.url) {
     imageSrc = product.thumbnail.url;
   } else if (typeof product.thumbnail === 'string' && product.thumbnail) {

@@ -541,7 +541,7 @@ export default function GuestOrderTrackingPage() {
                     <div key={idx} className="item-card-row">
                       <div style={{ width: 52, height: 52, position: 'relative', borderRadius: 10, overflow: 'hidden', background: '#ffffff', border: '1px solid rgba(26,18,9,0.08)', flexShrink: 0 }}>
                         <Image
-                          src={item.productThumbnail || '/mens-watch-highlight.png'}
+                          src={item.productThumbnail || '/winsor_hero_backgroundremoved.webp'}
                           alt={item.productTitle}
                           fill
                           sizes="52px"

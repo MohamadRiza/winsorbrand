@@ -50,7 +50,7 @@ const getProductGender = (product: IProduct): 'Gents' | 'Ladies' | 'Unisex' => {
 };
 
 const getWatchImageUrl = (p: IProduct): string => {
-  if (!p) return '/womens-watch-highlight.png';
+  if (!p) return '/category_HomeS/ladies_nobg.webp';
   if (p.thumbnail?.url) return p.thumbnail.url;
   if (typeof p.thumbnail === 'string' && p.thumbnail) return p.thumbnail;
   if (Array.isArray((p as any).images) && (p as any).images.length > 0) {
@@ -67,7 +67,7 @@ const getWatchImageUrl = (p: IProduct): string => {
       if (vImg0?.url) return vImg0.url;
     }
   }
-  return '/womens-watch-highlight.png';
+  return '/category_HomeS/ladies_nobg.webp';
 };
 
 function WomensCollectionContent() {

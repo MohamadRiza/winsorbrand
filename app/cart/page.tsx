@@ -2101,7 +2101,7 @@ export default function CartPage() {
                         return (
                           <div key={idx} style={{ display: 'flex', gap: 12, alignItems: 'center', borderBottom: idx < selectedItemsList.length - 1 ? '1px dashed rgba(184,142,60,0.15)' : 'none', paddingBottom: idx < selectedItemsList.length - 1 ? '10px' : '0' }}>
                             <img
-                              src={item.product?.thumbnail?.url || '/mens-watch-highlight.png'}
+                              src={item.product?.thumbnail?.url || '/winsor_hero_backgroundremoved.webp'}
                               alt={item.product?.title || 'Watch'}
                               style={{ width: 54, height: 54, objectFit: 'contain', borderRadius: 10, background: '#faf7f0', flexShrink: 0, border: '1px solid rgba(184,142,60,0.15)' }}
                             />

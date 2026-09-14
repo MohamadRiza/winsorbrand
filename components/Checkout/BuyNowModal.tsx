@@ -695,7 +695,7 @@ export default function BuyNowModal({
                 <div className="bnm-card">
                   <div style={{ display: 'flex', gap: 14, alignItems: 'center' }}>
                     <img
-                      src={item.productThumbnail || '/mens-watch-highlight.png'}
+                      src={item.productThumbnail || '/winsor_hero_backgroundremoved.webp'}
                       alt={item.productTitle}
                       style={{ width: 62, height: 62, objectFit: 'contain', borderRadius: 10, background: '#faf7f0', flexShrink: 0, border: '1px solid rgba(184,142,60,0.15)' }}
                     />
