@@ -156,6 +156,7 @@ function GenderSection({
             loop
             playsInline
             preload="none"
+            title={`${title} Showcase Video`}
             onLoadedData={handleVideoLoad}
             style={{
               position: 'absolute',

@@ -2,6 +2,7 @@
 
 import { useState, useRef } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 
 const items = [
   {
@@ -28,7 +29,7 @@ const items = [
 ];
 
 const Card = ({ item }: { item: (typeof items)[number] }) => (
-  <a
+  <Link
     href={item.href}
     className="group relative block w-full aspect-[3/4] sm:aspect-[4/5] rounded-2xl overflow-hidden shadow-lg transition-all duration-700 hover:shadow-2xl hover:-translate-y-2 border border-black/10 hover:border-[#8B6914]/50"
     style={{ textDecoration: 'none' }}
@@ -74,7 +75,7 @@ const Card = ({ item }: { item: (typeof items)[number] }) => (
         <span className="transition-transform duration-300 group-hover:translate-x-2">→</span>
       </div>
     </div>
-  </a>
+  </Link>
 );
 
 const Ourdetaills = () => {

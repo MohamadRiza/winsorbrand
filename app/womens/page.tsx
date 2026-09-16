@@ -733,11 +733,13 @@ function WomensCollectionContent() {
               placeholder="Search women's watches..." 
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
+              aria-label="Search women's watches"
               style={{ padding: '8px 14px', borderRadius: '6px', border: '1px solid rgba(26,18,9,0.12)', fontSize: '12px', width: '180px', outline: 'none' }}
             />
             <select 
               value={priceSort} 
               onChange={e => setPriceSort(e.target.value as any)}
+              aria-label="Sort by price"
               style={{ padding: '8px 12px', borderRadius: '6px', border: '1px solid rgba(26,18,9,0.12)', fontSize: '12px', outline: 'none', background: '#fff', cursor: 'pointer' }}
             >
               <option value="none">Default Sort</option>
@@ -787,7 +789,12 @@ function WomensCollectionContent() {
 
 export default function WomensCollectionPage() {
   return (
-    <Suspense fallback={<div style={{ padding: '100px 0', textAlign: 'center' }}>Loading Women's Collection…</div>}>
+    <Suspense fallback={
+      <div style={{ padding: '100px 0', textAlign: 'center' }}>
+        <h1 className="sr-only">Women&apos;s Collection</h1>
+        Loading Women&apos;s Collection…
+      </div>
+    }>
       <WomensCollectionContent />
     </Suspense>
   );

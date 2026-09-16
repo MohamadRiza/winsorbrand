@@ -93,7 +93,7 @@ export default async function ProductPage({
             '@type': 'MerchantReturnPolicy',
             'applicableCountry': 'LK',
             'returnPolicyCategory': 'https://schema.org/MerchantReturnFiniteReturnWindow',
-            'merchantReturnDays': 7,
+            'merchantReturnDays': 14,
           },
         },
       };

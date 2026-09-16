@@ -33,7 +33,7 @@ export default function ContactLayout({
     'mainEntity': {
       '@type': 'Organization',
       'name': 'Winsor Maison',
-      'telephone': '+94-77-123-4567',
+      'telephone': '+94-77-071-6212',
       'email': 'support@winsorbrand.com',
     },
   };

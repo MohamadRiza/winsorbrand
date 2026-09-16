@@ -34,8 +34,8 @@ interface GiftProduct {
 
 // ── Fallback backgrounds (used only if a category has no heroBackground) ──
 const FALLBACK_BACKGROUNDS = [
-  'https://photographylife.com/wp-content/uploads/2017/01/Dark-landscape-photo.jpg',
-  'https://photographylife.com/wp-content/uploads/2018/10/Final-Result-of-Jokulsarlon-Photo.jpg',
+  '/hero_bg_marble.jpg',
+  '/category_HomeS/classic_bg.webp',
 ];
 
 const OCCASION_BACKGROUNDS: Record<string, string> = {

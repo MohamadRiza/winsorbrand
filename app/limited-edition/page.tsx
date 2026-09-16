@@ -608,6 +608,7 @@ function LimitedEditionContent() {
           <select
             value={priceSort}
             onChange={(e: any) => setPriceSort(e.target.value)}
+            aria-label="Sort by price"
             style={{
               padding: '9px 14px',
               borderRadius: '6px',
@@ -676,7 +677,11 @@ function LimitedEditionContent() {
 
 export default function LimitedEditionPage() {
   return (
-    <Suspense fallback={<div style={{ minHeight: '100vh', background: '#faf7f0' }} />}>
+    <Suspense fallback={
+      <div style={{ minHeight: '100vh', background: '#faf7f0' }}>
+        <h1 className="sr-only">Limited Edition Timepiece Collection</h1>
+      </div>
+    }>
       <LimitedEditionContent />
     </Suspense>
   );

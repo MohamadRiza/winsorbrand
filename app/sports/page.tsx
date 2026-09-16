@@ -784,6 +784,7 @@ function SportsCollectionContent() {
           <select
             value={priceSort}
             onChange={(e: any) => setPriceSort(e.target.value)}
+            aria-label="Sort by price"
             style={{
               padding: '9px 14px',
               borderRadius: '6px',
@@ -852,7 +853,11 @@ function SportsCollectionContent() {
 
 export default function SportsCollectionPage() {
   return (
-    <Suspense fallback={<div style={{ minHeight: '100vh', background: '#faf7f0' }} />}>
+    <Suspense fallback={
+      <div style={{ minHeight: '100vh', background: '#faf7f0' }}>
+        <h1 className="sr-only">Sports Chronograph &amp; Diver Collection</h1>
+      </div>
+    }>
       <SportsCollectionContent />
     </Suspense>
   );

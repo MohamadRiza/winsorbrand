@@ -901,6 +901,8 @@ export default function Navbar() {
                       e.stopPropagation();
                       setExpandedMobileCol(isExpanded ? null : col.key);
                     }}
+                    aria-label={isExpanded ? `Collapse ${col.label} sub-categories` : `Expand ${col.label} sub-categories`}
+                    aria-expanded={isExpanded}
                     style={{
                       background: 'rgba(139, 105, 20, 0.1)',
                       border: '1px solid rgba(139, 105, 20, 0.28)',

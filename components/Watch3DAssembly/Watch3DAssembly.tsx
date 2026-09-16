@@ -342,30 +342,57 @@ export default function Watch3DAssembly() {
                 </p>
 
                 {/* Big Serif Heading with Synchronized Typewriter Effect */}
-                <h1
-                  className="mb-2 font-normal"
-                  style={{
-                    fontFamily: "'Cormorant Garamond', serif",
-                    fontSize: isMobile ? '20px' : '62px',
-                    lineHeight: 1.15,
-                    color: isDarkSlide ? '#ffffff' : '#1a1209',
-                    minHeight: isMobile ? '48px' : '145px',
-                  }}
-                >
-                  <span className="sr-only">
-                    {slide.titleLine1} {slide.titleLine2} {slide.titleLine3}
-                  </span>
-                  <span aria-hidden="true">
-                    {!mounted ? (
-                      <>
-                        {slide.titleLine1}<br />
-                        {slide.titleLine2} <span style={{ color: isDarkSlide ? '#dfb15b' : '#8b6914', fontStyle: 'italic' }}>{slide.titleLine3}</span>
-                      </>
-                    ) : (
-                      renderTypedTitle(slide, charIndex, isActive)
-                    )}
-                  </span>
-                </h1>
+                {idx === 0 ? (
+                  <h1
+                    className="mb-2 font-normal"
+                    style={{
+                      fontFamily: "'Cormorant Garamond', serif",
+                      fontSize: isMobile ? '20px' : '62px',
+                      lineHeight: 1.15,
+                      color: isDarkSlide ? '#ffffff' : '#1a1209',
+                      minHeight: isMobile ? '48px' : '145px',
+                    }}
+                  >
+                    <span className="sr-only">
+                      {slide.titleLine1} {slide.titleLine2} {slide.titleLine3}
+                    </span>
+                    <span aria-hidden="true">
+                      {!mounted ? (
+                        <>
+                          {slide.titleLine1}<br />
+                          {slide.titleLine2} <span style={{ color: isDarkSlide ? '#dfb15b' : '#8b6914', fontStyle: 'italic' }}>{slide.titleLine3}</span>
+                        </>
+                      ) : (
+                        renderTypedTitle(slide, charIndex, isActive)
+                      )}
+                    </span>
+                  </h1>
+                ) : (
+                  <h2
+                    className="mb-2 font-normal"
+                    style={{
+                      fontFamily: "'Cormorant Garamond', serif",
+                      fontSize: isMobile ? '20px' : '62px',
+                      lineHeight: 1.15,
+                      color: isDarkSlide ? '#ffffff' : '#1a1209',
+                      minHeight: isMobile ? '48px' : '145px',
+                    }}
+                  >
+                    <span className="sr-only">
+                      {slide.titleLine1} {slide.titleLine2} {slide.titleLine3}
+                    </span>
+                    <span aria-hidden="true">
+                      {!mounted ? (
+                        <>
+                          {slide.titleLine1}<br />
+                          {slide.titleLine2} <span style={{ color: isDarkSlide ? '#dfb15b' : '#8b6914', fontStyle: 'italic' }}>{slide.titleLine3}</span>
+                        </>
+                      ) : (
+                        renderTypedTitle(slide, charIndex, isActive)
+                      )}
+                    </span>
+                  </h2>
+                )}
 
                 {/* Tagline Description */}
                 <p

@@ -39,7 +39,7 @@ export default function RetailersLayout({
     'name': 'Winsor Maison Flagship Boutique',
     'description': 'Official flagship showroom and luxury horology fitting center for Winsor Maison.',
     'url': `${baseUrl}/retailers`,
-    'telephone': '+94-77-123-4567',
+    'telephone': '+94-77-071-6212',
     'logo': `${baseUrl}/icon.png`,
     'image': `${baseUrl}/hero_bg_marble.jpg`,
     'address': {

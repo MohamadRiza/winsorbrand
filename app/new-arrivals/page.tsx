@@ -713,6 +713,7 @@ function NewArrivalsContent() {
           <select
             value={priceSort}
             onChange={(e: any) => setPriceSort(e.target.value)}
+            aria-label="Sort by price"
             style={{
               padding: '9px 14px',
               borderRadius: '6px',

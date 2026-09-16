@@ -1536,10 +1536,14 @@ export default function CollectionsPage() {
                 style={{ width: '100%', height: '100%', objectFit: 'cover' }}
               />
             ) : (
-              <img
-                src={SLIDES[currentSlide].imageUrl}
+              <Image
+                src={SLIDES[currentSlide].imageUrl || '/winsor_girl_G.png'}
                 alt="Winsor Collection Slide"
+                width={700}
+                height={500}
+                priority
                 className="hero-banner-watch-img"
+                style={{ width: '100%', height: '100%', objectFit: 'contain' }}
               />
             )}
           </div>

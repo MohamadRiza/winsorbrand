@@ -120,7 +120,7 @@ export default function RootLayout({
         'areaServed': ['LK', 'AE', 'Worldwide'],
         'contactPoint': {
           '@type': 'ContactPoint',
-          'telephone': '+94-77-123-4567',
+          'telephone': '+94-77-071-6212',
           'contactType': 'customer service',
           'availableLanguage': ['English', 'Sinhala', 'Tamil', 'Arabic'],
         },

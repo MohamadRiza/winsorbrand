@@ -69,6 +69,7 @@ const WatchShowcase = () => {
               muted
               playsInline
               preload="metadata"
+              title="Winsor Royal Steel 360 Degree Rotating View"
               className="aspect-[4/5] w-full object-cover rounded-xl transition-transform duration-700 hover:scale-[1.03]"
               src="/watch360rotate.webm"
             />
@@ -92,6 +93,7 @@ const WatchShowcase = () => {
             muted
             playsInline
             preload="metadata"
+            title="Winsor Atelier Craftsmanship Showcase"
             className="aspect-[4/3] h-full max-h-[720px] w-full object-cover transition-transform duration-700 hover:scale-[1.02] sm:aspect-auto"
             src="/winsor_video.webm"
           />
