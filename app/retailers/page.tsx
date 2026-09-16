@@ -1181,6 +1181,9 @@ export default function StoreLocatorPage() {
                               src={r.image?.url || BOUTIQUE_PLACEHOLDER}
                               alt={r.name}
                               className="w-full h-full object-cover"
+                              onError={(e) => {
+                                (e.target as HTMLImageElement).src = BOUTIQUE_PLACEHOLDER;
+                              }}
                             />
                             <div className="retailer-card-img-shimmer" />
                           </div>
@@ -1259,6 +1262,9 @@ export default function StoreLocatorPage() {
                       src={sliderImages[sliderIndex]}
                       alt="Boutique Showroom Interior"
                       className="w-full h-full object-cover"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = BOUTIQUE_PLACEHOLDER;
+                      }}
                     />
 
                     {sliderImages.length > 1 && (
