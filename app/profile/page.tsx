@@ -463,11 +463,11 @@ export default function ProfilePage() {
             To view and manage your custom profile details, shipping addresses, and reward orders, please sign in.
           </p>
           <div style={{ marginTop: '28px' }}>
-            <SignInButton mode="modal">
+            <Link href="/login">
               <button className="gold-action-btn">
-                SIGN IN WITH CLERK
+                SIGN IN TO YOUR ACCOUNT
               </button>
-            </SignInButton>
+            </Link>
           </div>
         </div>
       </div>

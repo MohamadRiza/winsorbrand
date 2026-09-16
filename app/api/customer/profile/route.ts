@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAuth } from '@clerk/nextjs/server';
+import { getAuth, currentUser } from '@clerk/nextjs/server';
 import { connectDB } from '@/lib/db';
 import Customer from '@/lib/models/Customer';
 
@@ -15,7 +15,28 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    const customer = await Customer.findOne({ clerkId: userId });
+    let customer = await Customer.findOne({ clerkId: userId });
+
+    // Fallback: If not found by clerkId, match by user's email to auto-link
+    if (!customer) {
+      try {
+        const clerkUser = await currentUser();
+        const primaryEmail = clerkUser?.emailAddresses?.find(
+          e => e.id === clerkUser.primaryEmailAddressId
+        )?.emailAddress || clerkUser?.emailAddresses?.[0]?.emailAddress;
+
+        if (primaryEmail) {
+          customer = await Customer.findOne({ email: primaryEmail.toLowerCase().trim() });
+          if (customer) {
+            customer.clerkId = userId;
+            await customer.save();
+          }
+        }
+      } catch (e) {
+        console.warn('Auto-link customer by email fallback error:', e);
+      }
+    }
+
     return NextResponse.json({ success: true, data: customer || null });
   } catch (error: any) {
     console.error('Fetch customer profile API error:', error);
@@ -48,10 +69,32 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const customer = await Customer.findOneAndUpdate(
-      { clerkId: userId },
-      {
-        email,
+    const normalizedEmail = email.toLowerCase().trim();
+
+    // Prevent duplicate key error (E11000) by finding existing customer by clerkId OR email
+    let customer = await Customer.findOne({
+      $or: [
+        { clerkId: userId },
+        { email: normalizedEmail }
+      ]
+    });
+
+    if (customer) {
+      // Re-link clerkId to current user session & update details
+      customer.clerkId = userId;
+      customer.email = normalizedEmail;
+      if (mobileCode !== undefined) customer.mobileCode = mobileCode;
+      if (mobile !== undefined) customer.mobile = mobile;
+      if (profileImage !== undefined) customer.profileImage = profileImage;
+      if (country !== undefined) customer.country = country;
+      if (address !== undefined) customer.address = address;
+      if (city !== undefined) customer.city = city;
+      if (postalCode !== undefined) customer.postalCode = postalCode;
+      await customer.save();
+    } else {
+      customer = await Customer.create({
+        clerkId: userId,
+        email: normalizedEmail,
         mobileCode,
         mobile,
         profileImage,
@@ -59,9 +102,8 @@ export async function POST(req: NextRequest) {
         address,
         city,
         postalCode,
-      },
-      { new: true, upsert: true }
-    );
+      });
+    }
 
     return NextResponse.json({ success: true, data: customer });
   } catch (error: any) {

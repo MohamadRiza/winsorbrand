@@ -68,64 +68,26 @@ async function handleAdminAuth(req: NextRequest) {
   return null;
 }
 
-export async function proxy(req: NextRequest, event: NextFetchEvent) {
+const clerkHandler = clerkMiddleware(async (auth, req: NextRequest) => {
   const { pathname } = req.nextUrl;
 
-  // Run admin authentication check first if path is for admin area
+  // Staff portal routes do not use Clerk or admin checks
+  if (pathname.startsWith('/staff') || pathname.startsWith('/api/staff')) {
+    return NextResponse.next();
+  }
+
+  // Run admin authentication check if path is for admin area
   if (pathname.startsWith('/admin') || pathname.startsWith('/api/admin')) {
     const adminRes = await handleAdminAuth(req);
     if (adminRes) return adminRes;
     return NextResponse.next();
   }
 
-  // Staff portal routes do not use Clerk
-  if (pathname.startsWith('/staff') || pathname.startsWith('/api/staff')) {
-    return NextResponse.next();
-  }
+  return NextResponse.next();
+});
 
-  // ✅ BYPASS Clerk middleware for truly public routes
-  const isPublicPath =
-    pathname === '/' ||
-    pathname.startsWith('/collections') ||
-    pathname.startsWith('/our-story') ||
-    pathname.startsWith('/retailers') ||
-    pathname.startsWith('/gifts') ||
-    pathname.startsWith('/warranty') ||
-    pathname.startsWith('/cart') ||
-    pathname.startsWith('/orders') ||
-    pathname.startsWith('/contact') ||
-    pathname.startsWith('/faq') ||
-    pathname.startsWith('/customer-care') ||
-    pathname.startsWith('/privacy') ||
-    pathname.startsWith('/terms') ||
-    pathname.startsWith('/return') ||
-    pathname.startsWith('/mens') ||
-    pathname.startsWith('/womens') ||
-    pathname.startsWith('/sports') ||
-    pathname.startsWith('/new') ||
-    pathname.startsWith('/limited') ||
-    pathname.startsWith('/careers') ||
-    pathname.startsWith('/_next') ||
-    pathname.includes('.') ||
-    // Only these specific public API routes bypass Clerk
-    pathname.startsWith('/api/products') ||
-    pathname.startsWith('/api/gift-categories') ||
-    pathname.startsWith('/api/upload') ||
-    pathname.startsWith('/api/coupons') ||
-    pathname.startsWith('/api/occasion') ||
-    pathname.startsWith('/api/contact') ||
-    pathname.startsWith('/api/careers');
-
-  if (isPublicPath) {
-    return NextResponse.next();
-  }
-
-  // Otherwise, run Clerk middleware — this covers:
-  // /api/reviews, /api/reviews/pending, /api/reviews/my
-  // /api/customer/*, /api/cart/*, /api/wishlist/*
-  // /profile, /sign-in, /sign-up, etc.
-  return clerkMiddleware()(req, event);
-}
+export default clerkHandler;
+export const proxy = clerkHandler;
 
 export const config = {
   matcher: [
