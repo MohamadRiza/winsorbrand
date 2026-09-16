@@ -64,7 +64,7 @@ export default function GiftsPage() {
       try {
         setLoading(true);
         const [prodRes, catRes] = await Promise.all([
-          fetch('/api/products'),
+          fetch('/api/products/gifts?limit=10'),
           fetch('/api/gift-categories'),
         ]);
 
@@ -88,8 +88,8 @@ export default function GiftsPage() {
         }
 
         if (prodData.success) {
-          // Filter to only show active products
-          setProducts((prodData.data || []).filter((p: IProduct) => p.isActive));
+          // Use the same curated gift set as the homepage so counts and products agree.
+          setProducts(prodData.data || []);
         } else {
           throw new Error(prodData.error || 'Failed to fetch products');
         }
@@ -150,7 +150,7 @@ export default function GiftsPage() {
     setPriceSort('none');
   };
 
-  // Filter products: must be active, have gift categories mapped, match category, search query & price sort
+  // Products come from the curated gifts endpoint; retain the category guard for resilience.
   const giftingProducts = products.filter(p => p.giftCategories && p.giftCategories.length > 0);
 
   let filteredProducts = giftingProducts.filter(p => {
@@ -177,7 +177,7 @@ export default function GiftsPage() {
   }
 
   return (
-    <div style={{ backgroundColor: '#faf7f0', minHeight: '100vh', width: '100%', paddingBottom: '20px' }}>
+    <main style={{ backgroundColor: '#faf7f0', minHeight: '100vh', width: '100%', paddingBottom: '20px' }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300&family=Jost:wght@300;400;500;600&display=swap');
 
@@ -1515,6 +1515,6 @@ export default function GiftsPage() {
         {/* Black Moving Marquee Ribbon & VIP Newsletter Card */}
         <NewsletterCard imageSrc="/graduation_gift.png" badgeText="WINSOR GIFTS CONCIERGE" />
       </div>
-    </div>
+    </main>
   );
 }

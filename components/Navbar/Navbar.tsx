@@ -405,7 +405,8 @@ export default function Navbar() {
           .wn-desk-only{display:none!important;}
           .wn-mob-only{display:flex!important;}
           .wn-top-row{padding:0 16px!important;}
-          .wn-actions-gap{gap:14px!important;}
+          .wn-actions-gap{gap:6px!important;}
+          .wn-ib{min-width:40px;min-height:40px;align-items:center;justify-content:center;}
         }
         
         .wn-logo-link{display:flex;align-items:center;justify-content:center;}
@@ -720,6 +721,8 @@ export default function Navbar() {
 
       {/* ── MOBILE DRAWER (PURE CRYSTAL GLASSMORPHISM) ── */}
       <div
+        aria-hidden={!mobileOpen}
+        inert={!mobileOpen}
         style={{
           position: 'fixed',
           top: 0,

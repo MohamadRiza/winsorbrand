@@ -1,6 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
+import Link from 'next/link';
 import { useUser } from '@clerk/nextjs';
 import { IProduct } from '@/types';
 import { toast } from 'react-hot-toast';
@@ -15,12 +16,72 @@ export interface CartItem {
 interface CartContextType {
   cartItems: CartItem[];
   loading: boolean;
-  addToCart: (productId: string, quantity: number, colorVariant?: string, product?: IProduct) => void;
-  removeFromCart: (productId: string, colorVariant?: string) => void;
-  updateQuantity: (productId: string, quantity: number, colorVariant?: string) => void;
-  clearCart: () => void;
+  addToCart: (productId: string, quantity: number, colorVariant?: string, product?: IProduct) => Promise<void> | void;
+  removeFromCart: (productId: string, colorVariant?: string) => Promise<void> | void;
+  updateQuantity: (productId: string, quantity: number, colorVariant?: string) => Promise<void> | void;
+  clearCart: () => Promise<void> | void;
   totalItemsCount: number;
 }
+
+const CART_STORAGE_KEY = 'winsor_cart';
+
+// Helper to sanitize product snapshot before saving into localStorage
+const sanitizeProductSnapshot = (product?: IProduct): IProduct | undefined => {
+  if (!product) return undefined;
+  return {
+    _id: product._id,
+    title: product.title,
+    price: product.price,
+    thumbnail: product.thumbnail ? { url: product.thumbnail.url } : undefined,
+    modelNo: product.modelNo || '',
+    colorVariants: product.colorVariants || [],
+    isSoldOut: product.isSoldOut || false,
+    giftCategories: product.giftCategories || [],
+    description: product.description || '',
+  } as IProduct;
+};
+
+// Helper to serialize items for localStorage
+const serializeCartItems = (items: CartItem[]): string => {
+  const sanitized = items.map(item => ({
+    productId: item.productId,
+    quantity: item.quantity,
+    colorVariant: item.colorVariant || '',
+    product: sanitizeProductSnapshot(item.product),
+  }));
+  return JSON.stringify(sanitized);
+};
+
+// Helper to safely read from localStorage
+const readStoredCart = (): CartItem[] => {
+  if (typeof window === 'undefined') return [];
+  try {
+    const raw = localStorage.getItem(CART_STORAGE_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+    return parsed.map((item: any) => ({
+      productId: item.productId,
+      quantity: Math.max(1, Number(item.quantity) || 1),
+      colorVariant: item.colorVariant || '',
+      product: item.product && typeof item.product === 'object' ? item.product : undefined,
+    }));
+  } catch (err) {
+    console.warn('Failed to parse cart from localStorage:', err);
+    return [];
+  }
+};
+
+// Helper to safely write to localStorage & notify
+const writeStoredCart = (items: CartItem[]) => {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.setItem(CART_STORAGE_KEY, serializeCartItems(items));
+    window.dispatchEvent(new CustomEvent('winsor_cart_updated', { detail: items }));
+  } catch (err) {
+    console.warn('Failed to save cart to localStorage:', err);
+  }
+};
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
@@ -28,7 +89,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const { user, isSignedIn, isLoaded } = useUser();
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const isSyncingRef = useRef(false);
 
   // Helper to map DB items to frontend items
   const mapDbItems = (dbItems: any[]): CartItem[] => {
@@ -36,7 +96,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       productId: item.productId?._id || item.productId,
       quantity: item.quantity,
       colorVariant: item.colorVariant || '',
-      product: item.productId && typeof item.productId === 'object' ? item.productId : undefined,
+      product: item.productId && typeof item.productId === 'object' ? sanitizeProductSnapshot(item.productId) : undefined,
     }));
   };
 
@@ -49,15 +109,18 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }));
   };
 
-  // Helper to merge two arrays of cart items
+  // Helper to merge two arrays of cart items safely without losing products or items
   const mergeCartItems = (localItems: CartItem[], serverItems: CartItem[]): CartItem[] => {
     const merged: CartItem[] = [...serverItems];
     for (const local of localItems) {
       const existingIdx = merged.findIndex(
-        item => item.productId === local.productId && item.colorVariant === local.colorVariant
+        item => item.productId === local.productId && (item.colorVariant || '') === (local.colorVariant || '')
       );
       if (existingIdx > -1) {
-        merged[existingIdx].quantity += local.quantity;
+        if (!merged[existingIdx].product && local.product) {
+          merged[existingIdx].product = local.product;
+        }
+        merged[existingIdx].quantity = Math.max(merged[existingIdx].quantity, local.quantity);
       } else {
         merged.push(local);
       }
@@ -65,12 +128,74 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     return merged;
   };
 
-  // Load and sync cart
+  // Helper to persist in localStorage immediately and sync to server if signed in
+  const syncToServer = async (items: CartItem[]) => {
+    if (!isSignedIn) return;
+    try {
+      await fetch('/api/customer/cart', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ items: mapToDbPayload(items) }),
+      });
+    } catch (err) {
+      console.warn('Failed to sync cart to server:', err);
+    }
+  };
+
+  // Synchronous and immediate local persistence + non-blocking background server sync
+  const persistCart = (newItems: CartItem[]) => {
+    setCartItems(newItems);
+    writeStoredCart(newItems);
+    if (isSignedIn) {
+      syncToServer(newItems);
+    }
+  };
+
+  // 1. Instant client-side hydration from localStorage (0ms on mount)
+  useEffect(() => {
+    const cached = readStoredCart();
+    if (cached.length > 0) {
+      setCartItems(cached);
+    }
+    setLoading(false);
+  }, []);
+
+  // 2. Cross-tab and window event synchronization
+  useEffect(() => {
+    const handleStorage = (e: StorageEvent) => {
+      if (e.key === CART_STORAGE_KEY && e.newValue) {
+        try {
+          const updated = readStoredCart();
+          setCartItems(updated);
+        } catch (err) {
+          console.warn('Failed to handle storage event for cart:', err);
+        }
+      }
+    };
+
+    const handleCustomUpdate = (e: any) => {
+      if (e.detail && Array.isArray(e.detail)) {
+        setCartItems(e.detail);
+      } else {
+        setCartItems(readStoredCart());
+      }
+    };
+
+    window.addEventListener('storage', handleStorage);
+    window.addEventListener('winsor_cart_updated', handleCustomUpdate);
+    return () => {
+      window.removeEventListener('storage', handleStorage);
+      window.removeEventListener('winsor_cart_updated', handleCustomUpdate);
+    };
+  }, []);
+
+  // 3. Load & sync cart when Clerk auth state is ready
   useEffect(() => {
     if (!isLoaded) return;
 
+    let isMounted = true;
+
     const loadAndSync = async () => {
-      setLoading(true);
       if (isSignedIn) {
         try {
           // 1. Fetch server cart
@@ -89,125 +214,83 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
             serverItems = mapDbItems(data.data.items);
           }
 
-          // 2. Read local guest cart safely
-          const localStr = localStorage.getItem('winsor_cart');
-          let localItems: CartItem[] = [];
-          if (localStr) {
-            try {
-              localItems = JSON.parse(localStr);
-            } catch (e) {
-              console.warn('Failed to parse local guest cart JSON:', e);
-            }
+          // 2. Read local cart snapshot
+          const localItems = readStoredCart();
+
+          let finalCart: CartItem[];
+          if (localItems.length > 0 && serverItems.length > 0) {
+            finalCart = mergeCartItems(localItems, serverItems);
+          } else if (localItems.length > 0) {
+            // Local has items, server had none (e.g. freshly added items before sync)
+            finalCart = localItems;
+          } else {
+            finalCart = serverItems;
           }
 
-          if (localItems.length > 0) {
-            // Merge local guest cart and server cart
-            const merged = mergeCartItems(localItems, serverItems);
-            
-            // Save merged to server
-            const saveRes = await fetch('/api/customer/cart', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ items: mapToDbPayload(merged) }),
-            });
-            let saveData: any = { success: false };
+          if (isMounted) {
+            setCartItems(finalCart);
+            writeStoredCart(finalCart);
+          }
+
+          // Persist merged cart to server if needed
+          if (localItems.length > 0 || (finalCart.length > 0 && serverItems.length === 0)) {
             try {
-              if (saveRes.ok && saveRes.headers.get('content-type')?.includes('application/json')) {
-                saveData = await saveRes.json();
-              }
-            } catch (e) {
-              console.warn('Failed to parse saved cart JSON:', e);
+              await fetch('/api/customer/cart', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ items: mapToDbPayload(finalCart) }),
+              });
+            } catch (saveErr) {
+              console.warn('Failed to persist merged cart to server:', saveErr);
             }
-            
-            if (saveData.success && saveData.data?.items) {
-              setCartItems(mapDbItems(saveData.data.items));
-            } else {
-              setCartItems(merged);
-            }
-            
-            // Clear guest cart
-            localStorage.removeItem('winsor_cart');
-            toast.success('Your guest cart items have been synced to your account.');
-          } else {
-            setCartItems(serverItems);
           }
         } catch (err) {
           console.warn('Failed to sync/fetch cart:', err);
         }
       } else {
-        // Signed out: Read local storage safely
+        // Signed out: check if any items need product info backfill
         try {
-          const localStr = localStorage.getItem('winsor_cart');
-          let localItems: CartItem[] = [];
-          if (localStr) {
-            try {
-              localItems = JSON.parse(localStr);
-            } catch (e) {
-              console.warn('Failed to parse local guest cart JSON:', e);
-            }
-          }
-          
-          if (localItems.length > 0) {
-            // Populate products info for display
+          const localItems = readStoredCart();
+          const missingProduct = localItems.some(item => !item.product);
+          if (missingProduct && localItems.length > 0) {
             const res = await fetch('/api/products');
-            let data: any = { success: false };
-            try {
-              if (res.ok && res.headers.get('content-type')?.includes('application/json')) {
-                data = await res.json();
+            if (res.ok && res.headers.get('content-type')?.includes('application/json')) {
+              const data = await res.json();
+              if (data.success && Array.isArray(data.data)) {
+                const allProducts: IProduct[] = data.data;
+                const populated = localItems.map(item => {
+                  if (item.product) return item;
+                  const prod = allProducts.find(p => p._id === item.productId);
+                  return prod ? { ...item, product: sanitizeProductSnapshot(prod) } : item;
+                });
+                if (isMounted) {
+                  setCartItems(populated);
+                  writeStoredCart(populated);
+                }
               }
-            } catch (e) {
-              console.warn('Failed to parse products JSON:', e);
             }
-
-            if (data.success && data.data) {
-              const allProducts: IProduct[] = data.data;
-              const populated = localItems.map(item => {
-                const prod = allProducts.find(p => p._id === item.productId);
-                return { ...item, product: prod };
-              });
-              setCartItems(populated);
-            } else {
-              setCartItems(localItems);
-            }
-          } else {
-            setCartItems([]);
           }
         } catch (err) {
-          console.warn('Failed to load local cart:', err);
+          console.warn('Failed to load local cart products:', err);
         }
       }
-      setLoading(false);
+
+      if (isMounted) {
+        setLoading(false);
+      }
     };
 
     loadAndSync();
-  }, [isSignedIn, isLoaded]);
 
-  // Save changes helper
-  const saveCart = async (newItems: CartItem[]) => {
-    setCartItems(newItems);
-    if (isSignedIn) {
-      try {
-        await fetch('/api/customer/cart', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ items: mapToDbPayload(newItems) }),
-        });
-      } catch (err) {
-        console.warn('Failed to save cart to server:', err);
-      }
-    } else {
-      localStorage.setItem('winsor_cart', JSON.stringify(newItems.map(item => ({
-        productId: item.productId,
-        quantity: item.quantity,
-        colorVariant: item.colorVariant,
-      }))));
-    }
-  };
+    return () => {
+      isMounted = false;
+    };
+  }, [isSignedIn, isLoaded]);
 
   const addToCart = async (productId: string, quantity: number, colorVariant?: string, product?: IProduct) => {
     let resolvedProduct = product;
 
-    // Fetch product if not passed in parameters (e.g. guest or general listing triggers)
+    // Fetch product if not passed in parameters (e.g. general listing triggers)
     if (!resolvedProduct) {
       try {
         const res = await fetch(`/api/products/${productId}`);
@@ -230,7 +313,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
       const maxStock = variant.qty;
       const currentInCart = cartItems.find(
-        item => item.productId === productId && item.colorVariant === colorVariant
+        item => item.productId === productId && (item.colorVariant || '') === (colorVariant || '')
       )?.quantity || 0;
 
       if (currentInCart + quantity > maxStock) {
@@ -240,23 +323,35 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
 
     const existingIdx = cartItems.findIndex(
-      item => item.productId === productId && item.colorVariant === colorVariant
+      item => item.productId === productId && (item.colorVariant || '') === (colorVariant || '')
     );
 
     let updated: CartItem[];
     if (existingIdx > -1) {
       updated = [...cartItems];
-      updated[existingIdx].quantity += quantity;
-      if (!updated[existingIdx].product && resolvedProduct) {
-        updated[existingIdx].product = resolvedProduct;
-      }
+      updated[existingIdx] = {
+        ...updated[existingIdx],
+        quantity: updated[existingIdx].quantity + quantity,
+        product: updated[existingIdx].product || sanitizeProductSnapshot(resolvedProduct),
+      };
     } else {
-      updated = [...cartItems, { productId, quantity, colorVariant, product: resolvedProduct }];
+      updated = [
+        ...cartItems,
+        {
+          productId,
+          quantity,
+          colorVariant: colorVariant || '',
+          product: sanitizeProductSnapshot(resolvedProduct),
+        },
+      ];
     }
 
-    // Show custom toast notification
-    const watchName = product?.title || 'Timepiece';
-    const watchImg = product?.thumbnail?.url || '/graduation_gift.png';
+    // 1. Immediately persist synchronously (0ms) - ensures localStorage & state are written BEFORE any user navigation
+    persistCart(updated);
+
+    // 2. Show custom toast notification with Next.js Link
+    const watchName = resolvedProduct?.title || 'Timepiece';
+    const watchImg = resolvedProduct?.thumbnail?.url || '/graduation_gift.png';
     const variantText = colorVariant ? ` (${colorVariant})` : '';
 
     toast.custom(
@@ -300,9 +395,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
             </h4>
           </div>
 
-          {/* Action button */}
-          <a
+          {/* Action button - Next.js Link for instant SPA navigation */}
+          <Link
             href="/cart"
+            onClick={() => toast.dismiss(t.id)}
             style={{
               padding: '6px 14px',
               background: '#8B6914',
@@ -314,10 +410,11 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
               textDecoration: 'none',
               borderRadius: '4px',
               transition: 'background 0.2s ease',
+              display: 'inline-block',
             }}
           >
             Cart
-          </a>
+          </Link>
 
           {/* Durative progress bar */}
           <div 
@@ -352,22 +449,20 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       ),
       { duration: 4000 }
     );
-
-    await saveCart(updated);
   };
 
-  const removeFromCart = async (productId: string, colorVariant?: string) => {
+  const removeFromCart = (productId: string, colorVariant?: string) => {
     const updated = cartItems.filter(
-      item => !(item.productId === productId && item.colorVariant === colorVariant)
+      item => !(item.productId === productId && (item.colorVariant || '') === (colorVariant || ''))
     );
-    await saveCart(updated);
+    persistCart(updated);
   };
 
-  const updateQuantity = async (productId: string, quantity: number, colorVariant?: string) => {
+  const updateQuantity = (productId: string, quantity: number, colorVariant?: string) => {
     if (quantity < 1) return;
 
     // Validate inventory stock limits
-    const item = cartItems.find(i => i.productId === productId && i.colorVariant === colorVariant);
+    const item = cartItems.find(i => i.productId === productId && (i.colorVariant || '') === (colorVariant || ''));
     if (item && item.product && item.product.colorVariants) {
       let variant = item.product.colorVariants[0];
       if (colorVariant) {
@@ -375,23 +470,34 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         if (found) variant = found;
       }
 
-      if (quantity > variant.qty) {
+      if (variant && quantity > variant.qty) {
         toast.error(`Sorry, only ${variant.qty} item(s) available in stock for this timepiece.`);
         return;
       }
     }
 
     const updated = cartItems.map(item => {
-      if (item.productId === productId && item.colorVariant === colorVariant) {
+      if (item.productId === productId && (item.colorVariant || '') === (colorVariant || '')) {
         return { ...item, quantity };
       }
       return item;
     });
-    await saveCart(updated);
+    persistCart(updated);
   };
 
-  const clearCart = async () => {
-    await saveCart([]);
+  const clearCart = () => {
+    setCartItems([]);
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.removeItem(CART_STORAGE_KEY);
+        window.dispatchEvent(new CustomEvent('winsor_cart_updated', { detail: [] }));
+      } catch (err) {
+        console.warn('Failed to clear cart from localStorage:', err);
+      }
+    }
+    if (isSignedIn) {
+      syncToServer([]);
+    }
   };
 
   const totalItemsCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);

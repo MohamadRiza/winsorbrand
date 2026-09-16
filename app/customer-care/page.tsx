@@ -186,7 +186,7 @@ export default function CustomerCarePage() {
   }
 
   return (
-    <>
+    <main>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=Jost:wght@300;400;500;600;700&display=swap');
 
@@ -1425,6 +1425,6 @@ export default function CustomerCarePage() {
           )}
         </div>
       </div>
-    </>
+    </main>
   );
 }

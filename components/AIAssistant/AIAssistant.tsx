@@ -844,9 +844,9 @@ export default function AIAssistant() {
           }
           .ai-widget-trigger {
             right: 20px;
-            bottom: 24px;
-            width: 52px;
-            height: 52px;
+            bottom: max(16px, env(safe-area-inset-bottom));
+            width: 48px;
+            height: 48px;
           }
           .wn-concierge-dropup {
             right: 20px;
@@ -862,6 +862,8 @@ export default function AIAssistant() {
         className={`wn-concierge-dropup ${isMenuOpen && !isOpen ? 'open' : ''}`}
         role="dialog"
         aria-label="Winsor Concierge Options"
+        aria-hidden={!isMenuOpen || isOpen}
+        inert={!isMenuOpen || isOpen}
       >
         <div style={{
           padding: '6px 8px 6px',
@@ -1056,7 +1058,14 @@ export default function AIAssistant() {
       </button>
 
       {/* CHAT WINDOW */}
-      <div className={`ai-chat-window ${isOpen ? 'open' : ''}`}>
+      <div
+        className={`ai-chat-window ${isOpen ? 'open' : ''}`}
+        role="dialog"
+        aria-label="Winsi AI Concierge"
+        aria-modal={isOpen}
+        aria-hidden={!isOpen}
+        inert={!isOpen}
+      >
         
         {/* HEADER WITH WINSI ROUND DP */}
         <div className="ai-chat-header">

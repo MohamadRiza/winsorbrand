@@ -20,7 +20,7 @@ export async function GET(req: NextRequest) {
 
     const products = await Product
       .find(filter)
-      .select('title modelNo price thumbnail colorVariants stickerEnabled stickerText giftCategories showOnGiftHome')
+      .select('title modelNo price thumbnail colorVariants stickerEnabled stickerText giftCategories showOnGiftHome description specifications isSoldOut')
       .limit(limit)
       .sort({ createdAt: -1 })
       .lean();
