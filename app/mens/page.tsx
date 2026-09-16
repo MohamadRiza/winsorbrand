@@ -786,7 +786,12 @@ function MensCollectionContent() {
 
 export default function MensCollectionPage() {
   return (
-    <Suspense fallback={<div style={{ padding: '100px 0', textAlign: 'center' }}>Loading Men's Collection…</div>}>
+    <Suspense fallback={
+      <div style={{ padding: '100px 0', textAlign: 'center' }}>
+        <h1 className="sr-only">Men&apos;s Collection</h1>
+        Loading Men&apos;s Collection…
+      </div>
+    }>
       <MensCollectionContent />
     </Suspense>
   );

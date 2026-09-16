@@ -904,7 +904,7 @@ export default function CollectionsSection() {
                   className="wn-cat-card"
                 >
                   {/* Watch Image Area */}
-                  <div style={{
+                  <span style={{
                     width: '100%',
                     height: isMobile ? '62px' : '120px',
                     display: 'flex',
@@ -927,10 +927,10 @@ export default function CollectionsSection() {
                       }}
                       className="wn-cat-img"
                     />
-                  </div>
+                  </span>
 
                   {/* Card Titles Inside at Bottom */}
-                  <div style={{
+                  <span style={{
                     marginTop: isMobile ? '4px' : '10px',
                     textAlign: 'center',
                     width: '100%',
@@ -964,7 +964,7 @@ export default function CollectionsSection() {
                     }}>
                       {cat.subLabel}
                     </span>
-                  </div>
+                  </span>
                 </button>
               );
             })}

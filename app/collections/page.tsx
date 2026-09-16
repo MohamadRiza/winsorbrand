@@ -1901,6 +1901,7 @@ export default function CollectionsPage() {
                 value={selectedGift}
                 onChange={e => setSelectedGift(e.target.value)}
                 className="toolbar-select"
+                aria-label="Filter by gift occasion"
               >
                 <option value="all">All Occasions</option>
                 {giftCategories.map(cat => (
@@ -1916,8 +1917,9 @@ export default function CollectionsPage() {
               value={selectedGender}
               onChange={e => setSelectedGender(e.target.value as any)}
               className="toolbar-select"
+              aria-label="Filter by gender"
             >
-              <option value="all">All Watches (Men & Women)</option>
+              <option value="all">All Watches (Men &amp; Women)</option>
               <option value="gents">👨 Gents / Men's Watches</option>
               <option value="ladies">👩 Ladies / Women's Watches</option>
             </select>
@@ -1927,6 +1929,7 @@ export default function CollectionsPage() {
               value={priceSort}
               onChange={e => setPriceSort(e.target.value as any)}
               className="toolbar-select"
+              aria-label="Sort by price"
             >
               <option value="none">Sort By: Featured</option>
               <option value="low-to-high">Price: Low to High</option>
@@ -2140,7 +2143,7 @@ export default function CollectionsPage() {
           {/* NEWSLETTER BANNER — SUBSCRIBE FOR UPDATES */}
           <div className="newsletter-banner shadow-2xl">
             <div className="newsletter-image-block">
-              <img src="/collections_pg.webp" alt="Winsor Maison Timepiece Collection" />
+              <Image src="/collections_pg.webp" alt="Winsor Maison Timepiece Collection" width={600} height={400} className="w-full h-full object-cover" />
               <div className="newsletter-image-overlay" />
               <div className="newsletter-image-badge">
                 <span className="badge-gold-dot" />

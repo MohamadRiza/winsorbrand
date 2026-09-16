@@ -487,6 +487,7 @@ export default function Navbar() {
             <div className="wn-actions-gap" style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '18px', flex: 1, justifyContent: 'flex-end' }}>
               {/* Currency - Desktop */}
               <button className="wn-desk-only wn-a" onMouseEnter={() => { cancelClose(); openCurrency(); }}
+                aria-label={`Select currency, currently ${selected.code}`}
                 style={{ display: 'flex', alignItems: 'center', gap: '5px', color: tca, fontFamily: "'Jost',sans-serif", fontSize: '11px', letterSpacing: '0.08em', background: 'none', border: 'none', cursor: 'pointer', transition: 'color 0.2s ease' }}>
                 <GlobeIcon /><CountryFlag iso={selected.iso} width={16} height={11} /><span>{selected.code}</span><ChevronDn />
               </button>
@@ -523,7 +524,7 @@ export default function Navbar() {
                     }}
                   />
                 )}
-                <button className="wn-ib" style={ibS} onClick={() => setSearchOpen(v => !v)}>
+                <button className="wn-ib" style={ibS} onClick={() => setSearchOpen(v => !v)} aria-label={searchOpen ? "Close search" : "Search timepieces"}>
                   <SearchIcon />
                 </button>
                 {/* Search Dropdown */}
@@ -646,15 +647,15 @@ export default function Navbar() {
                   </UserButton>
                 </div>
               )}
-              <Link href="/cart" style={{ position: 'relative', color: tc, display: 'flex' }} className="wn-ib">
+              <Link href="/cart" style={{ position: 'relative', color: tc, display: 'flex' }} className="wn-ib" aria-label={`Shopping bag, ${totalItemsCount} item${totalItemsCount !== 1 ? 's' : ''}`}>
                 <BagIcon />
-                <span style={{ position: 'absolute', top: '-3px', right: '-5px', width: '14px', height: '14px', borderRadius: '50%', background: '#8B6914', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '8px', fontFamily: "'Jost',sans-serif" }}>
+                <span style={{ position: 'absolute', top: '-3px', right: '-5px', width: '14px', height: '14px', borderRadius: '50%', background: '#8B6914', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '8px', fontFamily: "'Jost',sans-serif" }} aria-hidden="true">
                   {totalItemsCount > 9 ? '9+' : totalItemsCount}
                 </span>
               </Link>
 
               {/* Mobile Menu Toggle */}
-              <button className="wn-mob-only wn-ib" style={{ ...ibS, padding: '6px' }} onClick={() => setMobileOpen(v => !v)}>
+              <button className="wn-mob-only wn-ib" style={{ ...ibS, padding: '6px' }} onClick={() => setMobileOpen(v => !v)} aria-label={mobileOpen ? "Close navigation menu" : "Open navigation menu"} aria-expanded={mobileOpen}>
                 {mobileOpen ? <CloseIcon /> : <MenuIcon />}
               </button>
             </div>

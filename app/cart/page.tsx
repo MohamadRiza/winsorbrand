@@ -592,9 +592,10 @@ export default function CartPage() {
   if (cartLoading || !userLoaded) {
     return (
       <div style={{ minHeight: '80vh', background: '#faf7f0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Jost', sans-serif" }}>
+        <h1 className="sr-only">Shopping Bag</h1>
         <div style={{ textAlign: 'center' }}>
           <div className="shimmer-circle" style={{ width: '48px', height: '48px', borderRadius: '50%', border: '3px solid rgba(139,105,20,0.1)', borderTopColor: '#8B6914', animation: 'spin 1s linear infinite', margin: '0 auto 16px' }} />
-          <p style={{ color: 'rgba(26,18,9,0.5)', fontSize: '13px', letterSpacing: '0.05em' }}>Loading Shopping Bag...</p>
+          <p style={{ color: 'rgba(26,18,9,0.8)', fontSize: '13px', letterSpacing: '0.05em' }}>Loading Shopping Bag...</p>
         </div>
         <style>{`
           @keyframes spin {

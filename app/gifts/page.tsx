@@ -1343,6 +1343,7 @@ export default function GiftsPage() {
                   value={selectedCategorySlug}
                   onChange={e => setSelectedCategorySlug(e.target.value)}
                   className="toolbar-select"
+                  aria-label="Filter by gift occasion"
                 >
                   <option value="all">All Occasions</option>
                   {giftCategories.map(cat => (
@@ -1358,6 +1359,7 @@ export default function GiftsPage() {
                 value={priceSort}
                 onChange={e => setPriceSort(e.target.value as any)}
                 className="toolbar-select"
+                aria-label="Sort by price"
               >
                 <option value="none">Sort By: Featured</option>
                 <option value="low-to-high">Price: Low to High</option>

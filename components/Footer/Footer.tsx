@@ -128,7 +128,7 @@ function CurrencySelectorCompact() {
         }}
         onMouseEnter={(e) => e.currentTarget.style.borderColor = '#8B6914'}
         onMouseLeave={(e) => e.currentTarget.style.borderColor = 'rgba(139,105,20,0.3)'}
-        aria-label="Select currency"
+        aria-label={`Select currency, currently ${selected.code}`}
         aria-expanded={isOpen}
       >
         <GlobeIcon />

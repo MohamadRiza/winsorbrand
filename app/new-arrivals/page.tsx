@@ -781,7 +781,11 @@ function NewArrivalsContent() {
 
 export default function NewArrivalsPage() {
   return (
-    <Suspense fallback={<div style={{ minHeight: '100vh', background: '#faf7f0' }} />}>
+    <Suspense fallback={
+      <div style={{ minHeight: '100vh', background: '#faf7f0' }}>
+        <h1 className="sr-only">New Arrivals Collection</h1>
+      </div>
+    }>
       <NewArrivalsContent />
     </Suspense>
   );

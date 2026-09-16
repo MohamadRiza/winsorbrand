@@ -440,7 +440,7 @@ export default function CareersPage() {
             </h2>
             <div className="w-12 h-0.5 bg-[#8B6914] mx-auto mt-2" />
             <p className="text-xs sm:text-sm text-[#1a1209]/60 font-light leading-relaxed" style={{ fontFamily: "'Jost', sans-serif" }}>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+              At WINSOR, we are committed to building genuine recognition — driven by craftsmanship, retail integrity, and the loyalty of our collectors across Sri Lanka.
             </p>
           </div>
 
@@ -450,7 +450,7 @@ export default function CareersPage() {
             <div className="group bg-white border border-[#1a1209]/10 rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl hover:border-[#8B6914]/40 transition-all duration-300 flex flex-col">
               <div
                 role="img"
-                aria-label="Award Image Placeholder — Lorem Ipsum"
+                aria-label="Winsor Brand Excellence Award Placeholder"
                 className="relative h-56 w-full bg-[#16120c] border-b border-[#8B6914]/20 flex flex-col items-center justify-center p-6 text-center select-none"
               >
                 <div className="w-12 h-12 rounded-full bg-[#8B6914]/15 border border-[#8B6914]/30 flex items-center justify-center mb-2 text-[#8B6914]">
@@ -471,10 +471,10 @@ export default function CareersPage() {
               <div className="p-6 lg:p-7 space-y-3 flex-1 flex flex-col justify-between">
                 <div>
                   <h3 className="text-xl font-bold text-[#1a1209] leading-snug" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
-                    Lorem Ipsum Horology Accolade
+                    Brand Excellence Recognition
                   </h3>
                   <p className="text-xs text-[#1a1209]/70 font-light leading-relaxed mt-2" style={{ fontFamily: "'Jost', sans-serif" }}>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio. Praesent libero. Sed cursus ante dapibus diam.
+                    Pursuing recognition for WINSOR&apos;s commitment to genuine craftsmanship, fixed retail integrity, and outstanding after-sales service across Sri Lanka.
                   </p>
                 </div>
               </div>
@@ -484,7 +484,7 @@ export default function CareersPage() {
             <div className="group bg-white border border-[#1a1209]/10 rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl hover:border-[#8B6914]/40 transition-all duration-300 flex flex-col">
               <div
                 role="img"
-                aria-label="Award Image Placeholder — Lorem Ipsum"
+                aria-label="Winsor Consumer Trust Award Placeholder"
                 className="relative h-56 w-full bg-[#16120c] border-b border-[#8B6914]/20 flex flex-col items-center justify-center p-6 text-center select-none"
               >
                 <div className="w-12 h-12 rounded-full bg-[#8B6914]/15 border border-[#8B6914]/30 flex items-center justify-center mb-2 text-[#8B6914]">
@@ -505,10 +505,10 @@ export default function CareersPage() {
               <div className="p-6 lg:p-7 space-y-3 flex-1 flex flex-col justify-between">
                 <div>
                   <h3 className="text-xl font-bold text-[#1a1209] leading-snug" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
-                    Lorem Ipsum Retail Distinction
+                    Retail Quality Distinction
                   </h3>
                   <p className="text-xs text-[#1a1209]/70 font-light leading-relaxed mt-2" style={{ fontFamily: "'Jost', sans-serif" }}>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum.
+                    Building a record of consumer trust through nationwide fixed MRP, transparent warranty terms, and a growing base of loyal repeat collectors.
                   </p>
                 </div>
               </div>
@@ -518,7 +518,7 @@ export default function CareersPage() {
             <div className="group bg-white border border-[#1a1209]/10 rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl hover:border-[#8B6914]/40 transition-all duration-300 flex flex-col">
               <div
                 role="img"
-                aria-label="Award Image Placeholder — Lorem Ipsum"
+                aria-label="Winsor Boutique Excellence Award Placeholder"
                 className="relative h-56 w-full bg-[#16120c] border-b border-[#8B6914]/20 flex flex-col items-center justify-center p-6 text-center select-none"
               >
                 <div className="w-12 h-12 rounded-full bg-[#8B6914]/15 border border-[#8B6914]/30 flex items-center justify-center mb-2 text-[#8B6914]">
@@ -539,10 +539,10 @@ export default function CareersPage() {
               <div className="p-6 lg:p-7 space-y-3 flex-1 flex flex-col justify-between">
                 <div>
                   <h3 className="text-xl font-bold text-[#1a1209] leading-snug" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
-                    Lorem Ipsum Workplace Accolade
+                    Boutique Excellence Recognition
                   </h3>
                   <p className="text-xs text-[#1a1209]/70 font-light leading-relaxed mt-2" style={{ fontFamily: "'Jost', sans-serif" }}>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia.
+                    Recognized by retail partners across Sri Lanka for premium presentation, consistent stock standards, and professional marketing collaboration programs.
                   </p>
                 </div>
               </div>

@@ -944,7 +944,7 @@ export default function AIAssistant() {
             setIsOpen(true);
           }}
         >
-          <div style={{
+          <span style={{
             position: 'relative',
             width: '38px',
             height: '38px',
@@ -953,6 +953,7 @@ export default function AIAssistant() {
             overflow: 'hidden',
             flexShrink: 0,
             boxShadow: '0 4px 12px rgba(139, 105, 20, 0.25)',
+            display: 'inline-flex',
           }}>
             <Image
               src="/winsi_dp.jpg"
@@ -961,7 +962,7 @@ export default function AIAssistant() {
               sizes="38px"
               style={{ objectFit: 'cover' }}
             />
-            <div style={{
+            <span style={{
               position: 'absolute',
               bottom: '0px',
               right: '0px',
@@ -971,8 +972,8 @@ export default function AIAssistant() {
               background: '#10b981',
               border: '1.5px solid #1a1209',
             }} />
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
+          </span>
+          <span style={{ display: 'flex', flexDirection: 'column' }}>
             <span style={{
               fontFamily: "'Jost', sans-serif",
               fontSize: '13px',
@@ -990,7 +991,7 @@ export default function AIAssistant() {
             }}>
               Instant horology guidance
             </span>
-          </div>
+          </span>
         </button>
       </div>
 

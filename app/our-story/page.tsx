@@ -32,7 +32,7 @@ const TIMELINE = [
     year: "2025",
     badge: "HONORS",
     title: "Brand Milestones & Accolades",
-    text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+    text: "WINSOR achieved recognition across the Sri Lankan retail landscape, earning praise for consistent quality, punctual delivery standards, and a growing network of satisfied collectors across the island.",
   },
   {
     year: "2026",
@@ -59,34 +59,34 @@ const AWARDS = [
   {
     id: "1",
     year: "2026",
-    title: "Lorem Ipsum Horology Accolade",
-    category: "Lorem Ipsum Accolade",
-    desc: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.",
-    altText: "Award Image Placeholder — Lorem Ipsum",
+    title: "Award Pending Recognition",
+    category: "Brand Excellence",
+    desc: "Our team continues to pursue official industry recognition for WINSOR's commitment to genuine craftsmanship, fixed retail integrity, and outstanding after-sales care across Sri Lanka.",
+    altText: "Winsor Brand Excellence Award Placeholder",
   },
   {
     id: "2",
     year: "2025",
-    title: "Lorem Ipsum Watchmaker Accolade",
-    category: "Lorem Ipsum Accolade",
-    desc: "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident.",
-    altText: "Award Image Placeholder — Lorem Ipsum",
+    title: "Retail Quality Distinction",
+    category: "Consumer Trust Award",
+    desc: "WINSOR is proud to be building a record of consumer trust, backed by a nationwide fixed MRP policy, transparent warranty terms, and a growing base of loyal repeat collectors.",
+    altText: "Winsor Consumer Trust Award Placeholder",
   },
   {
     id: "3",
     year: "2025",
-    title: "Lorem Ipsum Boutique Accolade",
-    category: "Lorem Ipsum Accolade",
-    desc: "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo.",
-    altText: "Award Image Placeholder — Lorem Ipsum",
+    title: "Boutique Excellence Recognition",
+    category: "Retail Network Award",
+    desc: "Recognized by retail partners across Sri Lanka for WINSOR's dedication to premium presentation, consistent stock standards, and professional marketing collaboration programs.",
+    altText: "Winsor Boutique Excellence Award Placeholder",
   },
   {
     id: "4",
     year: "2023",
-    title: "Lorem Ipsum Heritage Accolade",
-    category: "Lorem Ipsum Accolade",
-    desc: "Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt.",
-    altText: "Award Image Placeholder — Lorem Ipsum",
+    title: "Brand Launch Achievement",
+    category: "Heritage Foundation",
+    desc: "From the moment of Dubai registration in 2023, WINSOR set out to bridge the gap between affordable watches and true luxury — a mission recognized by early retail partners and collectors alike.",
+    altText: "Winsor Brand Launch Achievement Placeholder",
   },
 ];
 
@@ -404,7 +404,7 @@ export default function OurStoryPage() {
               Recognized Industry Distinction
             </h2>
             <p className="font-serif italic text-xs sm:text-sm text-[#1a1209]/70 max-w-lg mx-auto">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+              At WINSOR, every milestone is a reflection of our commitment to craftsmanship, integrity, and the trust placed in us by our collectors and retail partners across Sri Lanka.
             </p>
           </div>
 

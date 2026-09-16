@@ -123,13 +123,12 @@ export default function VideoPlayer({ src = "/winsor_video.webm" }: VideoPlayerP
     >
       <video
         ref={videoRef}
-        src={src}
         loop
         playsInline
         muted
         preload="metadata"
         className="w-full h-full object-cover"
-        aria-label="Winsor Horology Craftsmanship Film"
+        title="Winsor Horology Craftsmanship Film"
       >
         <source src={src} type="video/webm" />
       </video>
