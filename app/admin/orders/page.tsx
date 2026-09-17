@@ -114,15 +114,18 @@ export default function AdminOrdersPage() {
         const query = searchQuery.toLowerCase();
         const matchesRef = order.orderRef.toLowerCase().includes(query);
         const matchesClerk = (order.clerkId ?? '').toLowerCase().includes(query);
-        const matchesGuest = (order.guestName ?? '').toLowerCase().includes(query) || (order.guestEmail ?? '').toLowerCase().includes(query);
+        const matchesGuest = (order.guestName ?? '').toLowerCase().includes(query) || (order.guestEmail ?? '').toLowerCase().includes(query) || (order.guestMobile ?? '').toLowerCase().includes(query);
+        const matchesCustomer = (order.customerName ?? '').toLowerCase().includes(query) || (order.customerEmail ?? '').toLowerCase().includes(query) || (order.customerMobile ?? '').toLowerCase().includes(query);
         const matchesCity = order.shippingAddress?.city?.toLowerCase().includes(query);
+        const matchesAddress = order.shippingAddress?.address?.toLowerCase().includes(query);
+        const matchesPostal = order.shippingAddress?.postalCode?.toLowerCase().includes(query);
         const matchesMobile = order.shippingAddress?.mobile?.toLowerCase().includes(query);
         const matchesItems = order.items.some(item => 
           item.productTitle.toLowerCase().includes(query) ||
           item.productModelNo.toLowerCase().includes(query)
         );
 
-        return matchesRef || matchesClerk || matchesGuest || matchesCity || matchesMobile || matchesItems;
+        return matchesRef || matchesClerk || matchesGuest || matchesCustomer || matchesCity || matchesAddress || matchesPostal || matchesMobile || matchesItems;
       }
 
       return true;
@@ -257,7 +260,7 @@ export default function AdminOrdersPage() {
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search by Order Ref (e.g. WS-894210), Customer ID, City, Phone, or Timepiece title..."
+            placeholder="Search by Order Ref, Customer Name, Email, Phone, City, or Timepiece title..."
             className="w-full pl-10 pr-4 py-2.5 bg-[#fbf9f4] border border-[#1a1209]/15 rounded-lg text-[#1a1209] placeholder-[#1a1209]/40 focus:outline-none focus:border-[#8B6914] focus:ring-2 focus:ring-[#8B6914]/20 transition text-sm font-['Jost']"
           />
         </div>
@@ -326,12 +329,31 @@ export default function AdminOrdersPage() {
                             </span>
                           )}
                         </div>
-                        <span className="text-xs text-[#1a1209]/50 mt-0.5 truncate font-mono">
-                          {order.isGuestOrder
-                            ? `Guest: ${(order.guestName || 'Unknown').slice(0, 14)}`
-                            : `ID: ${(order.clerkId ?? '').slice(0, 14)}...`
-                          }
-                        </span>
+                        {/* Customer Full Name & Type Badge */}
+                        <div className="flex items-center gap-1.5 mt-1">
+                          <span className="font-semibold text-xs text-[#1a1209] truncate max-w-[170px]" title={order.customerName || order.guestName || 'Client'}>
+                            {order.customerName || order.guestName || (order.isGuestOrder ? 'Guest Customer' : 'Registered Patron')}
+                          </span>
+                          {order.isGuestOrder ? (
+                            <span className="px-1.5 py-0.5 rounded text-[9px] font-extrabold bg-amber-50 text-amber-800 border border-amber-200 uppercase tracking-wider">
+                              Guest
+                            </span>
+                          ) : (
+                            <span className="px-1.5 py-0.5 rounded text-[9px] font-extrabold bg-emerald-50 text-emerald-800 border border-emerald-200 uppercase tracking-wider">
+                              Patron
+                            </span>
+                          )}
+                        </div>
+                        {/* Customer Email Address */}
+                        {(order.customerEmail || order.guestEmail) ? (
+                          <span className="text-[11px] text-[#8B6914] font-medium mt-0.5 truncate max-w-[200px]" title={order.customerEmail || order.guestEmail || ''}>
+                            {order.customerEmail || order.guestEmail}
+                          </span>
+                        ) : order.clerkId ? (
+                          <span className="text-[10.5px] text-[#1a1209]/40 mt-0.5 truncate font-mono">
+                            ID: {order.clerkId.slice(0, 14)}...
+                          </span>
+                        ) : null}
                       </div>
                     </td>
                     <td className="px-6 py-4 text-xs font-medium text-[#1a1209]/80 font-mono">
@@ -582,6 +604,116 @@ export default function AdminOrdersPage() {
                 </div>
               )}
 
+              {/* ── Customer & Contact Information ───────────────────────── */}
+              {selectedOrder && (
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="text-xs font-semibold text-[#1a1209]/70 uppercase tracking-wider">
+                      Customer Information
+                    </h3>
+                    <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${
+                      selectedOrder.isGuestOrder 
+                        ? 'bg-amber-50 text-amber-800 border-amber-300' 
+                        : 'bg-emerald-50 text-emerald-800 border-emerald-300'
+                    }`}>
+                      {selectedOrder.isGuestOrder ? 'Guest Customer' : 'Registered Patron'}
+                    </span>
+                  </div>
+
+                  <div className="bg-[#fbf9f4] border border-[#1a1209]/10 rounded-2xl p-4 text-xs space-y-3 font-['Jost'] shadow-sm">
+                    {/* Full Name */}
+                    <div className="flex justify-between items-center border-b border-[#1a1209]/5 pb-2.5">
+                      <span className="text-[#1a1209]/60 font-medium flex items-center gap-1.5">
+                        <svg className="w-4 h-4 text-[#8B6914]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                        Full Name
+                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-[#1a1209] font-bold text-sm">
+                          {selectedOrder.customerName || selectedOrder.guestName || (selectedOrder.isGuestOrder ? 'Guest Customer' : 'Registered Patron')}
+                        </span>
+                        {(selectedOrder.customerName || selectedOrder.guestName) && (
+                          <button
+                            onClick={() => copyToClipboard(selectedOrder.customerName || selectedOrder.guestName || '', 'Customer Name')}
+                            className="text-[#8B6914] hover:text-[#1a1209] text-[11px] font-semibold transition cursor-pointer p-0.5"
+                            title="Copy Name"
+                          >
+                            Copy
+                          </button>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Email Address */}
+                    <div className="flex justify-between items-center border-b border-[#1a1209]/5 pb-2.5">
+                      <span className="text-[#1a1209]/60 font-medium flex items-center gap-1.5">
+                        <svg className="w-4 h-4 text-[#8B6914]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                        Email Address
+                      </span>
+                      <div className="flex items-center gap-2">
+                        {selectedOrder.customerEmail || selectedOrder.guestEmail ? (
+                          <a 
+                            href={`mailto:${selectedOrder.customerEmail || selectedOrder.guestEmail}`}
+                            className="text-[#8B6914] hover:underline font-semibold font-mono text-xs"
+                          >
+                            {selectedOrder.customerEmail || selectedOrder.guestEmail}
+                          </a>
+                        ) : (
+                          <span className="text-[#1a1209]/40 font-mono text-xs">N/A</span>
+                        )}
+                        {(selectedOrder.customerEmail || selectedOrder.guestEmail) && (
+                          <button
+                            onClick={() => copyToClipboard(selectedOrder.customerEmail || selectedOrder.guestEmail || '', 'Email Address')}
+                            className="text-[#8B6914] hover:text-[#1a1209] text-[11px] font-semibold transition cursor-pointer p-0.5"
+                            title="Copy Email"
+                          >
+                            Copy
+                          </button>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Primary Mobile */}
+                    <div className="flex justify-between items-center border-b border-[#1a1209]/5 pb-2.5">
+                      <span className="text-[#1a1209]/60 font-medium flex items-center gap-1.5">
+                        <svg className="w-4 h-4 text-[#8B6914]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                        </svg>
+                        Mobile Contact
+                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-[#1a1209] font-mono font-bold text-xs">
+                          {selectedOrder.customerMobile || selectedOrder.guestMobile || (selectedOrder.shippingAddress ? `${selectedOrder.shippingAddress.mobileCode} ${selectedOrder.shippingAddress.mobile}` : 'N/A')}
+                        </span>
+                        <button
+                          onClick={() => copyToClipboard(selectedOrder.customerMobile || selectedOrder.guestMobile || `${selectedOrder.shippingAddress?.mobileCode} ${selectedOrder.shippingAddress?.mobile}`, 'Mobile Number')}
+                          className="text-[#8B6914] hover:text-[#1a1209] text-[11px] font-semibold transition cursor-pointer p-0.5"
+                          title="Copy Phone"
+                        >
+                          Copy
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Account / Patron Status */}
+                    <div className="flex justify-between items-center pt-0.5">
+                      <span className="text-[#1a1209]/60 font-medium flex items-center gap-1.5">
+                        <svg className="w-4 h-4 text-[#8B6914]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                        </svg>
+                        Account Type
+                      </span>
+                      <span className="font-mono text-[11px] text-[#1a1209]/80 bg-white px-2 py-0.5 rounded border border-[#1a1209]/10">
+                        {selectedOrder.isGuestOrder ? 'Guest Checkout (No Account)' : (selectedOrder.clerkId || 'Registered Patron')}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Timepiece Items Purchased */}
               <div>
                 <h3 className="text-xs font-semibold text-[#1a1209]/70 uppercase tracking-wider mb-3">
@@ -786,8 +918,18 @@ export default function AdminOrdersPage() {
 
               {/* Shipping Address */}
               <div>
-                <h3 className="text-xs font-semibold text-[#1a1209]/70 uppercase tracking-wider mb-3">Shipping Address</h3>
+                <h3 className="text-xs font-semibold text-[#1a1209]/70 uppercase tracking-wider mb-3">Shipping & Delivery Details</h3>
                 <div className="bg-[#fbf9f4] border border-[#1a1209]/10 rounded-2xl p-4 text-xs space-y-3 font-['Jost']">
+                  <div className="flex justify-between border-b border-[#1a1209]/5 pb-2">
+                    <span className="text-[#1a1209]/60 font-medium">Recipient Name</span>
+                    <span className="text-[#1a1209] font-bold text-right">{selectedOrder?.customerName || selectedOrder?.guestName || 'Valued Client'}</span>
+                  </div>
+                  {(selectedOrder?.customerEmail || selectedOrder?.guestEmail) && (
+                    <div className="flex justify-between border-b border-[#1a1209]/5 pb-2">
+                      <span className="text-[#1a1209]/60 font-medium">Contact Email</span>
+                      <span className="text-[#8B6914] font-mono font-medium text-right">{selectedOrder?.customerEmail || selectedOrder?.guestEmail}</span>
+                    </div>
+                  )}
                   <div className="flex justify-between border-b border-[#1a1209]/5 pb-2">
                     <span className="text-[#1a1209]/60 font-medium">Street Address</span>
                     <span className="text-[#1a1209] font-semibold text-right max-w-[220px]">{selectedOrder?.shippingAddress?.address}</span>

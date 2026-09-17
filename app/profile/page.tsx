@@ -79,7 +79,7 @@ export default function ProfilePage() {
   const { openUserProfile, signOut } = useClerk();
 
   // Tab State
-  const [activeTab, setActiveTab] = useState<'profile-details' | 'dashboard' | 'orders' | 'wishlist' | 'addresses' | 'security' | 'notifications' | 'payment-methods' | 'reviews'>('profile-details');
+  const [activeTab, setActiveTab] = useState<'profile-details' | 'dashboard' | 'orders' | 'wishlist' | 'addresses' | 'security' | 'notifications' | 'reviews'>('profile-details');
 
   // Reviews States
   const [pendingReviews, setPendingReviews] = useState<any[]>([]);
@@ -103,6 +103,10 @@ export default function ProfilePage() {
   const [wishlistCount, setWishlistCount] = useState(0);
   const [wishlistIds, setWishlistIds] = useState<string[]>([]);
   const [allProducts, setAllProducts] = useState<any[]>([]);
+
+  // Orders Filter & Search States
+  const [orderFilter, setOrderFilter] = useState<'all' | 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled'>('all');
+  const [orderSearchQuery, setOrderSearchQuery] = useState('');
 
   // Form States
   const [fullName, setFullName] = useState('');
@@ -257,12 +261,12 @@ export default function ProfilePage() {
 
   // Fetch Mongo Profile & Orders
   useEffect(() => {
-    if (!isSignedIn) return;
+    if (!isSignedIn || !user) return;
 
     const fetchProfile = async () => {
       setLoading(true);
       try {
-        const res = await fetch('/api/customer/profile');
+        const res = await fetch(`/api/customer/profile?clerkId=${user.id}&email=${encodeURIComponent(user.primaryEmailAddress?.emailAddress || '')}`);
         let data: any = { success: false };
         try {
           if (res.ok && res.headers.get('content-type')?.includes('application/json')) {
@@ -273,13 +277,15 @@ export default function ProfilePage() {
         }
 
         if (data.success && data.data) {
+          const rawMobile = data.data.mobile || '';
+          const cleanMobile = rawMobile.replace(/\D/g, '').replace(/^0+/, '').slice(0, 9);
           setFormData({
             mobileCode: data.data.mobileCode || '+94',
-            mobile: data.data.mobile || '',
+            mobile: cleanMobile,
             country: data.data.country || 'LK',
             address: data.data.address || '',
             city: data.data.city || '',
-            postalCode: data.data.postalCode || '',
+            postalCode: (data.data.postalCode || '').replace(/\D/g, '').slice(0, 10),
           });
         }
       } catch (err) {
@@ -291,7 +297,7 @@ export default function ProfilePage() {
 
     const fetchOrders = async () => {
       try {
-        const res = await fetch('/api/customer/orders');
+        const res = await fetch(`/api/customer/orders?clerkId=${user.id}`);
         if (res.ok) {
           const data = await res.json();
           if (data.success) {
@@ -305,7 +311,7 @@ export default function ProfilePage() {
 
     fetchProfile();
     fetchOrders();
-  }, [isSignedIn]);
+  }, [isSignedIn, user]);
 
   // Fetch All Products on mount
   useEffect(() => {
@@ -356,6 +362,28 @@ export default function ProfilePage() {
   // Form Inputs Handler
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
+    if (name === 'mobile') {
+      // Mobile Number: numbers only, skip leading '0' (start from 2nd digit), maximum 9 digits
+      const digitsOnly = value.replace(/\D/g, '').replace(/^0+/, '').slice(0, 9);
+      setFormData(prev => ({ ...prev, mobile: digitsOnly }));
+      return;
+    }
+    if (name === 'postalCode') {
+      // Postal Code: numbers only, maximum 10 digits
+      const digitsOnly = value.replace(/\D/g, '').slice(0, 10);
+      setFormData(prev => ({ ...prev, postalCode: digitsOnly }));
+      return;
+    }
+    if (name === 'address') {
+      // Home Address: maximum 200 characters
+      setFormData(prev => ({ ...prev, address: value.slice(0, 200) }));
+      return;
+    }
+    if (name === 'city') {
+      // City / Town: maximum 100 characters
+      setFormData(prev => ({ ...prev, city: value.slice(0, 100) }));
+      return;
+    }
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
@@ -375,10 +403,13 @@ export default function ProfilePage() {
       }
 
       // 2. Update Mongo Details
+      const cleanMobile = formData.mobile.replace(/\D/g, '').replace(/^0+/, '').slice(0, 9);
       const payload = {
+        clerkId: user.id,
         email: user.primaryEmailAddress?.emailAddress,
         profileImage: user.imageUrl,
         ...formData,
+        mobile: cleanMobile,
       };
 
       const res = await fetch('/api/customer/profile', {
@@ -436,6 +467,37 @@ export default function ProfilePage() {
     const s = (o.status || '').toLowerCase();
     return s === 'delivered';
   }).length;
+
+  // Orders Filter Counts & Filtered Orders
+  const orderCounts = {
+    all: orders.length,
+    pending: orders.filter(o => (o.status || '').toLowerCase() === 'pending').length,
+    processing: orders.filter(o => (o.status || '').toLowerCase() === 'processing').length,
+    shipped: orders.filter(o => (o.status || '').toLowerCase() === 'shipped').length,
+    delivered: orders.filter(o => (o.status || '').toLowerCase() === 'delivered').length,
+    cancelled: orders.filter(o => ['cancelled', 'cancel_requested'].includes((o.status || '').toLowerCase())).length,
+  };
+
+  const filteredOrders = orders.filter(o => {
+    const s = (o.status || '').toLowerCase();
+    if (orderFilter === 'pending' && s !== 'pending') return false;
+    if (orderFilter === 'processing' && s !== 'processing') return false;
+    if (orderFilter === 'shipped' && s !== 'shipped') return false;
+    if (orderFilter === 'delivered' && s !== 'delivered') return false;
+    if (orderFilter === 'cancelled' && !['cancelled', 'cancel_requested'].includes(s)) return false;
+
+    if (orderSearchQuery.trim()) {
+      const q = orderSearchQuery.toLowerCase().trim();
+      const matchRef = (o.orderRef || '').toLowerCase().includes(q);
+      const matchItem = Array.isArray(o.items) && o.items.some((item: any) =>
+        (item.productTitle || '').toLowerCase().includes(q) ||
+        (item.productModelNo || '').toLowerCase().includes(q) ||
+        (item.colorVariant || '').toLowerCase().includes(q)
+      );
+      if (!matchRef && !matchItem) return false;
+    }
+    return true;
+  });
 
   // Filtered Wishlist Products
   const wishlistedProducts = allProducts.filter(p => wishlistIds.includes(p._id));
@@ -767,8 +829,8 @@ export default function ProfilePage() {
         .profile-form-group { display: flex; flex-direction: column; gap: 7px; }
         .profile-form-label { font-size: 10.5px; font-weight: 700; color: rgba(26,18,9,0.55); letter-spacing: 0.08em; text-transform: uppercase; }
         .input-wrapper-gold { position: relative; display: flex; align-items: center; width: 100%; }
-        .input-icon-left { position: absolute; left: 13px; color: #8b6914; display: flex; align-items: center; pointer-events: none; }
-        .input-icon-right { position: absolute; right: 13px; color: rgba(26,18,9,0.35); display: flex; align-items: center; pointer-events: none; }
+        .input-icon-left { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); color: #8b6914; display: flex; align-items: center; justify-content: center; pointer-events: none; z-index: 2; line-height: 1; }
+        .input-icon-right { position: absolute; right: 13px; top: 50%; transform: translateY(-50%); color: rgba(26,18,9,0.35); display: flex; align-items: center; justify-content: center; pointer-events: none; z-index: 2; line-height: 1; }
         .profile-form-input {
           width: 100%; padding: 12px 16px 12px 40px;
           border: 1.5px solid rgba(184, 142, 60, 0.2);
@@ -836,10 +898,313 @@ export default function ProfilePage() {
 
         /* ── Status Badges ── */
         .status-badge { font-size: 9px; font-weight: 750; text-transform: uppercase; letter-spacing: 0.06em; padding: 3px 8px; border-radius: 20px; white-space: nowrap; }
-        .status-badge.delivered { background: rgba(46,125,50,0.07); color: #2e7d32; border: 1px solid rgba(46,125,50,0.18); }
+        .status-badge.pending { background: rgba(139,105,20,0.08); color: #8b6914; border: 1px solid rgba(139,105,20,0.25); }
         .status-badge.processing { background: rgba(239,108,0,0.07); color: #ef6c00; border: 1px solid rgba(239,108,0,0.18); }
         .status-badge.shipped { background: rgba(21,101,192,0.07); color: #1565c0; border: 1px solid rgba(21,101,192,0.18); }
+        .status-badge.delivered { background: rgba(46,125,50,0.07); color: #2e7d32; border: 1px solid rgba(46,125,50,0.18); }
         .status-badge.cancelled { background: rgba(198,40,40,0.07); color: #c62828; border: 1px solid rgba(198,40,40,0.18); }
+        .status-badge.cancel_requested { background: rgba(184,142,60,0.1); color: #b88e3c; border: 1px solid rgba(184,142,60,0.3); }
+
+        /* ── Luxury Order Filter Bar ── */
+        .order-filter-bar {
+          display: flex;
+          flex-direction: column;
+          gap: 14px;
+          margin-bottom: 22px;
+          padding-bottom: 18px;
+          border-bottom: 1px solid rgba(184, 142, 60, 0.18);
+        }
+        .order-filter-pills {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          overflow-x: auto;
+          padding-bottom: 4px;
+          scrollbar-width: none;
+        }
+        .order-filter-pills::-webkit-scrollbar {
+          display: none;
+        }
+        .order-filter-pill {
+          display: inline-flex;
+          align-items: center;
+          gap: 7px;
+          padding: 8px 15px;
+          border-radius: 100px;
+          font-family: 'Jost', sans-serif;
+          font-size: 12px;
+          font-weight: 600;
+          letter-spacing: 0.03em;
+          background: #FAF7F0;
+          color: #1a1209;
+          border: 1.5px solid rgba(184, 142, 60, 0.22);
+          cursor: pointer;
+          white-space: nowrap;
+          transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .order-filter-pill:hover {
+          border-color: #8B6914;
+          background: rgba(184, 142, 60, 0.08);
+          color: #8B6914;
+        }
+        .order-filter-pill.active {
+          background: #1a1209;
+          color: #FAF7F0;
+          border-color: #1a1209;
+          box-shadow: 0 4px 14px rgba(26, 18, 9, 0.18);
+        }
+        .filter-pill-badge {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          min-width: 18px;
+          height: 18px;
+          padding: 0 5px;
+          border-radius: 100px;
+          font-size: 10px;
+          font-weight: 700;
+          background: rgba(184, 142, 60, 0.18);
+          color: #8B6914;
+          transition: all 0.25s ease;
+        }
+        .order-filter-pill.active .filter-pill-badge {
+          background: #8B6914;
+          color: #FAF7F0;
+        }
+        .order-search-box {
+          position: relative;
+          display: flex;
+          align-items: center;
+          width: 100%;
+          max-width: 420px;
+        }
+        .order-search-box .search-icon {
+          position: absolute;
+          left: 14px;
+          color: rgba(139, 105, 20, 0.7);
+          pointer-events: none;
+        }
+        .order-search-input {
+          width: 100%;
+          padding: 9px 36px 9px 38px;
+          border-radius: 100px;
+          border: 1.5px solid rgba(184, 142, 60, 0.25);
+          background: #FFFFFF;
+          font-family: 'Jost', sans-serif;
+          font-size: 12.5px;
+          color: #1a1209;
+          outline: none;
+          transition: all 0.25s ease;
+        }
+        .order-search-input:focus {
+          border-color: #8B6914;
+          box-shadow: 0 0 0 3px rgba(139, 105, 20, 0.12);
+        }
+        .order-search-clear {
+          position: absolute;
+          right: 12px;
+          background: none;
+          border: none;
+          font-size: 16px;
+          color: rgba(26, 18, 9, 0.4);
+          cursor: pointer;
+          padding: 0;
+          line-height: 1;
+        }
+        .order-search-clear:hover {
+          color: #1a1209;
+        }
+
+        /* ── Profile Order Card ── */
+        .profile-order-card {
+          border: 1.5px solid rgba(184, 142, 60, 0.22);
+          padding: 18px 20px;
+          border-radius: 16px;
+          background: #FAF7F0;
+          display: flex;
+          flex-direction: column;
+          gap: 14px;
+          box-shadow: 0 4px 18px rgba(26, 18, 9, 0.03);
+          width: 100%;
+          box-sizing: border-box;
+          overflow: hidden;
+          transition: all 0.25s ease;
+        }
+        .profile-order-card:hover {
+          border-color: rgba(184, 142, 60, 0.4);
+          box-shadow: 0 8px 24px rgba(184, 142, 60, 0.08);
+        }
+
+        .poc-header {
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+          border-bottom: 1.5px solid rgba(184, 142, 60, 0.15);
+          padding-bottom: 12px;
+          width: 100%;
+        }
+        .poc-header-top {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          gap: 10px;
+          width: 100%;
+        }
+        .poc-ref {
+          font-weight: 700;
+          color: #1a1209;
+          font-size: 13.5px;
+          font-family: 'Jost', monospace;
+          word-break: break-all;
+        }
+        .poc-header-sub {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          font-size: 11.5px;
+          color: rgba(26, 18, 9, 0.55);
+          flex-wrap: wrap;
+        }
+        .poc-items-count {
+          color: #8B6914;
+          font-weight: 600;
+        }
+
+        .poc-items-list {
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+          width: 100%;
+        }
+        .poc-item-row {
+          display: flex;
+          align-items: flex-start;
+          gap: 12px;
+          width: 100%;
+          padding-bottom: 10px;
+          border-bottom: 1px dashed rgba(184, 142, 60, 0.14);
+        }
+        .poc-item-row:last-child {
+          border-bottom: none;
+          padding-bottom: 0;
+        }
+        .poc-item-thumb {
+          width: 52px;
+          height: 52px;
+          background: transparent;
+          border: 1px solid rgba(184, 142, 60, 0.18);
+          border-radius: 8px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 3px;
+          flex-shrink: 0;
+        }
+        .poc-item-thumb img {
+          max-width: 100%;
+          max-height: 100%;
+          object-fit: contain;
+        }
+        .poc-item-details {
+          flex: 1;
+          min-width: 0;
+          display: flex;
+          flex-direction: column;
+          gap: 3px;
+        }
+        .poc-item-title {
+          font-size: 13px;
+          font-weight: 650;
+          color: #1a1209;
+          line-height: 1.3;
+          word-break: break-word;
+        }
+        .poc-item-meta {
+          font-size: 11px;
+          color: rgba(26, 18, 9, 0.55);
+          line-height: 1.3;
+        }
+        .poc-item-price-block {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          flex-wrap: wrap;
+          gap: 8px;
+          margin-top: 4px;
+        }
+        .poc-item-price {
+          font-size: 12.5px;
+          font-weight: 700;
+          color: #8b6914;
+        }
+
+        .poc-footer {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding-top: 12px;
+          border-top: 1px dashed rgba(184, 142, 60, 0.2);
+          flex-wrap: wrap;
+          gap: 12px;
+          width: 100%;
+        }
+        .poc-total {
+          font-size: 12.5px;
+          color: rgba(26, 18, 9, 0.7);
+        }
+        .poc-total strong {
+          color: #1a1209;
+          font-size: 14px;
+          font-weight: 700;
+        }
+        .poc-actions {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          flex-wrap: wrap;
+        }
+        .poc-btn-track {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          gap: 6px;
+          padding: 8px 14px;
+          border-radius: 100px;
+          background: rgba(184, 142, 60, 0.1);
+          border: 1px solid rgba(184, 142, 60, 0.28);
+          color: #8B6914;
+          font-size: 11px;
+          font-weight: 650;
+          text-decoration: none;
+          text-transform: uppercase;
+          letter-spacing: 0.04em;
+          transition: all 0.2s ease;
+          white-space: nowrap;
+        }
+        .poc-btn-track:hover {
+          background: #8B6914;
+          color: #FAF7F0;
+        }
+        .poc-btn-details {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          gap: 5px;
+          padding: 8px 14px;
+          border-radius: 100px;
+          background: #1a1209;
+          color: #FAF7F0;
+          font-size: 11px;
+          font-weight: 650;
+          text-decoration: none;
+          text-transform: uppercase;
+          letter-spacing: 0.04em;
+          transition: all 0.2s ease;
+          white-space: nowrap;
+        }
+        .poc-btn-details:hover {
+          background: #8B6914;
+        }
 
         /* ── Benefits ── */
         .patron-black-card {
@@ -1057,13 +1422,23 @@ export default function ProfilePage() {
 
           /* ── Content layout ── */
           .portal-main-grid { grid-template-columns: 1fr; gap: 0; }
-          .portal-content-panel { gap: 14px; padding: 16px 14px 8px; }
+          .portal-content-panel {
+            gap: 14px;
+            padding: 14px 12px 90px !important;
+            overflow-x: hidden;
+            width: 100%;
+            box-sizing: border-box;
+          }
           .content-card {
-            padding: 20px 16px; border-radius: 16px;
+            padding: 16px 12px !important;
+            border-radius: 14px;
             box-shadow: 0 4px 20px rgba(26,18,9,0.05);
             background: #FAF7F0;
             border: 1.5px solid rgba(184, 142, 60, 0.22);
             backdrop-filter: blur(8px);
+            width: 100%;
+            box-sizing: border-box;
+            overflow: hidden;
           }
           .card-title { font-size: 20px; }
           .card-subtitle { font-size: 11.5px; }
@@ -1082,6 +1457,78 @@ export default function ProfilePage() {
           .order-item-title { font-size: 12px; max-width: 145px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
           .order-ref-date { font-size: 10px; max-width: 145px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
           .status-badge { flex-shrink: 0; font-size: 8.5px; }
+
+          /* ── Mobile Profile Order Card Rules ── */
+          .profile-order-card {
+            padding: 14px 12px !important;
+            border-radius: 12px !important;
+            gap: 12px !important;
+            width: 100% !important;
+            box-sizing: border-box !important;
+          }
+          .poc-header-top {
+            gap: 8px !important;
+          }
+          .poc-ref {
+            font-size: 12px !important;
+            max-width: calc(100% - 85px) !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+            white-space: nowrap !important;
+          }
+          .poc-item-thumb {
+            width: 44px !important;
+            height: 44px !important;
+          }
+          .poc-item-title {
+            font-size: 12px !important;
+          }
+          .poc-item-meta {
+            font-size: 10.5px !important;
+          }
+          .poc-item-price-block {
+            display: flex !important;
+            flex-direction: row !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+            width: 100% !important;
+            margin-top: 4px !important;
+          }
+          .poc-footer {
+            flex-direction: column !important;
+            align-items: stretch !important;
+            gap: 10px !important;
+          }
+          .poc-total {
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            width: 100% !important;
+            font-size: 12px !important;
+          }
+          .poc-actions {
+            display: grid !important;
+            grid-template-columns: 1fr 1fr !important;
+            gap: 8px !important;
+            width: 100% !important;
+          }
+          .poc-btn-track, .poc-btn-details {
+            width: 100% !important;
+            padding: 8px 6px !important;
+            font-size: 10px !important;
+          }
+          .order-filter-bar {
+            margin-bottom: 16px !important;
+            padding-bottom: 12px !important;
+            gap: 10px !important;
+          }
+          .order-filter-pill {
+            padding: 6px 12px !important;
+            font-size: 11px !important;
+          }
+          .order-search-box {
+            max-width: 100% !important;
+          }
 
           /* ── Bottom split ── */
           .portal-bottom-split { display: flex; flex-direction: column; gap: 14px; }
@@ -1125,7 +1572,7 @@ export default function ProfilePage() {
 
             <h1 className="patron-name">{fullName || 'WINSOR PATRON'}</h1>
             <span className="member-since">
-              Member since {user.createdAt ? new Date(user.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long' }) : 'June 2026'} • Verified Winsor Maison Client
+              Member since {user.createdAt ? new Date(user.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long' }) : new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long' })} • Verified Winsor Maison Client
             </span>
 
             {/* Professional Numbers Hero Stats Grid */}
@@ -1164,7 +1611,7 @@ export default function ProfilePage() {
                   </svg>
                 </div>
                 <div>
-                  <div className="hero-stat-val">{(50 + orders.length * 25).toLocaleString()}</div>
+                  <div className="hero-stat-val">{(orders.length * 25).toLocaleString()}</div>
                   <div className="hero-stat-lbl">POINTS</div>
                 </div>
               </div>
@@ -1197,7 +1644,6 @@ export default function ProfilePage() {
             { id: 'addresses', label: 'Addresses', icon: <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" /></svg> },
             { id: 'security', label: 'Security', icon: <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg> },
             { id: 'notifications', label: 'Alerts', icon: <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" /><path d="M13.73 21a2 2 0 0 1-3.46 0" /></svg> },
-            { id: 'payment-methods', label: 'Payment', icon: <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><rect x="1" y="4" width="22" height="16" rx="2" ry="2" /><line x1="1" y1="10" x2="23" y2="10" /></svg> },
           ].map(tab => (
             <button
               key={tab.id}
@@ -1297,13 +1743,6 @@ export default function ProfilePage() {
                   <path d="M13.73 21a2 2 0 0 1-3.46 0" />
                 </svg>
                 Notifications
-              </button>
-              <button className={`sidebar-menu-btn ${activeTab === 'payment-methods' ? 'active' : ''}`} onClick={() => setActiveTab('payment-methods')}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                  <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
-                  <line x1="1" y1="10" x2="23" y2="10" />
-                </svg>
-                Payment Methods
               </button>
               <button className="sidebar-menu-btn" onClick={() => signOut()} style={{ color: '#c62828' }}>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
@@ -1427,10 +1866,13 @@ export default function ProfilePage() {
                     {/* Mobile & Country Row */}
                     <div className="profile-form-grid">
                       <div className="profile-form-group">
-                        <label className="profile-form-label">Mobile Number</label>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <label className="profile-form-label">Mobile Number</label>
+                          <span style={{ fontSize: '10px', color: 'rgba(26,18,9,0.45)' }}>{formData.mobile.length}/9 Digits</span>
+                        </div>
                         <div style={{ display: 'flex', gap: '8px' }}>
-                          <div style={{ position: 'relative', width: '115px', flexShrink: 0 }}>
-                            <span className="input-icon-left">
+                          <div className="input-wrapper-gold" style={{ width: '120px', flexShrink: 0 }}>
+                            <span className="input-icon-left" style={{ left: '10px' }}>
                               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                                 <circle cx="12" cy="12" r="10" />
                                 <line x1="2" y1="12" x2="22" y2="12" />
@@ -1442,7 +1884,7 @@ export default function ProfilePage() {
                               value={formData.mobileCode}
                               onChange={handleInputChange}
                               className="custom-select"
-                              style={{ paddingLeft: '34px', paddingRight: '22px', fontSize: '12px' }}
+                              style={{ paddingLeft: '32px', paddingRight: '22px', fontSize: '12px', height: '46px' }}
                             >
                               {DIAL_CODES.map((dc, idx) => (
                                 <option key={`${dc.code}-${idx}`} value={dc.code}>
@@ -1451,15 +1893,23 @@ export default function ProfilePage() {
                               ))}
                             </select>
                           </div>
-                          <div style={{ flex: 1 }}>
+                          <div className="input-wrapper-gold" style={{ flex: 1 }}>
                             <input
                               type="tel"
                               name="mobile"
                               value={formData.mobile}
                               onChange={handleInputChange}
-                              placeholder="77 123 4567"
+                              onKeyDown={(e) => {
+                                if (e.key === '0' && (formData.mobile.length === 0 || (e.currentTarget.selectionStart === 0 && (e.currentTarget.selectionEnd === 0 || e.currentTarget.selectionEnd === formData.mobile.length)))) {
+                                  e.preventDefault();
+                                }
+                              }}
+                              maxLength={9}
+                              inputMode="numeric"
+                              pattern="[0-9]{1,9}"
+                              placeholder="771234567"
                               className="profile-form-input"
-                              style={{ paddingLeft: '14px' }}
+                              style={{ paddingLeft: '14px', height: '46px' }}
                               required
                             />
                           </div>
@@ -1481,6 +1931,7 @@ export default function ProfilePage() {
                             value={formData.country}
                             onChange={handleInputChange}
                             className="custom-select"
+                            style={{ height: '46px' }}
                           >
                             {COUNTRIES.map(c => (
                               <option key={c.code} value={c.code}>
@@ -1494,7 +1945,10 @@ export default function ProfilePage() {
 
                     {/* Home Address */}
                     <div className="profile-form-group">
-                      <label className="profile-form-label">Home Address</label>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <label className="profile-form-label">Home Address</label>
+                        <span style={{ fontSize: '10px', color: 'rgba(26,18,9,0.45)' }}>{formData.address.length}/200</span>
+                      </div>
                       <div className="input-wrapper-gold">
                         <span className="input-icon-left">
                           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -1507,6 +1961,7 @@ export default function ProfilePage() {
                           name="address"
                           value={formData.address}
                           onChange={handleInputChange}
+                          maxLength={200}
                           placeholder="Street address, Suite, Apartment number"
                           className="profile-form-input"
                           required
@@ -1517,7 +1972,10 @@ export default function ProfilePage() {
                     {/* City & Postal Code Row */}
                     <div className="profile-form-grid">
                       <div className="profile-form-group">
-                        <label className="profile-form-label">City / Town</label>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <label className="profile-form-label">City / Town</label>
+                          <span style={{ fontSize: '10px', color: 'rgba(26,18,9,0.45)' }}>{formData.city.length}/100</span>
+                        </div>
                         <div className="input-wrapper-gold">
                           <span className="input-icon-left">
                             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -1530,6 +1988,7 @@ export default function ProfilePage() {
                             name="city"
                             value={formData.city}
                             onChange={handleInputChange}
+                            maxLength={100}
                             placeholder="e.g. Colombo"
                             className="profile-form-input"
                             required
@@ -1538,7 +1997,10 @@ export default function ProfilePage() {
                       </div>
 
                       <div className="profile-form-group">
-                        <label className="profile-form-label">Postal Code</label>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <label className="profile-form-label">Postal Code</label>
+                          <span style={{ fontSize: '10px', color: 'rgba(26,18,9,0.45)' }}>{formData.postalCode.length}/10 Numbers</span>
+                        </div>
                         <div className="input-wrapper-gold">
                           <span className="input-icon-left">
                             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -1551,6 +2013,9 @@ export default function ProfilePage() {
                             name="postalCode"
                             value={formData.postalCode}
                             onChange={handleInputChange}
+                            maxLength={10}
+                            inputMode="numeric"
+                            pattern="[0-9]{1,10}"
                             placeholder="e.g. 00100"
                             className="profile-form-input"
                             required
@@ -1631,10 +2096,10 @@ export default function ProfilePage() {
                   <div className="metric-tile-card" style={{ background: 'linear-gradient(135deg, #ffffff 0%, #faf7f0 100%)', border: '1px solid rgba(139,105,20,0.18)', padding: '20px', borderRadius: '14px', boxShadow: '0 4px 15px rgba(26,18,9,0.03)' }}>
                     <div className="metric-tile-label" style={{ fontSize: '10.5px', textTransform: 'uppercase', color: 'rgba(26,18,9,0.5)', fontWeight: 700, letterSpacing: '0.1em' }}>Reward Point Balance</div>
                     <div className="metric-tile-value" style={{ fontSize: '32px', fontFamily: 'Jost, monospace', fontVariantNumeric: 'tabular-nums', color: '#1a1209', fontWeight: 700, marginTop: '6px', lineHeight: 1 }}>
-                      {(50 + orders.length * 25).toLocaleString()}
+                      {(orders.length * 25).toLocaleString()}
                     </div>
                     <div className="metric-tile-sub" style={{ fontSize: '10.5px', color: '#8b6914', fontWeight: 600, marginTop: '8px' }}>
-                      +25 Points per timepiece order
+                      {orders.length > 0 ? `+25 Points per timepiece order (${orders.length * 25} total)` : '0 Points • 25 Points earned per order'}
                     </div>
                   </div>
 
@@ -1738,110 +2203,234 @@ export default function ProfilePage() {
               <div className="content-card">
                 <div className="card-header-block">
                   <h3 className="card-title">Order History</h3>
-                  <p className="card-subtitle">Track your recent Winsor timepiece purchases.</p>
+                  <p className="card-subtitle">Track your recent Winsor timepiece purchases and dispatch status.</p>
                 </div>
-                {orders.length > 0 ? (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
-                    {orders.map((o: any, idx) => (
-                      <div key={idx} style={{ border: '1.5px solid rgba(184, 142, 60, 0.22)', padding: '20px', borderRadius: '16px', background: '#FAF7F0', display: 'flex', flexDirection: 'column', gap: '14px', boxShadow: '0 4px 18px rgba(26,18,9,0.03)' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1.5px solid rgba(184, 142, 60, 0.15)', paddingBottom: '10px' }}>
-                          <div>
-                            <span style={{ fontWeight: 700, color: '#1a1209', fontSize: '13.5px', fontFamily: 'Jost, monospace' }}>Order: #{o.orderRef}</span>
-                            <span style={{ fontSize: '11.5px', color: 'rgba(26,18,9,0.55)', marginLeft: '12px' }}>
-                              {new Date(o.createdAt).toLocaleDateString()}
-                            </span>
-                          </div>
-                          <div className={`status-badge ${o.status.toLowerCase()}`}>{o.status}</div>
-                        </div>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                          {o.items.map((item: any, itemIdx: number) => (
-                            <div key={itemIdx} style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                              <div className="order-watch-thumb" style={{ width: '52px', height: '52px', background: 'transparent', border: '1px solid rgba(184, 142, 60, 0.18)', borderRadius: '8px' }}>
-                                <img src={item.productThumbnail} alt={item.productTitle} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
-                              </div>
-                              <div style={{ flex: 1, minWidth: 0 }}>
-                                <div style={{ fontSize: '13px', fontWeight: 650, color: '#1a1209' }}>{item.productTitle}</div>
-                                <div style={{ fontSize: '11px', color: 'rgba(26,18,9,0.55)', marginTop: '2px' }}>
-                                  Model: {item.productModelNo} {item.colorVariant ? `— Variant: ${item.colorVariant}` : ''}
-                                </div>
-                              </div>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
-                                <div style={{ textAlign: 'right', fontSize: '13px', fontWeight: 700, color: '#8b6914' }}>
-                                  {item.quantity} × LKR {item.price.toLocaleString()}
-                                </div>
-                                {o.status.toLowerCase() === 'delivered' && (
-                                  isItemReviewed(item.productId, o.orderRef) ? (
-                                    <span
-                                      style={{
-                                        display: 'inline-flex',
-                                        alignItems: 'center',
-                                        gap: '5px',
-                                        background: 'rgba(46, 125, 50, 0.08)',
-                                        border: '1px solid rgba(46, 125, 50, 0.28)',
-                                        color: '#2e7d32',
-                                        fontSize: '10.5px',
-                                        padding: '6px 14px',
-                                        borderRadius: '100px',
-                                        fontFamily: "'Jost', sans-serif",
-                                        fontWeight: 700,
-                                        letterSpacing: '0.05em',
-                                        whiteSpace: 'nowrap',
-                                        textTransform: 'uppercase',
-                                      }}
-                                    >
-                                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg>
-                                      Reviewed
-                                    </span>
-                                  ) : (
-                                    <button
-                                      type="button"
-                                      onClick={() => {
-                                        setReviewItem({
-                                          orderId: o.orderRef,
-                                          productId: item.productId,
-                                          productTitle: item.productTitle,
-                                          productModelNo: item.productModelNo,
-                                          productThumbnail: item.productThumbnail,
-                                          colorVariant: item.colorVariant,
-                                          price: item.price,
-                                          daysLeft: 90,
-                                        });
-                                        setIsReviewModalOpen(true);
-                                      }}
-                                      style={{
-                                        display: 'inline-flex',
-                                        alignItems: 'center',
-                                        gap: '5px',
-                                        background: 'rgba(139,105,20,0.08)',
-                                        border: '1px solid rgba(139,105,20,0.28)',
-                                        color: '#8b6914',
-                                        fontSize: '10.5px',
-                                        padding: '6px 14px',
-                                        borderRadius: '100px',
-                                        cursor: 'pointer',
-                                        fontFamily: "'Jost', sans-serif",
-                                        fontWeight: 700,
-                                        letterSpacing: '0.05em',
-                                        whiteSpace: 'nowrap',
-                                        textTransform: 'uppercase',
-                                        transition: 'all 0.25s ease',
-                                      }}
-                                    >
-                                      <svg width="12" height="12" viewBox="0 0 24 24" fill="#8b6914" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" /></svg>
-                                      Write Review
-                                    </button>
-                                  )
-                                )}
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    ))}
+
+                {/* Filter & Search Bar */}
+                {orders.length > 0 && (
+                  <div className="order-filter-bar">
+                    <div className="order-filter-pills">
+                      {[
+                        { key: 'all', label: 'All Orders', count: orderCounts.all },
+                        { key: 'pending', label: 'Pending', count: orderCounts.pending },
+                        { key: 'processing', label: 'Processing', count: orderCounts.processing },
+                        { key: 'shipped', label: 'In Transit', count: orderCounts.shipped },
+                        { key: 'delivered', label: 'Delivered', count: orderCounts.delivered },
+                        { key: 'cancelled', label: 'Cancelled', count: orderCounts.cancelled },
+                      ].map(tab => (
+                        <button
+                          key={tab.key}
+                          type="button"
+                          onClick={() => setOrderFilter(tab.key as any)}
+                          className={`order-filter-pill ${orderFilter === tab.key ? 'active' : ''}`}
+                        >
+                          <span>{tab.label}</span>
+                          <span className="filter-pill-badge">{tab.count}</span>
+                        </button>
+                      ))}
+                    </div>
+
+                    <div className="order-search-box">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" className="search-icon">
+                        <circle cx="11" cy="11" r="8" />
+                        <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                      </svg>
+                      <input
+                        type="text"
+                        placeholder="Search by Order # or Watch Name..."
+                        value={orderSearchQuery}
+                        onChange={e => setOrderSearchQuery(e.target.value)}
+                        className="order-search-input"
+                      />
+                      {orderSearchQuery && (
+                        <button
+                          type="button"
+                          onClick={() => setOrderSearchQuery('')}
+                          className="order-search-clear"
+                          title="Clear search"
+                        >
+                          ×
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {orders.length === 0 ? (
+                  <div style={{ textAlign: 'center', padding: '48px 16px', color: 'rgba(26,18,9,0.55)', fontSize: '13px' }}>
+                    <div style={{ width: '48px', height: '48px', margin: '0 auto 12px', opacity: 0.4 }}>
+                      <svg viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <polyline points="12 6 12 12 16 14"/>
+                      </svg>
+                    </div>
+                    <p style={{ margin: '0 0 14px 0', fontSize: '13.5px', color: '#1a1209', fontWeight: 600 }}>No Orders Placed Yet</p>
+                    <p style={{ margin: '0 0 18px 0', fontSize: '12px', color: 'rgba(26,18,9,0.5)' }}>Explore our catalog to make your first acquisition.</p>
+                    <Link href="/collections" style={{ display: 'inline-block', background: '#1a1209', color: '#FAF7F0', padding: '10px 22px', borderRadius: '100px', fontSize: '11px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', textDecoration: 'none' }}>
+                      Discover Timepieces
+                    </Link>
+                  </div>
+                ) : filteredOrders.length === 0 ? (
+                  <div style={{ textAlign: 'center', padding: '44px 20px', background: '#FAF7F0', border: '1.5px dashed rgba(184, 142, 60, 0.3)', borderRadius: '16px' }}>
+                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.3" style={{ margin: '0 auto 10px', opacity: 0.6 }}>
+                      <circle cx="11" cy="11" r="8" />
+                      <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                    </svg>
+                    <h4 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '20px', fontWeight: 600, color: '#1a1209', margin: '0 0 6px' }}>
+                      No {orderFilter !== 'all' ? `${orderFilter.toUpperCase()} ` : ''}Orders Found
+                    </h4>
+                    <p style={{ fontSize: '12.5px', color: 'rgba(26,18,9,0.55)', maxWidth: '420px', margin: '0 auto 16px', lineHeight: 1.5 }}>
+                      {orderSearchQuery
+                        ? `No orders matched "${orderSearchQuery}". Clear your search or try another filter.`
+                        : `You have no orders currently in "${orderFilter}" status.`}
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => { setOrderFilter('all'); setOrderSearchQuery(''); }}
+                      className="gold-action-btn"
+                      style={{ padding: '8px 22px', fontSize: '11px' }}
+                    >
+                      VIEW ALL ORDERS ({orders.length})
+                    </button>
                   </div>
                 ) : (
-                  <div style={{ textAlign: 'center', padding: '40px 10px', color: 'rgba(26,18,9,0.55)', fontSize: '13px' }}>
-                    No orders found in your patron history. Explore our catalog to make your first acquisition.
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', width: '100%' }}>
+                    {filteredOrders.map((o: any, idx) => {
+                      const orderTotal = o.subtotal || (o.items || []).reduce((acc: number, it: any) => acc + (it.price * (it.quantity || 1)), 0);
+                      const itemCount = (o.items || []).reduce((acc: number, it: any) => acc + (it.quantity || 1), 0);
+                      const orderMobile = o.shippingAddress?.mobile || formData.mobile || '';
+
+                      return (
+                        <div key={idx} className="profile-order-card">
+                          {/* ORDER HEADER */}
+                          <div className="poc-header">
+                            <div className="poc-header-top">
+                              <Link
+                                href={`/orders/track?ref=${encodeURIComponent(o.orderRef)}${orderMobile ? `&mobile=${encodeURIComponent(orderMobile)}` : ''}`}
+                                className="poc-ref"
+                                style={{ textDecoration: 'none', cursor: 'pointer' }}
+                                title="Click to track timepiece live"
+                              >
+                                Order: #{o.orderRef}
+                              </Link>
+                              <span className={`status-badge ${(o.status || 'pending').toLowerCase()}`}>{o.status || 'Pending'}</span>
+                            </div>
+                            <div className="poc-header-sub">
+                              <span>Placed: {new Date(o.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                              <span>•</span>
+                              <span className="poc-items-count">{itemCount} {itemCount === 1 ? 'timepiece' : 'timepieces'}</span>
+                            </div>
+                          </div>
+
+                          {/* ORDER ITEMS */}
+                          <div className="poc-items-list">
+                            {o.items.map((item: any, itemIdx: number) => (
+                              <div key={itemIdx} className="poc-item-row">
+                                <div className="poc-item-thumb">
+                                  <img src={item.productThumbnail} alt={item.productTitle} />
+                                </div>
+                                <div className="poc-item-details">
+                                  <div className="poc-item-title">{item.productTitle}</div>
+                                  <div className="poc-item-meta">
+                                    Model: {item.productModelNo} {item.colorVariant ? `— ${item.colorVariant}` : ''}
+                                  </div>
+                                  <div className="poc-item-price-block">
+                                    <span className="poc-item-price">
+                                      {item.quantity} × LKR {item.price.toLocaleString()}
+                                    </span>
+                                    {o.status.toLowerCase() === 'delivered' && (
+                                      isItemReviewed(item.productId, o.orderRef) ? (
+                                        <span
+                                          style={{
+                                            display: 'inline-flex',
+                                            alignItems: 'center',
+                                            gap: '4px',
+                                            background: 'rgba(46, 125, 50, 0.08)',
+                                            border: '1px solid rgba(46, 125, 50, 0.28)',
+                                            color: '#2e7d32',
+                                            fontSize: '10px',
+                                            padding: '4px 10px',
+                                            borderRadius: '100px',
+                                            fontFamily: "'Jost', sans-serif",
+                                            fontWeight: 700,
+                                            letterSpacing: '0.04em',
+                                            whiteSpace: 'nowrap',
+                                            textTransform: 'uppercase',
+                                          }}
+                                        >
+                                          ✓ Reviewed
+                                        </span>
+                                      ) : (
+                                        <button
+                                          type="button"
+                                          onClick={() => {
+                                            setReviewItem({
+                                              orderId: o.orderRef,
+                                              productId: item.productId,
+                                              productTitle: item.productTitle,
+                                              productModelNo: item.productModelNo,
+                                              productThumbnail: item.productThumbnail,
+                                              colorVariant: item.colorVariant,
+                                              price: item.price,
+                                              daysLeft: 90,
+                                            });
+                                            setIsReviewModalOpen(true);
+                                          }}
+                                          style={{
+                                            display: 'inline-flex',
+                                            alignItems: 'center',
+                                            gap: '4px',
+                                            background: 'rgba(139,105,20,0.08)',
+                                            border: '1px solid rgba(139,105,20,0.28)',
+                                            color: '#8b6914',
+                                            fontSize: '10px',
+                                            padding: '4px 10px',
+                                            borderRadius: '100px',
+                                            cursor: 'pointer',
+                                            fontFamily: "'Jost', sans-serif",
+                                            fontWeight: 700,
+                                            letterSpacing: '0.04em',
+                                            whiteSpace: 'nowrap',
+                                            textTransform: 'uppercase',
+                                            transition: 'all 0.25s ease',
+                                          }}
+                                        >
+                                          <svg width="11" height="11" viewBox="0 0 24 24" fill="#8b6914" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" /></svg>
+                                          Write Review
+                                        </button>
+                                      )
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+
+                          {/* ORDER FOOTER ACTIONS & TOTAL */}
+                          <div className="poc-footer">
+                            <div className="poc-total">
+                              <span>Total Investment:</span>{' '}
+                              <strong>LKR {orderTotal.toLocaleString()}</strong>
+                            </div>
+                            <div className="poc-actions">
+                              <Link
+                                href={`/orders/track?ref=${encodeURIComponent(o.orderRef)}${orderMobile ? `&mobile=${encodeURIComponent(orderMobile)}` : ''}`}
+                                className="poc-btn-track"
+                              >
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                                Live Tracking
+                              </Link>
+                              <Link
+                                href="/orders"
+                                className="poc-btn-details"
+                              >
+                                Full Details →
+                              </Link>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
                 )}
               </div>
@@ -1938,19 +2527,6 @@ export default function ProfilePage() {
                     <span>Email receipts and VAT invoice summaries (Currently Unavailable)</span>
                   </label>
                 </div>
-              </div>
-            )}
-
-            {/* PAYMENT METHODS TAB */}
-            {activeTab === 'payment-methods' && (
-              <div className="content-card">
-                <div className="card-header-block">
-                  <h3 className="card-title">Payment Methods</h3>
-                  <p className="card-subtitle">Manage secure checkout cards and profiles.</p>
-                </div>
-                <p style={{ fontSize: '13px', color: 'rgba(26,18,9,0.5)', textAlign: 'center', padding: '20px 0' }}>
-                  No payment methods stored. Payments are verified securely at checkout.
-                </p>
               </div>
             )}
 

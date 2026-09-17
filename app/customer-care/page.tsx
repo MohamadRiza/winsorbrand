@@ -64,7 +64,11 @@ export default function CustomerCarePage() {
       const fetchProfileMobile = async () => {
         setProfileLoading(true);
         try {
-          const res = await fetch('/api/customer/profile');
+          const userEmail = user.primaryEmailAddress?.emailAddress || '';
+          const params = new URLSearchParams();
+          if (user.id) params.set('clerkId', user.id);
+          if (userEmail) params.set('email', userEmail);
+          const res = await fetch(`/api/customer/profile?${params.toString()}`);
           if (!res.ok || !res.headers.get('content-type')?.includes('application/json')) {
             return;
           }

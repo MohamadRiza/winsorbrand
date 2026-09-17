@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { useClerk, SignInButton } from '@clerk/nextjs';
 import toast from 'react-hot-toast';
 import { generateReceiptPdf } from '@/lib/utils/generateReceiptPdf';
@@ -118,12 +119,12 @@ export default function GuestCheckoutModal({
   // ── Form validation ─────────────────────────────────────────────────────
   const validateForm = () => {
     const errs: Record<string, string> = {};
-    if (!form.name.trim() || form.name.trim().length < 2) errs.name = 'Full name is required';
+    if (!form.name.trim() || form.name.trim().length < 2) errs.name = 'Full name is required (min 2 characters)';
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) errs.email = 'Valid email is required';
-    if (!/^[\d\s\-+]{6,20}$/.test(form.mobile.trim())) errs.mobile = 'Valid mobile number required';
+    if (!form.mobile.trim() || form.mobile.length < 6 || form.mobile.length > 9) errs.mobile = 'Valid mobile number required (max 9 digits)';
     if (!form.address.trim()) errs.address = 'Delivery address is required';
     if (!form.city.trim()) errs.city = 'City is required';
-    if (!form.postalCode.trim()) errs.postalCode = 'Postal code is required';
+    if (!form.postalCode.trim() || !/^\d{1,15}$/.test(form.postalCode.trim())) errs.postalCode = 'Valid postal code is required (numbers only, max 15 digits)';
     setFormErrors(errs);
     return Object.keys(errs).length === 0;
   };
@@ -439,31 +440,36 @@ export default function GuestCheckoutModal({
         }
 
         .gcm-input {
-          width: 100%; box-sizing: border-box;
-          background: #fff; border: 1.5px solid rgba(184, 142, 60, 0.25);
-          border-radius: 10px; padding: 11px 14px;
+          width: 100%; height: 46px; box-sizing: border-box;
+          background: #ffffff; border: 1.5px solid rgba(184, 142, 60, 0.25);
+          border-radius: 10px; padding: 0 14px;
           font-family: 'Jost', sans-serif; font-size: 13.5px; color: #1a1209;
-          outline: none; transition: border-color 0.2s ease;
+          outline: none; transition: all 0.2s ease;
+          display: flex; align-items: center;
         }
-        .gcm-input:focus { border-color: #b88e3c; box-shadow: 0 0 0 3px rgba(184, 142, 60, 0.1); }
-        .gcm-input.error { border-color: #c62828; }
+        .gcm-input:focus {
+          border-color: #b88e3c;
+          background: #ffffff;
+          box-shadow: 0 0 0 3px rgba(184, 142, 60, 0.12);
+        }
+        .gcm-input.error { border-color: #c62828; background: #fffcfb; }
         .gcm-label {
           display: block; font-size: 10.5px; font-weight: 700;
           color: #8e7c66; text-transform: uppercase;
           letter-spacing: 0.12em; margin-bottom: 6px;
         }
         .gcm-field { margin-bottom: 14px; }
-        .gcm-error { font-size: 10.5px; color: #c62828; margin-top: 4px; }
+        .gcm-error { font-size: 10.5px; color: #c62828; margin-top: 4px; font-weight: 500; }
 
         .gcm-btn-primary {
-          width: 100%; height: 48px;
+          width: 100%; height: 48px; box-sizing: border-box;
           background: linear-gradient(135deg, #c59b4e 0%, #936f26 100%);
           color: #ffffff; border: none; border-radius: 12px;
           cursor: pointer; font-family: 'Jost', sans-serif;
           font-size: 12.5px; font-weight: 700; letter-spacing: 0.08em;
           text-transform: uppercase; transition: all 0.2s ease;
           display: flex; align-items: center; justify-content: center; gap: 8px;
-          box-shadow: 0 4px 14px rgba(184, 142, 60, 0.28); margin-top: 8px;
+          box-shadow: 0 4px 14px rgba(184, 142, 60, 0.28); margin-top: 0;
         }
         .gcm-btn-primary:hover:not(:disabled) {
           background: linear-gradient(135deg, #d4a755 0%, #a47c2d 100%);
@@ -472,13 +478,43 @@ export default function GuestCheckoutModal({
         .gcm-btn-primary:disabled { opacity: 0.6; cursor: not-allowed; box-shadow: none; }
 
         .gcm-btn-outline {
-          width: 100%; height: 46px; background: transparent;
+          width: 100%; height: 48px; box-sizing: border-box;
+          background: transparent;
           border: 1.5px solid rgba(184, 142, 60, 0.45); color: #9e7529;
           border-radius: 12px; cursor: pointer; font-family: 'Jost', sans-serif;
           font-size: 12.5px; font-weight: 700; letter-spacing: 0.08em;
           text-transform: uppercase; transition: all 0.2s ease;
+          display: flex; align-items: center; justify-content: center; gap: 8px;
+          margin-top: 0;
         }
-        .gcm-btn-outline:hover { border-color: #b88e3c; background: rgba(184, 142, 60, 0.06); color: #b88e3c; }
+        .gcm-btn-outline:hover {
+          border-color: #b88e3c; background: rgba(184, 142, 60, 0.06); color: #b88e3c;
+        }
+
+        .gcm-edit-btn {
+          display: inline-flex; align-items: center; gap: 5px;
+          background: rgba(184, 142, 60, 0.08);
+          border: 1px solid rgba(184, 142, 60, 0.25);
+          color: #8b6914; border-radius: 100px;
+          padding: 4px 12px; font-family: 'Jost', sans-serif;
+          font-size: 11px; font-weight: 700; text-transform: uppercase;
+          letter-spacing: 0.04em; cursor: pointer;
+          transition: all 0.2s ease;
+        }
+        .gcm-edit-btn:hover {
+          background: #8b6914; color: #ffffff; border-color: #8b6914;
+        }
+
+        .gcm-actions-row {
+          display: flex; gap: 12px; align-items: center; margin-top: 18px;
+        }
+        .gcm-btn-back {
+          width: 110px; flex-shrink: 0;
+        }
+
+        .gcm-city-postal-grid {
+          display: grid; grid-template-columns: 1fr 1fr; gap: 0 14px; align-items: start;
+        }
 
         .gcm-divider {
           display: flex; align-items: center; gap: 12px; margin: 16px 0;
@@ -528,6 +564,11 @@ export default function GuestCheckoutModal({
           .gcm-body { padding: 0 20px 20px; }
           .gcm-header-title { font-size: 20px; }
           .gcm-trust-footer { flex-wrap: wrap; gap: 10px; justify-content: center; }
+          .gcm-btn-back { width: 90px; }
+        }
+
+        @media (max-width: 480px) {
+          .gcm-city-postal-grid { grid-template-columns: 1fr !important; }
         }
       `}</style>
 
@@ -667,101 +708,161 @@ export default function GuestCheckoutModal({
               </div>
             )}
 
-            {/* ═══════════════════════ STEP 2: FORM ════════════════════════ */}
+            {/* ═══════════════════════ STEP 2: FORM (DELIVERY INFORMATION) ════════════════════════ */}
             {step === 'form' && (
               <div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 14px' }}>
-                  <div className="gcm-field" style={{ gridColumn: '1 / -1' }}>
-                    <label className="gcm-label">Full Name *</label>
-                    <input
-                      className={`gcm-input${formErrors.name ? ' error' : ''}`}
-                      value={form.name}
-                      onChange={e => setForm(p => ({ ...p, name: e.target.value }))}
-                      placeholder="John Smith"
-                      autoFocus
-                    />
-                    {formErrors.name && <div className="gcm-error">{formErrors.name}</div>}
+                {/* Full Name */}
+                <div className="gcm-field">
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                    <label className="gcm-label" style={{ marginBottom: 0 }}>Full Name *</label>
+                    <span style={{ fontSize: '10.5px', color: 'rgba(26,18,9,0.45)' }}>{form.name.length}/50</span>
                   </div>
-
-                  <div className="gcm-field">
-                    <label className="gcm-label">Email Address *</label>
-                    <input
-                      className={`gcm-input${formErrors.email ? ' error' : ''}`}
-                      type="email"
-                      value={form.email}
-                      onChange={e => setForm(p => ({ ...p, email: e.target.value }))}
-                      placeholder="you@email.com"
-                    />
-                    {formErrors.email && <div className="gcm-error">{formErrors.email}</div>}
-                  </div>
-
-                  <div className="gcm-field">
-                    <label className="gcm-label">Mobile Number *</label>
-                    <div style={{ display: 'flex', gap: 6 }}>
-                      <select
-                        className="gcm-input"
-                        style={{ width: 90, flexShrink: 0, padding: '11px 6px' }}
-                        value={form.mobileCode}
-                        onChange={e => setForm(p => ({ ...p, mobileCode: e.target.value }))}
-                      >
-                        {COUNTRIES.map(c => (
-                          <option key={c.code} value={c.dial}>{c.dial} {c.code}</option>
-                        ))}
-                      </select>
-                      <input
-                        className={`gcm-input${formErrors.mobile ? ' error' : ''}`}
-                        style={{ flex: 1 }}
-                        value={form.mobile}
-                        onChange={e => setForm(p => ({ ...p, mobile: e.target.value }))}
-                        placeholder="71 234 5678"
-                        type="tel"
-                      />
-                    </div>
-                    {formErrors.mobile && <div className="gcm-error">{formErrors.mobile}</div>}
-                  </div>
+                  <input
+                    className={`gcm-input${formErrors.name ? ' error' : ''}`}
+                    value={form.name}
+                    maxLength={50}
+                    onChange={e => {
+                      const val = e.target.value.slice(0, 50);
+                      setForm(p => ({ ...p, name: val }));
+                      if (formErrors.name) setFormErrors(p => ({ ...p, name: '' }));
+                    }}
+                    placeholder="e.g. Jonathan Sterling"
+                    autoFocus
+                  />
+                  {formErrors.name && <div className="gcm-error">{formErrors.name}</div>}
                 </div>
 
-                <div style={{ borderTop: '1px solid rgba(26,18,9,0.08)', paddingTop: 14, marginBottom: 14 }}>
-                  <div style={{ fontSize: '10px', fontWeight: 700, color: 'rgba(26,18,9,0.45)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 12 }}>
-                    Delivery Address
+                {/* Email Address */}
+                <div className="gcm-field">
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                    <label className="gcm-label" style={{ marginBottom: 0 }}>Email Address *</label>
+                    <span style={{ fontSize: '10.5px', color: 'rgba(26,18,9,0.45)' }}>{form.email.length}/100</span>
+                  </div>
+                  <input
+                    className={`gcm-input${formErrors.email ? ' error' : ''}`}
+                    type="email"
+                    maxLength={100}
+                    value={form.email}
+                    onChange={e => {
+                      const val = e.target.value.slice(0, 100);
+                      setForm(p => ({ ...p, email: val }));
+                      if (formErrors.email) setFormErrors(p => ({ ...p, email: '' }));
+                    }}
+                    placeholder="jonathan@sterling.com"
+                  />
+                  {formErrors.email && <div className="gcm-error">{formErrors.email}</div>}
+                </div>
+
+                {/* Mobile Number */}
+                <div className="gcm-field">
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                    <label className="gcm-label" style={{ marginBottom: 0 }}>Mobile Number *</label>
+                    <span style={{ fontSize: '10.5px', color: 'rgba(26,18,9,0.45)' }}>{form.mobile.length}/9 Digits</span>
+                  </div>
+                  <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                    <select
+                      className="gcm-input"
+                      style={{ width: 110, flexShrink: 0, padding: '0 8px', fontSize: '13px' }}
+                      value={form.mobileCode}
+                      onChange={e => setForm(p => ({ ...p, mobileCode: e.target.value }))}
+                    >
+                      {COUNTRIES.map(c => (
+                        <option key={c.code} value={c.dial}>{c.dial} ({c.code})</option>
+                      ))}
+                    </select>
+                    <input
+                      className={`gcm-input${formErrors.mobile ? ' error' : ''}`}
+                      style={{ flex: 1 }}
+                      value={form.mobile}
+                      maxLength={9}
+                      inputMode="numeric"
+                      pattern="[0-9]{1,9}"
+                      onKeyDown={(e) => {
+                        if (e.key === '0' && (form.mobile.length === 0 || (e.currentTarget.selectionStart === 0 && (e.currentTarget.selectionEnd === 0 || e.currentTarget.selectionEnd === form.mobile.length)))) {
+                          e.preventDefault();
+                        }
+                      }}
+                      onChange={e => {
+                        const digitsOnly = e.target.value.replace(/\D/g, '').replace(/^0+/, '').slice(0, 9);
+                        setForm(p => ({ ...p, mobile: digitsOnly }));
+                        if (formErrors.mobile) setFormErrors(p => ({ ...p, mobile: '' }));
+                      }}
+                      placeholder="712345678"
+                      type="tel"
+                    />
+                  </div>
+                  {formErrors.mobile && <div className="gcm-error">{formErrors.mobile}</div>}
+                </div>
+
+                {/* Delivery Address Section */}
+                <div style={{ borderTop: '1px solid rgba(184, 142, 60, 0.16)', paddingTop: 16, marginTop: 6, marginBottom: 14 }}>
+                  <div style={{ fontSize: '11px', fontWeight: 700, color: '#8b6914', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                    <span>Delivery Address</span>
                   </div>
 
                   <div className="gcm-field">
-                    <label className="gcm-label">Street Address *</label>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                      <label className="gcm-label" style={{ marginBottom: 0 }}>Street Address *</label>
+                      <span style={{ fontSize: '10.5px', color: 'rgba(26,18,9,0.45)' }}>{form.address.length}/200</span>
+                    </div>
                     <input
                       className={`gcm-input${formErrors.address ? ' error' : ''}`}
                       value={form.address}
-                      onChange={e => setForm(p => ({ ...p, address: e.target.value }))}
-                      placeholder="123 Main Street"
+                      maxLength={200}
+                      onChange={e => {
+                        const val = e.target.value.slice(0, 200);
+                        setForm(p => ({ ...p, address: val }));
+                        if (formErrors.address) setFormErrors(p => ({ ...p, address: '' }));
+                      }}
+                      placeholder="e.g. 42 Queens Road, Apartment 5B"
                     />
                     {formErrors.address && <div className="gcm-error">{formErrors.address}</div>}
                   </div>
 
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 14px' }}>
+                  <div className="gcm-city-postal-grid">
                     <div className="gcm-field">
-                      <label className="gcm-label">City *</label>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                        <label className="gcm-label" style={{ marginBottom: 0 }}>City *</label>
+                        <span style={{ fontSize: '10.5px', color: 'rgba(26,18,9,0.45)' }}>{form.city.length}/100</span>
+                      </div>
                       <input
                         className={`gcm-input${formErrors.city ? ' error' : ''}`}
                         value={form.city}
-                        onChange={e => setForm(p => ({ ...p, city: e.target.value }))}
+                        maxLength={100}
+                        onChange={e => {
+                          const val = e.target.value.slice(0, 100);
+                          setForm(p => ({ ...p, city: val }));
+                          if (formErrors.city) setFormErrors(p => ({ ...p, city: '' }));
+                        }}
                         placeholder="Colombo"
                       />
                       {formErrors.city && <div className="gcm-error">{formErrors.city}</div>}
                     </div>
 
                     <div className="gcm-field">
-                      <label className="gcm-label">Postal Code *</label>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                        <label className="gcm-label" style={{ marginBottom: 0 }}>Postal Code *</label>
+                        <span style={{ fontSize: '10.5px', color: 'rgba(26,18,9,0.45)' }}>{form.postalCode.length}/15</span>
+                      </div>
                       <input
                         className={`gcm-input${formErrors.postalCode ? ' error' : ''}`}
                         value={form.postalCode}
-                        onChange={e => setForm(p => ({ ...p, postalCode: e.target.value }))}
+                        maxLength={15}
+                        inputMode="numeric"
+                        pattern="[0-9]{1,15}"
+                        onChange={e => {
+                          const digitsOnly = e.target.value.replace(/\D/g, '').slice(0, 15);
+                          setForm(p => ({ ...p, postalCode: digitsOnly }));
+                          if (formErrors.postalCode) setFormErrors(p => ({ ...p, postalCode: '' }));
+                        }}
                         placeholder="00100"
                       />
                       {formErrors.postalCode && <div className="gcm-error">{formErrors.postalCode}</div>}
                     </div>
                   </div>
 
-                  <div className="gcm-field">
+                  <div className="gcm-field" style={{ marginBottom: 4 }}>
                     <label className="gcm-label">Country *</label>
                     <select
                       className="gcm-input"
@@ -778,78 +879,124 @@ export default function GuestCheckoutModal({
                   </div>
                 </div>
 
-                <div style={{ display: 'flex', gap: 10 }}>
-                  <button className="gcm-btn-outline" onClick={() => setStep('choice')} style={{ flex: 0, padding: '13px 20px', width: 'auto' }}>
+                <div className="gcm-actions-row">
+                  <button
+                    type="button"
+                    className="gcm-btn-outline gcm-btn-back"
+                    onClick={() => setStep('choice')}
+                  >
                     ← Back
                   </button>
                   <button
+                    type="button"
                     className="gcm-btn-primary"
-                    style={{ flex: 1, marginTop: 0 }}
+                    style={{ flex: 1 }}
                     onClick={() => {
                       if (validateForm()) setStep('summary');
                     }}
                   >
-                    Review Order →
+                    Review Purchase →
                   </button>
                 </div>
               </div>
             )}
 
-            {/* ═══════════════════════ STEP 3: SUMMARY ════════════════════ */}
+            {/* ═══════════════════════ STEP 3: SUMMARY (REVIEW PURCHASE) ════════════════════ */}
             {step === 'summary' && (
               <div>
                 {/* Delivery info recap */}
-                <div style={{ background: '#fff', border: '1px solid rgba(139,105,20,0.15)', borderRadius: '12px', padding: '14px 16px', marginBottom: '16px' }}>
-                  <div style={{ fontSize: '10px', fontWeight: 700, color: 'rgba(26,18,9,0.45)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '8px' }}>
-                    Delivering To
+                <div className="gcm-card" style={{ padding: '16px 18px', marginBottom: 14 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10, borderBottom: '1px solid rgba(184,142,60,0.12)', paddingBottom: 8 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '11px', fontWeight: 700, color: '#8b6914', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" /></svg>
+                      <span>Delivering To</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setStep('form')}
+                      className="gcm-edit-btn"
+                      title="Edit delivery address"
+                    >
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M12 20h9" /><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" /></svg>
+                      Edit
+                    </button>
                   </div>
-                  <div style={{ fontSize: '13px', color: '#1a1209', fontWeight: 600 }}>{form.name}</div>
-                  <div style={{ fontSize: '11.5px', color: 'rgba(26,18,9,0.6)', marginTop: 4, lineHeight: 1.6 }}>
-                    {form.address}, {form.city}, {form.postalCode}<br />
-                    {COUNTRIES.find(c => c.code === form.country)?.name || form.country}<br />
-                    {form.mobileCode} {form.mobile}
+
+                  <div style={{ fontSize: '14px', color: '#1a1209', fontWeight: 700, marginBottom: 4 }}>
+                    {form.name}
                   </div>
-                  <button
-                    onClick={() => setStep('form')}
-                    style={{ background: 'none', border: 'none', color: '#8b6914', fontSize: '11px', fontWeight: 600, cursor: 'pointer', marginTop: 8, padding: 0, fontFamily: "'Jost', sans-serif", textDecoration: 'underline' }}
-                  >
-                    Edit Details
-                  </button>
+                  
+                  <div style={{ fontSize: '12.5px', color: 'rgba(26,18,9,0.7)', lineHeight: 1.55, marginBottom: 10 }}>
+                    {form.address}, {form.city}, {form.postalCode}, {COUNTRIES.find(c => c.code === form.country)?.name || form.country}
+                  </div>
+
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, paddingTop: 8, borderTop: '1px solid rgba(26,18,9,0.06)' }}>
+                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: '11.5px', color: '#1a1209', background: 'rgba(184,142,60,0.06)', border: '1px solid rgba(184,142,60,0.18)', borderRadius: '6px', padding: '3px 8px', fontFamily: 'monospace' }}>
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#8b6914" strokeWidth="2.2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" /></svg>
+                      <span>{form.mobileCode} {form.mobile}</span>
+                    </div>
+                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: '11.5px', color: '#1a1209', background: 'rgba(184,142,60,0.06)', border: '1px solid rgba(184,142,60,0.18)', borderRadius: '6px', padding: '3px 8px' }}>
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#8b6914" strokeWidth="2.2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" /><polyline points="22,6 12,13 2,6" /></svg>
+                      <span>{form.email}</span>
+                    </div>
+                  </div>
                 </div>
 
                 {/* Order items */}
-                <div style={{ background: '#fff', border: '1px solid rgba(139,105,20,0.15)', borderRadius: '12px', padding: '14px 16px', marginBottom: '16px' }}>
-                  <div style={{ fontSize: '10px', fontWeight: 700, color: 'rgba(26,18,9,0.45)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '10px' }}>
-                    Order Items
+                <div className="gcm-card" style={{ padding: '16px 18px', marginBottom: 16 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12, borderBottom: '1px solid rgba(184,142,60,0.12)', paddingBottom: 8 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '11px', fontWeight: 700, color: '#8b6914', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                      <span>Timepiece Selection ({items.reduce((acc, i) => acc + i.quantity, 0)})</span>
+                    </div>
                   </div>
-                  {items.map((item, idx) => (
-                    <div key={idx} className="gcm-summary-item">
-                      <img
-                        src={item.productThumbnail || '/winsor_hero_backgroundremoved.webp'}
-                        alt={item.productTitle}
-                        style={{ width: 44, height: 44, objectFit: 'contain', borderRadius: 8, background: '#faf7f0', flexShrink: 0 }}
-                      />
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontSize: '13px', fontWeight: 600, color: '#1a1209', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.productTitle}</div>
-                        <div style={{ fontSize: '11px', color: 'rgba(26,18,9,0.5)', marginTop: 2 }}>
-                          {item.colorVariant && `${item.colorVariant} · `}Qty {item.quantity}
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                    {items.map((item, idx) => (
+                      <div key={idx} className="gcm-summary-item" style={{ display: 'flex', gap: 12, alignItems: 'center', padding: '8px 0', borderBottom: idx < items.length - 1 ? '1px dashed rgba(184,142,60,0.15)' : 'none' }}>
+                        <div style={{ width: 52, height: 52, position: 'relative', borderRadius: 10, overflow: 'hidden', background: '#ffffff', border: '1px solid rgba(184,142,60,0.2)', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <img
+                            src={item.productThumbnail || '/winsor_hero_backgroundremoved.webp'}
+                            alt={item.productTitle}
+                            style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '3px' }}
+                          />
+                        </div>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ fontSize: '14px', fontWeight: 700, color: '#1a1209', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                            {item.productTitle}
+                          </div>
+                          <div style={{ fontSize: '11.5px', color: '#7a6e5d', marginTop: 2 }}>
+                            Model: {item.productModelNo}{item.colorVariant ? ` · Edition: ${item.colorVariant}` : ''}
+                          </div>
+                          <div style={{ fontSize: '11px', color: '#8b6914', fontWeight: 600, marginTop: 2 }}>
+                            Qty: {item.quantity} × LKR {item.price.toLocaleString()}
+                          </div>
+                        </div>
+                        <div style={{ fontSize: '14.5px', fontWeight: 700, color: '#1a1209', fontFamily: "'Jost', monospace", fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}>
+                          LKR {(item.price * item.quantity).toLocaleString()}
                         </div>
                       </div>
-                      <div style={{ fontSize: '13px', fontWeight: 700, color: '#8b6914', fontFamily: 'monospace', flexShrink: 0 }}>
-                        LKR {(item.price * item.quantity).toLocaleString()}
-                      </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
 
-                  <div style={{ borderTop: '1px solid rgba(139,105,20,0.12)', paddingTop: 12, marginTop: 4 }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <span style={{ fontSize: '13px', fontWeight: 700, color: '#1a1209' }}>Total</span>
-                      <span style={{ fontSize: '18px', fontWeight: 700, color: '#8b6914', fontFamily: "'Jost', monospace", fontVariantNumeric: 'tabular-nums' }}>
+                  {/* Financial Breakdown */}
+                  <div style={{ borderTop: '1px solid rgba(184,142,60,0.14)', paddingTop: 12, marginTop: 10, display: 'flex', flexDirection: 'column', gap: 6 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '12px', color: '#7a6e5d' }}>
+                      <span>Timepieces Subtotal</span>
+                      <span style={{ fontWeight: 600, color: '#1a1209' }}>LKR {subtotal.toLocaleString()}</span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '12px', color: '#7a6e5d' }}>
+                      <span>Insured Atelier Delivery</span>
+                      <span style={{ fontWeight: 700, color: '#2e7d32', textTransform: 'uppercase', fontSize: '11px', letterSpacing: '0.04em' }}>Free / Complimentary</span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: 8, marginTop: 4, borderTop: '1.5px solid rgba(184,142,60,0.2)' }}>
+                      <div>
+                        <div style={{ fontSize: '13px', fontWeight: 800, color: '#1a1209', letterSpacing: '0.04em', textTransform: 'uppercase' }}>Total Investment</div>
+                        <div style={{ fontSize: '10.5px', color: '#7a6e5d' }}>Inclusive of all luxury taxes & insurance</div>
+                      </div>
+                      <span style={{ fontSize: '20px', fontWeight: 800, color: '#b88e3c', fontFamily: "'Jost', monospace", fontVariantNumeric: 'tabular-nums' }}>
                         LKR {subtotal.toLocaleString()}
                       </span>
-                    </div>
-                    <div style={{ fontSize: '10px', color: 'rgba(26,18,9,0.4)', marginTop: 4 }}>
-                      Payment is collected upon delivery confirmation by our team
                     </div>
                   </div>
                 </div>
@@ -861,13 +1008,18 @@ export default function GuestCheckoutModal({
                   </div>
                 )}
 
-                <div style={{ display: 'flex', gap: 10 }}>
-                  <button className="gcm-btn-outline" onClick={() => setStep('form')} style={{ flex: 0, padding: '13px 20px', width: 'auto' }}>
-                    &#8592; Back
+                <div className="gcm-actions-row">
+                  <button
+                    type="button"
+                    className="gcm-btn-outline gcm-btn-back"
+                    onClick={() => setStep('form')}
+                  >
+                    ← Back
                   </button>
                   <button
+                    type="button"
                     className="gcm-btn-primary"
-                    style={{ flex: 1, marginTop: 0 }}
+                    style={{ flex: 1 }}
                     onClick={handlePlaceOrder}
                     disabled={submitting}
                   >
@@ -878,10 +1030,11 @@ export default function GuestCheckoutModal({
                         </svg>
                         Creating Order...
                       </span>
-                    ) : 'Continue to Payment →'}
+                    ) : (
+                      <span>Continue to Payment →</span>
+                    )}
                   </button>
                 </div>
-                <style>{`@keyframes gcm-spin { to { transform: rotate(360deg); } }`}</style>
               </div>
             )}
 
@@ -1161,7 +1314,7 @@ export default function GuestCheckoutModal({
                     <span>🔍 Order Tracking:</span>
                   </div>
                   <div style={{ fontSize: '11.5px', color: 'rgba(26,18,9,0.7)', lineHeight: 1.6 }}>
-                    Visit <strong style={{ color: '#1a1209' }}>/orders/track</strong> and enter your reference code <strong style={{ color: '#8b6914', fontFamily: 'monospace' }}>{orderRef}</strong> with your mobile number.
+                    Visit <Link href={`/orders/track?ref=${encodeURIComponent(orderRef)}&mobile=${encodeURIComponent(form.mobile)}`} style={{ color: '#8b6914', fontWeight: 700, textDecoration: 'underline' }}>Track Timepiece Live</Link> or enter reference code <strong style={{ color: '#8b6914', fontFamily: 'monospace' }}>{orderRef}</strong> with your mobile number.
                   </div>
                 </div>
 

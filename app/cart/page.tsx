@@ -237,9 +237,14 @@ export default function CartPage() {
     }
 
     async function loadProfile() {
+      if (!user) return;
       setProfileLoading(true);
       try {
-        const res = await fetch('/api/customer/profile');
+        const userEmail = user?.primaryEmailAddress?.emailAddress || '';
+        const params = new URLSearchParams();
+        if (user?.id) params.set('clerkId', user.id);
+        if (userEmail) params.set('email', userEmail);
+        const res = await fetch(`/api/customer/profile?${params.toString()}`);
         const data = await res.json();
         if (data.success && data.data) {
           setProfile(data.data);
@@ -250,8 +255,19 @@ export default function CartPage() {
         setProfileLoading(false);
       }
     }
+
     loadProfile();
-  }, [isSignedIn]);
+
+    const handleWindowFocus = () => {
+      loadProfile();
+    };
+    window.addEventListener('focus', handleWindowFocus);
+    window.addEventListener('storage', handleWindowFocus);
+    return () => {
+      window.removeEventListener('focus', handleWindowFocus);
+      window.removeEventListener('storage', handleWindowFocus);
+    };
+  }, [isSignedIn, user]);
 
   // Sync selection state when cart items change
   useEffect(() => {
@@ -440,7 +456,7 @@ export default function CartPage() {
         const hashRes = await fetch('/api/payment/payhere-hash', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ orderRef: ref, amount: finalAmount, currency: 'LKR' }),
+          body: JSON.stringify({ clerkId: user?.id, orderRef: ref, amount: finalAmount, currency: 'LKR' }),
         });
         const hashData = await hashRes.json();
         if (!hashData.success) throw new Error('Failed to initialise payment gateway.');
@@ -483,6 +499,7 @@ export default function CartPage() {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
+            clerkId: user?.id,
             orderRef: ref,
             items: orderItems,
             shippingAddress: {
@@ -497,6 +514,9 @@ export default function CartPage() {
             isGift: orderHasGifts,
             couponCode: appliedCoupon?.code || null,
             validationToken: appliedCoupon?.validationToken || null,
+            customerName: user?.fullName || [user?.firstName, user?.lastName].filter(Boolean).join(' ') || profile?.name || 'Valued Patron',
+            customerEmail: user?.emailAddresses?.[0]?.emailAddress || profile?.email || '',
+            customerMobile: `${profile?.mobileCode || ''} ${profile?.mobile || ''}`.trim(),
             paymentMethod: 'card',
             paymentStatus: 'paid',
             payhereOrderId: payherePaymentId,
@@ -522,6 +542,7 @@ export default function CartPage() {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
+            clerkId: user?.id,
             orderRef: ref,
             items: orderItems,
             shippingAddress: {
@@ -536,6 +557,9 @@ export default function CartPage() {
             isGift: orderHasGifts,
             couponCode: appliedCoupon?.code || null,
             validationToken: appliedCoupon?.validationToken || null,
+            customerName: user?.fullName || [user?.firstName, user?.lastName].filter(Boolean).join(' ') || profile?.name || 'Valued Patron',
+            customerEmail: user?.emailAddresses?.[0]?.emailAddress || profile?.email || '',
+            customerMobile: `${profile?.mobileCode || ''} ${profile?.mobile || ''}`.trim(),
             paymentMethod: 'bank_transfer',
             paymentStatus: 'pending',
           }),
@@ -559,6 +583,7 @@ export default function CartPage() {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
+            clerkId: user?.id,
             orderRef: ref,
             fileBase64,
             fileName: bankReceipt!.name,

@@ -130,6 +130,10 @@ export interface IOrder {
   guestName?: string | null;
   guestEmail?: string | null;
   guestMobile?: string | null;
+  // Customer info fields
+  customerName?: string | null;
+  customerEmail?: string | null;
+  customerMobile?: string | null;
   // Coupon / Discount fields
   couponCode?: string | null;
   couponDiscountPercent?: number;

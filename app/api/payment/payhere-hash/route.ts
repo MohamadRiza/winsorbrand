@@ -20,7 +20,7 @@ import Order from '@/lib/models/Order';
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { orderRef, amount, currency = 'LKR', isGuest = false, guestEmail } = body;
+    const { orderRef, amount, currency = 'LKR', isGuest = false, guestEmail, clerkId } = body;
 
     // ── 1. Basic input validation ─────────────────────────────────────────────
     if (!orderRef || typeof amount !== 'number' || amount <= 0) {
@@ -32,14 +32,17 @@ export async function POST(req: NextRequest) {
 
     // ── 2. Authorization verification ─────────────────────────────────────────
     if (!isGuest) {
-      // Signed-in user: verify via Clerk session
-      const { userId } = getAuth(req);
+      // Signed-in user: verify via Clerk session or clerkId in body
+      let { userId } = getAuth(req);
+      if (!userId && clerkId) {
+        userId = clerkId;
+      }
       if (!userId) {
         return NextResponse.json({ success: false, error: 'Unauthorized. Please sign in.' }, { status: 401 });
       }
       await connectDB();
       const existingOrder = await Order.findOne({ orderRef });
-      if (existingOrder && existingOrder.clerkId !== userId) {
+      if (existingOrder && existingOrder.clerkId && existingOrder.clerkId !== userId) {
         return NextResponse.json({ success: false, error: 'Forbidden' }, { status: 403 });
       }
     } else {

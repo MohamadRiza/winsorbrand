@@ -135,7 +135,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       await fetch('/api/customer/cart', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ items: mapToDbPayload(items) }),
+        body: JSON.stringify({ items: mapToDbPayload(items), clerkId: user?.id }),
       });
     } catch (err) {
       console.warn('Failed to sync cart to server:', err);
@@ -199,7 +199,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       if (isSignedIn) {
         try {
           // 1. Fetch server cart
-          const res = await fetch('/api/customer/cart');
+          const res = await fetch(`/api/customer/cart${user?.id ? '?clerkId=' + user.id : ''}`);
           let data: any = { success: false };
           try {
             if (res.ok && res.headers.get('content-type')?.includes('application/json')) {

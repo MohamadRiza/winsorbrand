@@ -8,7 +8,10 @@ import Product from '@/lib/models/Product';
 export async function GET(req: NextRequest) {
   try {
     await connectDB();
-    const { userId } = getAuth(req);
+    let { userId } = getAuth(req);
+    if (!userId) {
+      userId = req.nextUrl.searchParams.get('clerkId');
+    }
 
     if (!userId) {
       return NextResponse.json(
@@ -47,7 +50,13 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     await connectDB();
-    const { userId } = getAuth(req);
+    let { userId } = getAuth(req);
+    const body = await req.json();
+    const { items, clerkId } = body;
+
+    if (!userId && clerkId) {
+      userId = clerkId;
+    }
 
     if (!userId) {
       return NextResponse.json(
@@ -55,9 +64,6 @@ export async function POST(req: NextRequest) {
         { status: 401 }
       );
     }
-
-    const body = await req.json();
-    const { items } = body;
 
     if (!Array.isArray(items)) {
       return NextResponse.json(

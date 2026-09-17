@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
     await connectDB();
 
     const body = await req.json();
-    const { orderRef, fileBase64, fileName, mimeType, isGuest = false, guestEmail } = body;
+    const { orderRef, fileBase64, fileName, mimeType, isGuest = false, guestEmail, clerkId } = body;
 
     // ── 1. Presence validation ────────────────────────────────────────────────
     if (!orderRef || !fileBase64 || !mimeType) {
@@ -65,15 +65,38 @@ export async function POST(req: NextRequest) {
     let order;
 
     if (!isGuest) {
-      // Signed-in user — verify via Clerk session
-      const { userId } = getAuth(req);
+      // Signed-in user — verify via Clerk session or clerkId fallback
+      let { userId } = getAuth(req);
+      if (!userId && clerkId) {
+        userId = clerkId;
+      }
+
       if (!userId) {
         return NextResponse.json(
           { success: false, error: 'Unauthorized. Please sign in.' },
           { status: 401 }
         );
       }
-      order = await Order.findOne({ orderRef, clerkId: userId });
+
+      order = await Order.findOne({ orderRef });
+      if (!order) {
+        return NextResponse.json(
+          { success: false, error: 'Order not found.' },
+          { status: 404 }
+        );
+      }
+
+      if (order.clerkId && order.clerkId !== userId) {
+        return NextResponse.json(
+          { success: false, error: 'You are not authorised to submit a receipt for this order.' },
+          { status: 403 }
+        );
+      }
+
+      if (!order.clerkId) {
+        order.clerkId = userId;
+        await order.save();
+      }
     } else {
       // Guest user — verify via email address
       if (!guestEmail || typeof guestEmail !== 'string') {

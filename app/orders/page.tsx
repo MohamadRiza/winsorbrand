@@ -73,6 +73,10 @@ export default function CustomerOrdersPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Filter & Search States
+  const [orderFilter, setOrderFilter] = useState<'all' | 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled'>('all');
+  const [searchQuery, setSearchQuery] = useState('');
+
   // Cancellation Modal States
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [selectedOrderForCancel, setSelectedOrderForCancel] = useState<Order | null>(null);
@@ -80,6 +84,37 @@ export default function CustomerOrdersPage() {
   const [customCancelReason, setCustomCancelReason] = useState('');
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [submittingCancel, setSubmittingCancel] = useState(false);
+
+  // Filter Calculations
+  const orderCounts = {
+    all: orders.length,
+    pending: orders.filter(o => (o.status || '').toLowerCase() === 'pending').length,
+    processing: orders.filter(o => (o.status || '').toLowerCase() === 'processing').length,
+    shipped: orders.filter(o => (o.status || '').toLowerCase() === 'shipped').length,
+    delivered: orders.filter(o => (o.status || '').toLowerCase() === 'delivered').length,
+    cancelled: orders.filter(o => ['cancelled', 'cancel_requested'].includes((o.status || '').toLowerCase())).length,
+  };
+
+  const filteredOrders = orders.filter(o => {
+    const s = (o.status || '').toLowerCase();
+    if (orderFilter === 'pending' && s !== 'pending') return false;
+    if (orderFilter === 'processing' && s !== 'processing') return false;
+    if (orderFilter === 'shipped' && s !== 'shipped') return false;
+    if (orderFilter === 'delivered' && s !== 'delivered') return false;
+    if (orderFilter === 'cancelled' && !['cancelled', 'cancel_requested'].includes(s)) return false;
+
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase().trim();
+      const matchRef = (o.orderRef || '').toLowerCase().includes(q);
+      const matchItem = Array.isArray(o.items) && o.items.some(item =>
+        (item.productTitle || '').toLowerCase().includes(q) ||
+        (item.productModelNo || '').toLowerCase().includes(q) ||
+        (item.colorVariant || '').toLowerCase().includes(q)
+      );
+      if (!matchRef && !matchItem) return false;
+    }
+    return true;
+  });
 
   useEffect(() => {
     if (!isSignedIn) {
@@ -265,6 +300,119 @@ export default function CustomerOrdersPage() {
           background: #8B6914;
           color: #FAF7F0;
           box-shadow: 0 4px 14px rgba(139, 105, 20, 0.25);
+        }
+
+        /* ── Luxury Order Filter Bar ── */
+        .orders-filter-container {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          flex-wrap: wrap;
+          gap: 16px;
+          margin-bottom: 28px;
+          padding-bottom: 20px;
+          border-bottom: 1.5px solid rgba(184, 142, 60, 0.18);
+        }
+        .orders-filter-pills {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          overflow-x: auto;
+          max-width: 100%;
+          padding-bottom: 4px;
+          scrollbar-width: none;
+        }
+        .orders-filter-pills::-webkit-scrollbar {
+          display: none;
+        }
+        .orders-filter-pill {
+          display: inline-flex;
+          align-items: center;
+          gap: 7px;
+          padding: 8px 16px;
+          border-radius: 100px;
+          font-family: 'Jost', sans-serif;
+          font-size: 12.5px;
+          font-weight: 600;
+          letter-spacing: 0.03em;
+          background: #FAF7F0;
+          color: #1a1209;
+          border: 1.5px solid rgba(184, 142, 60, 0.22);
+          cursor: pointer;
+          white-space: nowrap;
+          transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .orders-filter-pill:hover {
+          border-color: #8B6914;
+          background: rgba(184, 142, 60, 0.08);
+          color: #8B6914;
+        }
+        .orders-filter-pill.active {
+          background: #1a1209;
+          color: #FAF7F0;
+          border-color: #1a1209;
+          box-shadow: 0 4px 14px rgba(26, 18, 9, 0.18);
+        }
+        .orders-pill-badge {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          min-width: 18px;
+          height: 18px;
+          padding: 0 5px;
+          border-radius: 100px;
+          font-size: 10px;
+          font-weight: 700;
+          background: rgba(184, 142, 60, 0.18);
+          color: #8B6914;
+          transition: all 0.25s ease;
+        }
+        .orders-filter-pill.active .orders-pill-badge {
+          background: #8B6914;
+          color: #FAF7F0;
+        }
+        .orders-search-box {
+          position: relative;
+          display: flex;
+          align-items: center;
+          width: 100%;
+          max-width: 340px;
+        }
+        .orders-search-box .search-icon {
+          position: absolute;
+          left: 14px;
+          color: rgba(139, 105, 20, 0.7);
+          pointer-events: none;
+        }
+        .orders-search-input {
+          width: 100%;
+          padding: 9px 36px 9px 38px;
+          border-radius: 100px;
+          border: 1.5px solid rgba(184, 142, 60, 0.25);
+          background: #FFFFFF;
+          font-family: 'Jost', sans-serif;
+          font-size: 12.5px;
+          color: #1a1209;
+          outline: none;
+          transition: all 0.25s ease;
+        }
+        .orders-search-input:focus {
+          border-color: #8B6914;
+          box-shadow: 0 0 0 3px rgba(139, 105, 20, 0.12);
+        }
+        .orders-search-clear {
+          position: absolute;
+          right: 12px;
+          background: none;
+          border: none;
+          font-size: 16px;
+          color: rgba(26, 18, 9, 0.4);
+          cursor: pointer;
+          padding: 0;
+          line-height: 1;
+        }
+        .orders-search-clear:hover {
+          color: #1a1209;
         }
 
         /* ORDER CARD */
@@ -457,6 +605,32 @@ export default function CustomerOrdersPage() {
           box-shadow: 0 4px 14px rgba(198, 40, 40, 0.25);
         }
 
+        .order-track-action-btn {
+          display: inline-flex;
+          align-items: center;
+          gap: 7px;
+          background: #1a1209;
+          color: #FAF7F0;
+          border: 1px solid #1a1209;
+          padding: 9px 20px;
+          border-radius: 100px;
+          font-family: 'Jost', sans-serif;
+          font-size: 11.5px;
+          font-weight: 600;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          text-decoration: none;
+          transition: all 0.25s ease;
+          box-shadow: 0 2px 8px rgba(26, 18, 9, 0.12);
+        }
+        .order-track-action-btn:hover {
+          background: #8B6914;
+          border-color: #8B6914;
+          color: #FAF7F0;
+          box-shadow: 0 4px 14px rgba(139, 105, 20, 0.3);
+          transform: translateY(-1px);
+        }
+
         /* RESPONSIVE BREAKPOINTS */
         @media (max-width: 640px) {
           .orders-container { padding: 90px 16px 60px; }
@@ -468,6 +642,12 @@ export default function CustomerOrdersPage() {
           .order-item-total { grid-column: 1 / -1; text-align: right; border-top: 1px dashed rgba(184,142,60,0.15); padding-top: 8px; }
           .order-shipping-section { flex-direction: column; align-items: flex-start; gap: 16px; padding: 18px 20px; }
           .text-right-mobile-left { text-align: left !important; }
+          .orders-filter-container { flex-direction: column; align-items: stretch; gap: 12px; }
+          .orders-search-box { max-width: 100%; }
+          .orders-filter-pill { padding: 6px 12px; font-size: 11.5px; }
+          .order-customer-actions { flex-direction: column; align-items: stretch !important; gap: 12px; }
+          .order-track-action-btn { justify-content: center; width: 100%; box-sizing: border-box; }
+          .orders-cancel-btn { width: 100%; text-align: center; }
         }
 
         /* MODALS */
@@ -787,6 +967,56 @@ export default function CustomerOrdersPage() {
             </div>
           )}
 
+          {/* FILTER & SEARCH BAR */}
+          {orders.length > 0 && (
+            <div className="orders-filter-container">
+              <div className="orders-filter-pills">
+                {[
+                  { key: 'all', label: 'All Orders', count: orderCounts.all },
+                  { key: 'pending', label: 'Pending', count: orderCounts.pending },
+                  { key: 'processing', label: 'Processing', count: orderCounts.processing },
+                  { key: 'shipped', label: 'In Transit', count: orderCounts.shipped },
+                  { key: 'delivered', label: 'Delivered', count: orderCounts.delivered },
+                  { key: 'cancelled', label: 'Cancelled', count: orderCounts.cancelled },
+                ].map(tab => (
+                  <button
+                    key={tab.key}
+                    type="button"
+                    onClick={() => setOrderFilter(tab.key as any)}
+                    className={`orders-filter-pill ${orderFilter === tab.key ? 'active' : ''}`}
+                  >
+                    <span>{tab.label}</span>
+                    <span className="orders-pill-badge">{tab.count}</span>
+                  </button>
+                ))}
+              </div>
+
+              <div className="orders-search-box">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" className="search-icon">
+                  <circle cx="11" cy="11" r="8" />
+                  <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                </svg>
+                <input
+                  type="text"
+                  placeholder="Search by Order # or Watch Name..."
+                  value={searchQuery}
+                  onChange={e => setSearchQuery(e.target.value)}
+                  className="orders-search-input"
+                />
+                {searchQuery && (
+                  <button
+                    type="button"
+                    onClick={() => setSearchQuery('')}
+                    className="orders-search-clear"
+                    title="Clear search"
+                  >
+                    ×
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
+
           {orders.length === 0 ? (
             <div className="empty-orders-view">
               <div className="empty-orders-icon">
@@ -802,8 +1032,32 @@ export default function CustomerOrdersPage() {
                 Discover Timepieces
               </Link>
             </div>
+          ) : filteredOrders.length === 0 ? (
+            <div className="empty-orders-view">
+              <div className="empty-orders-icon">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="11" cy="11" r="8" />
+                  <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                </svg>
+              </div>
+              <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '24px', color: '#1a1209', margin: '0 0 8px', fontWeight: 500 }}>
+                No {orderFilter !== 'all' ? `${orderFilter.toUpperCase()} ` : ''}Orders Found
+              </h2>
+              <p style={{ color: 'rgba(26,18,9,0.5)', fontSize: '13.5px', margin: '0 0 24px', maxWidth: '420px', marginLeft: 'auto', marginRight: 'auto', lineHeight: 1.5 }}>
+                {searchQuery
+                  ? `No timepiece orders matched "${searchQuery}". Clear your search query or choose another filter.`
+                  : `You currently have no orders in "${orderFilter}" status.`}
+              </p>
+              <button
+                type="button"
+                onClick={() => { setOrderFilter('all'); setSearchQuery(''); }}
+                className="empty-orders-btn"
+              >
+                View All Orders ({orders.length})
+              </button>
+            </div>
           ) : (
-            orders.map(order => {
+            filteredOrders.map(order => {
               const statusCfg = STATUS_LABELS[order.status] || STATUS_LABELS.pending;
               const orderDate = new Date(order.createdAt).toLocaleDateString(undefined, {
                 year: 'numeric',
@@ -819,9 +1073,16 @@ export default function CustomerOrdersPage() {
                     <div className="order-meta">
                       <div className="order-meta-item">
                         <span className="order-meta-label">Reference</span>
-                        <span className="order-meta-value" style={{ fontFamily: 'monospace', color: '#8B6914' }}>
-                          {order.orderRef}
-                        </span>
+                        <Link
+                          href={`/orders/track?ref=${encodeURIComponent(order.orderRef)}${order.shippingAddress?.mobile ? `&mobile=${encodeURIComponent(order.shippingAddress.mobile)}` : ''}`}
+                          style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '5px' }}
+                          title="Click to track timepiece live"
+                        >
+                          <span className="order-meta-value" style={{ fontFamily: 'monospace', color: '#8B6914', fontWeight: 600 }}>
+                            {order.orderRef}
+                          </span>
+                          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                        </Link>
                       </div>
                       <div className="order-meta-item">
                         <span className="order-meta-label">Order Placed</span>
@@ -912,27 +1173,37 @@ export default function CustomerOrdersPage() {
                   </div>
 
                   {/* CUSTOMER ACTIONS ROW */}
-                  {(order.status === 'pending' || order.status === 'processing') && (
-                    <div style={{ padding: '16px 24px', borderTop: '1px solid rgba(26, 18, 9, 0.06)', display: 'flex', justifyContent: 'flex-end', background: 'rgba(26, 18, 9, 0.005)' }}>
-                      <button 
-                        onClick={() => handleCancelRequestClick(order)}
-                        className="orders-cancel-btn"
-                      >
-                        Request Cancellation
-                      </button>
-                    </div>
-                  )}
+                  <div className="order-customer-actions" style={{ padding: '16px 24px', borderTop: '1px solid rgba(184, 142, 60, 0.12)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px', background: 'rgba(184, 142, 60, 0.02)' }}>
+                    <Link
+                      href={`/orders/track?ref=${encodeURIComponent(order.orderRef)}${order.shippingAddress?.mobile ? `&mobile=${encodeURIComponent(order.shippingAddress.mobile)}` : ''}`}
+                      className="order-track-action-btn"
+                    >
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                      Live Tracking
+                    </Link>
 
-                  {order.status === 'cancel_requested' && (
-                    <div style={{ padding: '16px 24px', borderTop: '1px solid rgba(26, 18, 9, 0.06)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(201, 161, 74, 0.02)' }}>
-                      <span style={{ fontSize: '12.5px', color: 'rgba(26, 18, 9, 0.55)', fontStyle: 'italic' }}>
-                        Reason: {order.cancelReason || 'Not provided'}
-                      </span>
-                      <span style={{ fontSize: '12px', color: '#8B6914', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                        Awaiting Admin Approval
-                      </span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                      {(order.status === 'pending' || order.status === 'processing') && (
+                        <button 
+                          onClick={() => handleCancelRequestClick(order)}
+                          className="orders-cancel-btn"
+                        >
+                          Request Cancellation
+                        </button>
+                      )}
+
+                      {order.status === 'cancel_requested' && (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                          <span style={{ fontSize: '12px', color: 'rgba(26, 18, 9, 0.55)', fontStyle: 'italic' }}>
+                            Reason: {order.cancelReason || 'Not provided'}
+                          </span>
+                          <span style={{ fontSize: '11px', color: '#8B6914', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                            Awaiting Admin Approval
+                          </span>
+                        </div>
+                      )}
                     </div>
-                  )}
+                  </div>
 
                 </div>
               );

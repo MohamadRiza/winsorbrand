@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getAuth } from '@clerk/nextjs/server';
 import { connectDB } from '@/lib/db';
 import Order from '@/lib/models/Order';
 
@@ -8,16 +9,22 @@ export async function GET(req: NextRequest) {
 
     const { searchParams } = new URL(req.url);
     const rawRef = searchParams.get('ref')?.trim() || '';
-    const mobile = searchParams.get('mobile')?.trim() || '';
+    const mobile = searchParams.get('mobile')?.trim() || searchParams.get('phone')?.trim() || '';
+    let clerkId = searchParams.get('clerkId')?.trim() || '';
 
-    if (!rawRef || !mobile) {
+    let { userId } = getAuth(req);
+    if (!userId && clerkId) {
+      userId = clerkId;
+    }
+
+    if (!rawRef) {
       return NextResponse.json(
-        { success: false, error: 'Order reference and registered mobile number are required.' },
+        { success: false, error: 'Order reference is required.' },
         { status: 400 }
       );
     }
 
-    // Case-insensitive regex query for orderRef (e.g. WNS-2026-373243 or WG-8F9A2B)
+    // Case-insensitive regex query for orderRef (e.g. WNS-2026-373243 or WG-8F9A2B or WN-YOZHCSWY)
     const orderRefRegex = new RegExp(`^${rawRef.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')}$`, 'i');
 
     // Find order in DB (matches both guest & registered user orders)
@@ -32,33 +39,57 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // Normalise phone numbers for robust matching (removes +, spaces, dashes, parentheses)
-    const normalise = (m?: string | null) => (m ? m.replace(/[\s\-\+\(\)]/g, '') : '');
-    const inputMobile = normalise(mobile);
-    
+    // Normalise phone numbers for robust matching (removes non-digit characters)
+    const cleanDigits = (m?: string | null) => (m ? m.replace(/\D/g, '') : '');
+    const stripZero = (s: string) => s.replace(/^0+/, '');
+
+    const inputDigits = cleanDigits(mobile);
+    const inputStripped = stripZero(inputDigits);
+
     // Extract candidate mobile numbers stored on the order document
-    const candidateMobiles = [
-      normalise(order.guestMobile),
-      normalise(order.shippingAddress?.mobile),
+    const candidateNumbers = [
+      order.guestMobile,
+      order.shippingAddress?.mobile,
       order.shippingAddress?.mobileCode && order.shippingAddress?.mobile
-        ? normalise(`${order.shippingAddress.mobileCode}${order.shippingAddress.mobile}`)
-        : '',
-    ].filter(Boolean);
+        ? `${order.shippingAddress.mobileCode}${order.shippingAddress.mobile}`
+        : null,
+    ].filter(Boolean) as string[];
 
     // Verify if any candidate mobile matches input
-    const isMobileMatch = candidateMobiles.some(stored => {
-      if (!stored || !inputMobile) return false;
-      return stored.includes(inputMobile) || inputMobile.includes(stored);
+    const isMobileMatch = inputDigits.length > 0 && candidateNumbers.some(cand => {
+      const candDigits = cleanDigits(cand);
+      if (!candDigits) return false;
+      const candStripped = stripZero(candDigits);
+
+      return (
+        candDigits === inputDigits ||
+        candStripped === inputStripped ||
+        candDigits.endsWith(inputStripped) ||
+        inputDigits.endsWith(candStripped) ||
+        candDigits.includes(inputStripped) ||
+        inputStripped.includes(candStripped)
+      );
     });
 
-    if (!isMobileMatch) {
+    // Check if the caller is the authenticated owner of the order via Clerk
+    const isOwnerAuthenticated = Boolean(userId && order.clerkId && order.clerkId === userId);
+
+    if (!isOwnerAuthenticated && !isMobileMatch) {
+      if (!mobile) {
+        return NextResponse.json(
+          { success: false, error: 'Registered mobile number is required to view tracking records for this order.' },
+          { status: 400 }
+        );
+      }
       return NextResponse.json(
         { success: false, error: 'Mobile number does not match our records for this order reference.' },
         { status: 403 }
       );
     }
 
-    // Return sanitized order data
+    const orderMobile = order.shippingAddress?.mobile || order.guestMobile || '';
+
+    // Return sanitized order data with registered mobile number for auto-fill
     return NextResponse.json({
       success: true,
       data: {
@@ -67,7 +98,9 @@ export async function GET(req: NextRequest) {
         createdAt: order.createdAt,
         subtotal: order.subtotal || 0,
         finalTotal: order.finalTotal || order.subtotal || 0,
+        mobile: orderMobile,
         items: (order.items || []).map((item: any) => ({
+          productId: item.productId,
           productTitle: item.productTitle,
           productModelNo: item.productModelNo,
           productThumbnail: item.productThumbnail,
@@ -79,6 +112,8 @@ export async function GET(req: NextRequest) {
           address: order.shippingAddress?.address || '',
           city: order.shippingAddress?.city || '',
           country: order.shippingAddress?.country || 'LK',
+          postalCode: order.shippingAddress?.postalCode || '',
+          mobile: orderMobile,
         },
         guestName: order.guestName || (order.shippingAddress?.address ? 'Valued Client' : 'Customer'),
       },

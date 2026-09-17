@@ -19,6 +19,7 @@ interface BuyNowModalProps {
   onClose: () => void;
   item: BuyNowItem | null;
   profile: {
+    clerkId?: string;
     name?: string;
     email?: string;
     address?: string;
@@ -125,7 +126,7 @@ export default function BuyNowModal({
         const hashRes = await fetch('/api/payment/payhere-hash', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ orderRef: ref, amount: subtotal, currency: 'LKR' }),
+          body: JSON.stringify({ clerkId: profile?.clerkId, orderRef: ref, amount: subtotal, currency: 'LKR' }),
         });
         const hashData = await hashRes.json();
         if (!hashData.success) throw new Error('Failed to initialise payment gateway.');
@@ -155,6 +156,7 @@ export default function BuyNowModal({
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
+            clerkId: profile?.clerkId,
             orderRef: ref,
             items: [{
               productId: item.productId, productTitle: item.productTitle,
@@ -167,6 +169,9 @@ export default function BuyNowModal({
               country: profile!.country, mobile: profile!.mobile, mobileCode: profile!.mobileCode,
             },
             subtotal, isGift: false, couponCode: null, validationToken: null,
+            customerName: [userFirstName, userLastName].filter(Boolean).join(' ') || profile?.name || 'Valued Client',
+            customerEmail: userEmail || profile?.email || '',
+            customerMobile: `${profile?.mobileCode || ''} ${profile?.mobile || ''}`.trim(),
             paymentMethod: 'card',
             paymentStatus: 'paid',
             payhereOrderId: payherePaymentId,
@@ -183,6 +188,7 @@ export default function BuyNowModal({
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
+            clerkId: profile?.clerkId,
             orderRef: ref,
             items: [{
               productId: item.productId, productTitle: item.productTitle,
@@ -195,6 +201,9 @@ export default function BuyNowModal({
               country: profile!.country, mobile: profile!.mobile, mobileCode: profile!.mobileCode,
             },
             subtotal, isGift: false, couponCode: null, validationToken: null,
+            customerName: [userFirstName, userLastName].filter(Boolean).join(' ') || profile?.name || 'Valued Client',
+            customerEmail: userEmail || profile?.email || '',
+            customerMobile: `${profile?.mobileCode || ''} ${profile?.mobile || ''}`.trim(),
             paymentMethod: 'bank_transfer',
             paymentStatus: 'pending',
           }),
@@ -211,7 +220,7 @@ export default function BuyNowModal({
         });
         const receiptRes = await fetch('/api/payment/bank-receipt', {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ orderRef: ref, fileBase64, fileName: bankReceipt!.name, mimeType: bankReceipt!.type, isGuest: false }),
+          body: JSON.stringify({ clerkId: profile?.clerkId, orderRef: ref, fileBase64, fileName: bankReceipt!.name, mimeType: bankReceipt!.type, isGuest: false }),
         });
         setBankReceiptUploading(false);
         const receiptData = await receiptRes.json();
@@ -537,6 +546,7 @@ export default function BuyNowModal({
         .bnm-btn-primary {
           width: 100%;
           height: 48px;
+          box-sizing: border-box;
           background: linear-gradient(135deg, #c59b4e 0%, #936f26 100%);
           color: #ffffff;
           border: none;
@@ -553,7 +563,7 @@ export default function BuyNowModal({
           justify-content: center;
           gap: 8px;
           box-shadow: 0 4px 14px rgba(184, 142, 60, 0.28);
-          margin-top: 4px;
+          margin-top: 0;
         }
         .bnm-btn-primary:hover:not(:disabled) {
           background: linear-gradient(135deg, #d4a755 0%, #a47c2d 100%);
@@ -568,7 +578,8 @@ export default function BuyNowModal({
 
         .bnm-btn-outline {
           width: 100%;
-          height: 46px;
+          height: 48px;
+          box-sizing: border-box;
           background: transparent;
           border: 1.5px solid rgba(184, 142, 60, 0.45);
           color: #9e7529;
@@ -579,8 +590,12 @@ export default function BuyNowModal({
           font-weight: 700;
           letter-spacing: 0.08em;
           text-transform: uppercase;
-          margin-top: 10px;
+          margin-top: 0;
           transition: all 0.2s ease;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
         }
         .bnm-btn-outline:hover {
           border-color: #b88e3c;
@@ -637,6 +652,7 @@ export default function BuyNowModal({
           .bnm-body { padding: 0 20px 20px; }
           .bnm-title { font-size: 20px; }
           .bnm-trust-footer { flex-wrap: wrap; gap: 10px; justify-content: center; }
+          .bnm-btn-outline { width: 90px !important; }
         }
       `}</style>
 
@@ -770,10 +786,14 @@ export default function BuyNowModal({
                   </div>
                 )}
 
-                <button className="bnm-btn-primary" onClick={handleConfirm} disabled={!isProfileComplete}>
-                  Continue to Payment &#8594;
-                </button>
-                <button className="bnm-btn-outline" onClick={onClose}>Cancel</button>
+                <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginTop: 16 }}>
+                  <button className="bnm-btn-outline" onClick={onClose} style={{ width: 110, flexShrink: 0 }}>
+                    Cancel
+                  </button>
+                  <button className="bnm-btn-primary" onClick={handleConfirm} disabled={!isProfileComplete} style={{ flex: 1 }}>
+                    Continue to Payment &#8594;
+                  </button>
+                </div>
 
                 {/* Footer Trust Badges */}
                 <div className="bnm-trust-footer">
@@ -906,23 +926,28 @@ export default function BuyNowModal({
                   </div>
                 )}
 
-                <button
-                  className="bnm-btn-primary"
-                  onClick={handlePlaceOrder}
-                  disabled={submitting || bankReceiptUploading || (payMethod === 'bank_transfer' && (!bankTransferConfirmed || !bankReceipt))}
-                >
-                  {(submitting || bankReceiptUploading) ? (
-                    <>
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ animation: 'bnm-spin 1s linear infinite' }}><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" /></svg>
-                      {bankReceiptUploading ? 'Uploading Receipt...' : 'Processing...'}
-                    </>
-                  ) : (
-                    <>
-                      Confirm &amp; Place Order &#8594;
-                    </>
-                  )}
-                </button>
-                <button className="bnm-btn-outline" onClick={() => setStep('confirm')}>Back</button>
+                <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginTop: 16 }}>
+                  <button className="bnm-btn-outline" onClick={() => setStep('confirm')} style={{ width: 110, flexShrink: 0 }}>
+                    ← Back
+                  </button>
+                  <button
+                    className="bnm-btn-primary"
+                    onClick={handlePlaceOrder}
+                    disabled={submitting || bankReceiptUploading || (payMethod === 'bank_transfer' && (!bankTransferConfirmed || !bankReceipt))}
+                    style={{ flex: 1 }}
+                  >
+                    {(submitting || bankReceiptUploading) ? (
+                      <>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ animation: 'bnm-spin 1s linear infinite' }}><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" /></svg>
+                        {bankReceiptUploading ? 'Uploading Receipt...' : 'Processing...'}
+                      </>
+                    ) : (
+                      <>
+                        Place Order &#8594;
+                      </>
+                    )}
+                  </button>
+                </div>
 
                 {/* Trust Badges */}
                 <div className="bnm-trust-footer">

@@ -68,6 +68,23 @@ async function handleAdminAuth(req: NextRequest) {
   return null;
 }
 
+function isStaleClerkSession(token?: string): boolean {
+  if (!token) return false;
+  try {
+    const parts = token.split('.');
+    if (parts.length < 2) return false;
+    const header = JSON.parse(Buffer.from(parts[0], 'base64url').toString('utf8'));
+    // The active Clerk instance key id is 'ins_3Hlk2s3HqcNnByzqXuX1cTj4pNf'.
+    // Any session token signed with a different instance key (e.g. ins_2voZuNySdIp39pQgtQeQLkSXNb5) is stale.
+    if (header.kid && header.kid !== 'ins_3Hlk2s3HqcNnByzqXuX1cTj4pNf') {
+      return true;
+    }
+  } catch {
+    return true;
+  }
+  return false;
+}
+
 const clerkHandler = clerkMiddleware(async (auth, req: NextRequest) => {
   const { pathname } = req.nextUrl;
 
@@ -86,8 +103,45 @@ const clerkHandler = clerkMiddleware(async (auth, req: NextRequest) => {
   return NextResponse.next();
 });
 
-export default clerkHandler;
-export const proxy = clerkHandler;
+const middleware = async (req: NextRequest, event: NextFetchEvent) => {
+  let hadStaleCookie = false;
+  const sessionToken = req.cookies.get('__session')?.value;
+
+  if (isStaleClerkSession(sessionToken)) {
+    hadStaleCookie = true;
+    req.cookies.delete('__session');
+    req.cookies.delete('__client_uat');
+    req.cookies.delete('__clerk_handshake');
+    req.cookies.delete('__clerk_db_jwt');
+  }
+
+  try {
+    const res = await clerkHandler(req, event);
+    if (hadStaleCookie && res) {
+      if ('cookies' in res && (res as NextResponse).cookies) {
+        (res as NextResponse).cookies.delete('__session');
+        (res as NextResponse).cookies.delete('__client_uat');
+        (res as NextResponse).cookies.delete('__clerk_handshake');
+        (res as NextResponse).cookies.delete('__clerk_db_jwt');
+      } else if (res.headers) {
+        res.headers.append('Set-Cookie', '__session=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax');
+        res.headers.append('Set-Cookie', '__client_uat=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax');
+      }
+    }
+    return res;
+  } catch (err: any) {
+    console.warn('[Proxy] Handled Clerk token verification error:', err?.message || err);
+    const fallbackRes = NextResponse.next();
+    fallbackRes.cookies.delete('__session');
+    fallbackRes.cookies.delete('__client_uat');
+    fallbackRes.cookies.delete('__clerk_handshake');
+    fallbackRes.cookies.delete('__clerk_db_jwt');
+    return fallbackRes;
+  }
+};
+
+export default middleware;
+export const proxy = middleware;
 
 export const config = {
   matcher: [

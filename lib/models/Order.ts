@@ -95,6 +95,23 @@ const OrderSchema = new Schema<IOrderDocument>({
     trim: true,
     default: null,
   },
+  // ── Customer Info Fields ────────────────────────────────────
+  customerName: {
+    type: String,
+    trim: true,
+    default: null,
+  },
+  customerEmail: {
+    type: String,
+    trim: true,
+    lowercase: true,
+    default: null,
+  },
+  customerMobile: {
+    type: String,
+    trim: true,
+    default: null,
+  },
   // ── Coupon / Discount Fields ───────────────────────────────
   couponCode: {
     type: String,

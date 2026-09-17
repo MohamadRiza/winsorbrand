@@ -1,6 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { useUser } from '@clerk/nextjs';
 import Link from 'next/link';
 import Image from 'next/image';
 import toast from 'react-hot-toast';
@@ -59,42 +61,80 @@ interface OrderData {
   createdAt: string;
   subtotal: number;
   finalTotal?: number;
+  mobile?: string;
   items: OrderItemData[];
   shippingAddress: {
     address: string;
     city: string;
     country: string;
+    postalCode?: string;
+    mobile?: string;
   };
   guestName: string;
 }
 
-export default function GuestOrderTrackingPage() {
+function OrderTrackingContent() {
   const { convertPrice } = useCurrency();
+  const { user, isLoaded } = useUser();
+  const searchParams = useSearchParams();
 
-  const [orderRef, setOrderRef] = useState('');
-  const [mobile, setMobile] = useState('');
+  const urlRef = searchParams.get('ref')?.trim() || '';
+  const urlMobile = searchParams.get('mobile')?.trim() || searchParams.get('phone')?.trim() || '';
+
+  const [orderRef, setOrderRef] = useState(urlRef ? urlRef.toUpperCase() : '');
+  const [mobile, setMobile] = useState(urlMobile || '');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [order, setOrder] = useState<OrderData | null>(null);
   const [copied, setCopied] = useState(false);
+  const resultsRef = useRef<HTMLDivElement>(null);
+  const hasAutoTrackedRef = useRef(false);
 
-  const handleTrack = async (e: React.FormEvent) => {
-    e.preventDefault();
+  // Synchronize state if search parameters change in URL
+  useEffect(() => {
+    if (urlRef && !orderRef) setOrderRef(urlRef.toUpperCase());
+    if (urlMobile && !mobile) setMobile(urlMobile);
+  }, [urlRef, urlMobile]);
+
+  // Execute tracking query
+  const executeTrack = async (targetRef?: string, targetMob?: string) => {
+    const ref = (targetRef !== undefined ? targetRef : orderRef).trim().toUpperCase();
+    const mob = (targetMob !== undefined ? targetMob : mobile).trim();
+
     setError('');
-    setOrder(null);
 
-    const ref = orderRef.trim().toUpperCase();
-    const mob = mobile.trim();
+    if (!ref) {
+      setError('Please enter your order reference number.');
+      return;
+    }
 
-    if (!ref) { setError('Please enter your order reference number.'); return; }
-    if (!mob) { setError('Please enter your mobile number.'); return; }
+    // If no mobile provided and user is not signed in, prompt for mobile
+    if (!mob && !user?.id) {
+      setError('Please enter your registered mobile number to verify your order.');
+      return;
+    }
 
     setLoading(true);
     try {
-      const res = await fetch(`/api/orders/guest-track?ref=${encodeURIComponent(ref)}&mobile=${encodeURIComponent(mob)}`);
+      const params = new URLSearchParams();
+      params.set('ref', ref);
+      if (mob) params.set('mobile', mob);
+      if (user?.id) params.set('clerkId', user.id);
+
+      const res = await fetch(`/api/orders/guest-track?${params.toString()}`);
       const data = await res.json();
-      if (data.success) {
+      if (data.success && data.data) {
         setOrder(data.data);
+        if (data.data.orderRef) {
+          setOrderRef(data.data.orderRef);
+        }
+        if (data.data.mobile) {
+          setMobile(data.data.mobile);
+        }
+        // Smooth scroll to tracking results card
+        setTimeout(() => {
+          resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 150);
       } else {
         setError(data.error || 'Order not found. Please verify your reference number & mobile.');
       }
@@ -103,6 +143,22 @@ export default function GuestOrderTrackingPage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  // Automatically track on mount if order reference is present in URL
+  useEffect(() => {
+    if (!urlRef || hasAutoTrackedRef.current) return;
+
+    // Once Clerk auth is resolved (isLoaded), attempt automatic tracking
+    if (isLoaded) {
+      hasAutoTrackedRef.current = true;
+      executeTrack(urlRef, urlMobile);
+    }
+  }, [urlRef, urlMobile, isLoaded]);
+
+  const handleTrack = async (e: React.FormEvent) => {
+    e.preventDefault();
+    executeTrack();
   };
 
   const handleCopyRef = () => {
@@ -121,10 +177,10 @@ export default function GuestOrderTrackingPage() {
       customer: {
         name: order.guestName || 'Customer',
         email: 'N/A',
-        mobile: mobile,
+        mobile: mobile || order.mobile || order.shippingAddress?.mobile || 'N/A',
         address: order.shippingAddress.address,
         city: order.shippingAddress.city,
-        postalCode: 'N/A',
+        postalCode: order.shippingAddress.postalCode || 'N/A',
         country: order.shippingAddress.country,
       },
       items: order.items.map(i => ({
@@ -364,7 +420,7 @@ export default function GuestOrderTrackingPage() {
 
           {/* 🌟 ORDER RESULTS CARD */}
           {order && statusInfo && (
-            <div className="track-card animate-fade-up">
+            <div ref={resultsRef} className="track-card animate-fade-up">
               
               {/* Header Status & Action Buttons */}
               <div style={{
@@ -622,5 +678,20 @@ export default function GuestOrderTrackingPage() {
         </div>
       </div>
     </main>
+  );
+}
+
+export default function GuestOrderTrackingPage() {
+  return (
+    <Suspense
+      fallback={
+        <div style={{ minHeight: '100vh', background: '#faf7f0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ width: 36, height: 36, border: '3px solid rgba(139,105,20,0.15)', borderTop: '3px solid #8B6914', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+          <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+        </div>
+      }
+    >
+      <OrderTrackingContent />
+    </Suspense>
   );
 }

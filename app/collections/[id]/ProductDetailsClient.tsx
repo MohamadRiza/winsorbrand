@@ -19,12 +19,48 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
   const { convertPrice } = useCurrency();
   const { addToCart } = useCart();
   const router = useRouter();
-  const { isSignedIn } = useUser();
+  const { isSignedIn, user } = useUser();
 
   // Buy Now modal states
   const [showGuestModal, setShowGuestModal] = useState(false);
   const [showBuyNowModal, setShowBuyNowModal] = useState(false);
   const [buyerProfile, setBuyerProfile] = useState<any>(null);
+
+  // Preload buyer profile when signed in & refresh on window focus
+  useEffect(() => {
+    if (!isSignedIn || !user) {
+      setBuyerProfile(null);
+      return;
+    }
+
+    const loadProfile = async () => {
+      try {
+        const userEmail = user.primaryEmailAddress?.emailAddress || '';
+        const params = new URLSearchParams();
+        if (user.id) params.set('clerkId', user.id);
+        if (userEmail) params.set('email', userEmail);
+        const res = await fetch(`/api/customer/profile?${params.toString()}`);
+        const data = await res.json();
+        if (data.success && data.data) {
+          setBuyerProfile(data.data);
+        }
+      } catch (e) {
+        console.warn('Failed to preload buyer profile:', e);
+      }
+    };
+
+    loadProfile();
+
+    const handleWindowFocus = () => {
+      loadProfile();
+    };
+    window.addEventListener('focus', handleWindowFocus);
+    window.addEventListener('storage', handleWindowFocus);
+    return () => {
+      window.removeEventListener('focus', handleWindowFocus);
+      window.removeEventListener('storage', handleWindowFocus);
+    };
+  }, [isSignedIn, user]);
 
   // API States
   const [product, setProduct] = useState<IProduct | null>(null);
@@ -282,15 +318,17 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
 
     // Signed-in flow — fetch profile then open direct purchase modal
     try {
-      const res = await fetch('/api/customer/profile');
+      const userEmail = user?.primaryEmailAddress?.emailAddress || '';
+      const params = new URLSearchParams();
+      if (user?.id) params.set('clerkId', user.id);
+      if (userEmail) params.set('email', userEmail);
+      const res = await fetch(`/api/customer/profile?${params.toString()}`);
       const data = await res.json();
       if (data.success && data.data) {
         setBuyerProfile(data.data);
-      } else {
-        setBuyerProfile(null);
       }
     } catch {
-      setBuyerProfile(null);
+      // keep preloaded profile if present
     }
     setShowBuyNowModal(true);
   };
@@ -2304,6 +2342,9 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
             price: product.price,
           }}
           profile={buyerProfile}
+          userFirstName={user?.firstName || ''}
+          userLastName={user?.lastName || ''}
+          userEmail={user?.primaryEmailAddress?.emailAddress || ''}
           onOrderSuccess={() => {
             // Keep modal open so step 4 success popup (ref code + copy button + PDF receipt) is shown
           }}

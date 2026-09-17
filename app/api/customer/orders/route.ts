@@ -4,12 +4,16 @@ import { connectDB } from '@/lib/db';
 import Order from '@/lib/models/Order';
 import Product from '@/lib/models/Product';
 import Coupon from '@/lib/models/Coupon';
+import Customer from '@/lib/models/Customer';
 import { verifyCouponToken } from '@/app/api/customer/validate-coupon/route';
 
 export async function GET(req: NextRequest) {
   try {
     await connectDB();
-    const { userId } = getAuth(req);
+    let { userId } = getAuth(req);
+    if (!userId) {
+      userId = req.nextUrl.searchParams.get('clerkId');
+    }
 
     if (!userId) {
       return NextResponse.json(
@@ -32,7 +36,17 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     await connectDB();
-    const { userId } = getAuth(req);
+    let { userId } = getAuth(req);
+    const body = await req.json();
+    const {
+      clerkId, orderRef, items, shippingAddress, subtotal, isGift,
+      couponCode, validationToken, paymentMethod, paymentStatus, payhereOrderId,
+      customerName, customerEmail, customerMobile,
+    } = body;
+
+    if (!userId && clerkId) {
+      userId = clerkId;
+    }
 
     if (!userId) {
       return NextResponse.json(
@@ -40,9 +54,6 @@ export async function POST(req: NextRequest) {
         { status: 401 }
       );
     }
-
-    const body = await req.json();
-    const { orderRef, items, shippingAddress, subtotal, isGift, couponCode, validationToken, paymentMethod, paymentStatus, payhereOrderId } = body;
 
     if (!orderRef || !items || !shippingAddress || !subtotal) {
       return NextResponse.json(
@@ -185,8 +196,37 @@ export async function POST(req: NextRequest) {
     }
 
     const isPaid = paymentStatus === 'paid' || (paymentMethod === 'card' && paymentStatus === 'paid');
+
+    // Look up customer document to fill in any missing contact details
+    let resolvedCustomerName = customerName?.trim() || null;
+    let resolvedCustomerEmail = customerEmail?.trim()?.toLowerCase() || null;
+    let resolvedCustomerMobile = customerMobile?.trim() || null;
+
+    if (!resolvedCustomerEmail || !resolvedCustomerName) {
+      try {
+        const customerDoc = await Customer.findOne({ clerkId: userId });
+        if (customerDoc) {
+          if (!resolvedCustomerEmail && customerDoc.email) resolvedCustomerEmail = customerDoc.email;
+          if (!resolvedCustomerName && customerDoc.name) resolvedCustomerName = customerDoc.name;
+          if (!resolvedCustomerMobile && customerDoc.mobile) {
+            resolvedCustomerMobile = `${customerDoc.mobileCode || ''} ${customerDoc.mobile}`.trim();
+          }
+        }
+      } catch (e) {
+        console.warn('Could not lookup customer profile on order create:', e);
+      }
+    }
+
+    if (!resolvedCustomerMobile && shippingAddress?.mobile) {
+      resolvedCustomerMobile = `${shippingAddress.mobileCode || ''} ${shippingAddress.mobile}`.trim();
+    }
+
     const newOrder = await Order.create({
       clerkId: userId,
+      isGuestOrder: false,
+      customerName: resolvedCustomerName,
+      customerEmail: resolvedCustomerEmail,
+      customerMobile: resolvedCustomerMobile,
       orderRef,
       items,
       shippingAddress,
