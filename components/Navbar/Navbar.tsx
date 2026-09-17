@@ -152,6 +152,51 @@ export default function Navbar() {
   const [heroActiveSlide, setHeroActiveSlide] = useState(0);
   const [isNavbarHovered, setIsNavbarHovered] = useState(false);
 
+  // Mobile drawer touch swipe-to-close tracking
+  const [drawerDragX, setDrawerDragX] = useState(0);
+  const [isDrawerDragging, setIsDrawerDragging] = useState(false);
+  const drawerTouchStart = useRef<{ x: number; y: number } | null>(null);
+  const isHorizontalGesture = useRef<boolean | null>(null);
+
+  const handleDrawerTouchStart = (e: React.TouchEvent) => {
+    drawerTouchStart.current = {
+      x: e.touches[0].clientX,
+      y: e.touches[0].clientY,
+    };
+    isHorizontalGesture.current = null;
+    setIsDrawerDragging(false);
+    setDrawerDragX(0);
+  };
+
+  const handleDrawerTouchMove = (e: React.TouchEvent) => {
+    if (!drawerTouchStart.current) return;
+    const diffX = e.touches[0].clientX - drawerTouchStart.current.x;
+    const diffY = e.touches[0].clientY - drawerTouchStart.current.y;
+
+    // Detect gesture direction on early touch movement (> 8px)
+    if (isHorizontalGesture.current === null) {
+      if (Math.abs(diffX) > 8 || Math.abs(diffY) > 8) {
+        isHorizontalGesture.current = Math.abs(diffX) > Math.abs(diffY);
+      }
+    }
+
+    // Only drag rightward to dismiss (diffX > 0). NEVER allow dragging left into negative space (diffX < 0)!
+    if (isHorizontalGesture.current && diffX > 0) {
+      setIsDrawerDragging(true);
+      setDrawerDragX(diffX);
+    }
+  };
+
+  const handleDrawerTouchEnd = () => {
+    if (isDrawerDragging && drawerDragX > 70) {
+      setMobileOpen(false);
+    }
+    setDrawerDragX(0);
+    setIsDrawerDragging(false);
+    drawerTouchStart.current = null;
+    isHorizontalGesture.current = null;
+  };
+
   const searchContainerRef = useRef<HTMLDivElement>(null);
 
   const lastScrollY = useRef(0);
@@ -295,14 +340,22 @@ export default function Navbar() {
   useEffect(() => {
     if (mobileOpen) {
       document.body.style.overflow = 'hidden';
+      document.documentElement.style.overflow = 'hidden';
       document.body.classList.add('wn-mobile-menu-open');
+      document.documentElement.classList.add('wn-mobile-menu-open');
     } else {
       document.body.style.overflow = '';
+      document.documentElement.style.overflow = '';
       document.body.classList.remove('wn-mobile-menu-open');
+      document.documentElement.classList.remove('wn-mobile-menu-open');
+      setDrawerDragX(0);
+      setIsDrawerDragging(false);
     }
     return () => {
       document.body.style.overflow = '';
+      document.documentElement.style.overflow = '';
       document.body.classList.remove('wn-mobile-menu-open');
+      document.documentElement.classList.remove('wn-mobile-menu-open');
     };
   }, [mobileOpen]);
 
@@ -417,6 +470,51 @@ export default function Navbar() {
         }
         .wn-search-spinner {
           animation: wn-spin 0.8s linear infinite;
+        }
+        /* ── PRO GLASSMORPHISM MOBILE BUTTON STYLES & OPENING ANIMATION ── */
+        @keyframes wn-pill-reveal {
+          0% {
+            opacity: 0;
+            transform: translateY(16px) scale(0.96);
+            filter: blur(4px);
+          }
+          65% {
+            opacity: 0.95;
+            filter: blur(0);
+          }
+          100% {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            filter: blur(0);
+          }
+        }
+        .wn-anim-item {
+          opacity: 0;
+          animation: wn-pill-reveal 0.44s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+          will-change: transform, opacity, filter;
+        }
+        .wn-mob-close-btn{transition:all 0.28s cubic-bezier(0.25, 0.46, 0.45, 0.94);}
+        .wn-mob-close-btn:hover{background:linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(212,175,55,0.2) 100%)!important;border-color:rgba(212,175,55,0.6)!important;transform:rotate(90deg) scale(1.08);box-shadow:0 4px 16px rgba(139,105,20,0.18),inset 0 1px 0 rgba(255,255,255,1)!important;}
+        .wn-mob-currency-btn{transition:all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);}
+        .wn-mob-currency-btn:hover{background:linear-gradient(135deg, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.5) 100%)!important;border-color:rgba(212,175,55,0.45)!important;box-shadow:0 6px 20px -2px rgba(139,105,20,0.12),inset 0 1.5px 0 0 rgba(255,255,255,1)!important;transform:translateY(-1.5px);}
+        .wn-mob-col-btn{position:relative;overflow:hidden;transition:all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);}
+        .wn-mob-col-btn::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,0.4) 50%,transparent 100%);transform:translateX(-100%);transition:transform 0.6s ease;pointer-events:none;}
+        .wn-mob-col-btn:hover::before,.wn-mob-col-btn:active::before{transform:translateX(100%);}
+        .wn-mob-col-btn:hover{background:linear-gradient(135deg, rgba(255,255,255,0.82) 0%, rgba(255,255,255,0.45) 100%)!important;border-color:rgba(212,175,55,0.52)!important;box-shadow:0 8px 24px -2px rgba(139,105,20,0.15),inset 0 1.5px 0 0 rgba(255,255,255,1)!important;transform:translateY(-1.5px);}
+        .wn-mob-col-btn:hover span{color:#8B6914!important;}
+        .wn-mob-nav-link{position:relative;overflow:hidden;transition:all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);}
+        .wn-mob-nav-link::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,0.4) 50%,transparent 100%);transform:translateX(-100%);transition:transform 0.6s ease;pointer-events:none;}
+        .wn-mob-nav-link:hover::before,.wn-mob-nav-link:active::before{transform:translateX(100%);}
+        .wn-mob-nav-link:hover{background:linear-gradient(135deg, rgba(255,255,255,0.82) 0%, rgba(255,255,255,0.42) 100%)!important;border-color:rgba(212,175,55,0.45)!important;color:#8B6914!important;box-shadow:0 6px 20px -2px rgba(139,105,20,0.12),inset 0 1.5px 0 0 rgba(255,255,255,1)!important;transform:translateY(-1.5px);}
+        .wn-mob-profile-btn{position:relative;overflow:hidden;transition:all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);}
+        .wn-mob-profile-btn:hover{background:linear-gradient(135deg, rgba(255,255,255,0.85) 0%, rgba(212,175,55,0.22) 100%)!important;border-color:rgba(212,175,55,0.6)!important;transform:translateY(-1.5px);box-shadow:0 6px 18px rgba(139,105,20,0.16),inset 0 1.5px 0 0 rgba(255,255,255,1)!important;}
+        .wn-mob-cart-btn{transition:all 0.28s cubic-bezier(0.25, 0.46, 0.45, 0.94);}
+        .wn-mob-cart-btn:hover{transform:translateY(-1.5px);box-shadow:0 8px 24px rgba(139,105,20,0.55),inset 0 1.5px 1px rgba(255,255,255,0.45)!important;}
+        .wn-mob-signin-btn{transition:all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);}
+        .wn-mob-signin-btn:hover{background:linear-gradient(135deg, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.5) 100%)!important;border-color:rgba(212,175,55,0.45)!important;transform:translateY(-1.5px);box-shadow:0 5px 16px rgba(139,105,20,0.12),inset 0 1.5px 0 0 rgba(255,255,255,1)!important;}
+        body.wn-mobile-menu-open, html.wn-mobile-menu-open {
+          overflow: hidden !important;
+          touch-action: none !important;
         }
       `}</style>
 
@@ -703,26 +801,29 @@ export default function Navbar() {
         )}
       </header>
 
-      {/* ── MOBILE OVERLAY (GLASS BACKDROP) ── */}
+      {/* ── MOBILE OVERLAY ── */}
       <div
         onClick={() => setMobileOpen(false)}
         style={{
           position: 'fixed',
           inset: 0,
           zIndex: 9998,
-          background: 'rgba(15, 10, 5, 0.35)',
-          backdropFilter: 'blur(10px)',
-          WebkitBackdropFilter: 'blur(10px)',
+          background: 'rgba(10, 8, 5, 0.42)',
+          backdropFilter: 'blur(8px)',
+          WebkitBackdropFilter: 'blur(8px)',
           opacity: mobileOpen ? 1 : 0,
           pointerEvents: mobileOpen ? 'auto' : 'none',
           transition: 'opacity 0.35s ease'
         }}
       />
 
-      {/* ── MOBILE DRAWER (PURE CRYSTAL GLASSMORPHISM) ── */}
+      {/* ── MOBILE DRAWER (FROSTED CRYSTAL GLASS WITH NATIVE SWIPE-TO-DISMISS) ── */}
       <div
         aria-hidden={!mobileOpen}
         inert={!mobileOpen}
+        onTouchStart={handleDrawerTouchStart}
+        onTouchMove={handleDrawerTouchMove}
+        onTouchEnd={handleDrawerTouchEnd}
         style={{
           position: 'fixed',
           top: 0,
@@ -730,80 +831,73 @@ export default function Navbar() {
           bottom: 0,
           width: 'min(340px, 86vw)',
           zIndex: 9999,
-          background: 'rgba(250, 247, 240, 0.65)',
-          backdropFilter: 'blur(32px) saturate(220%)',
-          WebkitBackdropFilter: 'blur(32px) saturate(220%)',
-          borderLeft: '1px solid rgba(255, 255, 255, 0.75)',
-          boxShadow: '-16px 0 48px rgba(26, 18, 9, 0.18), inset 1px 0 0 rgba(255, 255, 255, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.9)',
-          transform: mobileOpen ? 'translateX(0)' : 'translateX(100%)',
-          transition: 'transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+          background: 'rgba(252, 249, 243, 0.74)',
+          backdropFilter: 'blur(36px) saturate(180%)',
+          WebkitBackdropFilter: 'blur(36px) saturate(180%)',
+          borderLeft: '1px solid rgba(255, 255, 255, 0.88)',
+          boxShadow: '-14px 0 50px rgba(26, 18, 9, 0.16), inset 1px 0 0 rgba(255, 255, 255, 0.9)',
+          transform: !mobileOpen
+            ? 'translateX(100%)'
+            : (isDrawerDragging && drawerDragX > 0 ? `translateX(${drawerDragX}px)` : 'translateX(0)'),
+          transition: isDrawerDragging ? 'none' : 'transform 0.38s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
           display: 'flex',
           flexDirection: 'column',
           overflowY: 'auto',
+          overflowX: 'hidden',
+          overscrollBehavior: 'contain',
+          WebkitOverflowScrolling: 'touch',
+          touchAction: 'pan-y',
           color: '#1a1209'
         }}
       >
-        {/* Mobile Header with Glass Logo & Close Button */}
+        {/* Subtle ambient gold glow - safely positioned without horizontal overflow */}
+        <div style={{ position: 'absolute', top: '-50px', right: 0, width: '200px', height: '200px', background: 'radial-gradient(circle, rgba(139,105,20,0.07) 0%, transparent 70%)', pointerEvents: 'none', zIndex: 0 }} />
+
+        {/* ── HEADER ── */}
         <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          padding: '18px 24px',
-          borderBottom: '1px solid rgba(139, 105, 20, 0.15)',
-          background: 'rgba(250, 247, 240, 0.75)',
-          backdropFilter: 'blur(20px)',
-          WebkitBackdropFilter: 'blur(20px)',
-          position: 'sticky',
-          top: 0,
-          zIndex: 10000
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          padding: '16px 20px',
+          borderBottom: '1px solid rgba(139, 105, 20, 0.12)',
+          background: 'rgba(255, 253, 248, 0.88)',
+          backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
+          position: 'sticky', top: 0, zIndex: 10
         }}>
           <Link href="/" className="wn-logo-link" style={{ flex: 1, justifyContent: 'flex-start' }} onClick={() => setMobileOpen(false)}>
-            <Image
-              src={LOGO_SOLID}
-              alt="Winsor Logo"
-              width={145}
-              height={48}
-              style={{ objectFit: 'contain', height: 'auto', maxWidth: '145px' }}
-              priority
-            />
+            <Image src={LOGO_SOLID} alt="Winsor Logo" width={140} height={46}
+              style={{ objectFit: 'contain', height: 'auto', maxWidth: '130px' }} priority />
           </Link>
           <button
+            className="wn-mob-close-btn"
             style={{
-              background: 'rgba(139, 105, 20, 0.1)',
-              border: '1px solid rgba(139, 105, 20, 0.28)',
-              color: '#8B6914',
-              padding: '8px',
-              borderRadius: '50%',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              transition: 'all 0.2s ease'
+              background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0.5) 100%)',
+              border: '1.5px solid rgba(139, 105, 20, 0.22)',
+              color: '#8B6914', padding: '8px', borderRadius: '50%',
+              cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+              boxShadow: '0 2px 12px rgba(26,18,9,0.06), inset 0 1.5px 1px rgba(255,255,255,0.95)',
+              backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
             }}
             onClick={() => setMobileOpen(false)}
+            aria-label="Close navigation menu"
           >
             <CloseIcon />
           </button>
         </div>
 
-        {/* Mobile Currency Selector (Glass Pill) */}
-        <div style={{ padding: '14px 24px', borderBottom: '1px solid rgba(139, 105, 20, 0.1)' }}>
+        {/* ── CURRENCY SELECTOR ── */}
+        <div style={{ padding: '12px 20px', borderBottom: '1px solid rgba(139, 105, 20, 0.08)', position: 'relative', zIndex: 1 }}>
           <button
+            className="wn-anim-item wn-mob-currency-btn"
             onClick={() => setMobileCurrencyOpen(v => !v)}
             style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '10px',
-              width: '100%',
-              background: 'rgba(255, 255, 255, 0.65)',
-              border: '1px solid rgba(139, 105, 20, 0.25)',
-              boxShadow: '0 2px 10px rgba(139, 105, 20, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.8)',
-              borderRadius: '8px',
-              padding: '10px 14px',
-              cursor: 'pointer',
-              justifyContent: 'space-between',
-              color: '#8B6914',
-              transition: 'all 0.2s ease'
+              animationDelay: '0.04s',
+              display: 'flex', alignItems: 'center', gap: '10px', width: '100%',
+              background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.52) 0%, rgba(255, 255, 255, 0.20) 100%)',
+              backdropFilter: 'blur(24px) saturate(190%)',
+              WebkitBackdropFilter: 'blur(24px) saturate(190%)',
+              border: '1px solid rgba(255, 255, 255, 0.75)',
+              boxShadow: '0 4px 16px -2px rgba(26,18,9,0.04), inset 0 1.5px 0 0 rgba(255,255,255,0.95)',
+              borderRadius: '9999px', padding: '11px 20px', cursor: 'pointer',
+              justifyContent: 'space-between', color: '#8B6914',
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -818,187 +912,109 @@ export default function Navbar() {
 
           {mobileCurrencyOpen && (
             <div style={{
-              marginTop: '10px',
-              maxHeight: '260px',
-              overflowY: 'auto',
-              padding: '6px 0',
-              background: 'rgba(250, 247, 240, 0.95)',
-              backdropFilter: 'blur(20px)',
-              WebkitBackdropFilter: 'blur(20px)',
-              border: '1px solid rgba(139, 105, 20, 0.2)',
-              borderRadius: '8px',
-              boxShadow: '0 12px 32px rgba(26, 18, 9, 0.15)'
+              marginTop: '8px', maxHeight: '240px', overflowY: 'auto', padding: '6px',
+              background: 'rgba(252, 249, 243, 0.97)',
+              backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)',
+              border: '1px solid rgba(139, 105, 20, 0.16)',
+              borderRadius: '16px', boxShadow: '0 14px 36px rgba(26,18,9,0.14)'
             }}>
               {CURRENCIES.map((c: CurrencyOption) => (
                 <button
                   key={c.code}
                   onClick={() => { setCurrency(c.code); setMobileCurrencyOpen(false); }}
                   style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '12px',
-                    width: '100%',
-                    padding: '10px 14px',
-                    background: selected.code === c.code ? 'rgba(139, 105, 20, 0.12)' : 'none',
-                    border: 'none',
-                    borderBottom: '1px solid rgba(26, 18, 9, 0.05)',
+                    display: 'flex', alignItems: 'center', gap: '12px', width: '100%',
+                    padding: '9px 14px',
+                    background: selected.code === c.code ? 'rgba(139,105,20,0.1)' : 'transparent',
+                    border: 'none', borderBottom: '1px solid rgba(26,18,9,0.05)',
+                    borderRadius: '8px',
                     cursor: 'pointer',
-                    color: selected.code === c.code ? '#8B6914' : 'rgba(26, 18, 9, 0.75)',
+                    color: selected.code === c.code ? '#8B6914' : 'rgba(26,18,9,0.75)',
                     transition: 'background 0.15s ease'
                   }}
                 >
                   <CountryFlag iso={c.iso} width={20} height={14} />
-                  <span style={{ fontFamily: "'Jost',sans-serif", fontSize: '13px', fontWeight: selected.code === c.code ? 600 : 400 }}>
-                    {c.code}
-                  </span>
-                  <span style={{ fontFamily: "'Jost',sans-serif", fontSize: '11px', color: 'rgba(26, 18, 9, 0.45)', marginLeft: 'auto' }}>
-                    {c.label}
-                  </span>
+                  <span style={{ fontFamily: "'Jost',sans-serif", fontSize: '13px', fontWeight: selected.code === c.code ? 600 : 400 }}>{c.code}</span>
+                  <span style={{ fontFamily: "'Jost',sans-serif", fontSize: '11px', color: 'rgba(26,18,9,0.42)', marginLeft: 'auto' }}>{c.label}</span>
                 </button>
               ))}
             </div>
           )}
         </div>
 
-        {/* Mobile Navigation Links (Interactive Glass Accordions) */}
-        <nav style={{ flex: 1, padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
-            <span style={{ fontFamily: "'Jost',sans-serif", fontSize: '9px', letterSpacing: '0.28em', color: '#8B6914', fontWeight: 600, textTransform: 'uppercase' }}>
+        {/* ── NAV LINKS (STAGGERED CASPER REVEAL) ── */}
+        <nav
+          key={mobileOpen ? 'nav-open' : 'nav-closed'}
+          style={{ flex: 1, padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: '8px', position: 'relative', zIndex: 1 }}
+        >
+
+          {/* Section label */}
+          <div className="wn-anim-item" style={{ animationDelay: '0.06s', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2px', padding: '0 6px' }}>
+            <span style={{ fontFamily: "'Jost',sans-serif", fontSize: '8.5px', letterSpacing: '0.3em', color: '#8B6914', fontWeight: 700, textTransform: 'uppercase' }}>
               HAUTE HORLOGERIE
             </span>
-            <span style={{ fontFamily: "'Jost',sans-serif", fontSize: '9px', letterSpacing: '0.15em', color: 'rgba(26, 18, 9, 0.4)', textTransform: 'uppercase' }}>COLLECTIONS</span>
+            <span style={{ fontFamily: "'Jost',sans-serif", fontSize: '8.5px', letterSpacing: '0.14em', color: 'rgba(26,18,9,0.35)', textTransform: 'uppercase' }}>COLLECTIONS</span>
           </div>
 
-          {COLLECTIONS.map(col => {
-            const isExpanded = expandedMobileCol === col.key;
-            return (
-              <div 
-                key={col.key} 
-                style={{ 
-                  borderRadius: '12px', 
-                  background: isExpanded ? 'rgba(255, 255, 255, 0.85)' : 'rgba(255, 255, 255, 0.5)', 
-                  border: isExpanded ? '1px solid rgba(139, 105, 20, 0.35)' : '1px solid rgba(255, 255, 255, 0.75)', 
-                  boxShadow: isExpanded ? '0 8px 24px rgba(139, 105, 20, 0.08)' : '0 4px 16px rgba(26, 18, 9, 0.03), inset 0 1px 0 rgba(255, 255, 255, 0.8)',
-                  overflow: 'hidden', 
-                  transition: 'all 0.25s ease' 
-                }}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 14px' }}>
-                  <Link
-                    href={col.href}
-                    onClick={() => setMobileOpen(false)}
-                    style={{
-                      fontFamily: "'Cormorant Garamond', serif",
-                      fontSize: '18px',
-                      letterSpacing: '0.06em',
-                      fontWeight: 600,
-                      color: isExpanded ? '#8B6914' : '#1a1209',
-                      textDecoration: 'none',
-                      flex: 1
-                    }}
-                  >
-                    {col.label}
-                  </Link>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setExpandedMobileCol(isExpanded ? null : col.key);
-                    }}
-                    aria-label={isExpanded ? `Collapse ${col.label} sub-categories` : `Expand ${col.label} sub-categories`}
-                    aria-expanded={isExpanded}
-                    style={{
-                      background: 'rgba(139, 105, 20, 0.1)',
-                      border: '1px solid rgba(139, 105, 20, 0.28)',
-                      color: '#8B6914',
-                      borderRadius: '50%',
-                      width: '26px',
-                      height: '26px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontSize: '13px',
-                      cursor: 'pointer',
-                      transition: 'all 0.2s ease'
-                    }}
-                    title="Toggle Sub-Categories"
-                  >
-                    {isExpanded ? '−' : '+'}
-                  </button>
-                </div>
+          {/* ── Collection Links (Crystal Frosted Glass Pills, Staggered Reveal, No Arrows) ── */}
+          {COLLECTIONS.map((col, idx) => (
+            <Link
+              key={col.key}
+              href={col.href}
+              onClick={() => setMobileOpen(false)}
+              className="wn-anim-item wn-mob-col-btn"
+              style={{
+                animationDelay: `${0.08 + idx * 0.04}s`,
+                display: 'flex',
+                alignItems: 'center',
+                padding: '13px 24px',
+                borderRadius: '9999px',
+                background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.48) 0%, rgba(255, 255, 255, 0.18) 100%)',
+                backdropFilter: 'blur(24px) saturate(190%)',
+                WebkitBackdropFilter: 'blur(24px) saturate(190%)',
+                border: '1px solid rgba(255, 255, 255, 0.75)',
+                boxShadow: '0 4px 18px -2px rgba(26, 18, 9, 0.05), inset 0 1.5px 0 0 rgba(255, 255, 255, 0.95), inset 0 -1px 0 0 rgba(0, 0, 0, 0.03)',
+                textDecoration: 'none',
+              }}
+            >
+              <span style={{
+                fontFamily: "'Cormorant Garamond', serif",
+                fontSize: '18px',
+                letterSpacing: '0.1em',
+                fontWeight: 600,
+                color: '#1a1209',
+                transition: 'color 0.2s ease',
+              }}>
+                {col.label}
+              </span>
+            </Link>
+          ))}
 
-                {/* Sub-Items Expandable Container */}
-                {isExpanded && (
-                  <div style={{ background: 'rgba(250, 247, 240, 0.45)', padding: '10px 14px 14px', borderTop: '1px solid rgba(139, 105, 20, 0.1)', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                    {col.items.map(sub => (
-                      <Link
-                        key={sub.label}
-                        href={sub.href}
-                        onClick={() => setMobileOpen(false)}
-                        style={{
-                          fontFamily: "'Jost', sans-serif",
-                          fontSize: '12px',
-                          letterSpacing: '0.08em',
-                          color: 'rgba(26, 18, 9, 0.85)',
-                          textDecoration: 'none',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'space-between',
-                          padding: '6px 0',
-                          borderBottom: '1px solid rgba(26, 18, 9, 0.05)'
-                        }}
-                      >
-                        <span>• {sub.label}</span>
-                        <span style={{ color: '#8B6914', fontSize: '11px' }}>→</span>
-                      </Link>
-                    ))}
-                    <Link
-                      href={col.href}
-                      onClick={() => setMobileOpen(false)}
-                      style={{
-                        fontFamily: "'Jost', sans-serif",
-                        fontSize: '10px',
-                        letterSpacing: '0.18em',
-                        color: '#8B6914',
-                        textTransform: 'uppercase',
-                        fontWeight: 600,
-                        textDecoration: 'none',
-                        marginTop: '4px',
-                        display: 'block'
-                      }}
-                    >
-                      EXPLORE ALL {col.label} →
-                    </Link>
-                  </div>
-                )}
-              </div>
-            );
-          })}
-
-          {/* EXPLORE SECTION */}
-          <div style={{ marginTop: '20px', marginBottom: '6px' }}>
-            <span style={{ fontFamily: "'Jost',sans-serif", fontSize: '9px', letterSpacing: '0.28em', color: '#8B6914', fontWeight: 600, textTransform: 'uppercase' }}>
+          {/* EXPLORE MAISON label */}
+          <div className="wn-anim-item" style={{ animationDelay: '0.28s', marginTop: '14px', marginBottom: '2px', padding: '0 6px' }}>
+            <span style={{ fontFamily: "'Jost',sans-serif", fontSize: '8.5px', letterSpacing: '0.3em', color: '#8B6914', fontWeight: 700, textTransform: 'uppercase' }}>
               EXPLORE MAISON
             </span>
           </div>
 
+          {/* Account quick links */}
           {isSignedIn && (
-            <div style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
+            <div className="wn-anim-item" style={{ animationDelay: '0.30s', display: 'flex', gap: '8px', marginBottom: '2px' }}>
               <Link
                 href="/profile"
                 onClick={() => setMobileOpen(false)}
+                className="wn-mob-profile-btn"
                 style={{
-                  flex: 1,
-                  padding: '10px 12px',
-                  background: 'rgba(139, 105, 20, 0.1)',
-                  border: '1px solid rgba(139, 105, 20, 0.28)',
-                  borderRadius: '8px',
+                  flex: 1, padding: '11px 16px', textAlign: 'center',
+                  background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.46) 0%, rgba(255, 255, 255, 0.16) 100%)',
+                  backdropFilter: 'blur(20px) saturate(190%)',
+                  WebkitBackdropFilter: 'blur(20px) saturate(190%)',
+                  border: '1px solid rgba(212, 175, 55, 0.38)',
+                  borderRadius: '9999px',
                   color: '#8B6914',
-                  fontFamily: "'Jost',sans-serif",
-                  fontSize: '11px',
-                  letterSpacing: '0.08em',
-                  textDecoration: 'none',
-                  textAlign: 'center',
-                  fontWeight: 600
+                  fontFamily: "'Jost',sans-serif", fontSize: '11.5px', letterSpacing: '0.1em',
+                  textDecoration: 'none', fontWeight: 600,
+                  boxShadow: '0 4px 14px -2px rgba(26, 18, 9, 0.04), inset 0 1.5px 0 0 rgba(255, 255, 255, 0.9), inset 0 -1px 0 0 rgba(139, 105, 20, 0.05)',
                 }}
               >
                 My Profile
@@ -1006,19 +1022,18 @@ export default function Navbar() {
               <Link
                 href="/orders"
                 onClick={() => setMobileOpen(false)}
+                className="wn-mob-profile-btn"
                 style={{
-                  flex: 1,
-                  padding: '10px 12px',
-                  background: 'rgba(139, 105, 20, 0.1)',
-                  border: '1px solid rgba(139, 105, 20, 0.28)',
-                  borderRadius: '8px',
+                  flex: 1, padding: '11px 16px', textAlign: 'center',
+                  background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.46) 0%, rgba(255, 255, 255, 0.16) 100%)',
+                  backdropFilter: 'blur(20px) saturate(190%)',
+                  WebkitBackdropFilter: 'blur(20px) saturate(190%)',
+                  border: '1px solid rgba(212, 175, 55, 0.38)',
+                  borderRadius: '9999px',
                   color: '#8B6914',
-                  fontFamily: "'Jost',sans-serif",
-                  fontSize: '11px',
-                  letterSpacing: '0.08em',
-                  textDecoration: 'none',
-                  textAlign: 'center',
-                  fontWeight: 600
+                  fontFamily: "'Jost',sans-serif", fontSize: '11.5px', letterSpacing: '0.1em',
+                  textDecoration: 'none', fontWeight: 600,
+                  boxShadow: '0 4px 14px -2px rgba(26, 18, 9, 0.04), inset 0 1.5px 0 0 rgba(255, 255, 255, 0.9), inset 0 -1px 0 0 rgba(139, 105, 20, 0.05)',
                 }}
               >
                 My Orders
@@ -1026,23 +1041,27 @@ export default function Navbar() {
             </div>
           )}
 
-          {[...TOP_LEFT_LINKS, ...TOP_RIGHT_LINKS].map(l => (
+          {/* Top-level nav links (Crystal Frosted Glass Pills, Staggered Reveal, No Arrows) */}
+          {[...TOP_LEFT_LINKS, ...TOP_RIGHT_LINKS].map((l, idx) => (
             <Link
               key={l.href}
               href={l.href}
               onClick={() => setMobileOpen(false)}
+              className="wn-anim-item wn-mob-nav-link"
               style={{
+                animationDelay: `${0.32 + idx * 0.04}s`,
                 fontFamily: "'Jost',sans-serif",
-                fontSize: '12.5px',
-                letterSpacing: '0.09em',
+                fontSize: '12.5px', letterSpacing: '0.09em',
                 color: '#1a1209',
-                padding: '10px 14px',
-                borderRadius: '8px',
+                fontWeight: 500,
+                padding: '12px 24px',
+                borderRadius: '9999px',
                 textDecoration: 'none',
-                transition: 'all 0.15s ease',
-                background: 'rgba(255, 255, 255, 0.5)',
-                border: '1px solid rgba(255, 255, 255, 0.75)',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.02)',
+                background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.42) 0%, rgba(255, 255, 255, 0.14) 100%)',
+                backdropFilter: 'blur(20px) saturate(190%)',
+                WebkitBackdropFilter: 'blur(20px) saturate(190%)',
+                border: '1px solid rgba(255, 255, 255, 0.72)',
+                boxShadow: '0 3px 14px -2px rgba(26, 18, 9, 0.04), inset 0 1.5px 0 0 rgba(255, 255, 255, 0.9), inset 0 -1px 0 0 rgba(0, 0, 0, 0.03)',
                 display: 'block'
               }}
             >
@@ -1051,61 +1070,72 @@ export default function Navbar() {
           ))}
         </nav>
 
-        {/* Mobile Footer Actions (Glass Bar) */}
+        {/* ── FOOTER BAR ── */}
         <div style={{
-          padding: '18px 24px',
-          borderTop: '1px solid rgba(139, 105, 20, 0.15)',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          background: 'rgba(250, 247, 240, 0.75)',
-          backdropFilter: 'blur(20px)',
-          WebkitBackdropFilter: 'blur(20px)',
-          position: 'sticky',
-          bottom: 0,
-          zIndex: 10000
+          padding: '14px 20px',
+          borderTop: '1px solid rgba(139,105,20,0.12)',
+          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+          background: 'rgba(255, 253, 248, 0.92)',
+          backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
+          position: 'sticky', bottom: 0, zIndex: 10,
+          boxShadow: '0 -4px 20px rgba(26,18,9,0.06)',
         }}>
           {!isSignedIn ? (
             <SignInButton mode="modal">
-              <button style={{ background: 'rgba(255, 255, 255, 0.65)', border: '1px solid rgba(139, 105, 20, 0.25)', padding: '8px 14px', borderRadius: '8px', cursor: 'pointer', color: '#1a1209', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <button
+                className="wn-anim-item wn-mob-signin-btn"
+                style={{
+                  animationDelay: '0.52s',
+                  background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0.22) 100%)',
+                  backdropFilter: 'blur(20px) saturate(190%)',
+                  WebkitBackdropFilter: 'blur(20px) saturate(190%)',
+                  border: '1px solid rgba(212, 175, 55, 0.35)',
+                  padding: '10px 18px', borderRadius: '9999px', cursor: 'pointer',
+                  color: '#1a1209', display: 'flex', alignItems: 'center', gap: '8px',
+                  boxShadow: '0 3px 14px -2px rgba(26, 18, 9, 0.04), inset 0 1.5px 0 0 rgba(255, 255, 255, 0.95)',
+                }}>
                 <UserIcon />
-                <span style={{ fontFamily: "'Jost',sans-serif", fontSize: '12px', color: '#8B6914', fontWeight: 500 }}>Sign In / Account</span>
+                <span style={{ fontFamily: "'Jost',sans-serif", fontSize: '12px', color: '#8B6914', fontWeight: 600 }}>Sign In / Account</span>
               </button>
             </SignInButton>
           ) : (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div className="wn-anim-item" style={{ animationDelay: '0.52s', display: 'flex', alignItems: 'center', gap: '8px' }}>
               <UserButton
-                appearance={{
-                  elements: {
-                    avatarBox: {
-                      width: '22px',
-                      height: '22px',
-                      border: '1px solid rgba(139, 105, 20, 0.5)',
-                    }
-                  }
-                }}
+                appearance={{ elements: { avatarBox: { width: '24px', height: '24px', border: '1.5px solid rgba(139,105,20,0.48)' } } }}
               >
                 <UserButton.MenuItems>
-                  <UserButton.Link
-                    label="My Profile"
-                    labelIcon={<UserIcon />}
-                    href="/profile"
-                  />
-                  <UserButton.Link
-                    label="My Orders"
-                    labelIcon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>}
-                    href="/orders"
-                  />
+                  <UserButton.Link label="My Profile" labelIcon={<UserIcon />} href="/profile" />
+                  <UserButton.Link label="My Orders" labelIcon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>} href="/orders" />
                 </UserButton.MenuItems>
               </UserButton>
               <span style={{ fontFamily: "'Jost',sans-serif", fontSize: '12px', color: '#1a1209', fontWeight: 500 }}>Account</span>
             </div>
           )}
 
-          <Link href="/cart" onClick={() => setMobileOpen(false)} style={{ color: '#1a1209', position: 'relative', display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(139, 105, 20, 0.12)', border: '1px solid rgba(139, 105, 20, 0.35)', padding: '8px 14px', borderRadius: '8px', textDecoration: 'none' }}>
+          <Link
+            href="/cart"
+            onClick={() => setMobileOpen(false)}
+            className="wn-anim-item wn-mob-cart-btn"
+            style={{
+              animationDelay: '0.52s',
+              position: 'relative', display: 'flex', alignItems: 'center', gap: '8px',
+              background: 'linear-gradient(135deg, #8B6914 0%, #C8980F 55%, #D4AF37 100%)',
+              border: '1.2px solid rgba(255, 255, 255, 0.5)',
+              padding: '10px 22px', borderRadius: '9999px', textDecoration: 'none',
+              boxShadow: '0 6px 20px rgba(139, 105, 20, 0.38), inset 0 1.5px 0 0 rgba(255, 255, 255, 0.45)'
+            }}
+          >
             <BagIcon />
-            <span style={{ fontFamily: "'Jost',sans-serif", fontSize: '12px', color: '#8B6914', fontWeight: 600 }}>Cart</span>
-            <span style={{ position: 'absolute', top: '-6px', right: '-6px', width: '18px', height: '18px', borderRadius: '50%', background: '#8B6914', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '9px', fontFamily: "'Jost',sans-serif", fontWeight: 700, border: '1px solid #ffffff' }}>
+            <span style={{ fontFamily: "'Jost',sans-serif", fontSize: '12px', color: '#FFFFFF', fontWeight: 700, letterSpacing: '0.06em' }}>Cart</span>
+            <span style={{
+              position: 'absolute', top: '-7px', right: '-7px',
+              width: '20px', height: '20px', borderRadius: '50%',
+              background: '#fff', color: '#8B6914',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: '9px', fontFamily: "'Jost',sans-serif", fontWeight: 700,
+              border: '1.5px solid #8B6914',
+              boxShadow: '0 2px 8px rgba(26,18,9,0.18)'
+            }}>
               {totalItemsCount > 9 ? '9+' : totalItemsCount}
             </span>
           </Link>

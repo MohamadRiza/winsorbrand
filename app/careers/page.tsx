@@ -4,6 +4,7 @@ import { useEffect, useState, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import Navbar from '@/components/Navbar/Navbar';
+import CareersHeroTypewriter from './CareersHeroTypewriter';
 
 interface Vacancy {
   _id: string;
@@ -87,12 +88,10 @@ export default function CareersPage() {
           <span className="text-[10px] lg:text-[11px] font-semibold tracking-[0.35em] text-[#8B6914] uppercase block animate-fadeIn" style={{ fontFamily: "'Jost', sans-serif" }}>
             JOIN THE MAISON
           </span>
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl text-white font-light tracking-wide leading-tight" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
-            Careers at Winsor Atelier
-          </h1>
-          <p className="text-white/80 text-sm lg:text-base font-light tracking-wide max-w-xl mx-auto leading-relaxed italic" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
-            Crafting the future of haute horlogerie. Explore opportunities within our design, operations, and client relations sectors.
-          </p>
+          <CareersHeroTypewriter
+            title="Careers at Winsor Atelier"
+            subtitle="Crafting the future of haute horlogerie. Explore opportunities within our design, operations, and client relations sectors."
+          />
         </div>
       </section>
 
