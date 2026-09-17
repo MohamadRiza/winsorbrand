@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { toast } from 'react-hot-toast';
 import dynamic from 'next/dynamic';
+import RetailersHeroTypewriter from './RetailersHeroTypewriter';
 
 const RetailersMap = dynamic(() => import('@/components/RetailersMap'), { ssr: false });
 
@@ -1077,10 +1078,10 @@ export default function StoreLocatorPage() {
           <span>AUTHORIZED RETAILERS & BOUTIQUES</span>
           <svg width="10" height="10" viewBox="0 0 24 24" fill="#dfb15b"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" /></svg>
         </div>
-        <h1 className="locator-title">Find A Retailer</h1>
-        <p className="locator-subtitle">
-          Discover official Winsor partner showrooms and flagship boutiques across Sri Lanka and internationally for an exceptional horological experience.
-        </p>
+        <RetailersHeroTypewriter
+          title="Find A Retailer"
+          subtitle="Discover official Winsor partner showrooms and flagship boutiques across Sri Lanka and internationally for an exceptional horological experience."
+        />
       </section>
 
       {/* ── SEARCH TOOLBAR ── */}

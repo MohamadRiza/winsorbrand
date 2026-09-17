@@ -118,7 +118,7 @@ export default function WomensHeroTypewriter({
 
   return (
     <>
-      <style jsx>{`
+      <style>{`
         .womens-title-ghost {
           font-family: 'Cinzel', 'Cormorant Garamond', Georgia, serif;
           font-size: clamp(26px, 3.4vw, 44px);
@@ -132,10 +132,7 @@ export default function WomensHeroTypewriter({
         }
         .womens-title-live {
           position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
+          inset: 0;
           display: flex;
           align-items: center;
           font-family: 'Cinzel', 'Cormorant Garamond', Georgia, serif;
@@ -200,9 +197,16 @@ export default function WomensHeroTypewriter({
           }
         }
         @media (max-width: 900px) {
+          .womens-title-ghost {
+            text-align: center;
+          }
           .womens-title-live {
             justify-content: center;
             text-align: center;
+          }
+          .womens-sub-container {
+            margin-left: auto !important;
+            margin-right: auto !important;
           }
           .womens-subtitle-ghost,
           .womens-subtitle-live {
@@ -224,7 +228,7 @@ export default function WomensHeroTypewriter({
       </span>
 
       {/* Title with Ghost Lock */}
-      <div style={{ position: 'relative', marginBottom: '14px' }}>
+      <div className="womens-title-container" style={{ position: 'relative', marginBottom: '14px', width: '100%' }}>
         <h1 className="womens-title-ghost" aria-hidden="true">
           {title}
         </h1>
@@ -237,7 +241,7 @@ export default function WomensHeroTypewriter({
       </div>
 
       {/* Subtitle with Ghost Lock */}
-      <div style={{ position: 'relative', maxWidth: '480px', marginBottom: '22px' }}>
+      <div className="womens-sub-container" style={{ position: 'relative', maxWidth: '480px', marginBottom: '22px', width: '100%' }}>
         <p className="womens-subtitle-ghost" aria-hidden="true">
           {subtitle}
         </p>

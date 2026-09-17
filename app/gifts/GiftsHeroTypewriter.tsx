@@ -2,15 +2,15 @@
 
 import { useState, useEffect } from 'react';
 
-interface MensHeroTypewriterProps {
+interface GiftsHeroTypewriterProps {
   title?: string;
   subtitle?: string;
 }
 
-export default function MensHeroTypewriter({
-  title = "Men's Timepiece Collection",
-  subtitle = "Engineered for those who never settle. Discover bold, distinguished timepieces crafted with Japanese precision movements and Dubai-certified quality.",
-}: MensHeroTypewriterProps) {
+export default function GiftsHeroTypewriter({
+  title = 'Curated Gifts for Memorable Milestones',
+  subtitle = 'Express your gratitude and love with a timeless Winsor timepiece. Crafted with Japanese precision movements and Dubai-verified quality.',
+}: GiftsHeroTypewriterProps) {
   const [typedTitle, setTypedTitle] = useState('');
   const [typedSubtitle, setTypedSubtitle] = useState('');
   const [cursorPos, setCursorPos] = useState<'title' | 'sub' | 'none'>('title');
@@ -51,12 +51,12 @@ export default function MensHeroTypewriter({
         await wait(450);
         if (isCancelled) return;
 
-        // 2. Type Title ("Men's Timepiece Collection")
+        // 2. Type Title ("Curated Gifts for Memorable Milestones")
         for (let i = 1; i <= title.length; i++) {
           if (isCancelled) return;
           setTypedTitle(title.slice(0, i));
           const char = title[i - 1];
-          await wait(char === "'" ? 100 : char === ' ' ? 70 : 52);
+          await wait(char === ' ' ? 70 : 50);
         }
         if (isCancelled) return;
         await wait(320);
@@ -72,11 +72,9 @@ export default function MensHeroTypewriter({
               ? 220
               : char === ','
               ? 140
-              : char === '-'
-              ? 90
               : char === ' '
               ? 35
-              : 26
+              : 25
           );
         }
         if (isCancelled) return;
@@ -85,22 +83,22 @@ export default function MensHeroTypewriter({
         await wait(4500);
         if (isCancelled) return;
 
-        // 5. Deliberate Slow Removal - Subtitle backspaces smoothly
+        // 5. Deliberate Removal - Subtitle backspaces smoothly
         setCursorPos('sub');
         for (let i = subtitle.length - 1; i >= 0; i--) {
           if (isCancelled) return;
           setTypedSubtitle(subtitle.slice(0, i));
-          await wait(22);
+          await wait(20);
         }
         if (isCancelled) return;
         await wait(240);
 
-        // 6. Deliberate Slow Removal - Title backspaces smoothly
+        // 6. Deliberate Removal - Title backspaces smoothly
         setCursorPos('title');
         for (let i = title.length - 1; i >= 0; i--) {
           if (isCancelled) return;
           setTypedTitle(title.slice(0, i));
-          await wait(42);
+          await wait(38);
         }
         if (isCancelled) return;
 
@@ -121,18 +119,21 @@ export default function MensHeroTypewriter({
   return (
     <>
       <style>{`
-        .mens-title-ghost {
+        .gifts-typewriter-container {
+          width: 100%;
+        }
+        .gifts-title-ghost {
           font-family: 'Cinzel', 'Cormorant Garamond', Georgia, serif;
           font-size: clamp(26px, 3.4vw, 44px);
           font-weight: 600;
           line-height: 1.15;
-          margin: 0;
           letter-spacing: 0.02em;
+          margin: 0;
           opacity: 0;
           pointer-events: none;
           user-select: none;
         }
-        .mens-title-live {
+        .gifts-title-live {
           position: absolute;
           inset: 0;
           display: flex;
@@ -141,14 +142,16 @@ export default function MensHeroTypewriter({
           font-size: clamp(26px, 3.4vw, 44px);
           font-weight: 600;
           line-height: 1.15;
-          margin: 0;
           letter-spacing: 0.02em;
+          margin: 0;
           color: #ffffff;
+          text-shadow: 0 4px 18px rgba(0, 0, 0, 0.4);
         }
-        .mens-subtitle-ghost {
+        .gifts-subtitle-ghost {
           font-family: 'Jost', sans-serif;
           font-size: clamp(13px, 1.1vw, 15px);
           line-height: 1.6;
+          color: rgba(255, 255, 255, 0.82);
           max-width: 480px;
           margin: 0;
           font-weight: 300;
@@ -156,7 +159,7 @@ export default function MensHeroTypewriter({
           pointer-events: none;
           user-select: none;
         }
-        .mens-subtitle-live {
+        .gifts-subtitle-live {
           position: absolute;
           top: 0;
           left: 0;
@@ -169,7 +172,7 @@ export default function MensHeroTypewriter({
           margin: 0;
           font-weight: 300;
         }
-        .mens-caret {
+        .gifts-caret {
           display: inline-block;
           width: 2.5px;
           height: 0.85em;
@@ -178,9 +181,9 @@ export default function MensHeroTypewriter({
           background: linear-gradient(180deg, #F3E3B8 0%, #D4AF37 50%, #8B6914 100%);
           box-shadow: 0 0 10px rgba(212, 175, 55, 0.8), 0 0 20px rgba(212, 175, 55, 0.35);
           border-radius: 1px;
-          animation: mens-caret-pulse 0.85s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+          animation: gifts-caret-pulse 0.85s cubic-bezier(0.4, 0, 0.2, 1) infinite;
         }
-        .mens-caret-sub {
+        .gifts-caret-sub {
           width: 1.8px;
           height: 0.88em;
           margin-left: 5px;
@@ -188,7 +191,7 @@ export default function MensHeroTypewriter({
           background: linear-gradient(180deg, #F3E3B8 0%, #D4AF37 70%, #8B6914 100%);
           box-shadow: 0 0 8px rgba(212, 175, 55, 0.6);
         }
-        @keyframes mens-caret-pulse {
+        @keyframes gifts-caret-pulse {
           0%, 100% {
             opacity: 1;
             transform: scaleY(1);
@@ -199,26 +202,17 @@ export default function MensHeroTypewriter({
           }
         }
         @media (max-width: 900px) {
-          .mens-title-ghost {
-            text-align: center;
-          }
-          .mens-title-live {
+          .gifts-title-live {
             justify-content: center;
             text-align: center;
           }
-          .mens-sub-container {
-            margin-left: auto !important;
-            margin-right: auto !important;
-          }
-          .mens-subtitle-ghost,
-          .mens-subtitle-live {
-            margin-left: auto;
-            margin-right: auto;
+          .gifts-subtitle-ghost, .gifts-subtitle-live {
+            margin: 0 auto;
             text-align: center;
           }
         }
         @media (prefers-reduced-motion: reduce) {
-          .mens-caret {
+          .gifts-caret {
             display: none !important;
           }
         }
@@ -229,30 +223,32 @@ export default function MensHeroTypewriter({
         {title}. {subtitle}
       </span>
 
-      {/* Title with Ghost Lock */}
-      <div className="mens-title-container" style={{ position: 'relative', marginBottom: '14px', width: '100%' }}>
-        <h1 className="mens-title-ghost" aria-hidden="true">
-          {title}
-        </h1>
-        <h1 className="mens-title-live" aria-hidden="true">
-          <span>
-            {typedTitle}
-            {cursorPos === 'title' && <span className="mens-caret" />}
-          </span>
-        </h1>
-      </div>
+      <div className="gifts-typewriter-container">
+        {/* Title with Ghost Lock */}
+        <div style={{ position: 'relative', marginBottom: '14px', width: '100%' }}>
+          <h1 className="gifts-title-ghost" aria-hidden="true">
+            {title}
+          </h1>
+          <h1 className="gifts-title-live" aria-hidden="true">
+            <span>
+              {typedTitle}
+              {cursorPos === 'title' && <span className="gifts-caret" />}
+            </span>
+          </h1>
+        </div>
 
-      {/* Subtitle with Ghost Lock */}
-      <div className="mens-sub-container" style={{ position: 'relative', maxWidth: '480px', marginBottom: '22px', width: '100%' }}>
-        <p className="mens-subtitle-ghost" aria-hidden="true">
-          {subtitle}
-        </p>
-        <p className="mens-subtitle-live" aria-hidden="true">
-          <span>
-            {typedSubtitle}
-            {cursorPos === 'sub' && <span className="mens-caret mens-caret-sub" />}
-          </span>
-        </p>
+        {/* Subtitle with Ghost Lock */}
+        <div style={{ position: 'relative', maxWidth: '480px', marginBottom: '22px', width: '100%' }}>
+          <p className="gifts-subtitle-ghost" aria-hidden="true">
+            {subtitle}
+          </p>
+          <p className="gifts-subtitle-live" aria-hidden="true">
+            <span>
+              {typedSubtitle}
+              {cursorPos === 'sub' && <span className="gifts-caret gifts-caret-sub" />}
+            </span>
+          </p>
+        </div>
       </div>
     </>
   );

@@ -120,7 +120,7 @@ export default function SportsHeroTypewriter({
 
   return (
     <>
-      <style jsx>{`
+      <style>{`
         .sports-title-ghost {
           font-family: 'Cinzel', 'Cormorant Garamond', Georgia, serif;
           font-size: clamp(26px, 3.4vw, 44px);
@@ -134,10 +134,7 @@ export default function SportsHeroTypewriter({
         }
         .sports-title-live {
           position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
+          inset: 0;
           display: flex;
           align-items: center;
           font-family: 'Cinzel', 'Cormorant Garamond', Georgia, serif;
@@ -202,9 +199,16 @@ export default function SportsHeroTypewriter({
           }
         }
         @media (max-width: 900px) {
+          .sports-title-ghost {
+            text-align: center;
+          }
           .sports-title-live {
             justify-content: center;
             text-align: center;
+          }
+          .sports-sub-container {
+            margin-left: auto !important;
+            margin-right: auto !important;
           }
           .sports-subtitle-ghost,
           .sports-subtitle-live {
@@ -226,7 +230,7 @@ export default function SportsHeroTypewriter({
       </span>
 
       {/* Title with Ghost Lock */}
-      <div style={{ position: 'relative', marginBottom: '14px' }}>
+      <div className="sports-title-container" style={{ position: 'relative', marginBottom: '14px', width: '100%' }}>
         <h1 className="sports-title-ghost" aria-hidden="true">
           {title}
         </h1>
@@ -239,7 +243,7 @@ export default function SportsHeroTypewriter({
       </div>
 
       {/* Subtitle with Ghost Lock */}
-      <div style={{ position: 'relative', maxWidth: '480px', marginBottom: '22px' }}>
+      <div className="sports-sub-container" style={{ position: 'relative', maxWidth: '480px', marginBottom: '22px', width: '100%' }}>
         <p className="sports-subtitle-ghost" aria-hidden="true">
           {subtitle}
         </p>

@@ -214,16 +214,50 @@ function WomensCollectionContent() {
           border-color: rgba(223,177,91,0.8);
         }
         @media (max-width: 900px) {
+          .womens-hero-section {
+            padding: 100px 16px 40px !important;
+            min-height: auto !important;
+          }
           .womens-hero-grid {
             grid-template-columns: 1fr;
             text-align: center;
-            gap: 32px;
+            gap: 28px;
+          }
+          .womens-hero-text-block {
+            text-align: center !important;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+          }
+          .womens-hero-pills-row {
+            justify-content: center !important;
           }
           .womens-hero-img-card {
-            height: 240px;
-            max-width: 480px;
+            height: 260px;
+            max-width: 440px;
             margin: 0 auto;
             width: 100%;
+          }
+        }
+        @media (max-width: 640px) {
+          .womens-hero-section {
+            padding: 90px 16px 32px !important;
+          }
+          .womens-hero-img-card {
+            height: 220px;
+            border-radius: 12px;
+          }
+          .womens-hero-card-bottom {
+            bottom: 12px !important;
+            left: 14px !important;
+            right: 14px !important;
+          }
+          .womens-hero-card-title {
+            font-size: 16px !important;
+          }
+          .womens-hero-card-badge {
+            font-size: 8px !important;
+            padding: 3px 8px !important;
           }
         }
 
@@ -523,6 +557,7 @@ function WomensCollectionContent() {
 
       {/* ── HERO BANNER (VIDEO + IMAGE COMBINED) ── */}
       <section 
+        className="womens-hero-section"
         style={{ 
           position: 'relative', 
           minHeight: 'min(82vh, 680px)', 
@@ -559,7 +594,7 @@ function WomensCollectionContent() {
             </div>
             {/* Animated Hero Title & Subtitle with Luxury Typewriter & Erase Effect */}
             <WomensHeroTypewriter />
-            <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap', alignItems: 'center' }}>
+            <div className="womens-hero-pills-row" style={{ display: 'flex', gap: '14px', flexWrap: 'wrap', alignItems: 'center' }}>
               <div style={{ padding: '8px 18px', background: 'rgba(139,105,20,0.2)', border: '1px solid rgba(223,177,91,0.45)', borderRadius: '20px', fontSize: '10px', letterSpacing: '0.18em', textTransform: 'uppercase', fontWeight: 600, color: '#dfb15b' }}>
                 {filteredProducts.length} WOMEN'S TIMEPIECES AVAILABLE
               </div>
@@ -577,12 +612,12 @@ function WomensCollectionContent() {
               priority
             />
             <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(10,8,5,0.85) 0%, transparent 60%)' }} />
-            <div style={{ position: 'absolute', bottom: '20px', left: '20px', right: '20px', zIndex: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+            <div className="womens-hero-card-bottom" style={{ position: 'absolute', bottom: '20px', left: '20px', right: '20px', zIndex: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
               <div>
                 <span style={{ fontSize: '9px', letterSpacing: '0.25em', color: '#dfb15b', textTransform: 'uppercase', fontWeight: 600, display: 'block' }}>LADIES ELEGANCE</span>
-                <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '20px', color: '#ffffff', fontWeight: 500 }}>Timeless & Graceful</span>
+                <span className="womens-hero-card-title" style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '20px', color: '#ffffff', fontWeight: 500 }}>Timeless & Graceful</span>
               </div>
-              <span style={{ fontSize: '10px', letterSpacing: '0.15em', color: 'rgba(255,255,255,0.7)', border: '1px solid rgba(255,255,255,0.2)', padding: '4px 10px', borderRadius: '4px' }}>DUBAI 2023</span>
+              <span className="womens-hero-card-badge" style={{ fontSize: '10px', letterSpacing: '0.15em', color: 'rgba(255,255,255,0.7)', border: '1px solid rgba(255,255,255,0.2)', padding: '4px 10px', borderRadius: '4px' }}>DUBAI 2023</span>
             </div>
           </div>
         </div>

@@ -8,6 +8,7 @@ import { useCart } from '@/app/context/CartContext';
 import { IGiftCategory, IProduct } from '@/types';
 import NewsletterCard from '@/components/NewsletterCard';
 import { toast } from 'react-hot-toast';
+import GiftsHeroTypewriter from './GiftsHeroTypewriter';
 
 const stripEmojis = (text: string) => {
   if (!text) return '';
@@ -1061,12 +1062,10 @@ export default function GiftsPage() {
             <div style={{ fontSize: '10px', letterSpacing: '0.28em', color: '#dfb15b', textTransform: 'uppercase', fontWeight: 600, marginBottom: '12px' }}>
               THE ART OF GIVING
             </div>
-            <h1 style={{ fontFamily: "'Cinzel', 'Cormorant Garamond', Georgia, serif", fontSize: 'clamp(26px, 3.4vw, 44px)', fontWeight: 600, lineHeight: 1.15, margin: '0 0 14px', letterSpacing: '0.02em', color: '#fff' }}>
-              Curated Gifts for Memorable Milestones
-            </h1>
-            <p style={{ fontFamily: "'Jost', sans-serif", fontSize: 'clamp(13px, 1.1vw, 15px)', lineHeight: 1.6, color: 'rgba(255,255,255,0.82)', maxWidth: '480px', margin: '0 0 22px', fontWeight: 300 }}>
-              Express your gratitude and love with a timeless Winsor timepiece. Crafted with Japanese precision movements and Dubai-verified quality.
-            </p>
+            <GiftsHeroTypewriter
+              title="Curated Gifts for Memorable Milestones"
+              subtitle="Express your gratitude and love with a timeless Winsor timepiece. Crafted with Japanese precision movements and Dubai-verified quality."
+            />
             <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap', alignItems: 'center' }}>
               <button className="hero-btn-primary" onClick={() => setSelectedCategorySlug('all')}>EXPLORE ALL GIFTS</button>
               <div style={{ padding: '8px 18px', background: 'rgba(139,105,20,0.2)', border: '1px solid rgba(223,177,91,0.45)', borderRadius: '20px', fontSize: '10px', letterSpacing: '0.18em', textTransform: 'uppercase', fontWeight: 600, color: '#dfb15b' }}>

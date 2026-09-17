@@ -165,16 +165,74 @@ function NewArrivalsContent() {
           border-color: rgba(223,177,91,0.8);
         }
         @media (max-width: 900px) {
+          .new-hero-section {
+            padding: 100px 16px 40px !important;
+            min-height: auto !important;
+          }
           .new-hero-grid {
             grid-template-columns: 1fr;
             text-align: center;
-            gap: 32px;
+            gap: 28px;
+          }
+          .new-hero-text-block {
+            text-align: center !important;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+          }
+          .new-hero-pills-row {
+            justify-content: center !important;
           }
           .new-hero-img-card {
-            height: 240px;
-            max-width: 480px;
+            height: 260px;
+            max-width: 440px;
             margin: 0 auto;
             width: 100%;
+          }
+        }
+        @media (max-width: 640px) {
+          .new-hero-section {
+            padding: 90px 16px 32px !important;
+          }
+          .new-hero-img-card {
+            height: 220px;
+            border-radius: 12px;
+          }
+          .new-hero-card-bottom {
+            bottom: 12px !important;
+            left: 14px !important;
+            right: 14px !important;
+          }
+          .new-hero-card-title {
+            font-size: 16px !important;
+          }
+          .new-hero-card-badge {
+            font-size: 8px !important;
+            padding: 3px 8px !important;
+          }
+          #new-catalog {
+            padding: 16px 14px 80px !important;
+          }
+          .new-toolbar-container {
+            padding: 14px !important;
+            flex-direction: column !important;
+            align-items: stretch !important;
+            gap: 12px !important;
+            margin-bottom: 24px !important;
+          }
+          .new-toolbar-pills {
+            justify-content: flex-start !important;
+            overflow-x: auto !important;
+            padding-bottom: 4px !important;
+            flex-wrap: nowrap !important;
+            -webkit-overflow-scrolling: touch !important;
+            width: 100% !important;
+          }
+          .new-toolbar-pills button {
+            flex-shrink: 0 !important;
+          }
+          .new-toolbar-select {
+            width: 100% !important;
           }
         }
 
@@ -474,6 +532,7 @@ function NewArrivalsContent() {
 
       {/* ── HERO BANNER ── */}
       <section 
+        className="new-hero-section"
         style={{ 
           position: 'relative', 
           minHeight: 'min(82vh, 680px)', 
@@ -504,13 +563,13 @@ function NewArrivalsContent() {
         {/* Hero Content */}
         <div className="new-hero-grid">
           {/* Left Column: Text & Badge */}
-          <div style={{ textAlign: 'left' }}>
+          <div className="new-hero-text-block" style={{ textAlign: 'left' }}>
             <div style={{ fontSize: '10px', letterSpacing: '0.28em', color: '#dfb15b', textTransform: 'uppercase', fontWeight: 600, marginBottom: '12px' }}>
               WINSOR MAISON HORLOGERIE
             </div>
             {/* Animated Hero Title & Subtitle with Luxury Typewriter & Erase Effect */}
             <NewArrivalsHeroTypewriter />
-            <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap', alignItems: 'center' }}>
+            <div className="new-hero-pills-row" style={{ display: 'flex', gap: '14px', flexWrap: 'wrap', alignItems: 'center' }}>
               <div style={{ padding: '8px 18px', background: 'rgba(139,105,20,0.2)', border: '1px solid rgba(223,177,91,0.45)', borderRadius: '20px', fontSize: '10px', letterSpacing: '0.18em', textTransform: 'uppercase', fontWeight: 600, color: '#dfb15b' }}>
                 {filteredProducts.length} NEW TIMEPIECES AVAILABLE
               </div>
@@ -528,12 +587,12 @@ function NewArrivalsContent() {
               style={{ objectFit: 'cover', objectPosition: 'center' }}
             />
             <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(10,8,5,0.85) 0%, transparent 60%)' }} />
-            <div style={{ position: 'absolute', bottom: '20px', left: '20px', right: '20px', zIndex: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+            <div className="new-hero-card-bottom" style={{ position: 'absolute', bottom: '20px', left: '20px', right: '20px', zIndex: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
               <div>
                 <span style={{ fontSize: '9px', letterSpacing: '0.25em', color: '#dfb15b', textTransform: 'uppercase', fontWeight: 600, display: 'block' }}>2026 EDITION</span>
-                <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '20px', color: '#ffffff', fontWeight: 500 }}>Precision & Innovation</span>
+                <span className="new-hero-card-title" style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '20px', color: '#ffffff', fontWeight: 500 }}>Precision & Innovation</span>
               </div>
-              <span style={{ fontSize: '10px', letterSpacing: '0.15em', color: 'rgba(255,255,255,0.7)', border: '1px solid rgba(255,255,255,0.2)', padding: '4px 10px', borderRadius: '4px' }}>DUBAI 2023</span>
+              <span className="new-hero-card-badge" style={{ fontSize: '10px', letterSpacing: '0.15em', color: 'rgba(255,255,255,0.7)', border: '1px solid rgba(255,255,255,0.2)', padding: '4px 10px', borderRadius: '4px' }}>DUBAI 2023</span>
             </div>
           </div>
         </div>
@@ -637,6 +696,7 @@ function NewArrivalsContent() {
 
         {/* ── TOOLBAR & FILTERS ── */}
         <div 
+          className="new-toolbar-container"
           style={{ 
             display: 'flex', 
             flexWrap: 'wrap', 
@@ -682,7 +742,7 @@ function NewArrivalsContent() {
           </div>
 
           {/* Filter Pills */}
-          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
+          <div className="new-toolbar-pills" style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
             {(['new', 'sports', 'luxury', 'limited', 'all'] as const).map((sec) => (
               <button
                 key={sec}
@@ -708,6 +768,7 @@ function NewArrivalsContent() {
 
           {/* Price Sorting */}
           <select
+            className="new-toolbar-select"
             value={priceSort}
             onChange={(e: any) => setPriceSort(e.target.value)}
             aria-label="Sort by price"

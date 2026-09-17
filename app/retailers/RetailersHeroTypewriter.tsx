@@ -118,7 +118,7 @@ export default function RetailersHeroTypewriter({
 
   return (
     <>
-      <style jsx>{`
+      <style>{`
         .retailer-typewriter-container {
           width: 100%;
           max-width: 780px;
@@ -225,7 +225,7 @@ export default function RetailersHeroTypewriter({
 
       <div className="retailer-typewriter-container">
         {/* Title with Ghost Lock */}
-        <div style={{ position: 'relative', marginBottom: '14px' }}>
+        <div style={{ position: 'relative', marginBottom: '14px', width: '100%' }}>
           <h1 className="retailer-title-ghost" aria-hidden="true">
             {title}
           </h1>
@@ -238,7 +238,7 @@ export default function RetailersHeroTypewriter({
         </div>
 
         {/* Subtitle with Ghost Lock */}
-        <div style={{ position: 'relative', maxWidth: '680px', margin: '0 auto' }}>
+        <div style={{ position: 'relative', maxWidth: '680px', margin: '0 auto', width: '100%' }}>
           <p className="retailer-subtitle-ghost" aria-hidden="true">
             {subtitle}
           </p>

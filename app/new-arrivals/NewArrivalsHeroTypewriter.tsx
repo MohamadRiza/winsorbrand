@@ -118,7 +118,7 @@ export default function NewArrivalsHeroTypewriter({
 
   return (
     <>
-      <style jsx>{`
+      <style>{`
         .new-arr-title-ghost {
           font-family: 'Cinzel', 'Cormorant Garamond', Georgia, serif;
           font-size: clamp(26px, 3.4vw, 44px);
@@ -132,10 +132,7 @@ export default function NewArrivalsHeroTypewriter({
         }
         .new-arr-title-live {
           position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
+          inset: 0;
           display: flex;
           align-items: center;
           font-family: 'Cinzel', 'Cormorant Garamond', Georgia, serif;
@@ -200,9 +197,16 @@ export default function NewArrivalsHeroTypewriter({
           }
         }
         @media (max-width: 900px) {
+          .new-arr-title-ghost {
+            text-align: center;
+          }
           .new-arr-title-live {
             justify-content: center;
             text-align: center;
+          }
+          .new-arr-sub-container {
+            margin-left: auto !important;
+            margin-right: auto !important;
           }
           .new-arr-subtitle-ghost,
           .new-arr-subtitle-live {
@@ -224,7 +228,7 @@ export default function NewArrivalsHeroTypewriter({
       </span>
 
       {/* Title with Ghost Lock */}
-      <div style={{ position: 'relative', marginBottom: '14px' }}>
+      <div className="new-arr-title-container" style={{ position: 'relative', marginBottom: '14px', width: '100%' }}>
         <h1 className="new-arr-title-ghost" aria-hidden="true">
           {title}
         </h1>
@@ -237,7 +241,7 @@ export default function NewArrivalsHeroTypewriter({
       </div>
 
       {/* Subtitle with Ghost Lock */}
-      <div style={{ position: 'relative', maxWidth: '480px', marginBottom: '22px' }}>
+      <div className="new-arr-sub-container" style={{ position: 'relative', maxWidth: '480px', marginBottom: '22px', width: '100%' }}>
         <p className="new-arr-subtitle-ghost" aria-hidden="true">
           {subtitle}
         </p>
