@@ -3,6 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import VideoPlayer from "./VideoPlayer";
 import StoryHeroTypewriter from "./StoryHeroTypewriter";
+import AwardsGallery from "./AwardsGallery";
 
 export const metadata = {
   title: "Our Story — Winsor Maison | Ride Your Moment",
@@ -32,14 +33,14 @@ const TIMELINE = [
   {
     year: "2025",
     badge: "HONORS",
-    title: "Brand Milestones & Accolades",
-    text: "WINSOR achieved recognition across the Sri Lankan retail landscape, earning praise for consistent quality, punctual delivery standards, and a growing network of satisfied collectors across the island.",
+    title: "The Crown of Precision Award in Sri Lanka",
+    text: "Conferred 'The Crown of Precision Award in Sri Lanka' at the People's Excellency Awards 2025 (Waters Edge Hotel, Colombo), recognizing Winsor Watches for horological craftsmanship and dependable precision.",
   },
   {
     year: "2026",
     badge: "DISTINCTION",
-    title: "Most Trusted Emerging Watch Brand",
-    text: "Celebrated as the Most Trusted Emerging Watch Brand of the Year in Sri Lanka, while pioneering expansion into curated executive lifestyle accessories including signature perfumes, leather goods, and travel luggage.",
+    title: "Most Trusted Emerging Watch Brand of the Year",
+    text: "Awarded 'Most Trusted Emerging Watch Brand of the Year Award 2026' by the Global Laurel Excellence Awards 2026, alongside pioneering expansion into curated executive lifestyle accessories.",
   },
   {
     year: "Today",
@@ -54,41 +55,6 @@ const STATS = [
   { value: "1 YEAR", label: "Official Warranty", sub: "Comprehensive Care & Service" },
   { value: "FIXED MRP", label: "Nationwide Sri Lanka", sub: "Complete Price Transparency" },
   { value: "100%", label: "Genuine Quality", sub: "Surgical 316L Steel & Sapphire" },
-];
-
-const AWARDS = [
-  {
-    id: "1",
-    year: "2026",
-    title: "Award Pending Recognition",
-    category: "Brand Excellence",
-    desc: "Our team continues to pursue official industry recognition for WINSOR's commitment to genuine craftsmanship, fixed retail integrity, and outstanding after-sales care across Sri Lanka.",
-    altText: "Winsor Brand Excellence Award Placeholder",
-  },
-  {
-    id: "2",
-    year: "2025",
-    title: "Retail Quality Distinction",
-    category: "Consumer Trust Award",
-    desc: "WINSOR is proud to be building a record of consumer trust, backed by a nationwide fixed MRP policy, transparent warranty terms, and a growing base of loyal repeat collectors.",
-    altText: "Winsor Consumer Trust Award Placeholder",
-  },
-  {
-    id: "3",
-    year: "2025",
-    title: "Boutique Excellence Recognition",
-    category: "Retail Network Award",
-    desc: "Recognized by retail partners across Sri Lanka for WINSOR's dedication to premium presentation, consistent stock standards, and professional marketing collaboration programs.",
-    altText: "Winsor Boutique Excellence Award Placeholder",
-  },
-  {
-    id: "4",
-    year: "2023",
-    title: "Brand Launch Achievement",
-    category: "Heritage Foundation",
-    desc: "From the moment of Dubai registration in 2023, WINSOR set out to bridge the gap between affordable watches and true luxury — a mission recognized by early retail partners and collectors alike.",
-    altText: "Winsor Brand Launch Achievement Placeholder",
-  },
 ];
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
@@ -400,54 +366,8 @@ export default function OurStoryPage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
-            {AWARDS.map((award) => (
-              <div
-                key={award.id}
-                className="ws-award-card bg-[#faf7f0] rounded-xl overflow-hidden border border-[#8B6914]/20 shadow-sm flex flex-col"
-              >
-                {/* Award Photo Placeholder with Alt Text */}
-                <div
-                  role="img"
-                  aria-label={award.altText}
-                  className="relative aspect-[4/3] w-full bg-[#16120c] border-b border-[#8B6914]/20 flex flex-col items-center justify-center p-4 text-center select-none"
-                >
-                  <div className="w-10 h-10 rounded-full bg-[#8B6914]/15 border border-[#8B6914]/30 flex items-center justify-center mb-2 text-[#8B6914]">
-                    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-                      <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" />
-                      <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" />
-                      <path d="M4 22h16" />
-                      <path d="M18 2H6v7a6 6 0 0 0 12 0V2z" />
-                    </svg>
-                  </div>
-                  <span className="font-['Jost'] text-[11px] text-[#dfb15b] font-medium tracking-wider uppercase">
-                    {award.altText}
-                  </span>
-                  <span className="font-['Jost'] text-[9px] text-white/40 mt-0.5">
-                    Real award image to be added
-                  </span>
-                  <div className="absolute top-2.5 right-2.5 bg-[#8B6914] text-white text-[9px] font-bold font-['Jost'] px-2.5 py-0.5 rounded-full shadow tracking-wider">
-                    {award.year}
-                  </div>
-                </div>
-
-                {/* Award Details */}
-                <div className="p-4 sm:p-5 flex flex-col flex-1 justify-between">
-                  <div>
-                    <span className="font-['Jost'] text-[9px] tracking-[0.18em] font-semibold text-[#8B6914] uppercase block mb-1">
-                      {award.category}
-                    </span>
-                    <h3 className="font-serif text-sm sm:text-base font-medium text-[#1a1209] leading-snug mb-2">
-                      {award.title}
-                    </h3>
-                    <p className="font-['Jost'] text-[11px] sm:text-xs text-[#1a1209]/70 leading-relaxed font-light">
-                      {award.desc}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+          {/* Interactive Awards Gallery (Masterpiece Banner + 4 Accolade Cards + Full-Res Lightbox) */}
+          <AwardsGallery />
         </div>
       </section>
 
