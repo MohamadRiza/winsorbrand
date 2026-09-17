@@ -4,6 +4,7 @@ import { useEffect, useState, useMemo } from 'react';
 import { toast } from 'react-hot-toast';
 import { IOrder, OrderStatus } from '@/types';
 import PermissionGate from '@/components/Admin/PermissionGate';
+import { generateReceiptPdf } from '@/lib/utils/generateReceiptPdf';
 
 export default function AdminOrdersPage() {
   const [orders, setOrders] = useState<IOrder[]>([]);
@@ -14,9 +15,15 @@ export default function AdminOrdersPage() {
   const [selectedOrder, setSelectedOrder] = useState<IOrder | null>(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
+  // Bank Transfer Payment Approval / Rejection Modal States
+  const [confirmApprovalOrder, setConfirmApprovalOrder] = useState<IOrder | null>(null);
+  const [isApprovingPayment, setIsApprovingPayment] = useState(false);
+  const [confirmRejectOrder, setConfirmRejectOrder] = useState<IOrder | null>(null);
+  const [isRejectingPayment, setIsRejectingPayment] = useState(false);
+
   // Filters State
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeTab, setActiveTab] = useState<'all' | 'cancel_requested' | 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled'>('all');
+  const [activeTab, setActiveTab] = useState<'all' | 'bank_pending' | 'cancel_requested' | 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled'>('all');
 
   useEffect(() => {
     fetchOrders();
@@ -82,6 +89,139 @@ export default function AdminOrdersPage() {
     }
   };
 
+  // ✅ APPROVE DIRECT BANK TRANSFER PAYMENT (HIGH-RISK VERIFICATION)
+  const handleApproveBankPayment = async (order: IOrder) => {
+    if (!order._id) return;
+    try {
+      setIsApprovingPayment(true);
+
+      // Optimistic update: mark paymentStatus = 'paid' and advance to 'processing' if currently 'pending'
+      const nextStatus = order.status === 'pending' ? 'processing' : order.status;
+      setOrders(prev => prev.map(o => o._id === order._id ? {
+        ...o,
+        paymentStatus: 'paid',
+        status: nextStatus,
+      } : o));
+
+      if (selectedOrder?._id === order._id) {
+        setSelectedOrder(prev => prev ? {
+          ...prev,
+          paymentStatus: 'paid',
+          status: nextStatus,
+        } : null);
+      }
+
+      const res = await fetch(`/api/admin/orders/${order._id}/verify-receipt`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'approve' }),
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Failed to verify and approve bank payment');
+      }
+
+      toast.success(`Payment for Order #${order.orderRef} APPROVED & marked as PAID!`);
+      if (data.data) {
+        setOrders(prev => prev.map(o => o._id === order._id ? { ...o, ...data.data } : o));
+        if (selectedOrder?._id === order._id) {
+          setSelectedOrder(data.data);
+        }
+      }
+    } catch (err: any) {
+      console.error('Approve bank payment error:', err);
+      toast.error(err.message || 'Failed to approve payment. Reverting changes.');
+      // Revert to original order
+      setOrders(prev => prev.map(o => o._id === order._id ? order : o));
+      if (selectedOrder?._id === order._id) {
+        setSelectedOrder(order);
+      }
+    } finally {
+      setIsApprovingPayment(false);
+      setConfirmApprovalOrder(null);
+    }
+  };
+
+  // ❌ REJECT DIRECT BANK TRANSFER PAYMENT
+  const handleRejectBankPayment = async (order: IOrder) => {
+    if (!order._id) return;
+    try {
+      setIsRejectingPayment(true);
+
+      setOrders(prev => prev.map(o => o._id === order._id ? { ...o, paymentStatus: 'failed' } : o));
+      if (selectedOrder?._id === order._id) {
+        setSelectedOrder(prev => prev ? { ...prev, paymentStatus: 'failed' } : null);
+      }
+
+      const res = await fetch(`/api/admin/orders/${order._id}/verify-receipt`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'reject' }),
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Failed to reject bank payment');
+      }
+
+      toast.success(`Payment for Order #${order.orderRef} marked as Failed / Rejected.`);
+      if (data.data) {
+        setOrders(prev => prev.map(o => o._id === order._id ? { ...o, ...data.data } : o));
+        if (selectedOrder?._id === order._id) {
+          setSelectedOrder(data.data);
+        }
+      }
+    } catch (err: any) {
+      console.error('Reject bank payment error:', err);
+      toast.error(err.message || 'Failed to reject payment.');
+      setOrders(prev => prev.map(o => o._id === order._id ? order : o));
+      if (selectedOrder?._id === order._id) {
+        setSelectedOrder(order);
+      }
+    } finally {
+      setIsRejectingPayment(false);
+      setConfirmRejectOrder(null);
+    }
+  };
+
+  // 📄 DOWNLOAD OFFICIAL PDF RECEIPT
+  const handleDownloadReceipt = (order: IOrder) => {
+    const isBank = order.paymentMethod === 'bank_transfer';
+    const isPaid = order.paymentStatus === 'paid';
+    const resolvedMobile = order.customerMobile || order.guestMobile || `${order.shippingAddress?.mobileCode || ''} ${order.shippingAddress?.mobile || ''}`.trim() || 'N/A';
+
+    generateReceiptPdf({
+      orderRef: order.orderRef,
+      date: order.createdAt ? new Date(order.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) : undefined,
+      customer: {
+        name: order.customerName || order.guestName || 'Valued Patron',
+        email: order.customerEmail || order.guestEmail || 'N/A',
+        mobile: resolvedMobile,
+        address: order.shippingAddress?.address || 'N/A',
+        city: order.shippingAddress?.city || 'N/A',
+        postalCode: order.shippingAddress?.postalCode || 'N/A',
+        country: order.shippingAddress?.country || 'LK',
+      },
+      customerMobile: resolvedMobile,
+      items: order.items.map(i => ({
+        productTitle: i.productTitle,
+        productModelNo: i.productModelNo,
+        colorVariant: i.colorVariant,
+        quantity: i.quantity,
+        price: i.price,
+      })),
+      subtotal: order.subtotal,
+      finalTotal: order.finalTotal || order.subtotal,
+      couponCode: order.couponCode || undefined,
+      discountPercent: order.couponDiscountPercent || undefined,
+      discountAmount: order.couponDiscountAmount || undefined,
+      paymentMethod: isBank ? 'Direct Bank Transfer' : 'PayHere Gateway',
+      paymentStatus: isPaid ? 'paid' : 'pending',
+    });
+    toast.success(`Official PDF Receipt for #${order.orderRef} downloaded!`);
+  };
+
   const copyToClipboard = (text: string, label: string) => {
     navigator.clipboard.writeText(text);
     toast.success(`Copied ${label} to clipboard!`);
@@ -91,6 +231,7 @@ export default function AdminOrdersPage() {
   const metrics = useMemo(() => {
     return {
       total: orders.length,
+      bankPending: orders.filter(o => o.paymentMethod === 'bank_transfer' && o.paymentStatus !== 'paid').length,
       cancelRequests: orders.filter(o => o.status === 'cancel_requested').length,
       processing: orders.filter(o => o.status === 'processing').length,
       pending: orders.filter(o => o.status === 'pending').length,
@@ -106,7 +247,11 @@ export default function AdminOrdersPage() {
   // Filtered orders
   const filteredOrders = useMemo(() => {
     return orders.filter(order => {
-      if (activeTab !== 'all' && order.status !== activeTab) {
+      if (activeTab === 'bank_pending') {
+        if (order.paymentMethod !== 'bank_transfer' || order.paymentStatus === 'paid') {
+          return false;
+        }
+      } else if (activeTab !== 'all' && order.status !== activeTab) {
         return false;
       }
 
@@ -183,7 +328,7 @@ export default function AdminOrdersPage() {
             Order Management
           </h1>
           <p className="text-[#1a1209]/60 text-sm mt-0.5">
-            Review client purchases, manage status transitions, and resolve cancellation requests.
+            Review client purchases, manage status transitions, and verify direct bank payments.
           </p>
         </div>
         <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-xl border border-[#1a1209]/10 shadow-sm">
@@ -193,7 +338,7 @@ export default function AdminOrdersPage() {
       </div>
 
       {/* Luxury Professional Metrics Row */}
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3.5">
         {/* Total Orders */}
         <div className="bg-white border border-[#1a1209]/10 rounded-xl p-4 flex flex-col justify-between shadow-sm hover:border-[#8B6914]/30 transition-all">
           <span className="text-[11px] font-semibold tracking-wider text-[#1a1209]/50 uppercase">Total Orders</span>
@@ -201,6 +346,26 @@ export default function AdminOrdersPage() {
             {metrics.total.toLocaleString()}
           </span>
         </div>
+
+        {/* Bank Transfer Approvals */}
+        <button 
+          onClick={() => setActiveTab('bank_pending')}
+          className={`text-left bg-white border rounded-xl p-4 flex flex-col justify-between transition-all shadow-sm ${
+            metrics.bankPending > 0 
+              ? 'border-indigo-400 bg-indigo-50/30 hover:bg-indigo-50/50 ring-1 ring-indigo-400/30' 
+              : 'border-[#1a1209]/10 hover:border-[#8B6914]/30'
+          }`}
+        >
+          <div className="flex items-center justify-between w-full">
+            <span className="text-[11px] font-semibold tracking-wider text-[#1a1209]/50 uppercase">Bank Approvals</span>
+            {metrics.bankPending > 0 && (
+              <span className="h-2 w-2 rounded-full bg-indigo-600 animate-ping" />
+            )}
+          </div>
+          <span className={`text-3xl font-bold font-['Jost'] tabular-nums tracking-tight mt-2 ${metrics.bankPending > 0 ? 'text-indigo-700' : 'text-[#1a1209]'}`}>
+            {metrics.bankPending.toLocaleString()}
+          </span>
+        </button>
 
         {/* Cancellation Requests */}
         <button 
@@ -232,7 +397,7 @@ export default function AdminOrdersPage() {
 
         {/* Processing / Shipped */}
         <div className="bg-white border border-[#1a1209]/10 rounded-xl p-4 flex flex-col justify-between shadow-sm hover:border-[#8B6914]/30 transition-all">
-          <span className="text-[11px] font-semibold tracking-wider text-[#1a1209]/50 uppercase">In Transit (Proc/Ship)</span>
+          <span className="text-[11px] font-semibold tracking-wider text-[#1a1209]/50 uppercase">In Transit</span>
           <span className="text-3xl font-bold text-blue-700 font-['Jost'] tabular-nums tracking-tight mt-2">
             {(metrics.processing + metrics.shipped).toLocaleString()}
           </span>
@@ -269,6 +434,7 @@ export default function AdminOrdersPage() {
         <div className="flex flex-wrap gap-2 border-t border-[#1a1209]/5 pt-3">
           {[
             { id: 'all', label: `All Orders (${metrics.total})` },
+            { id: 'bank_pending', label: `Bank Approvals (${metrics.bankPending})`, alert: metrics.bankPending > 0 },
             { id: 'cancel_requested', label: `Cancel Requested (${metrics.cancelRequests})` },
             { id: 'pending', label: `Pending (${metrics.pending})` },
             { id: 'processing', label: `Processing (${metrics.processing})` },
@@ -279,12 +445,17 @@ export default function AdminOrdersPage() {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as any)}
-              className={`px-3.5 py-1.5 text-xs font-semibold rounded-lg border transition-all cursor-pointer ${
+              className={`px-3.5 py-1.5 text-xs font-semibold rounded-lg border transition-all cursor-pointer flex items-center gap-1.5 ${
                 activeTab === tab.id
                   ? 'bg-[#1a1209] text-[#faf7f0] border-[#1a1209] shadow-sm'
+                  : tab.alert
+                  ? 'bg-indigo-50 text-indigo-800 border-indigo-200 hover:bg-indigo-100/70'
                   : 'bg-white text-[#1a1209]/70 border-[#1a1209]/10 hover:bg-[#faf7f0]/60'
               }`}
             >
+              {tab.alert && activeTab !== tab.id && (
+                <span className="w-1.5 h-1.5 rounded-full bg-indigo-600 animate-pulse" />
+              )}
               {tab.label}
             </button>
           ))}
@@ -405,8 +576,23 @@ export default function AdminOrdersPage() {
                           <span className={`w-1.5 h-1.5 rounded-full ${
                             order.paymentStatus === 'paid' ? 'bg-emerald-500' : order.paymentStatus === 'failed' ? 'bg-rose-500' : 'bg-amber-500'
                           }`} />
-                          {order.paymentStatus === 'paid' ? 'Paid' : order.paymentStatus === 'failed' ? 'Failed' : 'Pending'}
+                          {order.paymentStatus === 'paid' ? 'Paid' : order.paymentStatus === 'failed' ? 'Failed' : 'Pending Approval'}
                         </span>
+                        {/* Quick Approve Action for Bank Transfer Orders */}
+                        {order.paymentMethod === 'bank_transfer' && order.paymentStatus !== 'paid' && (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setConfirmApprovalOrder(order);
+                            }}
+                            className="inline-flex items-center justify-center gap-1 px-2.5 py-1 bg-emerald-700 hover:bg-emerald-800 text-white rounded-md text-[10px] font-bold transition shadow-xs cursor-pointer mt-0.5"
+                          >
+                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                            </svg>
+                            Approve Payment
+                          </button>
+                        )}
                       </div>
                     </td>
                     <td className="px-6 py-4">
@@ -424,12 +610,23 @@ export default function AdminOrdersPage() {
                       </div>
                     </td>
                     <td className="px-6 py-4 text-right">
-                      <button
-                        onClick={() => openOrderDetails(order)}
-                        className="px-4 py-1.5 bg-[#1a1209] hover:bg-[#8B6914] text-[#faf7f0] text-xs font-medium rounded-lg transition-all shadow-sm cursor-pointer"
-                      >
-                        View Details
-                      </button>
+                      <div className="flex items-center justify-end gap-1.5">
+                        <button
+                          onClick={() => handleDownloadReceipt(order)}
+                          className="p-1.5 text-[#1a1209]/60 hover:text-[#8B6914] hover:bg-[#8B6914]/10 rounded-lg transition cursor-pointer"
+                          title="Download Official PDF Receipt"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                          </svg>
+                        </button>
+                        <button
+                          onClick={() => openOrderDetails(order)}
+                          className="px-3.5 py-1.5 bg-[#1a1209] hover:bg-[#8B6914] text-[#faf7f0] text-xs font-medium rounded-lg transition-all shadow-sm cursor-pointer"
+                        >
+                          View Details
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 );
@@ -855,47 +1052,123 @@ export default function AdminOrdersPage() {
                       </div>
                     )}
 
-                    {/* Bank Transfer Receipt */}
+                    {/* Bank Transfer Receipt & Verification Panel */}
                     {selectedOrder.paymentMethod === 'bank_transfer' && (
-                      <div className="space-y-3 pt-1">
-                        <p className="text-[#1a1209]/60 font-medium">Bank Transfer Receipt</p>
+                      <div className="space-y-4 pt-2 border-t border-[#1a1209]/5">
+                        <div className="flex items-center justify-between">
+                          <p className="text-xs font-bold text-[#1a1209] uppercase tracking-wider">
+                            Bank Transfer Slip & Approval
+                          </p>
+                          <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${
+                            selectedOrder.paymentStatus === 'paid'
+                              ? 'bg-emerald-50 text-emerald-700 border-emerald-300'
+                              : selectedOrder.paymentStatus === 'failed'
+                              ? 'bg-rose-50 text-rose-700 border-rose-300'
+                              : 'bg-amber-50 text-amber-800 border-amber-300'
+                          }`}>
+                            {selectedOrder.paymentStatus === 'paid' ? 'Payment Verified & Approved' : selectedOrder.paymentStatus === 'failed' ? 'Payment Rejected' : 'Awaiting Admin Verification'}
+                          </span>
+                        </div>
+
                         {selectedOrder.receiptUrl ? (
-                          <div className="space-y-2.5">
+                          <div className="space-y-3">
                             {/* Preview for image receipts */}
                             {/\.(jpe?g|png|gif|webp)$/i.test(selectedOrder.receiptUrl) ? (
-                              <div className="rounded-xl overflow-hidden border border-[#1a1209]/15 bg-white shadow-sm">
+                              <div className="rounded-xl overflow-hidden border border-[#1a1209]/15 bg-white shadow-sm group relative">
                                 <img
                                   src={selectedOrder.receiptUrl}
                                   alt="Bank Transfer Receipt"
-                                  className="w-full object-contain max-h-60"
+                                  className="w-full object-contain max-h-64 cursor-pointer bg-[#faf7f0]/50"
+                                  onClick={() => window.open(selectedOrder.receiptUrl!, '_blank')}
                                 />
+                                <a
+                                  href={selectedOrder.receiptUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="absolute bottom-2 right-2 bg-[#1a1209]/80 hover:bg-[#1a1209] text-white text-[10px] font-medium px-2.5 py-1 rounded-lg backdrop-blur-xs transition flex items-center gap-1 shadow-sm"
+                                >
+                                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+                                  Enlarge Slip
+                                </a>
                               </div>
                             ) : (
                               /* PDF icon preview */
-                              <div className="flex items-center gap-3 p-3 bg-white rounded-xl border border-[#1a1209]/10">
-                                <div className="w-10 h-10 bg-rose-50 border border-rose-200 rounded-lg flex items-center justify-center flex-shrink-0">
-                                  <svg className="w-5 h-5 text-rose-600" fill="currentColor" viewBox="0 0 24 24">
-                                    <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zm-1 1.5L18.5 9H13V3.5zM8 12h8v1H8v-1zm0 2.5h8v1H8v-1zm0 2.5h5v1H8v-1z"/>
-                                  </svg>
+                              <div className="flex items-center justify-between p-3 bg-white rounded-xl border border-[#1a1209]/10 shadow-xs">
+                                <div className="flex items-center gap-3">
+                                  <div className="w-10 h-10 bg-rose-50 border border-rose-200 rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <svg className="w-5 h-5 text-rose-600" fill="currentColor" viewBox="0 0 24 24">
+                                      <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zm-1 1.5L18.5 9H13V3.5zM8 12h8v1H8v-1zm0 2.5h8v1H8v-1zm0 2.5h5v1H8v-1z"/>
+                                    </svg>
+                                  </div>
+                                  <div>
+                                    <p className="font-semibold text-[#1a1209] text-sm">Uploaded Bank Slip</p>
+                                    <p className="text-[#1a1209]/50 text-[10px] font-mono">PDF Document Attached</p>
+                                  </div>
                                 </div>
-                                <div className="min-w-0">
-                                  <p className="font-semibold text-[#1a1209] text-sm truncate">Bank Transfer Receipt</p>
-                                  <p className="text-[#1a1209]/50 text-[10px] font-mono">PDF Document</p>
+                                <a
+                                  href={selectedOrder.receiptUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="px-3 py-1.5 bg-[#1a1209] hover:bg-[#8B6914] text-white text-xs font-semibold rounded-lg transition"
+                                >
+                                  Open PDF Slip
+                                </a>
+                              </div>
+                            )}
+
+                            {/* Verification Actions Control Card */}
+                            {selectedOrder.paymentStatus !== 'paid' ? (
+                              <div className="p-4 bg-amber-50/80 border border-amber-300/80 rounded-xl space-y-3">
+                                <div className="flex items-start gap-2.5">
+                                  <div className="w-6 h-6 rounded-lg bg-amber-100 border border-amber-300 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                    <svg className="w-3.5 h-3.5 text-amber-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                    </svg>
+                                  </div>
+                                  <div>
+                                    <p className="text-xs font-bold text-amber-950">Action Required: Verify Direct Bank Transfer</p>
+                                    <p className="text-[11px] text-amber-900 mt-0.5 leading-relaxed">
+                                      Verify that <strong>LKR {(selectedOrder.finalTotal || selectedOrder.subtotal).toLocaleString()}</strong> was credited to your bank. Approving marks the order as Paid and updates the PDF receipt to <strong>APPROVED & PAID</strong>.
+                                    </p>
+                                  </div>
+                                </div>
+
+                                <div className="flex gap-2 pt-1">
+                                  <button
+                                    type="button"
+                                    onClick={() => setConfirmApprovalOrder(selectedOrder)}
+                                    className="flex-1 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded-lg transition-all shadow-sm flex items-center justify-center gap-1.5 cursor-pointer"
+                                  >
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                                    </svg>
+                                    Approve Bank Payment
+                                  </button>
+
+                                  <button
+                                    type="button"
+                                    onClick={() => setConfirmRejectOrder(selectedOrder)}
+                                    className="px-4 py-2.5 bg-white border border-rose-300 hover:bg-rose-50 text-rose-700 text-xs font-semibold rounded-lg transition-all cursor-pointer"
+                                  >
+                                    Reject
+                                  </button>
+                                </div>
+                              </div>
+                            ) : (
+                              <div className="p-3.5 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center justify-between">
+                                <div className="flex items-center gap-2.5">
+                                  <div className="w-7 h-7 rounded-lg bg-emerald-100 border border-emerald-300 flex items-center justify-center text-emerald-700">
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                                    </svg>
+                                  </div>
+                                  <div>
+                                    <p className="text-xs font-bold text-emerald-900">Payment Officially Verified & Approved</p>
+                                    <p className="text-[10px] text-emerald-700">The customer PDF receipt now reflects APPROVED & PAID with official Maison stamp.</p>
+                                  </div>
                                 </div>
                               </div>
                             )}
-                            {/* View / Download Button */}
-                            <a
-                              href={selectedOrder.receiptUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="flex items-center justify-center gap-2 w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-xl transition-all shadow-sm"
-                            >
-                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                              </svg>
-                              View / Download Receipt
-                            </a>
                           </div>
                         ) : (
                           <div className="flex items-center gap-2.5 p-3 bg-amber-50 border border-amber-200 rounded-xl">
@@ -905,8 +1178,8 @@ export default function AdminOrdersPage() {
                               </svg>
                             </div>
                             <div>
-                              <p className="font-semibold text-amber-800 text-xs">Receipt Not Yet Uploaded</p>
-                              <p className="text-amber-700 text-[10px] mt-0.5">Customer has not uploaded a bank receipt yet.</p>
+                              <p className="font-semibold text-amber-800 text-xs">Receipt Slip Not Yet Uploaded</p>
+                              <p className="text-amber-700 text-[10px] mt-0.5">The patron has not yet uploaded proof of transfer.</p>
                             </div>
                           </div>
                         )}
@@ -992,10 +1265,23 @@ export default function AdminOrdersPage() {
             </div>
 
             {/* Drawer Footer */}
-            <div className="px-6 py-4 border-t border-[#1a1209]/10 bg-[#faf7f0] flex justify-end gap-3">
+            <div className="px-6 py-4 border-t border-[#1a1209]/10 bg-[#faf7f0] flex items-center justify-between gap-3">
+              {selectedOrder && (
+                <button
+                  type="button"
+                  onClick={() => handleDownloadReceipt(selectedOrder)}
+                  className="px-4 py-2.5 bg-[#1a1209] hover:bg-[#8B6914] text-[#faf7f0] text-xs font-semibold rounded-xl transition-all shadow-sm flex items-center gap-2 cursor-pointer"
+                >
+                  <svg className="w-4 h-4 text-[#d4af37]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                  </svg>
+                  Download Official Receipt (PDF)
+                </button>
+              )}
               <button
+                type="button"
                 onClick={closeOrderDetails}
-                className="px-5 py-2.5 border border-[#1a1209]/20 rounded-xl text-xs font-semibold text-[#1a1209] hover:bg-[#1a1209]/5 transition-all bg-white shadow-sm cursor-pointer"
+                className="px-5 py-2.5 border border-[#1a1209]/20 rounded-xl text-xs font-semibold text-[#1a1209] hover:bg-[#1a1209]/5 transition-all bg-white shadow-sm cursor-pointer ml-auto"
               >
                 Close Drawer
               </button>
@@ -1003,6 +1289,116 @@ export default function AdminOrdersPage() {
           </div>
         </div>
       </div>
+
+      {/* ── HIGH-RISK CONFIRMATION MODAL: APPROVE BANK PAYMENT ── */}
+      {confirmApprovalOrder && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1a1209]/60 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-[#1a1209]/15 space-y-4 font-['Jost']">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-emerald-100 border border-emerald-300 flex items-center justify-center text-emerald-800 flex-shrink-0">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                </svg>
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-[#1a1209] font-['Cormorant_Garamond']">
+                  Confirm Bank Payment Approval
+                </h3>
+                <p className="text-xs text-[#1a1209]/60">High-Risk Financial Verification</p>
+              </div>
+            </div>
+
+            <div className="bg-[#faf7f0] border border-[#1a1209]/10 rounded-xl p-3.5 space-y-2 text-xs">
+              <div className="flex justify-between">
+                <span className="text-[#1a1209]/60">Order Reference:</span>
+                <span className="font-mono font-bold text-[#1a1209]">#{confirmApprovalOrder.orderRef}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-[#1a1209]/60">Customer Name:</span>
+                <span className="font-semibold text-[#1a1209]">{confirmApprovalOrder.customerName || confirmApprovalOrder.guestName || 'Valued Client'}</span>
+              </div>
+              <div className="flex justify-between border-t border-[#1a1209]/10 pt-2 text-sm">
+                <span className="font-semibold text-[#1a1209]">Amount to Verify:</span>
+                <span className="font-mono font-bold text-emerald-700">LKR {(confirmApprovalOrder.finalTotal || confirmApprovalOrder.subtotal).toLocaleString()}</span>
+              </div>
+            </div>
+
+            <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-[11px] text-amber-900 leading-relaxed">
+              ⚠️ <strong>Strict Verification Required:</strong> Please ensure funds have physically cleared into your bank account before approving. Approving will mark this order as <strong>Paid</strong> and update the customer's PDF receipt to <strong>APPROVED & PAID</strong>.
+            </div>
+
+            <div className="flex gap-2.5 pt-2">
+              <button
+                type="button"
+                disabled={isApprovingPayment}
+                onClick={() => setConfirmApprovalOrder(null)}
+                className="flex-1 py-2.5 border border-[#1a1209]/20 rounded-xl text-xs font-semibold text-[#1a1209] hover:bg-[#1a1209]/5 transition cursor-pointer disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={isApprovingPayment}
+                onClick={() => handleApproveBankPayment(confirmApprovalOrder)}
+                className="flex-1 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded-xl transition shadow-sm flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
+              >
+                {isApprovingPayment ? (
+                  <>
+                    <svg className="animate-spin h-3.5 w-3.5 text-white" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
+                    Approving...
+                  </>
+                ) : (
+                  'Yes, Confirm & Approve'
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── CONFIRMATION MODAL: REJECT BANK PAYMENT ── */}
+      {confirmRejectOrder && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1a1209]/60 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-[#1a1209]/15 space-y-4 font-['Jost']">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-rose-100 border border-rose-300 flex items-center justify-center text-rose-800 flex-shrink-0">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-[#1a1209] font-['Cormorant_Garamond']">
+                  Reject Bank Payment
+                </h3>
+                <p className="text-xs text-[#1a1209]/60">Order #{confirmRejectOrder.orderRef}</p>
+              </div>
+            </div>
+
+            <p className="text-xs text-[#1a1209]/70 leading-relaxed">
+              Are you sure you want to mark payment for Order <strong>#{confirmRejectOrder.orderRef}</strong> as failed/rejected?
+            </p>
+
+            <div className="flex gap-2.5 pt-2">
+              <button
+                type="button"
+                disabled={isRejectingPayment}
+                onClick={() => setConfirmRejectOrder(null)}
+                className="flex-1 py-2.5 border border-[#1a1209]/20 rounded-xl text-xs font-semibold text-[#1a1209] hover:bg-[#1a1209]/5 transition cursor-pointer disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={isRejectingPayment}
+                onClick={() => handleRejectBankPayment(confirmRejectOrder)}
+                className="flex-1 py-2.5 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl transition shadow-sm flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
+              >
+                {isRejectingPayment ? 'Rejecting...' : 'Confirm Rejection'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
     </PermissionGate>
   );

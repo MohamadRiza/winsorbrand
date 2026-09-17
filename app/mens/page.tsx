@@ -10,6 +10,7 @@ import { IProduct, CollectionSection, IGiftCategory } from '@/types';
 import NewsletterCard from '@/components/NewsletterCard';
 import ProductCard from '@/components/ProductCard';
 import { toast } from 'react-hot-toast';
+import MensHeroTypewriter from './MensHeroTypewriter';
 
 // Helper to determine product gender
 const getProductGender = (product: IProduct): 'Gents' | 'Ladies' | 'Unisex' => {
@@ -555,12 +556,8 @@ function MensCollectionContent() {
             <div style={{ fontSize: '10px', letterSpacing: '0.28em', color: '#dfb15b', textTransform: 'uppercase', fontWeight: 600, marginBottom: '12px' }}>
               WINSOR MAISON HORLOGERIE
             </div>
-            <h1 style={{ fontFamily: "'Cinzel', 'Cormorant Garamond', Georgia, serif", fontSize: 'clamp(26px, 3.4vw, 44px)', fontWeight: 600, lineHeight: 1.15, margin: '0 0 14px', letterSpacing: '0.02em', color: '#fff' }}>
-              Men's Timepiece Collection
-            </h1>
-            <p style={{ fontFamily: "'Jost', sans-serif", fontSize: 'clamp(13px, 1.1vw, 15px)', lineHeight: 1.6, color: 'rgba(255,255,255,0.82)', maxWidth: '480px', margin: '0 0 22px', fontWeight: 300 }}>
-              Engineered for those who never settle. Discover bold, distinguished timepieces crafted with Japanese precision movements and Dubai-certified quality.
-            </p>
+            {/* Animated Hero Title & Subtitle with Luxury Typewriter & Erase Effect */}
+            <MensHeroTypewriter />
             <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap', alignItems: 'center' }}>
               <div style={{ padding: '8px 18px', background: 'rgba(139,105,20,0.2)', border: '1px solid rgba(223,177,91,0.45)', borderRadius: '20px', fontSize: '10px', letterSpacing: '0.18em', textTransform: 'uppercase', fontWeight: 600, color: '#dfb15b' }}>
                 {filteredProducts.length} MEN'S TIMEPIECES AVAILABLE

@@ -248,17 +248,24 @@ export default function BuyNowModal({
 
   const handleDownloadReceipt = () => {
     if (!orderRef || !item) return;
+    const resolvedMobile = `${profile?.mobileCode || ''} ${profile?.mobile || ''}`.trim() || 'N/A';
     generateReceiptPdf({
       orderRef,
       customer: {
-        name: profile?.name || 'Customer', email: profile?.email || userEmail || 'N/A',
-        mobile: `${profile?.mobileCode || ''} ${profile?.mobile || ''}`.trim(),
-        address: profile?.address || 'N/A', city: profile?.city || 'N/A',
-        postalCode: profile?.postalCode || 'N/A', country: profile?.country || 'N/A',
+        name: profile?.name || 'Customer',
+        email: profile?.email || userEmail || 'N/A',
+        mobile: resolvedMobile,
+        address: profile?.address || 'N/A',
+        city: profile?.city || 'N/A',
+        postalCode: profile?.postalCode || 'N/A',
+        country: profile?.country || 'N/A',
       },
+      customerMobile: resolvedMobile,
       items: [{ productTitle: item.productTitle, productModelNo: item.productModelNo, colorVariant: item.colorVariant, quantity: item.quantity, price: item.price }],
-      subtotal, finalTotal: subtotal,
-      paymentMethod: payMethod === 'payhere' ? 'PayHere Card Payment' : 'Bank Transfer',
+      subtotal,
+      finalTotal: subtotal,
+      paymentMethod: payMethod === 'payhere' ? 'PayHere Card Payment' : 'Direct Bank Transfer',
+      paymentStatus: payMethod === 'payhere' ? 'paid' : 'pending',
     });
     toast.success('PDF Receipt downloaded successfully!');
   };

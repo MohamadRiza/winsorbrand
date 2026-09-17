@@ -327,18 +327,20 @@ export default function GuestCheckoutModal({
   const handleDownloadReceipt = () => {
     if (!orderRef) return;
     const countryName = COUNTRIES.find(c => c.code === form.country)?.name || form.country;
+    const resolvedMobile = `${form.mobileCode} ${form.mobile.trim()}`.trim();
 
     generateReceiptPdf({
       orderRef,
       customer: {
         name: form.name.trim() || 'Guest Customer',
         email: form.email.trim(),
-        mobile: `${form.mobileCode} ${form.mobile.trim()}`,
+        mobile: resolvedMobile,
         address: form.address.trim(),
         city: form.city.trim(),
         postalCode: form.postalCode.trim(),
         country: countryName,
       },
+      customerMobile: resolvedMobile,
       items: items.map(i => ({
         productTitle: i.productTitle,
         productModelNo: i.productModelNo,
@@ -348,7 +350,8 @@ export default function GuestCheckoutModal({
       })),
       subtotal,
       finalTotal: subtotal,
-      paymentMethod: 'Pay on Delivery / Order Confirmation',
+      paymentMethod: payMethod === 'payhere' ? 'PayHere Card Payment' : 'Direct Bank Transfer',
+      paymentStatus: payMethod === 'payhere' ? 'paid' : 'pending',
     });
 
     toast.success('PDF Receipt downloaded successfully!');

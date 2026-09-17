@@ -69,8 +69,16 @@ interface OrderData {
     country: string;
     postalCode?: string;
     mobile?: string;
+    mobileCode?: string;
   };
-  guestName: string;
+  guestName?: string;
+  guestEmail?: string;
+  guestMobile?: string;
+  customerName?: string;
+  customerEmail?: string;
+  customerMobile?: string;
+  paymentMethod?: string;
+  paymentStatus?: string;
 }
 
 function OrderTrackingContent() {
@@ -171,18 +179,23 @@ function OrderTrackingContent() {
 
   const handleDownloadReceipt = () => {
     if (!order) return;
+    const isBank = order.paymentMethod === 'bank_transfer' || (order.paymentMethod || '').toLowerCase().includes('bank');
+    const isPaid = order.paymentStatus === 'paid';
+    const resolvedMobile = mobile || order.customerMobile || order.guestMobile || `${order.shippingAddress?.mobileCode || ''} ${order.shippingAddress?.mobile || ''}`.trim() || order.shippingAddress?.mobile || 'N/A';
+
     generateReceiptPdf({
       orderRef: order.orderRef,
       date: new Date(order.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }),
       customer: {
-        name: order.guestName || 'Customer',
-        email: 'N/A',
-        mobile: mobile || order.mobile || order.shippingAddress?.mobile || 'N/A',
+        name: order.customerName || order.guestName || 'Valued Patron',
+        email: order.customerEmail || order.guestEmail || 'N/A',
+        mobile: resolvedMobile,
         address: order.shippingAddress.address,
         city: order.shippingAddress.city,
         postalCode: order.shippingAddress.postalCode || 'N/A',
         country: order.shippingAddress.country,
       },
+      customerMobile: resolvedMobile,
       items: order.items.map(i => ({
         productTitle: i.productTitle,
         productModelNo: i.productModelNo,
@@ -192,7 +205,8 @@ function OrderTrackingContent() {
       })),
       subtotal: order.subtotal,
       finalTotal: order.finalTotal || order.subtotal,
-      paymentMethod: 'Order Confirmation / Verified Purchase',
+      paymentMethod: isBank ? 'Direct Bank Transfer' : 'PayHere Card Payment',
+      paymentStatus: isPaid ? 'paid' : 'pending',
     });
     toast.success('Official PDF Receipt downloaded!');
   };

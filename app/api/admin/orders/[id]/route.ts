@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db';
 import Order from '@/lib/models/Order';
 import Product from '@/lib/models/Product';
+import Customer from '@/lib/models/Customer';
 import { verifyPermissions } from '@/lib/authHelper';
 
 export async function PATCH(
@@ -17,12 +18,28 @@ export async function PATCH(
     await connectDB();
     const { id } = await params;
     const body = await req.json();
-    const { status } = body;
+    const { status, paymentStatus } = body;
 
     const VALID_STATUSES = ['pending', 'processing', 'shipped', 'delivered', 'cancelled', 'cancel_requested'];
-    if (!status || !VALID_STATUSES.includes(status)) {
+    const VALID_PAYMENT_STATUSES = ['pending', 'paid', 'failed'];
+
+    if (!status && !paymentStatus) {
       return NextResponse.json(
-        { success: false, error: 'Invalid or missing status' },
+        { success: false, error: 'Invalid or missing status/paymentStatus' },
+        { status: 400 }
+      );
+    }
+
+    if (status && !VALID_STATUSES.includes(status)) {
+      return NextResponse.json(
+        { success: false, error: 'Invalid order status' },
+        { status: 400 }
+      );
+    }
+
+    if (paymentStatus && !VALID_PAYMENT_STATUSES.includes(paymentStatus)) {
+      return NextResponse.json(
+        { success: false, error: 'Invalid payment status' },
         { status: 400 }
       );
     }
@@ -39,7 +56,7 @@ export async function PATCH(
 
     // Stock replenishment check:
     // If the status is changing to 'cancelled' from a non-cancelled active state, restore inventory stock in parallel
-    if (status === 'cancelled' && previousStatus !== 'cancelled') {
+    if (status && status === 'cancelled' && previousStatus !== 'cancelled') {
       await Promise.all(
         order.items.map(async (item: any) => {
           const product = await Product.findById(item.productId);
@@ -64,13 +81,46 @@ export async function PATCH(
       );
     }
 
-    order.status = status;
-    if (status === 'delivered' && !(order as any).deliveredAt) {
-      (order as any).deliveredAt = new Date();
+    if (status) {
+      order.status = status;
+      if (status === 'delivered' && !(order as any).deliveredAt) {
+        (order as any).deliveredAt = new Date();
+      }
     }
+
+    if (paymentStatus) {
+      order.paymentStatus = paymentStatus;
+    }
+
     await order.save();
 
-    return NextResponse.json({ success: true, data: order });
+    // Enrich with customer details
+    const cust = order.clerkId ? await Customer.findOne({ clerkId: order.clerkId }).lean() : null;
+
+    const customerName = order.customerName
+      || order.guestName
+      || cust?.name
+      || (cust?.email ? cust.email.split('@')[0] : (order.isGuestOrder ? 'Guest Customer' : 'Registered Patron'));
+
+    const customerEmail = order.customerEmail
+      || order.guestEmail
+      || cust?.email
+      || null;
+
+    const customerMobile = order.customerMobile
+      || order.guestMobile
+      || (order.shippingAddress?.mobileCode && order.shippingAddress?.mobile
+        ? `${order.shippingAddress.mobileCode} ${order.shippingAddress.mobile}`
+        : (cust?.mobileCode && cust?.mobile ? `${cust.mobileCode} ${cust.mobile}` : null));
+
+    const enriched = {
+      ...order.toObject(),
+      customerName,
+      customerEmail,
+      customerMobile,
+    };
+
+    return NextResponse.json({ success: true, data: enriched });
   } catch (error: any) {
     console.error('Admin update order error:', error);
     return NextResponse.json(

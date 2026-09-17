@@ -2,6 +2,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import VideoPlayer from "./VideoPlayer";
+import StoryHeroTypewriter from "./StoryHeroTypewriter";
 
 export const metadata = {
   title: "Our Story — Winsor Maison | Ride Your Moment",
@@ -147,17 +148,8 @@ export default function OurStoryPage() {
             <span className="w-6 sm:w-10 h-[1px] bg-gradient-to-l from-transparent via-[#dfb15b] to-[#dfb15b]" />
           </div>
 
-          {/* Main Title (Balanced, never oversized) */}
-          <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-[54px] font-normal leading-[1.12] tracking-tight text-white mb-4">
-            Ride Your Moment
-          </h1>
-
-          <div className="w-12 h-[1px] bg-gradient-to-r from-transparent via-[#dfb15b] to-transparent mx-auto mb-4 sm:mb-5" />
-
-          {/* Subtitle */}
-          <p className="font-serif text-sm sm:text-base md:text-lg font-light leading-relaxed text-white/85 max-w-xl mx-auto mb-7 sm:mb-8">
-            Forging authentic horology, surgical-grade 316L steel, and Japanese precision movements — engineered for everyday prestige across Sri Lanka.
-          </p>
+          {/* Animated Hero Title & Subtitle with Luxury Typewriter & Erase Effect */}
+          <StoryHeroTypewriter />
 
           {/* Luxury CTA Buttons (Compact & Refined) */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 mb-10 sm:mb-12">

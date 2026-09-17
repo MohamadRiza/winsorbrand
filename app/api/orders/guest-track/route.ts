@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAuth } from '@clerk/nextjs/server';
 import { connectDB } from '@/lib/db';
 import Order from '@/lib/models/Order';
+import Customer from '@/lib/models/Customer';
 
 export async function GET(req: NextRequest) {
   try {
@@ -87,7 +88,26 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    const orderMobile = order.shippingAddress?.mobile || order.guestMobile || '';
+    // Extract formatted phone number with country code
+    let orderMobile = order.customerMobile || order.guestMobile || '';
+    if (!orderMobile && order.shippingAddress?.mobile) {
+      const code = order.shippingAddress.mobileCode || '';
+      orderMobile = code && !order.shippingAddress.mobile.startsWith('+')
+        ? `${code} ${order.shippingAddress.mobile}`.trim()
+        : order.shippingAddress.mobile;
+    }
+
+    if (!orderMobile && order.clerkId) {
+      try {
+        const cust = await Customer.findOne({ clerkId: order.clerkId }).lean() as any;
+        if (cust?.mobile) {
+          const code = cust.mobileCode || '';
+          orderMobile = code && !cust.mobile.startsWith('+') ? `${code} ${cust.mobile}`.trim() : cust.mobile;
+        }
+      } catch {
+        // ignore
+      }
+    }
 
     // Return sanitized order data with registered mobile number for auto-fill
     return NextResponse.json({
@@ -114,8 +134,14 @@ export async function GET(req: NextRequest) {
           country: order.shippingAddress?.country || 'LK',
           postalCode: order.shippingAddress?.postalCode || '',
           mobile: orderMobile,
+          mobileCode: order.shippingAddress?.mobileCode || '',
         },
         guestName: order.guestName || (order.shippingAddress?.address ? 'Valued Client' : 'Customer'),
+        customerName: order.customerName || order.guestName || 'Valued Client',
+        customerEmail: order.customerEmail || order.guestEmail || '',
+        customerMobile: order.customerMobile || order.guestMobile || orderMobile,
+        paymentMethod: order.paymentMethod || 'card',
+        paymentStatus: order.paymentStatus || (order.paymentMethod === 'bank_transfer' ? 'pending' : 'paid'),
       },
     });
   } catch (error: any) {

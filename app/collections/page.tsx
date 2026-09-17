@@ -17,6 +17,226 @@ const SECTIONS: { key: CollectionSection; label: string }[] = [
   { key: 'bestsellers', label: 'Best Sellers' },
 ];
 
+/**
+ * Luxury Typewriter Hero Animation
+ * Seamlessly types, pauses, erases (removes), and loops the brand statement
+ * with zero layout shifts and bespoke gold caret pulsing.
+ */
+interface TypewriterHeroTextProps {
+  titleL1?: string;
+  titleL2?: string;
+  descL1?: string;
+  descL2?: string;
+  onCycleComplete?: () => void;
+}
+
+function TypewriterHeroText({
+  titleL1 = 'Timeless Craft.',
+  titleL2 = 'Modern Legacy.',
+  descL1 = 'Precision, heritage and excellence —',
+  descL2 = 'crafted for Dubai/UAE Registered brand.',
+  onCycleComplete,
+}: TypewriterHeroTextProps) {
+  const [t1, setT1] = useState('');
+  const [t2, setT2] = useState('');
+  const [d1, setD1] = useState('');
+  const [d2, setD2] = useState('');
+  const [cursorPos, setCursorPos] = useState<'t1' | 't2' | 'd1' | 'd2' | 'none'>('t1');
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.matchMedia) {
+      setPrefersReducedMotion(window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (prefersReducedMotion) {
+      setT1(titleL1);
+      setT2(titleL2);
+      setD1(descL1);
+      setD2(descL2);
+      setCursorPos('none');
+      const timer = setTimeout(() => {
+        if (onCycleComplete) onCycleComplete();
+      }, 7000);
+      return () => clearTimeout(timer);
+    }
+
+    let isCancelled = false;
+    let activeTimer: any = null;
+
+    const wait = (ms: number) =>
+      new Promise<void>((resolve) => {
+        if (isCancelled) return resolve();
+        activeTimer = setTimeout(() => {
+          activeTimer = null;
+          resolve();
+        }, ms);
+      });
+
+    const runLoop = async () => {
+      while (!isCancelled) {
+        // 1. Initial breathing pause with cursor blinking at line 1
+        setT1('');
+        setT2('');
+        setD1('');
+        setD2('');
+        setCursorPos('t1');
+        await wait(450);
+        if (isCancelled) return;
+
+        // 2. Type Title Line 1
+        for (let i = 1; i <= titleL1.length; i++) {
+          if (isCancelled) return;
+          setT1(titleL1.slice(0, i));
+          const char = titleL1[i - 1];
+          await wait(char === '.' ? 220 : (char === ' ' ? 70 : 50));
+        }
+        if (isCancelled) return;
+        await wait(200);
+
+        // 3. Move cursor to Title Line 2 and type
+        setCursorPos('t2');
+        for (let i = 1; i <= titleL2.length; i++) {
+          if (isCancelled) return;
+          setT2(titleL2.slice(0, i));
+          const char = titleL2[i - 1];
+          await wait(char === '.' ? 240 : (char === ' ' ? 70 : 50));
+        }
+        if (isCancelled) return;
+        await wait(320);
+
+        // 4. Move cursor to Description Line 1 and type
+        setCursorPos('d1');
+        for (let i = 1; i <= descL1.length; i++) {
+          if (isCancelled) return;
+          setD1(descL1.slice(0, i));
+          const char = descL1[i - 1];
+          await wait(char === '—' ? 240 : (char === ',' ? 140 : 28));
+        }
+        if (isCancelled) return;
+        await wait(180);
+
+        // 5. Move cursor to Description Line 2 and type
+        setCursorPos('d2');
+        for (let i = 1; i <= descL2.length; i++) {
+          if (isCancelled) return;
+          setD2(descL2.slice(0, i));
+          const char = descL2[i - 1];
+          await wait(char === '.' ? 220 : (char === '/' ? 120 : 28));
+        }
+        if (isCancelled) return;
+
+        // 6. Hold Complete for generous reading period (4.2 seconds)
+        await wait(4200);
+        if (isCancelled) return;
+
+        // 7. Slow Removal: Erase Description Line 2 deliberately
+        setCursorPos('d2');
+        for (let i = descL2.length - 1; i >= 0; i--) {
+          if (isCancelled) return;
+          setD2(descL2.slice(0, i));
+          await wait(36);
+        }
+        if (isCancelled) return;
+        await wait(140);
+
+        // 8. Slow Removal: Erase Description Line 1 deliberately
+        setCursorPos('d1');
+        for (let i = descL1.length - 1; i >= 0; i--) {
+          if (isCancelled) return;
+          setD1(descL1.slice(0, i));
+          await wait(36);
+        }
+        if (isCancelled) return;
+        await wait(200);
+
+        // 9. Slow Removal: Erase Title Line 2 deliberately
+        setCursorPos('t2');
+        for (let i = titleL2.length - 1; i >= 0; i--) {
+          if (isCancelled) return;
+          setT2(titleL2.slice(0, i));
+          await wait(44);
+        }
+        if (isCancelled) return;
+        await wait(140);
+
+        // 10. Slow Removal: Erase Title Line 1 deliberately
+        setCursorPos('t1');
+        for (let i = titleL1.length - 1; i >= 0; i--) {
+          if (isCancelled) return;
+          setT1(titleL1.slice(0, i));
+          await wait(44);
+        }
+        if (isCancelled) return;
+
+        // 11. Empty pause with pulsing cursor on clean canvas
+        setCursorPos('t1');
+        await wait(450);
+        if (isCancelled) return;
+
+        // 12. Trigger synchronized transition to the next hero image
+        if (onCycleComplete) {
+          onCycleComplete();
+          return;
+        }
+
+        await wait(550);
+      }
+    };
+
+    runLoop();
+
+    return () => {
+      isCancelled = true;
+      if (activeTimer) clearTimeout(activeTimer);
+    };
+  }, [titleL1, titleL2, descL1, descL2, prefersReducedMotion, onCycleComplete]);
+
+  return (
+    <>
+      {/* Screen-reader text for SEO and Accessibility */}
+      <span
+        style={{
+          position: 'absolute',
+          width: '1px',
+          height: '1px',
+          padding: 0,
+          margin: '-1px',
+          overflow: 'hidden',
+          clip: 'rect(0,0,0,0)',
+          border: 0,
+        }}
+      >
+        {titleL1} {titleL2} {descL1} {descL2}
+      </span>
+
+      <h1 className="hero-banner-title" aria-hidden="true">
+        <span className="typewriter-line">
+          {t1 ? t1 : (cursorPos === 't1' ? null : <span style={{ opacity: 0, userSelect: 'none' }}>&nbsp;</span>)}
+          {cursorPos === 't1' && <span className="typewriter-cursor" />}
+        </span>
+        <span className="typewriter-line">
+          {t2 ? t2 : (cursorPos === 't2' ? null : <span style={{ opacity: 0, userSelect: 'none' }}>&nbsp;</span>)}
+          {cursorPos === 't2' && <span className="typewriter-cursor" />}
+        </span>
+      </h1>
+
+      <div className="hero-banner-desc" aria-hidden="true" style={{ marginBottom: '36px' }}>
+        <span className="typewriter-desc-line">
+          {d1 ? d1 : (cursorPos === 'd1' ? null : <span style={{ opacity: 0, userSelect: 'none' }}>&nbsp;</span>)}
+          {cursorPos === 'd1' && <span className="typewriter-cursor typewriter-cursor-desc" />}
+        </span>
+        <span className="typewriter-desc-line">
+          {d2 ? d2 : (cursorPos === 'd2' ? null : <span style={{ opacity: 0, userSelect: 'none' }}>&nbsp;</span>)}
+          {cursorPos === 'd2' && <span className="typewriter-cursor typewriter-cursor-desc" />}
+        </span>
+      </div>
+    </>
+  );
+}
+
 export default function CollectionsPage() {
   const { convertPrice } = useCurrency();
   const { addToCart } = useCart();
@@ -29,21 +249,15 @@ export default function CollectionsPage() {
     setCurrentSlide(prev => (prev + 1) % 3);
   };
 
-  useEffect(() => {
-    // If current slide is NOT the video (slide 0), set an auto-advance timer for images
-    if (currentSlide !== 0) {
-      const timer = setTimeout(() => {
-        nextSlide();
-      }, 5000);
-      return () => clearTimeout(timer);
-    }
-  }, [currentSlide]);
-
   const SLIDES = useMemo(() => [
     {
       type: 'video',
       videoUrl: '/watch_smoke_vid.webm',
       tag: 'BUILT FOR MOMENTS THAT MATTER',
+      titleL1: 'Timeless Craft.',
+      titleL2: 'Modern Legacy.',
+      descL1: 'Precision, heritage and excellence —',
+      descL2: 'crafted for Dubai/UAE Registered brand.',
       title: <>Timeless Craft.<br />Modern Legacy.</>,
       desc: <>Precision, heritage and excellence —<br />crafted for Dubai/UAE Registered brand.</>,
     },
@@ -51,6 +265,10 @@ export default function CollectionsPage() {
       type: 'image',
       imageUrl: '/winsor_girl_G.png',
       tag: 'ELEGANCE & GRACE',
+      titleL1: 'Timeless Beauty.',
+      titleL2: 'Complements Every You.',
+      descL1: 'A harmony of refined design and exquisite craftsmanship —',
+      descL2: 'made to complement your style.',
       title: <>Timeless Beauty.<br />Complements Every You.</>,
       desc: <>A harmony of refined design and exquisite craftsmanship —<br />made to complement your style.</>,
     },
@@ -58,6 +276,10 @@ export default function CollectionsPage() {
       type: 'image',
       imageUrl: '/winsor_man.png',
       tag: 'BOLD & DISTINGUISHED',
+      titleL1: 'Engineered For',
+      titleL2: 'Those Who Never Settle.',
+      descL1: 'Uncompromising style and robust elegance —',
+      descL2: 'built for the modern trailblazer.',
       title: <>Engineered For<br />Those Who Never Settle.</>,
       desc: <>Uncompromising style and robust elegance —<br />built for the modern trailblazer.</>,
     },
@@ -350,6 +572,7 @@ export default function CollectionsPage() {
           letter-spacing: 0.02em;
           margin-bottom: 20px;
           color: #fff;
+          min-height: calc(2 * 1.15em);
         }
         .hero-banner-desc {
           font-family: 'Cormorant Garamond', serif;
@@ -358,6 +581,51 @@ export default function CollectionsPage() {
           color: rgba(255,255,255,0.7);
           line-height: 1.45;
           margin-bottom: 36px;
+          min-height: calc(2 * 1.45em);
+        }
+        .typewriter-line {
+          display: block;
+          min-height: 1.15em;
+          line-height: 1.15;
+        }
+        .typewriter-desc-line {
+          display: block;
+          min-height: 1.45em;
+          line-height: 1.45;
+        }
+        .typewriter-cursor {
+          display: inline-block;
+          width: 2.5px;
+          height: 0.85em;
+          margin-left: 5px;
+          vertical-align: -0.05em;
+          background: linear-gradient(180deg, #F3E3B8 0%, #D4AF37 50%, #8B6914 100%);
+          box-shadow: 0 0 10px rgba(212, 175, 55, 0.8), 0 0 20px rgba(212, 175, 55, 0.35);
+          border-radius: 1px;
+          animation: winsor-caret-pulse 0.85s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+        }
+        .typewriter-cursor-desc {
+          width: 1.8px;
+          height: 0.88em;
+          margin-left: 5px;
+          vertical-align: -0.05em;
+          background: linear-gradient(180deg, #F3E3B8 0%, #D4AF37 70%, #8B6914 100%);
+          box-shadow: 0 0 8px rgba(212, 175, 55, 0.6);
+        }
+        @keyframes winsor-caret-pulse {
+          0%, 100% {
+            opacity: 1;
+            transform: scaleY(1);
+          }
+          50% {
+            opacity: 0.15;
+            transform: scaleY(0.85);
+          }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .typewriter-cursor {
+            display: none !important;
+          }
         }
         .hero-banner-actions {
           display: flex;
@@ -415,6 +683,19 @@ export default function CollectionsPage() {
           height: 100%;
           object-fit: cover;
           object-position: center 30%;
+        }
+        @keyframes hero-media-fade-in {
+          0% {
+            opacity: 0.35;
+            transform: scale(1.02);
+          }
+          100% {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+        .hero-banner-media-active {
+          animation: hero-media-fade-in 0.9s cubic-bezier(0.25, 1, 0.5, 1) forwards;
         }
         .hero-banner-watch-bg {
           position: absolute;
@@ -1513,8 +1794,14 @@ export default function CollectionsPage() {
           {/* Active Slide content */}
           <div className="hero-banner-content">
             <span className="hero-banner-tag">{SLIDES[currentSlide].tag}</span>
-            <h1 className="hero-banner-title">{SLIDES[currentSlide].title}</h1>
-            <div className="hero-banner-desc" style={{ marginBottom: '36px' }}>{SLIDES[currentSlide].desc}</div>
+            <TypewriterHeroText
+              key={`hero-typewriter-${currentSlide}`}
+              titleL1={SLIDES[currentSlide].titleL1}
+              titleL2={SLIDES[currentSlide].titleL2}
+              descL1={SLIDES[currentSlide].descL1}
+              descL2={SLIDES[currentSlide].descL2}
+              onCycleComplete={nextSlide}
+            />
             <div className="hero-banner-actions">
               <button className="hero-btn-primary" onClick={() => { setSelectedSection('all'); setSelectedGender('all'); scrollToProducts(); }}>EXPLORE COLLECTION</button>
               <button className="hero-btn-secondary">
@@ -1527,22 +1814,24 @@ export default function CollectionsPage() {
             <div className="hero-banner-watch-bg" />
             {SLIDES[currentSlide].type === 'video' ? (
               <video
-                key={SLIDES[currentSlide].videoUrl}
+                key={`hero-video-${currentSlide}-${SLIDES[currentSlide].videoUrl}`}
                 src={SLIDES[currentSlide].videoUrl}
                 autoPlay
                 playsInline
                 muted={isMuted}
                 onEnded={nextSlide}
+                className="hero-banner-watch-img hero-banner-media-active"
                 style={{ width: '100%', height: '100%', objectFit: 'cover' }}
               />
             ) : (
               <Image
+                key={`hero-img-${currentSlide}-${SLIDES[currentSlide].imageUrl}`}
                 src={SLIDES[currentSlide].imageUrl || '/winsor_girl_G.png'}
                 alt="Winsor Collection Slide"
                 width={700}
                 height={500}
                 priority
-                className="hero-banner-watch-img"
+                className="hero-banner-watch-img hero-banner-media-active"
                 style={{ width: '100%', height: '100%', objectFit: 'contain' }}
               />
             )}

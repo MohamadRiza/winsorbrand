@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useUser } from '@clerk/nextjs';
 import { Turnstile, type TurnstileInstance } from '@marsidev/react-turnstile';
 import toast from 'react-hot-toast';
+import CareHeroTypewriter from './CareHeroTypewriter';
 
 const DIAL_CODES = [
   { code: '+94', label: 'LK (+94)' },
@@ -951,11 +952,8 @@ export default function CustomerCarePage() {
           <svg width="10" height="10" viewBox="0 0 24 24" fill="#dfb15b"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" /></svg>
         </div>
 
-        <h1 className="care-hero-title">Customer Care & Support</h1>
-        
-        <p className="care-hero-subtitle">
-          Handcrafted timepieces deserve bespoke attention. Our horology concierge experts in Sri Lanka and Dubai stand ready to assist with servicing, inquiries, and private appointments.
-        </p>
+        {/* Animated Hero Title & Subtitle with Luxury Typewriter & Erase Effect */}
+        <CareHeroTypewriter />
 
         <div className="hero-highlights-row">
           <div className="hero-highlight-pill">
