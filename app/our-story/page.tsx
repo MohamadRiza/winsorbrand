@@ -121,10 +121,9 @@ export default function OurStoryPage() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 mb-10 sm:mb-12">
             <Link
               href="/collections"
-              className="group w-full sm:w-auto px-7 py-3 bg-gradient-to-r from-[#8B6914] via-[#c9a14a] to-[#8B6914] hover:from-[#a67c1e] hover:to-[#a67c1e] text-white text-[11px] tracking-[0.2em] uppercase font-semibold rounded-full shadow-[0_4px_20px_rgba(139,105,20,0.3)] transition-all duration-300 hover:scale-[1.02] flex items-center justify-center gap-2"
+              className="group w-full sm:w-auto px-7 py-3 bg-gradient-to-r from-[#8B6914] via-[#c9a14a] to-[#8B6914] hover:from-[#a67c1e] hover:to-[#a67c1e] text-white text-[11px] tracking-[0.2em] uppercase font-semibold rounded-full shadow-[0_4px_20px_rgba(139,105,20,0.3)] transition-all duration-300 hover:scale-[1.02] flex items-center justify-center"
             >
-              <span>Explore Timepieces</span>
-              <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>
+              Explore Timepieces
             </Link>
             <Link
               href="/retailers"
@@ -271,10 +270,9 @@ export default function OurStoryPage() {
 
             <Link
               href="/collections"
-              className="inline-flex items-center gap-2 text-[11px] font-semibold tracking-[0.2em] uppercase text-[#8B6914] hover:text-[#1a1209] transition-colors duration-200"
+              className="inline-flex items-center text-[11px] font-semibold tracking-[0.2em] uppercase text-[#8B6914] hover:text-[#1a1209] transition-colors duration-200"
             >
-              <span>Explore The Collection</span>
-              <span className="text-sm">→</span>
+              Explore The Collection
             </Link>
           </div>
         </div>
@@ -402,7 +400,7 @@ export default function OurStoryPage() {
 
             <Link
               href="/gifts"
-              className="inline-block px-6 py-3 bg-[#dfb15b] hover:bg-[#8B6914] text-[#1a1209] hover:text-white text-[11px] tracking-[0.2em] uppercase font-semibold rounded-md transition-all duration-300 shadow-lg"
+              className="inline-flex items-center justify-center px-7 py-3 bg-gradient-to-r from-[#8B6914] via-[#c9a14a] to-[#8B6914] hover:from-[#a67c1e] hover:to-[#a67c1e] text-white text-[11px] tracking-[0.2em] uppercase font-semibold rounded-full shadow-[0_4px_20px_rgba(139,105,20,0.3)] transition-all duration-300 hover:scale-[1.02]"
             >
               Explore Gifting & Lifestyle
             </Link>
@@ -428,13 +426,13 @@ export default function OurStoryPage() {
             <div className="flex flex-wrap gap-3">
               <Link
                 href="/retailers"
-                className="px-6 py-2.5 bg-[#8B6914] hover:bg-[#a67c1e] text-white text-[11px] tracking-[0.18em] uppercase font-semibold rounded-md transition-colors"
+                className="px-6 py-2.5 bg-gradient-to-r from-[#8B6914] via-[#c9a14a] to-[#8B6914] hover:from-[#a67c1e] hover:to-[#a67c1e] text-white text-[11px] tracking-[0.18em] uppercase font-semibold rounded-full shadow-[0_4px_16px_rgba(139,105,20,0.25)] transition-all duration-300 hover:scale-[1.02]"
               >
                 Find Retailers
               </Link>
               <Link
                 href="/customer-care"
-                className="px-6 py-2.5 bg-white hover:bg-[#FAF4E8] text-[#1a1209] border border-[#8B6914]/40 text-[11px] tracking-[0.18em] uppercase font-semibold rounded-md transition-colors"
+                className="px-6 py-2.5 bg-white/90 hover:bg-white text-[#1a1209] border border-[#8B6914]/40 hover:border-[#8B6914] text-[11px] tracking-[0.18em] uppercase font-semibold rounded-full transition-all duration-300 shadow-sm hover:scale-[1.02]"
               >
                 Dealer Inquiries
               </Link>

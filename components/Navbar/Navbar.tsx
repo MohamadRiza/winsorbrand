@@ -494,24 +494,57 @@ export default function Navbar() {
           will-change: transform, opacity, filter;
         }
         .wn-mob-close-btn{transition:all 0.28s cubic-bezier(0.25, 0.46, 0.45, 0.94);}
-        .wn-mob-close-btn:hover{background:linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(212,175,55,0.2) 100%)!important;border-color:rgba(212,175,55,0.6)!important;transform:rotate(90deg) scale(1.08);box-shadow:0 4px 16px rgba(139,105,20,0.18),inset 0 1px 0 rgba(255,255,255,1)!important;}
-        .wn-mob-currency-btn{transition:all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);}
-        .wn-mob-currency-btn:hover{background:linear-gradient(135deg, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.5) 100%)!important;border-color:rgba(212,175,55,0.45)!important;box-shadow:0 6px 20px -2px rgba(139,105,20,0.12),inset 0 1.5px 0 0 rgba(255,255,255,1)!important;transform:translateY(-1.5px);}
-        .wn-mob-col-btn{position:relative;overflow:hidden;transition:all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);}
-        .wn-mob-col-btn::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,0.4) 50%,transparent 100%);transform:translateX(-100%);transition:transform 0.6s ease;pointer-events:none;}
+        .wn-mob-close-btn:hover{background:#FFFFFF!important;border-color:rgba(139,105,20,0.5)!important;transform:rotate(90deg) scale(1.08);box-shadow:0 4px 14px rgba(139,105,20,0.15)!important;}
+        .wn-mob-currency-btn{
+          transition:all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+          background: #FFFFFF !important;
+          border: 1px solid rgba(139, 105, 20, 0.20) !important;
+          box-shadow: 0 2px 6px -1px rgba(26, 18, 9, 0.04), inset 0 1px 0 rgba(255, 255, 255, 1) !important;
+        }
+        .wn-mob-currency-btn:hover{border-color:rgba(139,105,20,0.48)!important;box-shadow:0 5px 16px -2px rgba(139,105,20,0.12)!important;transform:translateY(-1.5px);}
+        .wn-mob-col-btn{
+          position:relative;
+          overflow:hidden;
+          transition:all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+          background: #FFFFFF !important;
+          border: 1px solid rgba(139, 105, 20, 0.20) !important;
+          box-shadow: 0 2px 8px -1px rgba(26, 18, 9, 0.05), inset 0 1px 0 rgba(255, 255, 255, 1) !important;
+        }
+        .wn-mob-col-btn::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent 0%,rgba(212,175,55,0.12) 50%,transparent 100%);transform:translateX(-100%);transition:transform 0.6s ease;pointer-events:none;}
         .wn-mob-col-btn:hover::before,.wn-mob-col-btn:active::before{transform:translateX(100%);}
-        .wn-mob-col-btn:hover{background:linear-gradient(135deg, rgba(255,255,255,0.82) 0%, rgba(255,255,255,0.45) 100%)!important;border-color:rgba(212,175,55,0.52)!important;box-shadow:0 8px 24px -2px rgba(139,105,20,0.15),inset 0 1.5px 0 0 rgba(255,255,255,1)!important;transform:translateY(-1.5px);}
+        .wn-mob-col-btn:hover{background:#FFFFFF!important;border-color:rgba(139,105,20,0.55)!important;box-shadow:0 6px 18px -2px rgba(139,105,20,0.14),inset 0 1px 0 rgba(255,255,255,1)!important;transform:translateY(-1.5px);}
         .wn-mob-col-btn:hover span{color:#8B6914!important;}
-        .wn-mob-nav-link{position:relative;overflow:hidden;transition:all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);}
-        .wn-mob-nav-link::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,0.4) 50%,transparent 100%);transform:translateX(-100%);transition:transform 0.6s ease;pointer-events:none;}
+        .wn-mob-nav-link{
+          position:relative;
+          overflow:hidden;
+          transition:all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+          background: #FFFFFF !important;
+          border: 1px solid rgba(139, 105, 20, 0.16) !important;
+          box-shadow: 0 2px 6px -1px rgba(26, 18, 9, 0.04), inset 0 1px 0 rgba(255, 255, 255, 1) !important;
+        }
+        .wn-mob-nav-link::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent 0%,rgba(212,175,55,0.1) 50%,transparent 100%);transform:translateX(-100%);transition:transform 0.6s ease;pointer-events:none;}
         .wn-mob-nav-link:hover::before,.wn-mob-nav-link:active::before{transform:translateX(100%);}
-        .wn-mob-nav-link:hover{background:linear-gradient(135deg, rgba(255,255,255,0.82) 0%, rgba(255,255,255,0.42) 100%)!important;border-color:rgba(212,175,55,0.45)!important;color:#8B6914!important;box-shadow:0 6px 20px -2px rgba(139,105,20,0.12),inset 0 1.5px 0 0 rgba(255,255,255,1)!important;transform:translateY(-1.5px);}
-        .wn-mob-profile-btn{position:relative;overflow:hidden;transition:all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);}
-        .wn-mob-profile-btn:hover{background:linear-gradient(135deg, rgba(255,255,255,0.85) 0%, rgba(212,175,55,0.22) 100%)!important;border-color:rgba(212,175,55,0.6)!important;transform:translateY(-1.5px);box-shadow:0 6px 18px rgba(139,105,20,0.16),inset 0 1.5px 0 0 rgba(255,255,255,1)!important;}
-        .wn-mob-cart-btn{transition:all 0.28s cubic-bezier(0.25, 0.46, 0.45, 0.94);}
-        .wn-mob-cart-btn:hover{transform:translateY(-1.5px);box-shadow:0 8px 24px rgba(139,105,20,0.55),inset 0 1.5px 1px rgba(255,255,255,0.45)!important;}
-        .wn-mob-signin-btn{transition:all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);}
-        .wn-mob-signin-btn:hover{background:linear-gradient(135deg, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.5) 100%)!important;border-color:rgba(212,175,55,0.45)!important;transform:translateY(-1.5px);box-shadow:0 5px 16px rgba(139,105,20,0.12),inset 0 1.5px 0 0 rgba(255,255,255,1)!important;}
+        .wn-mob-nav-link:hover{background:#FFFFFF!important;border-color:rgba(139,105,20,0.48)!important;color:#8B6914!important;box-shadow:0 5px 16px -2px rgba(139,105,20,0.12),inset 0 1px 0 rgba(255,255,255,1)!important;transform:translateY(-1.5px);}
+        .wn-mob-profile-btn{
+          position:relative;
+          overflow:hidden;
+          transition:all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+          background: #FFFFFF !important;
+          border: 1px solid rgba(139, 105, 20, 0.28) !important;
+          box-shadow: 0 2px 6px -1px rgba(26, 18, 9, 0.04), inset 0 1px 0 rgba(255, 255, 255, 1) !important;
+        }
+        .wn-mob-profile-btn:hover{background:#FFFFFF!important;border-color:rgba(139,105,20,0.6)!important;transform:translateY(-1.5px);box-shadow:0 5px 14px rgba(139,105,20,0.14),inset 0 1px 0 rgba(255,255,255,1)!important;}
+        .wn-mob-cart-btn{
+          transition:all 0.28s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+          background: linear-gradient(135deg, #967018 0%, #C8980F 50%, #E2B960 100%) !important;
+        }
+        .wn-mob-cart-btn:hover{transform:translateY(-1.5px);box-shadow:0 8px 24px rgba(139,105,20,0.45),inset 0 1.5px 1px rgba(255,255,255,0.45)!important;}
+        .wn-mob-signin-btn{
+          transition:all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+          background: #FFFFFF !important;
+          border: 1px solid rgba(139, 105, 20, 0.28) !important;
+        }
+        .wn-mob-signin-btn:hover{border-color:rgba(139,105,20,0.55)!important;transform:translateY(-1.5px);box-shadow:0 4px 14px rgba(139,105,20,0.12)!important;}
         body.wn-mobile-menu-open, html.wn-mobile-menu-open {
           overflow: hidden !important;
           touch-action: none !important;
@@ -831,11 +864,9 @@ export default function Navbar() {
           bottom: 0,
           width: 'min(340px, 86vw)',
           zIndex: 9999,
-          background: 'rgba(252, 249, 243, 0.74)',
-          backdropFilter: 'blur(36px) saturate(180%)',
-          WebkitBackdropFilter: 'blur(36px) saturate(180%)',
-          borderLeft: '1px solid rgba(255, 255, 255, 0.88)',
-          boxShadow: '-14px 0 50px rgba(26, 18, 9, 0.16), inset 1px 0 0 rgba(255, 255, 255, 0.9)',
+          background: '#FAF8F5',
+          borderLeft: '1px solid rgba(139, 105, 20, 0.16)',
+          boxShadow: '-14px 0 50px rgba(26, 18, 9, 0.16)',
           transform: !mobileOpen
             ? 'translateX(100%)'
             : (isDrawerDragging && drawerDragX > 0 ? `translateX(${drawerDragX}px)` : 'translateX(0)'),
@@ -856,25 +887,23 @@ export default function Navbar() {
         {/* ── HEADER ── */}
         <div style={{
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          padding: '16px 20px',
+          padding: '13px 18px',
           borderBottom: '1px solid rgba(139, 105, 20, 0.12)',
-          background: 'rgba(255, 253, 248, 0.88)',
-          backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
+          background: '#FAF8F5',
           position: 'sticky', top: 0, zIndex: 10
         }}>
           <Link href="/" className="wn-logo-link" style={{ flex: 1, justifyContent: 'flex-start' }} onClick={() => setMobileOpen(false)}>
             <Image src={LOGO_SOLID} alt="Winsor Logo" width={140} height={46}
-              style={{ objectFit: 'contain', height: 'auto', maxWidth: '130px' }} priority />
+              style={{ objectFit: 'contain', height: 'auto', maxWidth: '125px' }} priority />
           </Link>
           <button
             className="wn-mob-close-btn"
             style={{
-              background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0.5) 100%)',
-              border: '1.5px solid rgba(139, 105, 20, 0.22)',
-              color: '#8B6914', padding: '8px', borderRadius: '50%',
+              background: '#FFFFFF',
+              border: '1px solid rgba(139, 105, 20, 0.22)',
+              color: '#8B6914', padding: '7.5px', borderRadius: '50%',
               cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
-              boxShadow: '0 2px 12px rgba(26,18,9,0.06), inset 0 1.5px 1px rgba(255,255,255,0.95)',
-              backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
+              boxShadow: '0 2px 8px rgba(26,18,9,0.06)',
             }}
             onClick={() => setMobileOpen(false)}
             aria-label="Close navigation menu"
@@ -884,26 +913,24 @@ export default function Navbar() {
         </div>
 
         {/* ── CURRENCY SELECTOR ── */}
-        <div style={{ padding: '12px 20px', borderBottom: '1px solid rgba(139, 105, 20, 0.08)', position: 'relative', zIndex: 1 }}>
+        <div style={{ padding: '8px 16px', borderBottom: '1px solid rgba(139, 105, 20, 0.08)', position: 'relative', zIndex: 1, background: '#FAF8F5' }}>
           <button
             className="wn-anim-item wn-mob-currency-btn"
             onClick={() => setMobileCurrencyOpen(v => !v)}
             style={{
               animationDelay: '0.04s',
-              display: 'flex', alignItems: 'center', gap: '10px', width: '100%',
-              background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.52) 0%, rgba(255, 255, 255, 0.20) 100%)',
-              backdropFilter: 'blur(24px) saturate(190%)',
-              WebkitBackdropFilter: 'blur(24px) saturate(190%)',
-              border: '1px solid rgba(255, 255, 255, 0.75)',
-              boxShadow: '0 4px 16px -2px rgba(26,18,9,0.04), inset 0 1.5px 0 0 rgba(255,255,255,0.95)',
-              borderRadius: '9999px', padding: '11px 20px', cursor: 'pointer',
+              display: 'flex', alignItems: 'center', gap: '8px', width: '100%',
+              background: '#FFFFFF',
+              border: '1px solid rgba(139, 105, 20, 0.20)',
+              boxShadow: '0 2px 6px -1px rgba(26,18,9,0.04), inset 0 1px 0 rgba(255,255,255,1)',
+              borderRadius: '9999px', padding: '7.5px 16px', cursor: 'pointer',
               justifyContent: 'space-between', color: '#8B6914',
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <GlobeIcon />
               <CountryFlag iso={selected.iso} width={18} height={13} />
-              <span style={{ fontFamily: "'Jost',sans-serif", fontSize: '12px', color: '#1a1209', fontWeight: 500 }}>
+              <span style={{ fontFamily: "'Jost',sans-serif", fontSize: '11.5px', color: '#1a1209', fontWeight: 500 }}>
                 {selected.code} — {selected.label}
               </span>
             </div>
@@ -945,18 +972,18 @@ export default function Navbar() {
         {/* ── NAV LINKS (STAGGERED CASPER REVEAL) ── */}
         <nav
           key={mobileOpen ? 'nav-open' : 'nav-closed'}
-          style={{ flex: 1, padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: '8px', position: 'relative', zIndex: 1 }}
+          style={{ flex: 1, padding: '10px 16px 16px', display: 'flex', flexDirection: 'column', gap: '6px', position: 'relative', zIndex: 1 }}
         >
 
           {/* Section label */}
-          <div className="wn-anim-item" style={{ animationDelay: '0.06s', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2px', padding: '0 6px' }}>
-            <span style={{ fontFamily: "'Jost',sans-serif", fontSize: '8.5px', letterSpacing: '0.3em', color: '#8B6914', fontWeight: 700, textTransform: 'uppercase' }}>
+          <div className="wn-anim-item" style={{ animationDelay: '0.06s', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1px', padding: '0 6px' }}>
+            <span style={{ fontFamily: "'Jost',sans-serif", fontSize: '8px', letterSpacing: '0.28em', color: '#8B6914', fontWeight: 700, textTransform: 'uppercase' }}>
               HAUTE HORLOGERIE
             </span>
-            <span style={{ fontFamily: "'Jost',sans-serif", fontSize: '8.5px', letterSpacing: '0.14em', color: 'rgba(26,18,9,0.35)', textTransform: 'uppercase' }}>COLLECTIONS</span>
+            <span style={{ fontFamily: "'Jost',sans-serif", fontSize: '8px', letterSpacing: '0.14em', color: 'rgba(26,18,9,0.35)', textTransform: 'uppercase' }}>COLLECTIONS</span>
           </div>
 
-          {/* ── Collection Links (Crystal Frosted Glass Pills, Staggered Reveal, No Arrows) ── */}
+          {/* ── Collection Links (Pure Luminous White Pills, Staggered Reveal, No Arrows) ── */}
           {COLLECTIONS.map((col, idx) => (
             <Link
               key={col.key}
@@ -967,20 +994,18 @@ export default function Navbar() {
                 animationDelay: `${0.08 + idx * 0.04}s`,
                 display: 'flex',
                 alignItems: 'center',
-                padding: '13px 24px',
+                padding: '8px 20px',
                 borderRadius: '9999px',
-                background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.48) 0%, rgba(255, 255, 255, 0.18) 100%)',
-                backdropFilter: 'blur(24px) saturate(190%)',
-                WebkitBackdropFilter: 'blur(24px) saturate(190%)',
-                border: '1px solid rgba(255, 255, 255, 0.75)',
-                boxShadow: '0 4px 18px -2px rgba(26, 18, 9, 0.05), inset 0 1.5px 0 0 rgba(255, 255, 255, 0.95), inset 0 -1px 0 0 rgba(0, 0, 0, 0.03)',
+                background: '#FFFFFF',
+                border: '1px solid rgba(139, 105, 20, 0.20)',
+                boxShadow: '0 2px 8px -1px rgba(26, 18, 9, 0.05), inset 0 1px 0 rgba(255, 255, 255, 1)',
                 textDecoration: 'none',
               }}
             >
               <span style={{
                 fontFamily: "'Cormorant Garamond', serif",
-                fontSize: '18px',
-                letterSpacing: '0.1em',
+                fontSize: '14.5px',
+                letterSpacing: '0.12em',
                 fontWeight: 600,
                 color: '#1a1209',
                 transition: 'color 0.2s ease',
@@ -991,30 +1016,28 @@ export default function Navbar() {
           ))}
 
           {/* EXPLORE MAISON label */}
-          <div className="wn-anim-item" style={{ animationDelay: '0.28s', marginTop: '14px', marginBottom: '2px', padding: '0 6px' }}>
-            <span style={{ fontFamily: "'Jost',sans-serif", fontSize: '8.5px', letterSpacing: '0.3em', color: '#8B6914', fontWeight: 700, textTransform: 'uppercase' }}>
+          <div className="wn-anim-item" style={{ animationDelay: '0.28s', marginTop: '8px', marginBottom: '1px', padding: '0 6px' }}>
+            <span style={{ fontFamily: "'Jost',sans-serif", fontSize: '8px', letterSpacing: '0.28em', color: '#8B6914', fontWeight: 700, textTransform: 'uppercase' }}>
               EXPLORE MAISON
             </span>
           </div>
 
           {/* Account quick links */}
           {isSignedIn && (
-            <div className="wn-anim-item" style={{ animationDelay: '0.30s', display: 'flex', gap: '8px', marginBottom: '2px' }}>
+            <div className="wn-anim-item" style={{ animationDelay: '0.30s', display: 'flex', gap: '6px', marginBottom: '1px' }}>
               <Link
                 href="/profile"
                 onClick={() => setMobileOpen(false)}
                 className="wn-mob-profile-btn"
                 style={{
-                  flex: 1, padding: '11px 16px', textAlign: 'center',
-                  background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.46) 0%, rgba(255, 255, 255, 0.16) 100%)',
-                  backdropFilter: 'blur(20px) saturate(190%)',
-                  WebkitBackdropFilter: 'blur(20px) saturate(190%)',
-                  border: '1px solid rgba(212, 175, 55, 0.38)',
+                  flex: 1, padding: '7px 14px', textAlign: 'center',
+                  background: '#FFFFFF',
+                  border: '1px solid rgba(139, 105, 20, 0.32)',
                   borderRadius: '9999px',
                   color: '#8B6914',
-                  fontFamily: "'Jost',sans-serif", fontSize: '11.5px', letterSpacing: '0.1em',
+                  fontFamily: "'Jost',sans-serif", fontSize: '10.5px', letterSpacing: '0.1em',
                   textDecoration: 'none', fontWeight: 600,
-                  boxShadow: '0 4px 14px -2px rgba(26, 18, 9, 0.04), inset 0 1.5px 0 0 rgba(255, 255, 255, 0.9), inset 0 -1px 0 0 rgba(139, 105, 20, 0.05)',
+                  boxShadow: '0 2px 6px -1px rgba(26, 18, 9, 0.04)',
                 }}
               >
                 My Profile
@@ -1024,16 +1047,14 @@ export default function Navbar() {
                 onClick={() => setMobileOpen(false)}
                 className="wn-mob-profile-btn"
                 style={{
-                  flex: 1, padding: '11px 16px', textAlign: 'center',
-                  background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.46) 0%, rgba(255, 255, 255, 0.16) 100%)',
-                  backdropFilter: 'blur(20px) saturate(190%)',
-                  WebkitBackdropFilter: 'blur(20px) saturate(190%)',
-                  border: '1px solid rgba(212, 175, 55, 0.38)',
+                  flex: 1, padding: '7px 14px', textAlign: 'center',
+                  background: '#FFFFFF',
+                  border: '1px solid rgba(139, 105, 20, 0.32)',
                   borderRadius: '9999px',
                   color: '#8B6914',
-                  fontFamily: "'Jost',sans-serif", fontSize: '11.5px', letterSpacing: '0.1em',
+                  fontFamily: "'Jost',sans-serif", fontSize: '10.5px', letterSpacing: '0.1em',
                   textDecoration: 'none', fontWeight: 600,
-                  boxShadow: '0 4px 14px -2px rgba(26, 18, 9, 0.04), inset 0 1.5px 0 0 rgba(255, 255, 255, 0.9), inset 0 -1px 0 0 rgba(139, 105, 20, 0.05)',
+                  boxShadow: '0 2px 6px -1px rgba(26, 18, 9, 0.04)',
                 }}
               >
                 My Orders
@@ -1041,7 +1062,7 @@ export default function Navbar() {
             </div>
           )}
 
-          {/* Top-level nav links (Crystal Frosted Glass Pills, Staggered Reveal, No Arrows) */}
+          {/* Top-level nav links (Pure Luminous White Pills, Staggered Reveal, No Arrows) */}
           {[...TOP_LEFT_LINKS, ...TOP_RIGHT_LINKS].map((l, idx) => (
             <Link
               key={l.href}
@@ -1051,17 +1072,15 @@ export default function Navbar() {
               style={{
                 animationDelay: `${0.32 + idx * 0.04}s`,
                 fontFamily: "'Jost',sans-serif",
-                fontSize: '12.5px', letterSpacing: '0.09em',
+                fontSize: '11.5px', letterSpacing: '0.08em',
                 color: '#1a1209',
                 fontWeight: 500,
-                padding: '12px 24px',
+                padding: '7.5px 20px',
                 borderRadius: '9999px',
                 textDecoration: 'none',
-                background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.42) 0%, rgba(255, 255, 255, 0.14) 100%)',
-                backdropFilter: 'blur(20px) saturate(190%)',
-                WebkitBackdropFilter: 'blur(20px) saturate(190%)',
-                border: '1px solid rgba(255, 255, 255, 0.72)',
-                boxShadow: '0 3px 14px -2px rgba(26, 18, 9, 0.04), inset 0 1.5px 0 0 rgba(255, 255, 255, 0.9), inset 0 -1px 0 0 rgba(0, 0, 0, 0.03)',
+                background: '#FFFFFF',
+                border: '1px solid rgba(139, 105, 20, 0.16)',
+                boxShadow: '0 2px 6px -1px rgba(26, 18, 9, 0.04), inset 0 1px 0 rgba(255, 255, 255, 1)',
                 display: 'block'
               }}
             >
@@ -1072,13 +1091,12 @@ export default function Navbar() {
 
         {/* ── FOOTER BAR ── */}
         <div style={{
-          padding: '14px 20px',
+          padding: '10px 16px',
           borderTop: '1px solid rgba(139,105,20,0.12)',
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-          background: 'rgba(255, 253, 248, 0.92)',
-          backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
+          background: '#FAF8F5',
           position: 'sticky', bottom: 0, zIndex: 10,
-          boxShadow: '0 -4px 20px rgba(26,18,9,0.06)',
+          boxShadow: '0 -4px 20px rgba(26,18,9,0.04)',
         }}>
           {!isSignedIn ? (
             <SignInButton mode="modal">
@@ -1086,16 +1104,14 @@ export default function Navbar() {
                 className="wn-anim-item wn-mob-signin-btn"
                 style={{
                   animationDelay: '0.52s',
-                  background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0.22) 100%)',
-                  backdropFilter: 'blur(20px) saturate(190%)',
-                  WebkitBackdropFilter: 'blur(20px) saturate(190%)',
-                  border: '1px solid rgba(212, 175, 55, 0.35)',
-                  padding: '10px 18px', borderRadius: '9999px', cursor: 'pointer',
-                  color: '#1a1209', display: 'flex', alignItems: 'center', gap: '8px',
-                  boxShadow: '0 3px 14px -2px rgba(26, 18, 9, 0.04), inset 0 1.5px 0 0 rgba(255, 255, 255, 0.95)',
+                  background: '#FFFFFF',
+                  border: '1px solid rgba(139, 105, 20, 0.28)',
+                  padding: '8px 15px', borderRadius: '9999px', cursor: 'pointer',
+                  color: '#1a1209', display: 'flex', alignItems: 'center', gap: '6px',
+                  boxShadow: '0 2px 6px -1px rgba(26, 18, 9, 0.04)',
                 }}>
                 <UserIcon />
-                <span style={{ fontFamily: "'Jost',sans-serif", fontSize: '12px', color: '#8B6914', fontWeight: 600 }}>Sign In / Account</span>
+                <span style={{ fontFamily: "'Jost',sans-serif", fontSize: '11px', color: '#8B6914', fontWeight: 600 }}>Sign In / Account</span>
               </button>
             </SignInButton>
           ) : (
@@ -1108,7 +1124,7 @@ export default function Navbar() {
                   <UserButton.Link label="My Orders" labelIcon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>} href="/orders" />
                 </UserButton.MenuItems>
               </UserButton>
-              <span style={{ fontFamily: "'Jost',sans-serif", fontSize: '12px', color: '#1a1209', fontWeight: 500 }}>Account</span>
+              <span style={{ fontFamily: "'Jost',sans-serif", fontSize: '11px', color: '#1a1209', fontWeight: 500 }}>Account</span>
             </div>
           )}
 
@@ -1118,21 +1134,21 @@ export default function Navbar() {
             className="wn-anim-item wn-mob-cart-btn"
             style={{
               animationDelay: '0.52s',
-              position: 'relative', display: 'flex', alignItems: 'center', gap: '8px',
-              background: 'linear-gradient(135deg, #8B6914 0%, #C8980F 55%, #D4AF37 100%)',
-              border: '1.2px solid rgba(255, 255, 255, 0.5)',
-              padding: '10px 22px', borderRadius: '9999px', textDecoration: 'none',
-              boxShadow: '0 6px 20px rgba(139, 105, 20, 0.38), inset 0 1.5px 0 0 rgba(255, 255, 255, 0.45)'
+              position: 'relative', display: 'flex', alignItems: 'center', gap: '6px',
+              background: 'linear-gradient(135deg, #967018 0%, #C8980F 50%, #E2B960 100%)',
+              border: '1.2px solid rgba(255, 255, 255, 0.55)',
+              padding: '8px 18px', borderRadius: '9999px', textDecoration: 'none',
+              boxShadow: '0 5px 18px rgba(139, 105, 20, 0.35), inset 0 1.5px 0 0 rgba(255, 255, 255, 0.45)'
             }}
           >
             <BagIcon />
-            <span style={{ fontFamily: "'Jost',sans-serif", fontSize: '12px', color: '#FFFFFF', fontWeight: 700, letterSpacing: '0.06em' }}>Cart</span>
+            <span style={{ fontFamily: "'Jost',sans-serif", fontSize: '11.5px', color: '#FFFFFF', fontWeight: 700, letterSpacing: '0.06em' }}>Cart</span>
             <span style={{
-              position: 'absolute', top: '-7px', right: '-7px',
-              width: '20px', height: '20px', borderRadius: '50%',
+              position: 'absolute', top: '-6px', right: '-6px',
+              width: '18px', height: '18px', borderRadius: '50%',
               background: '#fff', color: '#8B6914',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: '9px', fontFamily: "'Jost',sans-serif", fontWeight: 700,
+              fontSize: '8.5px', fontFamily: "'Jost',sans-serif", fontWeight: 700,
               border: '1.5px solid #8B6914',
               boxShadow: '0 2px 8px rgba(26,18,9,0.18)'
             }}>
