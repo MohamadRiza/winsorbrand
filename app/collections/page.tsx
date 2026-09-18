@@ -677,6 +677,7 @@ export default function CollectionsPage() {
           height: 100%;
           width: 50%;
           z-index: 1;
+          overflow: hidden;
         }
         .hero-banner-watch-img {
           width: 100%;
@@ -1571,6 +1572,13 @@ export default function CollectionsPage() {
             height: 100% !important;
             margin-top: 0 !important;
             z-index: 1;
+            overflow: hidden;
+          }
+          .hero-banner-watch-img {
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: cover !important;
+            object-position: center 20% !important;
           }
           .hero-banner-watch-bg {
             position: absolute;
@@ -1578,7 +1586,7 @@ export default function CollectionsPage() {
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.55) 100%) !important;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.42) 0%, rgba(0,0,0,0.25) 35%, rgba(0,0,0,0.72) 100%) !important;
             z-index: 2;
           }
           .hero-video-mute-btn {
@@ -1588,7 +1596,14 @@ export default function CollectionsPage() {
             height: 36px;
           }
           .hero-banner-slides {
-            display: none;
+            display: flex;
+            position: absolute;
+            bottom: 18px;
+            left: 50%;
+            transform: translateX(-50%);
+            right: auto;
+            z-index: 15;
+            gap: 8px;
           }
           .benefits-bar {
             display: flex;
@@ -1821,18 +1836,21 @@ export default function CollectionsPage() {
                 muted={isMuted}
                 onEnded={nextSlide}
                 className="hero-banner-watch-img hero-banner-media-active"
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center center' }}
               />
             ) : (
               <Image
                 key={`hero-img-${currentSlide}-${SLIDES[currentSlide].imageUrl}`}
                 src={SLIDES[currentSlide].imageUrl || '/winsor_girl_G.png'}
                 alt="Winsor Collection Slide"
-                width={700}
-                height={500}
+                fill
                 priority
+                sizes="(max-width: 1024px) 100vw, 50vw"
                 className="hero-banner-watch-img hero-banner-media-active"
-                style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                style={{
+                  objectFit: 'cover',
+                  objectPosition: currentSlide === 1 ? 'center 20%' : 'center 25%',
+                }}
               />
             )}
           </div>
