@@ -123,7 +123,7 @@ export default function Navbar() {
   const { totalItemsCount } = useCart();
   const pathname = usePathname();
   const router = useRouter();
-  const isTransparentPage = pathname === '/' || pathname === '/collections' || pathname === '/customer-care' || pathname === '/gifts' || pathname === '/retailers' || pathname === '/mens' || pathname === '/womens' || pathname === '/women' || pathname === '/sports' || pathname === '/limited-edition' || pathname === '/limited' || pathname === '/new-arrivals' || pathname === '/new';
+  const isTransparentPage = pathname === '/' || pathname === '/collections' || pathname === '/customer-care' || pathname === '/gifts' || pathname === '/retailers' || pathname === '/mens' || pathname === '/womens' || pathname === '/sports' || pathname === '/limited-edition' || pathname === '/limited' || pathname === '/new-arrivals';
 
   const [isTransparent, setIsTransparent] = useState(true);
   const [isVisible, setIsVisible] = useState(true);
@@ -779,11 +779,42 @@ export default function Navbar() {
                   </UserButton>
                 </div>
               )}
-              <Link href="/cart" style={{ position: 'relative', color: tc, display: 'flex' }} className="wn-ib" aria-label={`Shopping bag, ${totalItemsCount} item${totalItemsCount !== 1 ? 's' : ''}`}>
-                <BagIcon />
-                <span style={{ position: 'absolute', top: '-3px', right: '-5px', width: '14px', height: '14px', borderRadius: '50%', background: '#8B6914', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '8px', fontFamily: "'Jost',sans-serif" }} aria-hidden="true">
-                  {totalItemsCount > 9 ? '9+' : totalItemsCount}
-                </span>
+              <Link
+                href="/cart"
+                style={{ position: 'relative', color: tc, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                className="wn-ib"
+                aria-label={`Shopping bag, ${totalItemsCount} item${totalItemsCount !== 1 ? 's' : ''}`}
+              >
+                <div style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '17px', height: '17px' }}>
+                  <BagIcon />
+                  {totalItemsCount > 0 && (
+                    <span
+                      style={{
+                        position: 'absolute',
+                        top: '-4px',
+                        right: '-6px',
+                        width: '14px',
+                        height: '14px',
+                        borderRadius: '50%',
+                        background: '#8B6914',
+                        color: '#fff',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '8px',
+                        fontWeight: 600,
+                        fontFamily: "'Jost',sans-serif",
+                        lineHeight: 1,
+                        border: '1.2px solid rgba(250, 247, 240, 0.95)',
+                        boxShadow: '0 1px 3px rgba(0,0,0,0.18)',
+                        pointerEvents: 'none',
+                      }}
+                      aria-hidden="true"
+                    >
+                      {totalItemsCount > 9 ? '9+' : totalItemsCount}
+                    </span>
+                  )}
+                </div>
               </Link>
 
               {/* Mobile Menu Toggle */}

@@ -6,6 +6,7 @@ import Image from 'next/image';
 
 interface GenderSectionProps {
   gender: string;
+  href?: string;
   title: string;
   subtitle?: string;
   description?: string;
@@ -19,6 +20,7 @@ interface GenderSectionProps {
 
 function GenderSection({
   gender,
+  href,
   title,
   subtitle,
   description,
@@ -100,6 +102,8 @@ function GenderSection({
   const handleVideoLoad = () => {
     setIsVideoLoaded(true);
   };
+
+  const targetHref = href || (gender === 'men' ? '/mens' : gender === 'women' ? '/womens' : gender === 'gifts' ? '/gifts' : `/collections/${gender}`);
 
   return (
     <div
@@ -250,7 +254,7 @@ function GenderSection({
 
         {buttonType === 'link' ? (
           <Link
-            href={`/collections/${gender}`}
+            href={targetHref}
             style={{
               fontFamily: "'Jost', sans-serif",
               fontSize: isMobile ? '8.5px' : '11px',
@@ -271,7 +275,7 @@ function GenderSection({
           </Link>
         ) : (
           <Link
-            href={`/collections/${gender}`}
+            href={targetHref}
             style={{
               fontFamily: "'Jost', sans-serif",
               fontSize: isMobile ? '7.5px' : '10px',
@@ -375,6 +379,7 @@ export default function GenderCollectionSection() {
           >
             <GenderSection
               gender="men"
+              href="/mens"
               subtitle="BUILT FOR ADVENTURE"
               title={menData.title}
               image={menData.image}
@@ -395,6 +400,7 @@ export default function GenderCollectionSection() {
           >
             <GenderSection
               gender="women"
+              href="/womens"
               subtitle="DESIGNED FOR GRACE"
               title={womenData.title}
               image={womenData.image}
@@ -422,6 +428,7 @@ export default function GenderCollectionSection() {
         >
           <GenderSection
             gender="gifts"
+            href="/gifts"
             title={giftData.title}
             description="Give more than time. Give a memory."
             image={giftData.image}

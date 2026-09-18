@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     'elegant ladies wristwatch',
   ],
   alternates: {
-    canonical: `${baseUrl}/women`,
+    canonical: `${baseUrl}/womens`,
   },
   openGraph: {
     title: "Ladies Luxury Timepieces | Japan Movement — Winsor Maison",

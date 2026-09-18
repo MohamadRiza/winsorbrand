@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 
@@ -8,6 +8,59 @@ const WatchShowcase = () => {
   const sectionRef = useRef<HTMLElement>(null);
   const video360Ref = useRef<HTMLVideoElement>(null);
   const videoSpaceRef = useRef<HTMLVideoElement>(null);
+  const badgeRef = useRef<HTMLDivElement>(null);
+  const [pieceCount, setPieceCount] = useState(1);
+
+  useEffect(() => {
+    const el = badgeRef.current;
+    if (!el) return;
+
+    let animId: number | null = null;
+
+    const startCountUp = () => {
+      let startTime: number | null = null;
+      const duration = 2400; // 2.4 seconds (within 2-3s)
+      const startVal = 1;
+      const targetVal = 100;
+
+      setPieceCount(1);
+
+      const step = (timestamp: number) => {
+        if (!startTime) startTime = timestamp;
+        const elapsed = timestamp - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+
+        // Smooth ease-out cubic curve: fast start, graceful deceleration into 100
+        const easeOut = 1 - Math.pow(1 - progress, 3);
+        const current = Math.floor(startVal + (targetVal - startVal) * easeOut);
+        setPieceCount(current);
+
+        if (progress < 1) {
+          animId = requestAnimationFrame(step);
+        } else {
+          setPieceCount(100);
+        }
+      };
+
+      animId = requestAnimationFrame(step);
+    };
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          startCountUp();
+        }
+      },
+      { threshold: 0.25 }
+    );
+
+    observer.observe(el);
+
+    return () => {
+      observer.disconnect();
+      if (animId) cancelAnimationFrame(animId);
+    };
+  }, []);
 
   useEffect(() => {
     // Explicitly enforce muted property for strict browser autoplay compliance
@@ -107,13 +160,13 @@ const WatchShowcase = () => {
         <div className="group relative overflow-hidden rounded-xl sm:rounded-2xl bg-[#faf7f0] border border-[rgba(26,18,9,0.08)] shadow-[0_4px_20px_rgba(0,0,0,0.03)] grid grid-cols-[1.3fr_1fr] md:grid-cols-2 items-center md:h-[220px] lg:h-[240px]">
           {/* Left Text Content */}
           <div className="p-4 sm:p-7 lg:p-10 flex flex-col justify-center items-start text-left z-10 space-y-1.5 sm:space-y-2.5">
-            <span className="text-[9px] sm:text-[10px] lg:text-[11px] font-semibold text-[#8B6914] tracking-[0.22em] uppercase">
+            <span className="text-[9px] sm:text-[10px] lg:text-[11px] font-semibold text-[#8B6914] tracking-[0.22em] uppercase gold-reflect-text">
               ABOUT WINSOR
             </span>
-            <h3 className="font-serif text-base sm:text-2xl lg:text-[28px] font-normal leading-[1.2] text-[#1a1209]">
+            <h3 className="font-serif text-base sm:text-2xl lg:text-[28px] font-normal leading-[1.2] text-[#1a1209] heading-reflect-text">
               Crafting timeless elegance since day one.
             </h3>
-            <p className="text-[10.5px] sm:text-xs lg:text-sm text-[#666666] leading-relaxed max-w-md hidden xs:block sm:block">
+            <p className="text-[10.5px] sm:text-xs lg:text-sm text-[#666666] leading-relaxed max-w-md hidden xs:block sm:block body-reflect-text">
               Winsor is more than a watch. It&apos;s a legacy of precision, craftsmanship and timeless style.
             </p>
             <div className="pt-1 sm:pt-3">
@@ -168,13 +221,13 @@ const WatchShowcase = () => {
           {/* Right Text Content & Badge */}
           <div className="p-4 sm:p-7 lg:p-10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-6 text-left z-10 order-2">
             <div className="space-y-1.5 sm:space-y-2.5 max-w-xs sm:max-w-sm">
-              <span className="text-[9px] sm:text-[10px] lg:text-[11px] font-semibold text-[#8B6914] tracking-[0.22em] uppercase">
+              <span className="text-[9px] sm:text-[10px] lg:text-[11px] font-semibold text-[#8B6914] tracking-[0.22em] uppercase gold-reflect-text">
                 LIMITED EDITION
               </span>
-              <h3 className="font-serif text-base sm:text-2xl lg:text-[28px] font-normal leading-[1.2] text-[#1a1209]">
+              <h3 className="font-serif text-base sm:text-2xl lg:text-[28px] font-normal leading-[1.2] text-[#1a1209] heading-reflect-text">
                 Exclusivity Redefined
               </h3>
-              <p className="text-[10.5px] sm:text-xs lg:text-sm text-[#666666] leading-relaxed hidden xs:block sm:block">
+              <p className="text-[10.5px] sm:text-xs lg:text-sm text-[#666666] leading-relaxed hidden xs:block sm:block body-reflect-text">
                 Only 100 pieces worldwide. Own a masterpiece.
               </p>
               <div className="pt-1 sm:pt-3">
@@ -188,11 +241,25 @@ const WatchShowcase = () => {
             </div>
 
             {/* Badge Box (100 PIECES ONLY) */}
-            <div className="self-start sm:self-center border border-[#8B6914]/40 bg-[#FAF4E8] px-3 py-2 sm:px-4 sm:py-3.5 rounded-md sm:rounded-lg text-center min-w-[80px] sm:min-w-[110px] flex-shrink-0">
-              <span className="block font-serif text-lg sm:text-2xl lg:text-3xl font-bold text-[#8B6914] leading-none">
-                100
+            <div
+              ref={badgeRef}
+              className="relative overflow-hidden self-start sm:self-center border border-[#8B6914]/40 bg-[#FAF4E8] px-3.5 py-2.5 sm:px-5 sm:py-3.5 rounded-md sm:rounded-lg text-center min-w-[85px] sm:min-w-[115px] flex-shrink-0 shadow-[0_4px_16px_rgba(139,105,20,0.06),inset_0_1px_1px_rgba(255,255,255,0.7)] transition-all duration-300 hover:border-[#8B6914]/70 hover:shadow-[0_6px_20px_rgba(139,105,20,0.12)]"
+            >
+              {/* Subtle glass reflection sheen sliding across the badge box */}
+              <div
+                aria-hidden="true"
+                className="absolute inset-0 pointer-events-none overflow-hidden rounded-md sm:rounded-lg"
+              >
+                <div className="badge-light-sheen" />
+              </div>
+
+              {/* Animated number 1-100 with left-to-right reflective gold shine */}
+              <span className="block font-serif text-lg sm:text-2xl lg:text-3xl font-bold leading-none select-none relative z-10 gold-reflect-text tracking-tight">
+                {pieceCount}
               </span>
-              <span className="block text-[7.5px] sm:text-[8.5px] lg:text-[9px] font-semibold text-[#8B6914] tracking-[0.16em] uppercase mt-1">
+
+              {/* PIECES ONLY text with left-to-right reflective gold shine */}
+              <span className="block text-[7.5px] sm:text-[8.5px] lg:text-[9px] font-semibold tracking-[0.18em] uppercase mt-1 select-none relative z-10 gold-reflect-text">
                 PIECES ONLY
               </span>
             </div>
@@ -200,6 +267,110 @@ const WatchShowcase = () => {
         </div>
 
       </div>
+
+      <style>{`
+        @keyframes text-reflect-sweep {
+          0% {
+            background-position: 200% 0;
+          }
+          100% {
+            background-position: 0% 0;
+          }
+        }
+
+        .gold-reflect-text {
+          background: linear-gradient(
+            90deg,
+            #8B6914 0%,
+            #8B6914 12%,
+            #C5A059 22%,
+            #FFF6D6 26%,
+            #D4AF37 30%,
+            #8B6914 40%,
+            #8B6914 62%,
+            #C5A059 72%,
+            #FFF6D6 76%,
+            #D4AF37 80%,
+            #8B6914 90%,
+            #8B6914 100%
+          );
+          background-size: 200% 100%;
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          animation: text-reflect-sweep 6s linear infinite;
+          filter: drop-shadow(0 0 2px rgba(212, 175, 55, 0.15));
+        }
+
+        .heading-reflect-text {
+          background: linear-gradient(
+            90deg,
+            #1a1209 0%,
+            #1a1209 12%,
+            #5a4632 22%,
+            #e2d2b5 26%,
+            #5a4632 30%,
+            #1a1209 40%,
+            #1a1209 62%,
+            #5a4632 72%,
+            #e2d2b5 76%,
+            #5a4632 80%,
+            #1a1209 90%,
+            #1a1209 100%
+          );
+          background-size: 200% 100%;
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          animation: text-reflect-sweep 6s linear infinite;
+          filter: drop-shadow(0 0 2px rgba(212, 175, 55, 0.1));
+        }
+
+        .body-reflect-text {
+          background: linear-gradient(
+            90deg,
+            #666666 0%,
+            #666666 12%,
+            #8a7b6a 22%,
+            #ded2bd 26%,
+            #8a7b6a 30%,
+            #666666 40%,
+            #666666 62%,
+            #8a7b6a 72%,
+            #ded2bd 76%,
+            #8a7b6a 80%,
+            #666666 90%,
+            #666666 100%
+          );
+          background-size: 200% 100%;
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          animation: text-reflect-sweep 6s linear infinite;
+        }
+
+        @keyframes badge-sheen-sweep {
+          0% {
+            transform: translateX(-160%) skewX(-20deg);
+          }
+          100% {
+            transform: translateX(280%) skewX(-20deg);
+          }
+        }
+
+        .badge-light-sheen {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 50%;
+          height: 100%;
+          background: linear-gradient(
+            90deg,
+            transparent 0%,
+            rgba(255, 255, 255, 0.3) 50%,
+            transparent 100%
+          );
+          animation: badge-sheen-sweep 6s linear infinite;
+          pointer-events: none;
+        }
+      `}</style>
     </section>
   );
 };

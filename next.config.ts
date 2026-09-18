@@ -58,6 +58,21 @@ const nextConfig: NextConfig = {
         destination: '/collections/:id',
         permanent: true,
       },
+      {
+        source: '/men',
+        destination: '/mens',
+        permanent: true,
+      },
+      {
+        source: '/women',
+        destination: '/womens',
+        permanent: true,
+      },
+      {
+        source: '/new',
+        destination: '/new-arrivals',
+        permanent: true,
+      },
     ];
   },
 };
