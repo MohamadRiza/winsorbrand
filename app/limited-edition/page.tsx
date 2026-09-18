@@ -123,19 +123,23 @@ function LimitedEditionContent() {
       result = result.filter(p => {
         if (p.collectionSections?.includes(selectedSection)) return true;
         const titleLower = p.title.toLowerCase();
-        const descLower = p.description.toLowerCase();
+        const descLower = (p.description || '').toLowerCase();
         if (selectedSection === 'limited') {
-          return titleLower.includes('limited') || titleLower.includes('reserve') || titleLower.includes('anniversary') || titleLower.includes('edition') || descLower.includes('limited');
+          return p.collectionSections?.includes('limited') || titleLower.includes('limited') || titleLower.includes('reserve') || titleLower.includes('anniversary') || titleLower.includes('edition') || descLower.includes('limited');
+        }
+        if (selectedSection === 'new') {
+          return (p as any).isNewArrival || p.collectionSections?.includes('new') || titleLower.includes('new') || titleLower.includes('2026') || titleLower.includes('latest');
+        }
+        if (selectedSection === 'sports') {
+          return p.collectionSections?.includes('sports') || titleLower.includes('sport') || descLower.includes('sport');
+        }
+        if (selectedSection === 'luxury') {
+          return p.collectionSections?.includes('luxury') || titleLower.includes('executive') || titleLower.includes('luxury') || descLower.includes('luxury');
         }
         return false;
       });
-    } else {
-      result = result.filter(p => {
-        const titleLower = p.title.toLowerCase();
-        const descLower = p.description.toLowerCase();
-        return p.collectionSections?.includes('limited') || titleLower.includes('limited') || titleLower.includes('reserve') || titleLower.includes('edition') || descLower.includes('limited');
-      });
     }
+    // When selectedSection === 'all', all products are displayed without section exclusion
 
     // 3. Price Sorting
     if (priceSort === 'low-to-high') {
@@ -172,6 +176,20 @@ function LimitedEditionContent() {
         }
         .limited-hero-img-card:hover {
           transform: translateY(-4px) scale(1.015);
+        }
+        .limited-toolbar-search {
+          flex: 1 1 240px;
+          min-width: 220px;
+          position: relative;
+        }
+        .limited-toolbar-pills {
+          scrollbar-width: none !important;
+          -ms-overflow-style: none !important;
+        }
+        .limited-toolbar-pills::-webkit-scrollbar {
+          display: none !important;
+          width: 0 !important;
+          height: 0 !important;
         }
         @media (max-width: 900px) {
           .limited-hero-section {
@@ -229,16 +247,33 @@ function LimitedEditionContent() {
             gap: 12px !important;
             margin-bottom: 24px !important;
           }
+          .limited-toolbar-search {
+            flex: none !important;
+            width: 100% !important;
+            min-width: 0 !important;
+            height: auto !important;
+          }
           .limited-toolbar-pills {
             justify-content: flex-start !important;
             overflow-x: auto !important;
-            padding-bottom: 4px !important;
+            overflow-y: hidden !important;
+            padding-top: 2px !important;
+            padding-bottom: 2px !important;
             flex-wrap: nowrap !important;
             -webkit-overflow-scrolling: touch !important;
             width: 100% !important;
+            scrollbar-width: none !important;
+            -ms-overflow-style: none !important;
+            overscroll-behavior-x: contain !important;
+          }
+          .limited-toolbar-pills::-webkit-scrollbar {
+            display: none !important;
+            width: 0 !important;
+            height: 0 !important;
           }
           .limited-toolbar-pills button {
             flex-shrink: 0 !important;
+            white-space: nowrap !important;
           }
           .limited-toolbar-select {
             width: 100% !important;
@@ -477,7 +512,7 @@ function LimitedEditionContent() {
             <LimitedEditionHeroTypewriter />
             <div className="limited-hero-pills-row" style={{ display: 'flex', gap: '14px', flexWrap: 'wrap', alignItems: 'center' }}>
               <div style={{ padding: '8px 18px', background: 'rgba(139,105,20,0.2)', border: '1px solid rgba(223,177,91,0.45)', borderRadius: '20px', fontSize: '10px', letterSpacing: '0.18em', textTransform: 'uppercase', fontWeight: 600, color: '#dfb15b' }}>
-                {filteredProducts.length} LIMITED EDITIONS PRODUCED
+                {loading ? 'CURATED PIECES PRODUCED' : `${filteredProducts.length} LIMITED EDITIONS PRODUCED`}
               </div>
             </div>
           </div>
@@ -606,38 +641,44 @@ function LimitedEditionContent() {
           }}
         >
           {/* Search Box */}
-          <div style={{ flex: '1 1 240px', minWidth: '220px', position: 'relative' }}>
-            <input
-              type="text"
-              placeholder="Search limited editions..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '10px 14px 10px 38px',
-                borderRadius: '6px',
-                border: '1px solid rgba(26,18,9,0.15)',
-                fontSize: '12.5px',
-                outline: 'none',
-                background: '#faf7f0'
-              }}
-            />
-            <svg 
-              width="15" 
-              height="15" 
-              viewBox="0 0 24 24" 
-              fill="none" 
-              stroke="rgba(26,18,9,0.4)" 
-              strokeWidth="2"
-              style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }}
-            >
-              <circle cx="11" cy="11" r="8" />
-              <path d="m21 21-4.35-4.35" />
-            </svg>
+          <div className="limited-toolbar-search">
+            <div style={{ position: 'relative', width: '100%' }}>
+              <input
+                type="text"
+                placeholder="Search limited editions..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                aria-label="Search limited editions"
+                style={{
+                  width: '100%',
+                  height: '42px',
+                  boxSizing: 'border-box',
+                  padding: '10px 14px 10px 38px',
+                  borderRadius: '6px',
+                  border: '1px solid rgba(26,18,9,0.15)',
+                  fontSize: '12.5px',
+                  outline: 'none',
+                  background: '#faf7f0',
+                  display: 'block'
+                }}
+              />
+              <svg 
+                width="15" 
+                height="15" 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                stroke="rgba(26,18,9,0.4)" 
+                strokeWidth="2"
+                style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }}
+              >
+                <circle cx="11" cy="11" r="8" />
+                <path d="m21 21-4.35-4.35" />
+              </svg>
+            </div>
           </div>
 
           {/* Filter Pills */}
-          <div className="limited-toolbar-pills" style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
+          <div className="limited-toolbar-pills no-scrollbar" style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
             {(['limited', 'new', 'sports', 'luxury', 'all'] as const).map((sec) => (
               <button
                 key={sec}
@@ -653,7 +694,9 @@ function LimitedEditionContent() {
                   background: selectedSection === sec ? '#8b6914' : '#ffffff',
                   color: selectedSection === sec ? '#ffffff' : 'rgba(26,18,9,0.7)',
                   transition: 'all 0.2s ease',
-                  textTransform: 'uppercase'
+                  textTransform: 'uppercase',
+                  whiteSpace: 'nowrap',
+                  flexShrink: 0
                 }}
               >
                 {sec === 'limited' ? 'Limited Editions' : sec === 'new' ? 'New Additions' : sec === 'sports' ? 'Sports' : sec === 'luxury' ? 'Executive' : 'All'}

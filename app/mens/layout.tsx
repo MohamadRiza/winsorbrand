@@ -15,6 +15,9 @@ export const metadata: Metadata = {
     'luxury watch Colombo',
     'gents watch Dubai',
   ],
+  alternates: {
+    canonical: `${baseUrl}/mens`,
+  },
   openGraph: {
     title: "Gents Luxury Timepieces | Japan Movement — Winsor Maison",
     description:

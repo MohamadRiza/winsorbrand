@@ -15,6 +15,9 @@ export const metadata: Metadata = {
     'men sports watch Colombo',
     'Winsor sports collection',
   ],
+  alternates: {
+    canonical: `${baseUrl}/sports`,
+  },
   openGraph: {
     title: 'Sports Chronographs & Active Timepieces | Winsor Maison',
     description:

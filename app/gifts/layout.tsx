@@ -12,6 +12,9 @@ export const metadata: Metadata = {
     'corporate gifts Sri Lanka',
     'luxury watch box set',
   ],
+  alternates: {
+    canonical: `${baseUrl}/gifts`,
+  },
   openGraph: {
     title: 'Luxury Watch Gifts & Curated Box Sets | Winsor Maison',
     description: 'Explore bespoke watch gift sets and luxury timepiece gifts for special occasions.',

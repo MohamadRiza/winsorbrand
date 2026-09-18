@@ -168,7 +168,24 @@ function WomensCollectionContent() {
 
     // 3. Collection Section Filter
     if (selectedSection !== 'all') {
-      result = result.filter(p => p.collectionSections?.includes(selectedSection));
+      result = result.filter(p => {
+        if (p.collectionSections?.includes(selectedSection)) return true;
+        const titleLower = p.title.toLowerCase();
+        const descLower = (p.description || '').toLowerCase();
+        if (selectedSection === 'sports') {
+          return titleLower.includes('sport') || descLower.includes('sport');
+        }
+        if (selectedSection === 'luxury') {
+          return titleLower.includes('classic') || titleLower.includes('luxury') || titleLower.includes('executive') || descLower.includes('classic');
+        }
+        if (selectedSection === 'new') {
+          return (p as any).isNewArrival || titleLower.includes('new') || titleLower.includes('2026') || titleLower.includes('latest');
+        }
+        if (selectedSection === 'limited') {
+          return titleLower.includes('limited') || titleLower.includes('reserve') || titleLower.includes('edition');
+        }
+        return false;
+      });
     }
 
     // 4. Seasonal / Occasion Filter
@@ -212,6 +229,56 @@ function WomensCollectionContent() {
         .womens-hero-img-card:hover {
           transform: translateY(-4px) scale(1.015);
           border-color: rgba(223,177,91,0.8);
+        }
+        .womens-toolbar-container {
+          background: #ffffff;
+          border: 1px solid rgba(26,18,9,0.06);
+          border-radius: 12px;
+          padding: 18px 24px;
+          margin-bottom: 36px;
+          display: flex;
+          flex-wrap: wrap;
+          gap: 16px;
+          align-items: center;
+          justify-content: space-between;
+        }
+        .womens-toolbar-search {
+          flex: 1 1 240px;
+          min-width: 220px;
+          position: relative;
+        }
+        .womens-toolbar-pills {
+          display: flex;
+          gap: 8px;
+          flex-wrap: wrap;
+          align-items: center;
+          scrollbar-width: none !important;
+          -ms-overflow-style: none !important;
+        }
+        .womens-toolbar-pills::-webkit-scrollbar {
+          display: none !important;
+          width: 0 !important;
+          height: 0 !important;
+        }
+        .womens-toolbar-dropdowns {
+          display: flex;
+          gap: 10px;
+          align-items: center;
+        }
+        .womens-toolbar-select {
+          padding: 9px 14px;
+          border-radius: 8px;
+          border: 1px solid rgba(26,18,9,0.14);
+          font-size: 12px;
+          background: #faf7f0;
+          color: #1a1209;
+          cursor: pointer;
+          outline: none;
+          height: 40px;
+          transition: border-color 0.2s ease;
+        }
+        .womens-toolbar-select:focus {
+          border-color: #8b6914;
         }
         @media (max-width: 900px) {
           .womens-hero-section {
@@ -258,6 +325,52 @@ function WomensCollectionContent() {
           .womens-hero-card-badge {
             font-size: 8px !important;
             padding: 3px 8px !important;
+          }
+          #womens-catalog {
+            padding: 16px 14px 80px !important;
+          }
+          .womens-toolbar-container {
+            padding: 14px !important;
+            flex-direction: column !important;
+            align-items: stretch !important;
+            gap: 12px !important;
+            margin-bottom: 24px !important;
+          }
+          .womens-toolbar-search {
+            flex: none !important;
+            width: 100% !important;
+            min-width: 0 !important;
+            height: auto !important;
+          }
+          .womens-toolbar-pills {
+            justify-content: flex-start !important;
+            overflow-x: auto !important;
+            overflow-y: hidden !important;
+            padding: 4px 2px !important;
+            flex-wrap: nowrap !important;
+            -webkit-overflow-scrolling: touch !important;
+            width: 100% !important;
+            scrollbar-width: none !important;
+            -ms-overflow-style: none !important;
+            overscroll-behavior-x: contain !important;
+          }
+          .womens-toolbar-pills::-webkit-scrollbar {
+            display: none !important;
+            width: 0 !important;
+            height: 0 !important;
+          }
+          .womens-toolbar-pills button {
+            flex-shrink: 0 !important;
+            white-space: nowrap !important;
+          }
+          .womens-toolbar-dropdowns {
+            display: grid !important;
+            grid-template-columns: 1fr 1fr !important;
+            gap: 10px !important;
+            width: 100% !important;
+          }
+          .womens-toolbar-select {
+            width: 100% !important;
           }
         }
 
@@ -596,7 +709,7 @@ function WomensCollectionContent() {
             <WomensHeroTypewriter />
             <div className="womens-hero-pills-row" style={{ display: 'flex', gap: '14px', flexWrap: 'wrap', alignItems: 'center' }}>
               <div style={{ padding: '8px 18px', background: 'rgba(139,105,20,0.2)', border: '1px solid rgba(223,177,91,0.45)', borderRadius: '20px', fontSize: '10px', letterSpacing: '0.18em', textTransform: 'uppercase', fontWeight: 600, color: '#dfb15b' }}>
-                {filteredProducts.length} WOMEN'S TIMEPIECES AVAILABLE
+                {loading ? 'CURATED TIMEPIECES AVAILABLE' : `${filteredProducts.length} WOMEN'S TIMEPIECES AVAILABLE`}
               </div>
             </div>
           </div>
@@ -717,28 +830,84 @@ function WomensCollectionContent() {
       </div>
 
       {/* ── MAIN CONTENT ── */}
-      <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '20px 4% 100px' }}>
+      {/* ── MAIN CONTENT ── */}
+      <div id="womens-catalog" style={{ maxWidth: '1400px', margin: '0 auto', padding: '20px 24px 100px' }}>
 
         {/* ── FILTER TOOLBAR ── */}
-        <div style={{ background: '#fff', border: '1px solid rgba(26,18,9,0.06)', borderRadius: '12px', padding: '20px 24px', marginBottom: '40px', display: 'flex', flexWrap: 'wrap', gap: '20px', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div className="womens-toolbar-container">
           
-          {/* Seasonal / Occasion Filter Dropdown */}
-          <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
-            <span style={{ fontSize: '10.5px', letterSpacing: '0.15em', color: '#8b6914', textTransform: 'uppercase', fontWeight: 600 }}>SEASON & OCCASION:</span>
+          {/* Search Box */}
+          <div className="womens-toolbar-search">
+            <div style={{ position: 'relative', width: '100%' }}>
+              <input 
+                type="text" 
+                placeholder="Search women's watches..." 
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                aria-label="Search women's watches"
+                style={{
+                  width: '100%',
+                  height: '42px',
+                  boxSizing: 'border-box',
+                  padding: '10px 14px 10px 38px',
+                  borderRadius: '6px',
+                  border: '1px solid rgba(26,18,9,0.15)',
+                  fontSize: '12.5px',
+                  outline: 'none',
+                  background: '#faf7f0',
+                  color: '#1a1209',
+                  display: 'block'
+                }}
+              />
+              <svg 
+                width="15" 
+                height="15" 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                stroke="rgba(26,18,9,0.4)" 
+                strokeWidth="2"
+                style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }}
+              >
+                <circle cx="11" cy="11" r="8" />
+                <path d="m21 21-4.35-4.35" />
+              </svg>
+            </div>
+          </div>
+
+          {/* Section Pills */}
+          <div className="womens-toolbar-pills no-scrollbar">
+            {(['all', 'sports', 'luxury', 'new', 'limited'] as const).map(sec => (
+              <button
+                key={sec}
+                onClick={() => setSelectedSection(sec)}
+                style={{
+                  padding: '7px 16px',
+                  borderRadius: '100px',
+                  fontSize: '11px',
+                  fontWeight: 600,
+                  letterSpacing: '0.05em',
+                  cursor: 'pointer',
+                  border: selectedSection === sec ? '1.5px solid #8b6914' : '1px solid rgba(26,18,9,0.12)',
+                  background: selectedSection === sec ? '#8b6914' : '#ffffff',
+                  color: selectedSection === sec ? '#ffffff' : 'rgba(26,18,9,0.7)',
+                  transition: 'all 0.2s ease',
+                  textTransform: 'uppercase',
+                  whiteSpace: 'nowrap',
+                  flexShrink: 0
+                }}
+              >
+                {sec === 'all' ? 'All' : sec === 'sports' ? 'Sports' : sec === 'luxury' ? 'Classic' : sec === 'new' ? 'New Arrivals' : 'Limited'}
+              </button>
+            ))}
+          </div>
+
+          {/* Occasion & Price Dropdowns */}
+          <div className="womens-toolbar-dropdowns">
             <select
               value={selectedGift}
               onChange={e => setSelectedGift(e.target.value)}
-              style={{
-                padding: '9px 16px',
-                borderRadius: '8px',
-                border: '1px solid rgba(139,105,20,0.3)',
-                background: '#faf7f0',
-                color: '#1a1209',
-                fontSize: '12px',
-                fontWeight: 500,
-                outline: 'none',
-                cursor: 'pointer'
-              }}
+              aria-label="Filter by season and occasion"
+              className="womens-toolbar-select"
             >
               <option value="all">All Seasons & Occasions</option>
               {giftCategories.map(cat => (
@@ -747,34 +916,14 @@ function WomensCollectionContent() {
                 </option>
               ))}
             </select>
-          </div>
 
-          {/* Section Pills */}
-          <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-            <button onClick={() => setSelectedSection('all')} style={{ padding: '7px 14px', borderRadius: '6px', fontSize: '10.5px', textTransform: 'uppercase', letterSpacing: '0.08em', background: selectedSection === 'all' ? 'rgba(139,105,20,0.12)' : 'transparent', color: selectedSection === 'all' ? '#8b6914' : 'rgba(26,18,9,0.6)', border: '1px solid rgba(26,18,9,0.08)', cursor: 'pointer' }}>All</button>
-            <button onClick={() => setSelectedSection('sports')} style={{ padding: '7px 14px', borderRadius: '6px', fontSize: '10.5px', textTransform: 'uppercase', letterSpacing: '0.08em', background: selectedSection === 'sports' ? 'rgba(139,105,20,0.12)' : 'transparent', color: selectedSection === 'sports' ? '#8b6914' : 'rgba(26,18,9,0.6)', border: '1px solid rgba(26,18,9,0.08)', cursor: 'pointer' }}>Sports</button>
-            <button onClick={() => setSelectedSection('luxury')} style={{ padding: '7px 14px', borderRadius: '6px', fontSize: '10.5px', textTransform: 'uppercase', letterSpacing: '0.08em', background: selectedSection === 'luxury' ? 'rgba(139,105,20,0.12)' : 'transparent', color: selectedSection === 'luxury' ? '#8b6914' : 'rgba(26,18,9,0.6)', border: '1px solid rgba(26,18,9,0.08)', cursor: 'pointer' }}>Classic</button>
-            <button onClick={() => setSelectedSection('new')} style={{ padding: '7px 14px', borderRadius: '6px', fontSize: '10.5px', textTransform: 'uppercase', letterSpacing: '0.08em', background: selectedSection === 'new' ? 'rgba(139,105,20,0.12)' : 'transparent', color: selectedSection === 'new' ? '#8b6914' : 'rgba(26,18,9,0.6)', border: '1px solid rgba(26,18,9,0.08)', cursor: 'pointer' }}>New Arrivals</button>
-            <button onClick={() => setSelectedSection('limited')} style={{ padding: '7px 14px', borderRadius: '6px', fontSize: '10.5px', textTransform: 'uppercase', letterSpacing: '0.08em', background: selectedSection === 'limited' ? 'rgba(139,105,20,0.12)' : 'transparent', color: selectedSection === 'limited' ? '#8b6914' : 'rgba(26,18,9,0.6)', border: '1px solid rgba(26,18,9,0.08)', cursor: 'pointer' }}>Limited</button>
-          </div>
-
-          {/* Search & Sort */}
-          <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-            <input 
-              type="text" 
-              placeholder="Search women's watches..." 
-              value={searchQuery}
-              onChange={e => setSearchQuery(e.target.value)}
-              aria-label="Search women's watches"
-              style={{ padding: '8px 14px', borderRadius: '6px', border: '1px solid rgba(26,18,9,0.12)', fontSize: '12px', width: '180px', outline: 'none' }}
-            />
             <select 
               value={priceSort} 
               onChange={e => setPriceSort(e.target.value as any)}
               aria-label="Sort by price"
-              style={{ padding: '8px 12px', borderRadius: '6px', border: '1px solid rgba(26,18,9,0.12)', fontSize: '12px', outline: 'none', background: '#fff', cursor: 'pointer' }}
+              className="womens-toolbar-select"
             >
-              <option value="none">Default Sort</option>
+              <option value="none">Sort by Price</option>
               <option value="low-to-high">Price: Low to High</option>
               <option value="high-to-low">Price: High to Low</option>
             </select>
@@ -794,7 +943,7 @@ function WomensCollectionContent() {
           <div style={{ textAlign: 'center', padding: '80px 20px', background: '#fff', borderRadius: '12px', border: '1px border rgba(26,18,9,0.06)' }}>
             <h3 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '24px', margin: '0 0 10px' }}>No Timepieces Found</h3>
             <p style={{ color: 'rgba(26,18,9,0.5)', fontSize: '13px', margin: '0 0 20px' }}>Try resetting your filter selection or search query.</p>
-            <button onClick={() => { setSelectedSection('all'); setSelectedGift('all'); setSearchQuery(''); }} style={{ padding: '10px 24px', background: '#8b6914', color: '#fff', border: 'none', borderRadius: '4px', fontSize: '11px', letterSpacing: '0.15em', textTransform: 'uppercase', cursor: 'pointer' }}>Reset All Filters</button>
+            <button onClick={() => { setSelectedSection('all'); setSelectedGift('all'); setPriceSort('none'); setSearchQuery(''); }} style={{ padding: '10px 24px', background: '#8b6914', color: '#fff', border: 'none', borderRadius: '4px', fontSize: '11px', letterSpacing: '0.15em', textTransform: 'uppercase', cursor: 'pointer' }}>Reset All Filters</button>
           </div>
         ) : (
           <div className="product-grid">

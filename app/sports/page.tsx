@@ -133,20 +133,23 @@ function SportsCollectionContent() {
       result = result.filter(p => {
         if (p.collectionSections?.includes(selectedSection)) return true;
         const titleLower = p.title.toLowerCase();
-        const descLower = p.description.toLowerCase();
+        const descLower = (p.description || '').toLowerCase();
         if (selectedSection === 'sports') {
           return titleLower.includes('sport') || titleLower.includes('diver') || titleLower.includes('chronograph') || descLower.includes('sport');
         }
+        if (selectedSection === 'new') {
+          return (p as any).isNewArrival || p.collectionSections?.includes('new') || titleLower.includes('new') || titleLower.includes('2026') || titleLower.includes('latest');
+        }
+        if (selectedSection === 'luxury') {
+          return p.collectionSections?.includes('luxury') || titleLower.includes('executive') || titleLower.includes('luxury') || descLower.includes('luxury');
+        }
+        if (selectedSection === 'limited') {
+          return p.collectionSections?.includes('limited') || titleLower.includes('limited') || titleLower.includes('reserve') || titleLower.includes('edition');
+        }
         return false;
       });
-    } else {
-      // If 'all', still prioritize sports/diver timepieces
-      result = result.filter(p => {
-        const titleLower = p.title.toLowerCase();
-        const descLower = p.description.toLowerCase();
-        return p.collectionSections?.includes('sports') || titleLower.includes('sport') || titleLower.includes('diver') || titleLower.includes('chrono') || descLower.includes('sport');
-      });
     }
+    // When selectedSection === 'all', all products are displayed without section exclusion
 
     // 3. Seasonal / Gift Category Filter
     if (selectedGift !== 'all') {
@@ -189,6 +192,51 @@ function SportsCollectionContent() {
         .sports-hero-img-card:hover {
           transform: translateY(-4px) scale(1.015);
           border-color: rgba(223,177,91,0.8);
+        }
+        .sports-toolbar-container {
+          background: #ffffff;
+          border: 1px solid rgba(26,18,9,0.06);
+          border-radius: 12px;
+          padding: 18px 24px;
+          margin-bottom: 36px;
+          display: flex;
+          flex-wrap: wrap;
+          gap: 16px;
+          align-items: center;
+          justify-content: space-between;
+        }
+        .sports-toolbar-search {
+          flex: 1 1 240px;
+          min-width: 220px;
+          position: relative;
+        }
+        .sports-toolbar-pills {
+          display: flex;
+          gap: 8px;
+          flex-wrap: wrap;
+          align-items: center;
+          scrollbar-width: none !important;
+          -ms-overflow-style: none !important;
+        }
+        .sports-toolbar-pills::-webkit-scrollbar {
+          display: none !important;
+          width: 0 !important;
+          height: 0 !important;
+        }
+        .sports-toolbar-select {
+          padding: 9px 14px;
+          border-radius: 8px;
+          border: 1px solid rgba(26,18,9,0.14);
+          font-size: 12px;
+          background: #faf7f0;
+          color: #1a1209;
+          cursor: pointer;
+          outline: none;
+          height: 40px;
+          transition: border-color 0.2s ease;
+        }
+        .sports-toolbar-select:focus {
+          border-color: #8b6914;
         }
         @media (max-width: 900px) {
           .sports-hero-section {
@@ -235,6 +283,46 @@ function SportsCollectionContent() {
           .sports-hero-card-badge {
             font-size: 8px !important;
             padding: 3px 8px !important;
+          }
+          #sports-catalog {
+            padding: 16px 14px 80px !important;
+          }
+          .sports-toolbar-container {
+            padding: 14px !important;
+            flex-direction: column !important;
+            align-items: stretch !important;
+            gap: 12px !important;
+            margin-bottom: 24px !important;
+          }
+          .sports-toolbar-search {
+            flex: none !important;
+            width: 100% !important;
+            min-width: 0 !important;
+            height: auto !important;
+          }
+          .sports-toolbar-pills {
+            justify-content: flex-start !important;
+            overflow-x: auto !important;
+            overflow-y: hidden !important;
+            padding: 4px 2px !important;
+            flex-wrap: nowrap !important;
+            -webkit-overflow-scrolling: touch !important;
+            width: 100% !important;
+            scrollbar-width: none !important;
+            -ms-overflow-style: none !important;
+            overscroll-behavior-x: contain !important;
+          }
+          .sports-toolbar-pills::-webkit-scrollbar {
+            display: none !important;
+            width: 0 !important;
+            height: 0 !important;
+          }
+          .sports-toolbar-pills button {
+            flex-shrink: 0 !important;
+            white-space: nowrap !important;
+          }
+          .sports-toolbar-select {
+            width: 100% !important;
           }
         }
 
@@ -618,7 +706,7 @@ function SportsCollectionContent() {
             <SportsHeroTypewriter />
             <div className="sports-hero-pills-row" style={{ display: 'flex', gap: '14px', flexWrap: 'wrap', alignItems: 'center' }}>
               <div style={{ padding: '8px 18px', background: 'rgba(139,105,20,0.2)', border: '1px solid rgba(223,177,91,0.45)', borderRadius: '20px', fontSize: '10px', letterSpacing: '0.18em', textTransform: 'uppercase', fontWeight: 600, color: '#dfb15b' }}>
-                {filteredProducts.length} SPORT TIMEPIECES AVAILABLE
+                {loading ? 'CURATED TIMEPIECES AVAILABLE' : `${filteredProducts.length} SPORT TIMEPIECES AVAILABLE`}
               </div>
             </div>
           </div>
@@ -742,53 +830,48 @@ function SportsCollectionContent() {
       <main id="sports-catalog" style={{ maxWidth: '1400px', margin: '0 auto', padding: '20px 24px 100px' }}>
 
         {/* ── TOOLBAR & FILTERS ── */}
-        <div 
-          style={{ 
-            display: 'flex', 
-            flexWrap: 'wrap', 
-            gap: '16px', 
-            justifyContent: 'space-between', 
-            alignItems: 'center', 
-            marginBottom: '32px',
-            background: '#ffffff',
-            padding: '20px 24px',
-            borderRadius: '12px',
-            border: '1px solid rgba(26,18,9,0.06)'
-          }}
-        >
+        {/* ── TOOLBAR & FILTERS ── */}
+        <div className="sports-toolbar-container">
           {/* Search Box */}
-          <div style={{ flex: '1 1 240px', minWidth: '220px', position: 'relative' }}>
-            <input
-              type="text"
-              placeholder="Search sports timepieces..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '10px 14px 10px 38px',
-                borderRadius: '6px',
-                border: '1px solid rgba(26,18,9,0.15)',
-                fontSize: '12.5px',
-                outline: 'none',
-                background: '#faf7f0'
-              }}
-            />
-            <svg 
-              width="15" 
-              height="15" 
-              viewBox="0 0 24 24" 
-              fill="none" 
-              stroke="rgba(26,18,9,0.4)" 
-              strokeWidth="2"
-              style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }}
-            >
-              <circle cx="11" cy="11" r="8" />
-              <path d="m21 21-4.35-4.35" />
-            </svg>
+          <div className="sports-toolbar-search">
+            <div style={{ position: 'relative', width: '100%' }}>
+              <input
+                type="text"
+                placeholder="Search sports timepieces..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                aria-label="Search sports timepieces"
+                style={{
+                  width: '100%',
+                  height: '42px',
+                  boxSizing: 'border-box',
+                  padding: '10px 14px 10px 38px',
+                  borderRadius: '6px',
+                  border: '1px solid rgba(26,18,9,0.15)',
+                  fontSize: '12.5px',
+                  outline: 'none',
+                  background: '#faf7f0',
+                  color: '#1a1209',
+                  display: 'block'
+                }}
+              />
+              <svg 
+                width="15" 
+                height="15" 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                stroke="rgba(26,18,9,0.4)" 
+                strokeWidth="2"
+                style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }}
+              >
+                <circle cx="11" cy="11" r="8" />
+                <path d="m21 21-4.35-4.35" />
+              </svg>
+            </div>
           </div>
 
           {/* Filter Pills */}
-          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
+          <div className="sports-toolbar-pills no-scrollbar">
             {(['sports', 'new', 'luxury', 'limited', 'all'] as const).map((sec) => (
               <button
                 key={sec}
@@ -804,7 +887,9 @@ function SportsCollectionContent() {
                   background: selectedSection === sec ? '#8b6914' : '#ffffff',
                   color: selectedSection === sec ? '#ffffff' : 'rgba(26,18,9,0.7)',
                   transition: 'all 0.2s ease',
-                  textTransform: 'uppercase'
+                  textTransform: 'uppercase',
+                  whiteSpace: 'nowrap',
+                  flexShrink: 0
                 }}
               >
                 {sec === 'sports' ? 'Sport Series' : sec === 'new' ? 'New Additions' : sec === 'luxury' ? 'Executive' : sec === 'limited' ? 'Limited' : 'All'}
@@ -814,19 +899,10 @@ function SportsCollectionContent() {
 
           {/* Price Sorting */}
           <select
+            className="sports-toolbar-select"
             value={priceSort}
             onChange={(e: any) => setPriceSort(e.target.value)}
             aria-label="Sort by price"
-            style={{
-              padding: '9px 14px',
-              borderRadius: '6px',
-              border: '1px solid rgba(26,18,9,0.15)',
-              fontSize: '12px',
-              background: '#ffffff',
-              color: '#1a1209',
-              cursor: 'pointer',
-              outline: 'none'
-            }}
           >
             <option value="none">Sort by Price</option>
             <option value="low-to-high">Price: Low to High</option>

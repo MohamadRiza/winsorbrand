@@ -13,6 +13,9 @@ export const metadata: Metadata = {
     'Japan movement new models',
     'luxury watch trends',
   ],
+  alternates: {
+    canonical: `${baseUrl}/new-arrivals`,
+  },
   openGraph: {
     title: 'New Arrivals 2026 | Winsor Maison',
     description:

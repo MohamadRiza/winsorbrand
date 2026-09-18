@@ -15,6 +15,9 @@ export const metadata: Metadata = {
     'Winsor space watch',
     'exclusive collector watch',
   ],
+  alternates: {
+    canonical: `${baseUrl}/limited-edition`,
+  },
   openGraph: {
     title: 'Limited Edition Timepieces | Japan Movement — Winsor Maison',
     description:

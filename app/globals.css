@@ -107,3 +107,15 @@ video, img {
     animation: none !important;
   }
 }
+
+/* ── UTILITY: Hide scrollbar for cross-device horizontal swipe containers ── */
+.no-scrollbar {
+  -ms-overflow-style: none !important;
+  scrollbar-width: none !important;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
