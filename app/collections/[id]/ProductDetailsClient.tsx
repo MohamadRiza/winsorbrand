@@ -10,6 +10,7 @@ import { useRouter } from 'next/navigation';
 import { useUser } from '@clerk/nextjs';
 import GuestCheckoutModal from '@/components/Checkout/GuestCheckoutModal';
 import BuyNowModal from '@/components/Checkout/BuyNowModal';
+import AmbientVideoPlayer from '@/components/Video/AmbientVideoPlayer';
 
 interface ProductDetailsClientProps {
   id: string;
@@ -1371,16 +1372,23 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
               )}
             </div>
 
-            <div className="main-image-view">
+            <div className={`main-image-view ${activeMediaType === 'video' ? '!overflow-visible' : ''}`}>
               {activeMediaType === 'video' && product.video?.url ? (
-                <video
+                <AmbientVideoPlayer
                   src={product.video.url}
                   controls
                   autoPlay
                   loop
                   muted
                   playsInline
-                  className="w-full h-full object-cover rounded-xl"
+                  aspectRatio="aspect-square"
+                  roundedClassName="rounded-xl"
+                  borderClassName="border border-[#c5a059]/40"
+                  className="w-full h-full"
+                  containerClassName="w-full h-full"
+                  showAmbientToggle={true}
+                  defaultAmbientOn={false}
+                  title={`${product.title} Product Video`}
                 />
               ) : (
                 selectedImage && (
@@ -1627,17 +1635,23 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
             The Timepiece in Focus
           </h2>
 
-          {/* Large Video Banner OR 3-Column Image Grid (When No Video Available) */}
+          {/* Large Video Banner with Ambient Mode OR 3-Column Image Grid (When No Video Available) */}
           {product.video?.url ? (
-            <div className="relative aspect-video rounded-2xl overflow-hidden border-2 border-[#8b6914]/30 shadow-2xl bg-black max-w-4xl mx-auto mb-10">
-              <video
+            <div className="relative max-w-4xl mx-auto mb-10 px-2 sm:px-0">
+              <AmbientVideoPlayer
                 src={product.video.url}
                 controls
                 muted
                 loop
                 autoPlay
                 playsInline
-                className="w-full h-full object-cover"
+                aspectRatio="aspect-video"
+                roundedClassName="rounded-[22px] sm:rounded-[28px]"
+                borderClassName="border border-[#c5a059]/40"
+                containerClassName="w-full aspect-video"
+                showAmbientToggle={true}
+                defaultAmbientOn={true}
+                title={`${product.title} in Focus`}
               />
             </div>
           ) : (
