@@ -135,7 +135,7 @@ export async function POST(req: NextRequest) {
         productId: product._id.toString(),
         productTitle: product.title,
         productModelNo: product.modelNo,
-        productThumbnail: product.thumbnail?.url || '',
+        productThumbnail: variant.image?.url || product.thumbnail?.url || '',
         colorVariant: variant.colorName,
         quantity: item.quantity,
         price: serverPrice,

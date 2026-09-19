@@ -2534,6 +2534,24 @@ export default function CollectionsPage() {
           </div>
         </div>
       </div>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'CollectionPage',
+            name: 'Luxury Timepiece Collections | Japan Movement Watches',
+            description:
+              'Explore hand-assembled Japan movement watches, prestige sports chronographs, and limited edition horology masterpieces by Winsor Maison.',
+            url: `${process.env.NEXT_PUBLIC_APP_URL || 'https://winsorbrand.com'}/collections`,
+            publisher: {
+              '@type': 'Organization',
+              name: 'Winsor Maison',
+              logo: `${process.env.NEXT_PUBLIC_APP_URL || 'https://winsorbrand.com'}/icon.png`,
+            },
+          }),
+        }}
+      />
     </>
   );
 }

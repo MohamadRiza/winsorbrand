@@ -4,10 +4,17 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useUser, SignInButton } from '@clerk/nextjs';
-import { useCart } from '@/app/context/CartContext';
+import { useCart, CartItem } from '@/app/context/CartContext';
 import { useCurrency } from '@/app/context/CurrencyContext';
 import toast from 'react-hot-toast';
 import GuestCheckoutModal from '@/components/Checkout/GuestCheckoutModal';
+
+// Helper to reliably extract the color variant image with fallback to main thumbnail
+const getItemImage = (item: CartItem): string => {
+  if (item.variantImage) return item.variantImage;
+  const variant = item.product?.colorVariants?.find(v => v.colorName === item.colorVariant);
+  return variant?.image?.url || item.product?.thumbnail?.url || '/winsor_hero_backgroundremoved.webp';
+};
 
 export default function CartPage() {
   const { isLoaded: userLoaded, isSignedIn, user } = useUser();
@@ -430,7 +437,7 @@ export default function CartPage() {
           productId: item.productId,
           productTitle: item.product?.title || 'Unknown Timepiece',
           productModelNo: item.product?.modelNo || 'N/A',
-          productThumbnail: item.product?.thumbnail?.url || '',
+          productThumbnail: getItemImage(item),
           colorVariant: item.colorVariant,
           quantity: item.quantity,
           price: item.product?.price || 0,
@@ -2127,7 +2134,7 @@ export default function CartPage() {
                         return (
                           <div key={idx} style={{ display: 'flex', gap: 12, alignItems: 'center', borderBottom: idx < selectedItemsList.length - 1 ? '1px dashed rgba(184,142,60,0.15)' : 'none', paddingBottom: idx < selectedItemsList.length - 1 ? '10px' : '0' }}>
                             <img
-                              src={item.product?.thumbnail?.url || '/winsor_hero_backgroundremoved.webp'}
+                              src={getItemImage(item)}
                               alt={item.product?.title || 'Watch'}
                               style={{ width: 54, height: 54, objectFit: 'contain', borderRadius: 10, background: '#faf7f0', flexShrink: 0, border: '1px solid rgba(184,142,60,0.15)' }}
                             />
@@ -2488,10 +2495,10 @@ export default function CartPage() {
 
                             {/* Image Container */}
                             <div className="cart-item-img-container">
-                              {item.product?.thumbnail?.url ? (
+                              {getItemImage(item) ? (
                                 <img
-                                  src={item.product.thumbnail.url}
-                                  alt={item.product.title || 'Winsor product'}
+                                  src={getItemImage(item)}
+                                  alt={item.product?.title || 'Winsor product'}
                                   className="w-full h-full object-cover"
                                 />
                               ) : (
@@ -3026,7 +3033,7 @@ export default function CartPage() {
           productId: item.productId,
           productTitle: item.product?.title || 'Timepiece',
           productModelNo: item.product?.modelNo || 'N/A',
-          productThumbnail: item.product?.thumbnail?.url || '',
+          productThumbnail: getItemImage(item),
           colorVariant: item.colorVariant,
           quantity: item.quantity,
           price: item.product?.price || 0,

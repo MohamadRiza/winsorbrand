@@ -22,8 +22,36 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    const orders = await Order.find({ clerkId: userId }).sort({ createdAt: -1 });
-    return NextResponse.json({ success: true, data: orders });
+    const orders = await Order.find({ clerkId: userId }).sort({ createdAt: -1 }).lean();
+
+    const productIds = Array.from(new Set(orders.flatMap((o: any) => (o.items || []).map((i: any) => i.productId)).filter(Boolean)));
+    const products = productIds.length > 0
+      ? await Product.find({ _id: { $in: productIds } } as any).select('_id thumbnail colorVariants').lean()
+      : [];
+    const productMap = new Map(products.map((p: any) => [p._id.toString(), p]));
+
+    const enrichedOrders = orders.map((order: any) => {
+      const enrichedItems = (order.items || []).map((item: any) => {
+        let thumbnail = item.productThumbnail;
+        if (item.productId && item.colorVariant) {
+          const prod = productMap.get(item.productId.toString());
+          const variant = prod?.colorVariants?.find((v: any) => v.colorName === item.colorVariant);
+          if (variant?.image?.url) {
+            thumbnail = variant.image.url;
+          }
+        }
+        return {
+          ...item,
+          productThumbnail: thumbnail || item.productThumbnail,
+        };
+      });
+      return {
+        ...order,
+        items: enrichedItems,
+      };
+    });
+
+    return NextResponse.json({ success: true, data: enrichedOrders });
   } catch (error: any) {
     console.error('Fetch customer orders API error:', error);
     return NextResponse.json(
@@ -69,7 +97,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 1. Validate stock first to prevent race conditions or partial updates
+    // 1. Validate stock first to prevent race conditions or partial updates and resolve authoritative variant thumbnail
+    const validatedItems = [];
     for (const item of items) {
       const product = await Product.findById(item.productId);
       if (!product) {
@@ -100,6 +129,12 @@ export async function POST(req: NextRequest) {
           { status: 400 }
         );
       }
+
+      const variantThumbnail = variant?.image?.url || item.productThumbnail || product.thumbnail?.url || '';
+      validatedItems.push({
+        ...item,
+        productThumbnail: variantThumbnail,
+      });
     }
 
     // 2. Decrement stock for variants
@@ -228,11 +263,11 @@ export async function POST(req: NextRequest) {
       customerEmail: resolvedCustomerEmail,
       customerMobile: resolvedCustomerMobile,
       orderRef,
-      items,
+      items: validatedItems,
       shippingAddress,
       subtotal,
       status: isPaid ? 'processing' : 'pending',
-      isGift: !!isGift || (Array.isArray(items) && items.some((i: any) => i.isGift)),
+      isGift: !!isGift || validatedItems.some((i: any) => i.isGift),
       // Coupon data (all computed server-side)
       couponCode: appliedCouponCode,
       couponDiscountPercent,

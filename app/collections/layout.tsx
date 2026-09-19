@@ -18,6 +18,9 @@ export const metadata: Metadata = {
     'Dubai watch brand',
     'fixed MRP watch Sri Lanka',
   ],
+  alternates: {
+    canonical: `${baseUrl}/collections`,
+  },
   openGraph: {
     title: 'Luxury Timepiece Collections | Winsor Maison',
     description:
@@ -40,27 +43,5 @@ export default function CollectionsLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const collectionJsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'CollectionPage',
-    'name': 'Luxury Timepiece Collections | Japan Movement Watches',
-    'description':
-      'Explore hand-assembled Japan movement watches, prestige sports chronographs, and limited edition horology masterpieces by Winsor Maison.',
-    'url': `${baseUrl}/collections`,
-    'publisher': {
-      '@type': 'Organization',
-      'name': 'Winsor Maison',
-      'logo': `${baseUrl}/icon.png`,
-    },
-  };
-
-  return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionJsonLd) }}
-      />
-      {children}
-    </>
-  );
+  return <>{children}</>;
 }

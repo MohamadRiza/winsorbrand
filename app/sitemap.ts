@@ -38,12 +38,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   let productRoutes: MetadataRoute.Sitemap = [];
   try {
     await connectDB();
-    const products = await Product.find({ isActive: true }).select('_id updatedAt').lean();
+    const products = await Product.find({ isActive: { $ne: false } }).select('_id updatedAt').lean();
     productRoutes = products.map((p: any) => ({
       url: `${baseUrl}/collections/${p._id}`,
       lastModified: p.updatedAt ? new Date(p.updatedAt) : new Date(),
-      changeFrequency: 'weekly' as const,
-      priority: 0.8,
+      changeFrequency: 'daily' as const,
+      priority: 0.9,
     }));
   } catch (error) {
     console.error('Sitemap product fetch error:', error);

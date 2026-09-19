@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db';
 import Order from '@/lib/models/Order';
 import Customer from '@/lib/models/Customer';
+import Product from '@/lib/models/Product';
 import { verifyPermissions } from '@/lib/authHelper';
 
 export async function GET(req: NextRequest) {
@@ -23,6 +24,13 @@ export async function GET(req: NextRequest) {
       : [];
     const customerMap = new Map(customers.map((c: any) => [c.clerkId, c]));
 
+    // Collect all productIds to ensure variant image lookup fallback for historical orders
+    const allProductIds = Array.from(new Set(orders.flatMap((o: any) => (o.items || []).map((i: any) => i.productId)).filter(Boolean)));
+    const products = allProductIds.length > 0
+      ? await Product.find({ _id: { $in: allProductIds } } as any).select('_id thumbnail colorVariants').lean()
+      : [];
+    const productMap = new Map(products.map((p: any) => [p._id.toString(), p]));
+
     const enrichedOrders = orders.map((order: any) => {
       const cust = order.clerkId ? customerMap.get(order.clerkId) : null;
 
@@ -42,8 +50,24 @@ export async function GET(req: NextRequest) {
           ? `${order.shippingAddress.mobileCode} ${order.shippingAddress.mobile}`
           : (cust?.mobileCode && cust?.mobile ? `${cust.mobileCode} ${cust.mobile}` : null));
 
+      const enrichedItems = (order.items || []).map((item: any) => {
+        let thumbnail = item.productThumbnail;
+        if (item.productId && item.colorVariant) {
+          const prod = productMap.get(item.productId.toString());
+          const variant = prod?.colorVariants?.find((v: any) => v.colorName === item.colorVariant);
+          if (variant?.image?.url) {
+            thumbnail = variant.image.url;
+          }
+        }
+        return {
+          ...item,
+          productThumbnail: thumbnail || item.productThumbnail,
+        };
+      });
+
       return {
         ...order,
+        items: enrichedItems,
         customerName,
         customerEmail,
         customerMobile,

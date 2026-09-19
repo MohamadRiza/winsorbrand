@@ -10,6 +10,7 @@ export interface CartItem {
   productId: string;
   quantity: number;
   colorVariant?: string;
+  variantImage?: string;
   product?: IProduct;
 }
 
@@ -47,6 +48,7 @@ const serializeCartItems = (items: CartItem[]): string => {
     productId: item.productId,
     quantity: item.quantity,
     colorVariant: item.colorVariant || '',
+    variantImage: item.variantImage || '',
     product: sanitizeProductSnapshot(item.product),
   }));
   return JSON.stringify(sanitized);
@@ -64,6 +66,7 @@ const readStoredCart = (): CartItem[] => {
       productId: item.productId,
       quantity: Math.max(1, Number(item.quantity) || 1),
       colorVariant: item.colorVariant || '',
+      variantImage: item.variantImage || '',
       product: item.product && typeof item.product === 'object' ? item.product : undefined,
     }));
   } catch (err) {
@@ -92,12 +95,17 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   // Helper to map DB items to frontend items
   const mapDbItems = (dbItems: any[]): CartItem[] => {
-    return dbItems.map((item) => ({
-      productId: item.productId?._id || item.productId,
-      quantity: item.quantity,
-      colorVariant: item.colorVariant || '',
-      product: item.productId && typeof item.productId === 'object' ? sanitizeProductSnapshot(item.productId) : undefined,
-    }));
+    return dbItems.map((item) => {
+      const productObj = item.productId && typeof item.productId === 'object' ? item.productId : undefined;
+      const variantObj = productObj?.colorVariants?.find((v: any) => v.colorName === item.colorVariant);
+      return {
+        productId: productObj?._id || item.productId,
+        quantity: item.quantity,
+        colorVariant: item.colorVariant || '',
+        variantImage: variantObj?.image?.url || '',
+        product: sanitizeProductSnapshot(productObj),
+      };
+    });
   };
 
   // Helper to map local items to DB payload
@@ -322,6 +330,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       }
     }
 
+    const variantObj = resolvedProduct?.colorVariants?.find(v => v.colorName === colorVariant);
+    const variantImage = variantObj?.image?.url || '';
+
     const existingIdx = cartItems.findIndex(
       item => item.productId === productId && (item.colorVariant || '') === (colorVariant || '')
     );
@@ -332,6 +343,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       updated[existingIdx] = {
         ...updated[existingIdx],
         quantity: updated[existingIdx].quantity + quantity,
+        variantImage: updated[existingIdx].variantImage || variantImage || '',
         product: updated[existingIdx].product || sanitizeProductSnapshot(resolvedProduct),
       };
     } else {
@@ -341,6 +353,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
           productId,
           quantity,
           colorVariant: colorVariant || '',
+          variantImage: variantImage || '',
           product: sanitizeProductSnapshot(resolvedProduct),
         },
       ];
@@ -351,7 +364,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
     // 2. Show custom toast notification with Next.js Link
     const watchName = resolvedProduct?.title || 'Timepiece';
-    const watchImg = resolvedProduct?.thumbnail?.url || '/graduation_gift.png';
+    const watchImg = variantImage || resolvedProduct?.thumbnail?.url || '/graduation_gift.png';
     const variantText = colorVariant ? ` (${colorVariant})` : '';
 
     toast.custom(

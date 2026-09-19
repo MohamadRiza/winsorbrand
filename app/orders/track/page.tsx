@@ -8,6 +8,7 @@ import Image from 'next/image';
 import toast from 'react-hot-toast';
 import { useCurrency } from '@/app/context/CurrencyContext';
 import { generateReceiptPdf } from '@/lib/utils/generateReceiptPdf';
+import TrackHeroTypewriter from './TrackHeroTypewriter';
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string; border: string }> = {
   pending: { label: 'Order Received', color: '#8b6914', bg: 'rgba(139,105,20,0.08)', border: 'rgba(139,105,20,0.25)' },
@@ -351,12 +352,8 @@ function OrderTrackingContent() {
               WINSOR MAISON HOROLOGY LOGISTICS
             </span>
           </div>
-          <h1 className="text-3xl sm:text-5xl font-light text-white tracking-wide leading-tight" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
-            Track Your Timepiece
-          </h1>
-          <p className="text-xs sm:text-sm text-white/80 font-light mt-3 max-w-lg mx-auto leading-relaxed" style={{ fontFamily: "'Jost', sans-serif" }}>
-            Enter your unique order reference code and registered phone number to view real-time artisan assembly, dispatch, and delivery status.
-          </p>
+          {/* Animated Hero Title & Subtitle with Luxury Typewriter & Erase Effect */}
+          <TrackHeroTypewriter />
         </div>
       </section>
 

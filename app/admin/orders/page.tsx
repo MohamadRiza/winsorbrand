@@ -540,8 +540,37 @@ export default function AdminOrdersPage() {
                         <span className="text-[11px] text-[#1a1209]/50 font-mono">{order.shippingAddress?.mobileCode} {order.shippingAddress?.mobile}</span>
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-xs font-semibold text-[#1a1209]/80">
-                      {itemCount} {itemCount === 1 ? 'Item' : 'Items'}
+                    <td className="px-6 py-4">
+                      <div className="flex flex-col gap-1.5">
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          {order.items.slice(0, 3).map((item, idx) => (
+                            <div
+                              key={idx}
+                              className="relative group/thumb flex-shrink-0"
+                              title={`${item.productTitle}${item.colorVariant ? ` (${item.colorVariant})` : ''}`}
+                            >
+                              <img
+                                src={item.productThumbnail || '/winsor_hero_backgroundremoved.webp'}
+                                alt={item.productTitle}
+                                className="w-9 h-9 rounded-lg object-cover border border-[#8B6914]/20 bg-[#faf7f0] shadow-xs"
+                              />
+                              {item.colorVariant && (
+                                <span className="absolute -bottom-1 -right-1 px-1 py-0.2 bg-[#1a1209] text-white text-[8px] font-bold rounded shadow-xs max-w-[46px] truncate">
+                                  {item.colorVariant}
+                                </span>
+                              )}
+                            </div>
+                          ))}
+                          {order.items.length > 3 && (
+                            <span className="text-[10px] font-bold text-[#8B6914] bg-[#8B6914]/10 px-1.5 py-0.5 rounded border border-[#8B6914]/20">
+                              +{order.items.length - 3}
+                            </span>
+                          )}
+                        </div>
+                        <span className="text-[11px] font-semibold text-[#1a1209]/70">
+                          {itemCount} {itemCount === 1 ? 'Piece' : 'Pieces'}
+                        </span>
+                      </div>
                     </td>
                     <td className="px-6 py-4 font-bold text-[#8B6914] text-sm font-mono tabular-nums">
                       LKR {(order.subtotal || 0).toLocaleString()}
@@ -920,16 +949,24 @@ export default function AdminOrdersPage() {
                   {selectedOrder?.items.map((item, index) => (
                     <div key={index} className="p-4 space-y-3 hover:bg-[#faf7f0]/30 transition-colors">
                       <div className="flex gap-3.5">
-                        <div className="w-16 h-16 bg-[#faf7f0] rounded-xl overflow-hidden border border-[#1a1209]/10 flex-shrink-0">
+                        <div className="w-16 h-16 bg-[#faf7f0] rounded-xl overflow-hidden border border-[#8B6914]/20 flex-shrink-0 relative">
                           <img 
-                            src={item.productThumbnail} 
+                            src={item.productThumbnail || '/winsor_hero_backgroundremoved.webp'} 
                             alt={item.productTitle} 
                             className="w-full h-full object-cover" 
                           />
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="font-semibold text-sm text-[#1a1209] truncate">{item.productTitle}</p>
-                          <p className="text-xs text-[#1a1209]/50 font-mono mt-0.5">Model: {item.productModelNo} · Color: {item.colorVariant || 'Default'}</p>
+                          <div className="flex items-center gap-2 mt-1 flex-wrap">
+                            <span className="text-xs text-[#1a1209]/60 font-mono">Model: {item.productModelNo}</span>
+                            {item.colorVariant && (
+                              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-bold bg-[#8B6914]/10 text-[#8B6914] border border-[#8B6914]/25">
+                                <span className="w-1.5 h-1.5 rounded-full bg-[#8B6914]" />
+                                Edition: {item.colorVariant}
+                              </span>
+                            )}
+                          </div>
                           
                           <div className="flex justify-between items-center mt-2">
                             <span className="text-xs font-medium text-[#1a1209]/70 font-mono">{item.quantity} × LKR {(item.price || 0).toLocaleString()}</span>

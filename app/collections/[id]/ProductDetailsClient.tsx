@@ -1424,20 +1424,30 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
               {getProductGender(product) === 'Ladies' ? "Women's Watch" : "Men's Watch"} | Classic Collection
             </p>
 
-            {/* Reviews Rating Row */}
-            <div className="flex items-center gap-2 mb-4 text-xs">
-              <div className="flex gap-0.5 text-[#dfb15b]">
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <span key={i} className="text-sm">★</span>
-                ))}
+            {/* Reviews Rating Row — Only shown when verified customer reviews exist */}
+            {reviewsStats.count > 0 && (
+              <div
+                className="flex items-center gap-2 mb-4 text-xs cursor-pointer hover:opacity-80 transition-opacity"
+                onClick={() => {
+                  const el = document.querySelector('.reviews-section');
+                  if (el) el.scrollIntoView({ behavior: 'smooth' });
+                }}
+              >
+                <div className="flex gap-0.5 text-[#dfb15b]">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <span key={i} className="text-sm">
+                      {i < Math.round(reviewsStats.average) ? '★' : '☆'}
+                    </span>
+                  ))}
+                </div>
+                <span className="font-semibold text-[#1a1209]">
+                  {reviewsStats.average}
+                </span>
+                <span className="text-[#1a1209]/50">
+                  ({reviewsStats.count} {reviewsStats.count === 1 ? 'review' : 'reviews'})
+                </span>
               </div>
-              <span className="font-semibold text-[#1a1209]">
-                {reviewsStats.count > 0 ? reviewsStats.average : '4.8'}
-              </span>
-              <span className="text-[#1a1209]/50">
-                ({reviewsStats.count > 0 ? reviewsStats.count : '125'} reviews)
-              </span>
-            </div>
+            )}
 
             {/* Price Tag & Tax Notice */}
             <div className="mb-6">
@@ -2329,7 +2339,7 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
             productId: product._id!,
             productTitle: product.title,
             productModelNo: product.modelNo,
-            productThumbnail: product.thumbnail?.url || '',
+            productThumbnail: selectedVariant?.image?.url || product.thumbnail?.url || '',
             colorVariant: selectedVariant?.colorName,
             quantity: 1,
             price: product.price,
@@ -2350,7 +2360,7 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
             productId: product._id!,
             productTitle: product.title,
             productModelNo: product.modelNo,
-            productThumbnail: product.thumbnail?.url || '',
+            productThumbnail: selectedVariant?.image?.url || product.thumbnail?.url || '',
             colorVariant: selectedVariant?.colorName,
             quantity: 1,
             price: product.price,

@@ -3,6 +3,7 @@ import { getAuth } from '@clerk/nextjs/server';
 import { connectDB } from '@/lib/db';
 import Order from '@/lib/models/Order';
 import Customer from '@/lib/models/Customer';
+import Product from '@/lib/models/Product';
 
 export async function GET(req: NextRequest) {
   try {
@@ -109,6 +110,33 @@ export async function GET(req: NextRequest) {
       }
     }
 
+    // Collect productIds to ensure variant image lookup fallback for historical orders
+    const productIds = Array.from(new Set((order.items || []).map((i: any) => i.productId).filter(Boolean)));
+    const products = productIds.length > 0
+      ? await Product.find({ _id: { $in: productIds } } as any).select('_id thumbnail colorVariants').lean()
+      : [];
+    const productMap = new Map(products.map((p: any) => [p._id.toString(), p]));
+
+    const enrichedItems = (order.items || []).map((item: any) => {
+      let thumbnail = item.productThumbnail;
+      if (item.productId && item.colorVariant) {
+        const prod = productMap.get(item.productId.toString());
+        const variant = prod?.colorVariants?.find((v: any) => v.colorName === item.colorVariant);
+        if (variant?.image?.url) {
+          thumbnail = variant.image.url;
+        }
+      }
+      return {
+        productId: item.productId,
+        productTitle: item.productTitle,
+        productModelNo: item.productModelNo,
+        productThumbnail: thumbnail || item.productThumbnail,
+        colorVariant: item.colorVariant,
+        quantity: item.quantity,
+        price: item.price,
+      };
+    });
+
     // Return sanitized order data with registered mobile number for auto-fill
     return NextResponse.json({
       success: true,
@@ -119,15 +147,7 @@ export async function GET(req: NextRequest) {
         subtotal: order.subtotal || 0,
         finalTotal: order.finalTotal || order.subtotal || 0,
         mobile: orderMobile,
-        items: (order.items || []).map((item: any) => ({
-          productId: item.productId,
-          productTitle: item.productTitle,
-          productModelNo: item.productModelNo,
-          productThumbnail: item.productThumbnail,
-          colorVariant: item.colorVariant,
-          quantity: item.quantity,
-          price: item.price,
-        })),
+        items: enrichedItems,
         shippingAddress: {
           address: order.shippingAddress?.address || '',
           city: order.shippingAddress?.city || '',
