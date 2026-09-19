@@ -3,6 +3,10 @@ import { connectDB } from '@/lib/db';
 import Product from '@/lib/models/Product';
 import Vacancy from '@/lib/models/Vacancy';
 
+// Ensure sitemap is re-evaluated dynamically so new products added by admin appear immediately
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://winsorbrand.com';
 
