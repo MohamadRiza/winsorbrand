@@ -2,6 +2,7 @@
 
 import { useState, FormEvent, useEffect, useRef, Suspense } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Toaster, toast } from 'react-hot-toast';
 import { Turnstile, type TurnstileInstance } from '@marsidev/react-turnstile';
@@ -146,6 +147,24 @@ function AdminLoginContent() {
       onMouseMove={handleGlobalMouseMove}
       className="min-h-screen w-full flex bg-[#f7f4ee] overflow-hidden select-none relative"
     >
+      {/* Top Floating Back to Home button */}
+      <Link
+        href="/"
+        className="fixed top-5 left-5 sm:top-6 sm:left-6 z-30 inline-flex items-center gap-2 px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-full bg-white/85 hover:bg-white text-[#1a1209] hover:text-[#8B6914] border border-[#1a1209]/10 hover:border-[#8B6914]/40 shadow-sm hover:shadow text-[11px] sm:text-xs font-medium tracking-wider uppercase transition-all duration-200 backdrop-blur-md group"
+        title="Back to Home"
+      >
+        <svg 
+          className="w-3.5 h-3.5 transition-transform group-hover:-translate-x-0.5 text-[#8B6914]" 
+          fill="none" 
+          stroke="currentColor" 
+          strokeWidth="2" 
+          viewBox="0 0 24 24"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+        </svg>
+        <span>Back to Home</span>
+      </Link>
+
       {/* Luxury Marble background texture */}
       <div 
         className="fixed inset-0 pointer-events-none z-0" 
@@ -246,14 +265,16 @@ function AdminLoginContent() {
               transition: 'transform 0.15s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
             }}
           >
-            <Image
-              src="/winsor-logo.png"
-              alt="Winsor"
-              width={180}
-              height={56}
-              priority
-              className="h-14 w-auto object-contain"
-            />
+            <Link href="/" title="Winsor Luxury Timepieces" className="transition-transform hover:scale-105 duration-200 inline-block">
+              <Image
+                src="/yellow.webp"
+                alt="Winsor"
+                width={180}
+                height={56}
+                priority
+                className="h-12 sm:h-14 w-auto object-contain"
+              />
+            </Link>
             <div className="flex items-center gap-3 mt-4">
               <span className="h-px w-8 bg-[#c9a14a]" />
               <span className="text-[11px] tracking-[0.4em] uppercase text-[#8B6914] font-medium">
@@ -364,15 +385,32 @@ function AdminLoginContent() {
             </form>
           </div>
 
-          <p 
-            className="text-center text-xs text-[#1a1209]/45 mt-6"
+          <div 
+            className="mt-6 flex flex-col items-center gap-3.5"
             style={{
               transform: `translate(${mousePos.x * 6}px, ${mousePos.y * 6}px)`,
               transition: 'transform 0.15s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
             }}
           >
-            Having trouble? Contact your administrator
-          </p>
+            <p className="text-center text-xs text-[#1a1209]/45">
+              Having trouble? Contact your administrator
+            </p>
+            <Link
+              href="/"
+              className="inline-flex items-center gap-2 px-5 py-2 rounded-full border border-[#8B6914]/25 bg-white/70 hover:bg-white text-[#1a1209]/80 hover:text-[#8B6914] text-[11px] font-semibold tracking-[0.14em] uppercase transition-all duration-200 shadow-sm hover:shadow backdrop-blur-sm group"
+            >
+              <svg 
+                className="w-3.5 h-3.5 transition-transform group-hover:-translate-x-1 text-[#8B6914]" 
+                fill="none" 
+                stroke="currentColor" 
+                strokeWidth="2" 
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+              </svg>
+              <span>Back to Home</span>
+            </Link>
+          </div>
         </div>
       </div>
 
