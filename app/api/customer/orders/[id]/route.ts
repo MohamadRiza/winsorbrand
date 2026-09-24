@@ -9,8 +9,14 @@ export async function PATCH(
 ) {
   try {
     await connectDB();
-    const { userId } = getAuth(req);
+    let { userId } = getAuth(req);
     const { id } = await params;
+    const body = await req.json();
+    const { cancelReason, clerkId } = body;
+
+    if (!userId && clerkId) {
+      userId = clerkId;
+    }
 
     if (!userId) {
       return NextResponse.json(
@@ -28,7 +34,7 @@ export async function PATCH(
     }
 
     // High security: Verify that the user owns the order
-    if (order.clerkId !== userId) {
+    if (order.clerkId && order.clerkId !== userId) {
       return NextResponse.json(
         { success: false, error: 'Forbidden. You do not own this order.' },
         { status: 403 }
@@ -42,9 +48,6 @@ export async function PATCH(
         { status: 400 }
       );
     }
-
-    const body = await req.json();
-    const { cancelReason } = body;
 
     if (!cancelReason || !cancelReason.trim()) {
       return NextResponse.json(

@@ -11,18 +11,35 @@ export async function GET(req: NextRequest) {
   try {
     await connectDB();
     let { userId } = getAuth(req);
-    if (!userId) {
-      userId = req.nextUrl.searchParams.get('clerkId');
+    const queryClerkId = req.nextUrl.searchParams.get('clerkId');
+    const queryEmail = req.nextUrl.searchParams.get('email');
+
+    if (!userId && queryClerkId) {
+      userId = queryClerkId;
     }
 
-    if (!userId) {
+    if (!userId && !queryEmail) {
       return NextResponse.json(
         { success: false, error: 'Unauthorized. Please sign in.' },
         { status: 401 }
       );
     }
 
-    const orders = await Order.find({ clerkId: userId }).sort({ createdAt: -1 }).lean();
+    const filterConditions: any[] = [];
+    if (userId) {
+      filterConditions.push({ clerkId: userId });
+    }
+    if (queryEmail) {
+      const cleanEmail = queryEmail.toLowerCase().trim();
+      filterConditions.push({ customerEmail: cleanEmail });
+      filterConditions.push({ guestEmail: cleanEmail });
+    }
+
+    const query = filterConditions.length === 1
+      ? filterConditions[0]
+      : { $or: filterConditions };
+
+    const orders = await Order.find(query).sort({ createdAt: -1 }).lean();
 
     const productIds = Array.from(new Set(orders.flatMap((o: any) => (o.items || []).map((i: any) => i.productId)).filter(Boolean)));
     const products = productIds.length > 0

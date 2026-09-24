@@ -67,7 +67,7 @@ const STATUS_LABELS: Record<string, { label: string; color: string; bg: string; 
 };
 
 export default function CustomerOrdersPage() {
-  const { isLoaded, isSignedIn } = useUser();
+  const { isLoaded, isSignedIn, user } = useUser();
   const { convertPrice } = useCurrency();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
@@ -117,6 +117,8 @@ export default function CustomerOrdersPage() {
   });
 
   useEffect(() => {
+    if (!isLoaded) return;
+
     if (!isSignedIn) {
       setLoading(false);
       return;
@@ -125,31 +127,37 @@ export default function CustomerOrdersPage() {
     async function fetchOrders() {
       try {
         setLoading(true);
-        const res = await fetch('/api/customer/orders');
+        setError(null);
+        const params = new URLSearchParams();
+        if (user?.id) params.set('clerkId', user.id);
+        const userEmail = user?.primaryEmailAddress?.emailAddress || '';
+        if (userEmail) params.set('email', userEmail);
+
+        const res = await fetch(`/api/customer/orders?${params.toString()}`);
         let data: any = { success: false };
         try {
-          if (res.ok && res.headers.get('content-type')?.includes('application/json')) {
+          if (res.headers.get('content-type')?.includes('application/json')) {
             data = await res.json();
           }
         } catch (e) {
           console.warn('Failed to parse orders JSON:', e);
         }
         
-        if (data.success) {
+        if (res.ok && data.success) {
           setOrders(data.data || []);
         } else {
           throw new Error(data.error || 'Failed to retrieve orders');
         }
       } catch (err: any) {
-        console.warn(err);
-        setError(err.message);
+        console.warn('Error fetching customer orders:', err);
+        setError(err.message || 'Failed to retrieve orders');
       } finally {
         setLoading(false);
       }
     }
 
     fetchOrders();
-  }, [isSignedIn]);
+  }, [isLoaded, isSignedIn, user]);
 
   // Open Cancel Request Dialog
   const handleCancelRequestClick = (order: Order) => {
@@ -175,7 +183,10 @@ export default function CustomerOrdersPage() {
       const res = await fetch(`/api/customer/orders/${selectedOrderForCancel._id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ cancelReason: finalReason }),
+        body: JSON.stringify({
+          cancelReason: finalReason,
+          clerkId: user?.id,
+        }),
       });
 
       const data = await res.json();
@@ -756,6 +767,10 @@ export default function CustomerOrdersPage() {
 
         /* EMPTY VIEW */
         .empty-orders-view {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
           text-align: center;
           background: #ffffff;
           border-radius: 8px;
@@ -765,8 +780,17 @@ export default function CustomerOrdersPage() {
         }
 
         .empty-orders-icon {
+          display: flex;
+          align-items: center;
+          justify-content: center;
           color: rgba(26, 18, 9, 0.15);
-          margin-bottom: 20px;
+          margin: 0 auto 20px auto;
+          width: 100%;
+        }
+
+        .empty-orders-icon svg {
+          display: block;
+          margin: 0 auto;
         }
 
         .empty-orders-btn {
@@ -1019,8 +1043,8 @@ export default function CustomerOrdersPage() {
 
           {orders.length === 0 ? (
             <div className="empty-orders-view">
-              <div className="empty-orders-icon">
-                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
+              <div className="empty-orders-icon" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', marginBottom: '20px' }}>
+                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'block', margin: '0 auto' }}>
                   <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
                 </svg>
               </div>
@@ -1034,8 +1058,8 @@ export default function CustomerOrdersPage() {
             </div>
           ) : filteredOrders.length === 0 ? (
             <div className="empty-orders-view">
-              <div className="empty-orders-icon">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
+              <div className="empty-orders-icon" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', marginBottom: '20px' }}>
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'block', margin: '0 auto' }}>
                   <circle cx="11" cy="11" r="8" />
                   <line x1="21" y1="21" x2="16.65" y2="16.65" />
                 </svg>

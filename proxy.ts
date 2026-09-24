@@ -74,10 +74,15 @@ function isStaleClerkSession(token?: string): boolean {
     const parts = token.split('.');
     if (parts.length < 2) return false;
     const header = JSON.parse(Buffer.from(parts[0], 'base64url').toString('utf8'));
-    // The active Clerk instance key id is 'ins_3Hlk2s3HqcNnByzqXuX1cTj4pNf'.
-    // Any session token signed with a different instance key (e.g. ins_2voZuNySdIp39pQgtQeQLkSXNb5) is stale.
-    if (header.kid && header.kid !== 'ins_3Hlk2s3HqcNnByzqXuX1cTj4pNf') {
+    // Invalidate the legacy Clerk instance key id 'ins_2voZuNySdIp39pQgtQeQLkSXNb5'
+    if (header.kid === 'ins_2voZuNySdIp39pQgtQeQLkSXNb5') {
       return true;
+    }
+    // In production, ensure session token matches the production instance key id 'ins_3Hlk2s3HqcNnByzqXuX1cTj4pNf'
+    if (process.env.NODE_ENV === 'production') {
+      if (header.kid && header.kid !== 'ins_3Hlk2s3HqcNnByzqXuX1cTj4pNf') {
+        return true;
+      }
     }
   } catch {
     return true;
