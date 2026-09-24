@@ -98,6 +98,56 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
     }
   };
 
+  // Mobile Timeless Pairings Carousel States & Handlers
+  const pairingsScrollRef = useRef<HTMLDivElement>(null);
+  const [activePairingIdx, setActivePairingIdx] = useState<number>(0);
+
+  const handlePairingsScroll = () => {
+    if (!pairingsScrollRef.current) return;
+    const { scrollLeft, scrollWidth, clientWidth } = pairingsScrollRef.current;
+    
+    // Near end of carousel
+    if (scrollLeft + clientWidth >= scrollWidth - 25) {
+      setActivePairingIdx((prev) => (prev !== 4 ? 4 : prev));
+      return;
+    }
+
+    const containerLeft = pairingsScrollRef.current.getBoundingClientRect().left;
+    const cards = pairingsScrollRef.current.children;
+    let closestIdx = 0;
+    let minDistance = Infinity;
+
+    for (let i = 0; i < Math.min(cards.length, 5); i++) {
+      const cardRect = cards[i].getBoundingClientRect();
+      const distance = Math.abs(cardRect.left - containerLeft - 24);
+      if (distance < minDistance) {
+        minDistance = distance;
+        closestIdx = i;
+      }
+    }
+    setActivePairingIdx((prev) => (prev !== closestIdx ? closestIdx : prev));
+  };
+
+  const scrollToPairing = (index: number) => {
+    if (!pairingsScrollRef.current) return;
+    const cards = pairingsScrollRef.current.children;
+    if (cards[index]) {
+      const card = cards[index] as HTMLElement;
+      pairingsScrollRef.current.scrollTo({
+        left: card.offsetLeft - 24,
+        behavior: 'smooth',
+      });
+      setActivePairingIdx(index);
+    }
+  };
+
+  const scrollPairingsByDir = (direction: 'left' | 'right') => {
+    const nextIdx = direction === 'left'
+      ? Math.max(0, activePairingIdx - 1)
+      : Math.min(4, activePairingIdx + 1);
+    scrollToPairing(nextIdx);
+  };
+
   // Fetch product data on mount/id change
   useEffect(() => {
     async function loadProduct() {
@@ -442,6 +492,25 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
           border: none;
           background: transparent;
           overflow: hidden;
+          isolation: isolate;
+        }
+        .main-watch-img {
+          transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1) !important;
+          transform-origin: center center !important;
+          will-change: transform;
+          backface-visibility: hidden;
+          -webkit-backface-visibility: hidden;
+        }
+        @media (min-width: 1025px) {
+          .main-image-view:hover .main-watch-img {
+            transform: scale(1.08) !important;
+          }
+        }
+        @media (max-width: 1024px) {
+          .main-watch-img {
+            transform: none !important;
+            transition: none !important;
+          }
         }
         
         /* DETAILS INFO SECTION */
@@ -943,19 +1012,278 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
           display: grid;
           grid-template-columns: repeat(5, 1fr);
           gap: 20px;
+          position: relative;
         }
-        @media (max-width: 1100px) {
+        @media (max-width: 1100px) and (min-width: 769px) {
           .pairings-grid {
             grid-template-columns: repeat(3, 1fr);
             gap: 16px;
           }
         }
-        @media (max-width: 640px) {
+        @media (max-width: 768px) {
+          .pairings-section {
+            margin-top: 48px !important;
+            padding-top: 36px !important;
+          }
+          .pairings-desc {
+            margin-bottom: 22px !important;
+          }
           .pairings-grid {
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
+            display: flex !important;
+            flex-direction: row !important;
+            flex-wrap: nowrap !important;
+            overflow-x: auto !important;
+            overflow-y: hidden !important;
+            scroll-snap-type: x mandatory !important;
+            scroll-behavior: smooth !important;
+            -webkit-overflow-scrolling: touch !important;
+            touch-action: pan-x pan-y !important;
+            overscroll-behavior-x: contain !important;
+            scrollbar-width: none !important;
+            -ms-overflow-style: none !important;
+            gap: 14px !important;
+            padding: 6px 24px 18px 24px !important;
+            margin-left: -24px !important;
+            margin-right: -24px !important;
+            scroll-padding: 0 24px !important;
+          }
+          .pairings-grid::-webkit-scrollbar {
+            display: none !important;
+          }
+          .pairing-card {
+            flex: 0 0 220px !important;
+            width: 220px !important;
+            min-width: 220px !important;
+            max-width: 220px !important;
+            scroll-snap-align: start !important;
+            border-radius: 12px !important;
+            border: 1px solid rgba(26, 18, 9, 0.08) !important;
+            box-shadow: 0 4px 16px rgba(26, 18, 9, 0.05) !important;
+            user-select: none !important;
+            -webkit-user-select: none !important;
+            -webkit-touch-callout: none !important;
+          }
+          .pairing-card:active {
+            transform: scale(0.98);
+          }
+          .pairing-img-container {
+            aspect-ratio: 1.25 !important;
+          }
+          .pairing-info {
+            padding: 14px 12px !important;
+          }
+          .pairing-card-title {
+            font-size: 13px !important;
+            margin-bottom: 3px !important;
+          }
+          .pairing-card-desc {
+            font-size: 11px !important;
+            margin-bottom: 10px !important;
+          }
+          .pairing-card-link {
+            font-size: 10px !important;
+          }
+          .pairings-mobile-controls {
+            display: flex !important;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            margin-top: 10px;
+            padding: 4px 0;
+          }
+
+          /* REVIEWS SECTION RESPONSIVE */
+          .reviews-layout-grid {
+            grid-template-columns: 1fr !important;
+            gap: 24px !important;
+          }
+          .rev-summary-sidebar {
+            position: relative !important;
+            top: 0 !important;
+            padding: 20px !important;
+          }
+          .rev-filter-row {
+            display: flex !important;
+            flex-direction: row !important;
+            flex-wrap: nowrap !important;
+            overflow-x: auto !important;
+            overflow-y: hidden !important;
+            scroll-behavior: smooth !important;
+            -webkit-overflow-scrolling: touch !important;
+            touch-action: pan-x pan-y !important;
+            overscroll-behavior-x: contain !important;
+            scrollbar-width: none !important;
+            -ms-overflow-style: none !important;
+            gap: 8px !important;
+            margin-left: -24px !important;
+            margin-right: -24px !important;
+            padding: 4px 24px 12px 24px !important;
+            margin-bottom: 20px !important;
+          }
+          .rev-filter-row::-webkit-scrollbar {
+            display: none !important;
+          }
+          .rev-filter-btn {
+            flex-shrink: 0 !important;
+            padding: 8px 15px !important;
+            font-size: 11.5px !important;
+            border-radius: 100px !important;
+          }
+          .rev-filter-btn:active {
+            transform: scale(0.95);
+          }
+          .see-more-rev-btn {
+            padding: 12px 24px !important;
+            font-size: 11px !important;
+            border-radius: 9px !important;
+          }
+
+          /* TRUST FEATURES MOBILE CONTINUOUS MARQUEE */
+          .features-footer-grid {
+            display: none !important;
+          }
+          .features-mobile-marquee-wrap {
+            display: block !important;
+            overflow: hidden !important;
+            width: calc(100% + 48px) !important;
+            margin-left: -24px !important;
+            margin-right: -24px !important;
+            position: relative !important;
+            border-top: 1px solid rgba(26,18,9,0.08) !important;
+            border-bottom: 1px solid rgba(26,18,9,0.08) !important;
+            padding: 16px 0 !important;
+            margin-top: 36px !important;
+            user-select: none !important;
+            -webkit-user-select: none !important;
+            background: #FAF7F0 !important;
+          }
+          .features-mobile-marquee-wrap::before,
+          .features-mobile-marquee-wrap::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 32px;
+            z-index: 2;
+            pointer-events: none;
+          }
+          .features-mobile-marquee-wrap::before {
+            left: 0;
+            background: linear-gradient(to right, #FAF7F0 0%, rgba(250, 247, 240, 0) 100%);
+          }
+          .features-mobile-marquee-wrap::after {
+            right: 0;
+            background: linear-gradient(to left, #FAF7F0 0%, rgba(250, 247, 240, 0) 100%);
+          }
+          .features-mobile-marquee-track {
+            display: flex !important;
+            width: max-content !important;
+            animation: features-footer-marquee 25s linear infinite !important;
+            will-change: transform !important;
+          }
+          .features-mobile-marquee-track:hover,
+          .features-mobile-marquee-track:active {
+            animation-play-state: paused !important;
+          }
+          .features-marquee-group {
+            display: flex !important;
+            align-items: center !important;
+            gap: 36px !important;
+            padding-right: 36px !important;
+            flex-shrink: 0 !important;
+          }
+          .features-marquee-item {
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 12px !important;
+            flex-shrink: 0 !important;
+            white-space: nowrap !important;
+          }
+          .features-marquee-icon {
+            flex-shrink: 0 !important;
+            width: 38px !important;
+            height: 38px !important;
+            border-radius: 50% !important;
+            background: rgba(139, 105, 20, 0.08) !important;
+            border: 1px solid rgba(139, 105, 20, 0.18) !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+          }
+          .features-marquee-text h4 {
+            font-size: 12px !important;
+            font-weight: 600 !important;
+            color: #1a1209 !important;
+            margin: 0 !important;
+            letter-spacing: 0.06em !important;
+            text-transform: uppercase !important;
+            font-family: 'Jost', sans-serif !important;
+            line-height: 1.2 !important;
+          }
+          .features-marquee-text p {
+            font-size: 10.5px !important;
+            color: rgba(26, 18, 9, 0.55) !important;
+            margin: 2px 0 0 0 !important;
+            font-family: 'Jost', sans-serif !important;
+            line-height: 1.2 !important;
+          }
+          @keyframes features-footer-marquee {
+            0% {
+              transform: translate3d(0, 0, 0);
+            }
+            100% {
+              transform: translate3d(-50%, 0, 0);
+            }
           }
         }
+        .pairings-mobile-controls {
+          display: none;
+        }
+        .pairings-nav-arrow {
+          width: 32px;
+          height: 32px;
+          border-radius: 50%;
+          border: 1px solid rgba(26, 18, 9, 0.15);
+          background: #FAF7F0;
+          color: #1a1209;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          padding: 0;
+        }
+        .pairings-nav-arrow:active:not(:disabled) {
+          background: #8B6914;
+          color: #ffffff;
+          border-color: #8B6914;
+          transform: scale(0.94);
+        }
+        .pairings-nav-arrow:disabled {
+          opacity: 0.25;
+          cursor: not-allowed;
+        }
+        .pairings-dots-container {
+          display: flex;
+          align-items: center;
+          gap: 7px;
+        }
+        .pairings-dot {
+          height: 6px;
+          width: 6px;
+          border-radius: 50%;
+          background: rgba(26, 18, 9, 0.2);
+          border: none;
+          padding: 0;
+          cursor: pointer;
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .pairings-dot.active {
+          width: 22px;
+          border-radius: 10px;
+          background: #8B6914;
+        }
+
         .pairing-card {
           display: flex;
           flex-direction: column;
@@ -1117,6 +1445,9 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
           color: rgba(26,18,9,0.5);
           margin: 2px 0 0 0;
         }
+        .features-mobile-marquee-wrap {
+          display: none;
+        }
 
         /* TOAST SUCCESS BOX */
         .toast-box {
@@ -1144,6 +1475,125 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
           pointer-events: auto;
         }
 
+        /* REVIEWS FILTER PILLS BASE */
+        .rev-filter-row {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 8px;
+          margin-bottom: 24px;
+        }
+        .rev-filter-btn {
+          padding: 7px 14px;
+          border-radius: 100px;
+          font-size: 11.5px;
+          font-weight: 600;
+          font-family: 'Jost', sans-serif;
+          letter-spacing: 0.05em;
+          cursor: pointer;
+          border: 1.5px solid rgba(26, 18, 9, 0.12);
+          background: #fff;
+          color: rgba(26, 18, 9, 0.7);
+          transition: all 0.2s ease;
+          white-space: nowrap;
+          flex-shrink: 0;
+          user-select: none;
+          -webkit-user-select: none;
+          outline: none;
+        }
+        .rev-filter-btn:hover {
+          border-color: #8B6914;
+          color: #8B6914;
+        }
+        .rev-filter-btn.active {
+          border-color: #8B6914;
+          background: #8B6914;
+          color: #fff;
+          box-shadow: 0 2px 8px rgba(139, 105, 20, 0.25);
+        }
+
+        /* SEE MORE REVIEWS BUTTON */
+        .see-more-rev-btn {
+          padding: 13px 32px;
+          background: #8B6914;
+          color: #ffffff;
+          border: none;
+          border-radius: 10px;
+          font-size: 11.5px;
+          font-weight: 600;
+          font-family: 'Jost', sans-serif;
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
+          cursor: pointer;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          gap: 10px;
+          box-shadow: 0 4px 14px rgba(139, 105, 20, 0.28);
+          transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+          user-select: none;
+          -webkit-user-select: none;
+          outline: none;
+        }
+        .see-more-rev-btn:hover {
+          background: #6f5410;
+          transform: translateY(-2px);
+          box-shadow: 0 6px 20px rgba(139, 105, 20, 0.38);
+        }
+        .see-more-rev-btn:hover svg {
+          transform: translateY(2px);
+        }
+        .see-more-rev-btn:active {
+          transform: translateY(0) scale(0.98);
+          box-shadow: 0 2px 8px rgba(139, 105, 20, 0.25);
+        }
+
+        /* SHOW REVIEWS WITH PHOTOS BUTTON */
+        .show-photos-btn {
+          margin-top: 10px;
+          width: 100%;
+          border: 1.5px solid #8B6914;
+          border-radius: 8px;
+          padding: 9px 14px;
+          font-size: 11px;
+          font-weight: 600;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
+          cursor: pointer;
+          font-family: 'Jost', sans-serif;
+          transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+          user-select: none;
+          -webkit-user-select: none;
+          outline: none;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          text-align: center;
+        }
+        .show-photos-btn:not(.active) {
+          background: transparent;
+          color: #8B6914;
+        }
+        .show-photos-btn:not(.active):hover {
+          background: #8B6914;
+          color: #ffffff;
+          transform: translateY(-1.5px);
+          box-shadow: 0 4px 14px rgba(139, 105, 20, 0.25);
+        }
+        .show-photos-btn.active {
+          background: #8B6914;
+          color: #ffffff;
+          box-shadow: 0 3px 10px rgba(139, 105, 20, 0.2);
+        }
+        .show-photos-btn.active:hover {
+          background: #6f5410;
+          border-color: #6f5410;
+          transform: translateY(-1.5px);
+          box-shadow: 0 5px 16px rgba(139, 105, 20, 0.32);
+        }
+        .show-photos-btn:active {
+          transform: translateY(0) scale(0.98);
+        }
+
         /* Responsive styling */
         @media (max-width: 1024px) {
           .detail-container {
@@ -1164,10 +1614,6 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
             gap: 16px;
           }
           .suggestions-grid {
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
-          }
-          .pairings-grid {
             grid-template-columns: repeat(2, 1fr);
             gap: 20px;
           }
@@ -1208,28 +1654,6 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
           .suggestions-grid {
             grid-template-columns: repeat(2, 1fr);
             gap: 12px;
-          }
-          .pairings-grid {
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-          }
-          .pairing-info {
-            padding: 10px 8px;
-          }
-          .pairing-card-title {
-            font-size: 11.5px;
-            margin-bottom: 2px;
-          }
-          .pairing-card-desc {
-            font-size: 9.5px;
-            margin-bottom: 6px;
-          }
-          .pairing-card-link {
-            font-size: 8.5px;
-          }
-          .features-footer-grid {
-            grid-template-columns: 1fr;
-            gap: 20px;
           }
           .store-banner-container {
             padding-left: 24px;
@@ -1286,13 +1710,6 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
           }
           .rev-photo-strip {
             gap: 6px !important;
-          }
-          .rev-filter-row {
-            gap: 6px !important;
-          }
-          .rev-filter-btn {
-            padding: 6px 10px !important;
-            font-size: 10px !important;
           }
           .rev-card {
             padding: 16px !important;
@@ -1398,6 +1815,7 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
                     fill
                     sizes="(max-width: 768px) 100vw, 55vw"
                     style={{ objectFit: 'contain' }}
+                    className="main-watch-img"
                     priority
                   />
                 )
@@ -1883,11 +2301,11 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
               Discover watches that complement your style
             </p>
 
-            <div className="pairings-grid">
+            <div className="pairings-grid" ref={pairingsScrollRef} onScroll={handlePairingsScroll}>
               {/* Card 1: New Arrivals */}
-              <Link href="/new-arrivals" className="pairing-card">
+              <Link href="/new-arrivals" className="pairing-card" draggable={false}>
                 <div className="pairing-img-container">
-                  <Image src="/category_HomeS/new_arrivals_bg.webp" alt="New Arrivals" fill sizes="(max-width: 768px) 50vw, 20vw" style={{ objectFit: 'cover' }} className="pairing-img" />
+                  <Image src="/category_HomeS/new_arrivals_bg.webp" alt="New Arrivals" fill sizes="(max-width: 768px) 70vw, 20vw" style={{ objectFit: 'cover' }} className="pairing-img" draggable={false} />
                 </div>
                 <div className="pairing-info">
                   <h4 className="pairing-card-title">New Arrivals</h4>
@@ -1897,9 +2315,9 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
               </Link>
 
               {/* Card 2: Classic */}
-              <Link href="/mens" className="pairing-card">
+              <Link href="/mens" className="pairing-card" draggable={false}>
                 <div className="pairing-img-container">
-                  <Image src="/category_HomeS/classic_bg.webp" alt="Classic" fill sizes="(max-width: 768px) 50vw, 20vw" style={{ objectFit: 'cover' }} className="pairing-img" />
+                  <Image src="/category_HomeS/classic_bg.webp" alt="Classic" fill sizes="(max-width: 768px) 70vw, 20vw" style={{ objectFit: 'cover' }} className="pairing-img" draggable={false} />
                 </div>
                 <div className="pairing-info">
                   <h4 className="pairing-card-title">Classic</h4>
@@ -1909,9 +2327,9 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
               </Link>
 
               {/* Card 3: Sport */}
-              <Link href="/sports" className="pairing-card">
+              <Link href="/sports" className="pairing-card" draggable={false}>
                 <div className="pairing-img-container">
-                  <Image src="/category_HomeS/sport_bg.webp" alt="Sport" fill sizes="(max-width: 768px) 50vw, 20vw" style={{ objectFit: 'cover' }} className="pairing-img" />
+                  <Image src="/category_HomeS/sport_bg.webp" alt="Sport" fill sizes="(max-width: 768px) 70vw, 20vw" style={{ objectFit: 'cover' }} className="pairing-img" draggable={false} />
                 </div>
                 <div className="pairing-info">
                   <h4 className="pairing-card-title">Sport</h4>
@@ -1921,9 +2339,9 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
               </Link>
 
               {/* Card 4: Limited Edition */}
-              <Link href="/limited-edition" className="pairing-card">
+              <Link href="/limited-edition" className="pairing-card" draggable={false}>
                 <div className="pairing-img-container">
-                  <Image src="/category_HomeS/limitted_bg.webp" alt="Limited Edition" fill sizes="(max-width: 768px) 50vw, 20vw" style={{ objectFit: 'cover' }} className="pairing-img" />
+                  <Image src="/category_HomeS/limitted_bg.webp" alt="Limited Edition" fill sizes="(max-width: 768px) 70vw, 20vw" style={{ objectFit: 'cover' }} className="pairing-img" draggable={false} />
                 </div>
                 <div className="pairing-info">
                   <h4 className="pairing-card-title">Limited Edition</h4>
@@ -1933,9 +2351,9 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
               </Link>
 
               {/* Card 5: Gifts */}
-              <Link href="/gifts" className="pairing-card">
+              <Link href="/gifts" className="pairing-card" draggable={false}>
                 <div className="pairing-img-container">
-                  <Image src="/graduation_gift.png" alt="Gifts Collection" fill sizes="(max-width: 768px) 50vw, 20vw" style={{ objectFit: 'cover' }} className="pairing-img" />
+                  <Image src="/graduation_gift.png" alt="Gifts Collection" fill sizes="(max-width: 768px) 70vw, 20vw" style={{ objectFit: 'cover' }} className="pairing-img" draggable={false} />
                 </div>
                 <div className="pairing-info">
                   <h4 className="pairing-card-title">Gifts</h4>
@@ -1943,6 +2361,45 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
                   <span className="pairing-card-link">VIEW ALL</span>
                 </div>
               </Link>
+            </div>
+
+            {/* Mobile Touch Carousel Controls */}
+            <div className="pairings-mobile-controls" aria-label="Timeless Pairings Navigation">
+              <button
+                type="button"
+                className="pairings-nav-arrow"
+                onClick={() => scrollPairingsByDir('left')}
+                disabled={activePairingIdx === 0}
+                aria-label="Previous pairing"
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+              </button>
+
+              <div className="pairings-dots-container">
+                {[0, 1, 2, 3, 4].map((idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    className={`pairings-dot ${activePairingIdx === idx ? 'active' : ''}`}
+                    onClick={() => scrollToPairing(idx)}
+                    aria-label={`Go to slide ${idx + 1}`}
+                  />
+                ))}
+              </div>
+
+              <button
+                type="button"
+                className="pairings-nav-arrow"
+                onClick={() => scrollPairingsByDir('right')}
+                disabled={activePairingIdx === 4}
+                aria-label="Next pairing"
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+              </button>
             </div>
           </div>
         </div>
@@ -2121,8 +2578,12 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
                         </div>
 
                         <button
-                          onClick={() => { setReviewFilter('photos'); setVisibleReviewsCount(5); }}
-                          style={{ marginTop: '10px', width: '100%', background: reviewFilter === 'photos' ? '#8B6914' : 'transparent', color: reviewFilter === 'photos' ? '#fff' : '#8B6914', border: '1.5px solid #8B6914', borderRadius: '8px', padding: '9px 14px', fontSize: '11px', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer', transition: 'all 0.25s', fontFamily: "'Jost',sans-serif" }}
+                          type="button"
+                          onClick={() => {
+                            setReviewFilter(reviewFilter === 'photos' ? 'all' : 'photos');
+                            setVisibleReviewsCount(5);
+                          }}
+                          className={`show-photos-btn ${reviewFilter === 'photos' ? 'active' : ''}`}
                         >
                           {reviewFilter === 'photos' ? '✓ Showing Photos Only' : 'Show Reviews with Photos'}
                         </button>
@@ -2131,18 +2592,22 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
                   </div>
 
                   {/* ── RIGHT: Filter Tabs + Cards ── */}
-                  <div>
+                  <div style={{ minWidth: 0 }}>
                     {/* Filter pill row */}
-                    <div className="rev-filter-row" style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '24px' }}>
+                    <div className="rev-filter-row">
                       {(['all', 'photos', 5, 4, 3, 2, 1] as const).map(f => {
                         const label = f === 'all' ? `All (${reviews.length})` : f === 'photos' ? `📷 With Photos (${allPhotoUrls.length})` : `${'★'.repeat(f)} ${f} Star (${starDistribution[f as 1 | 2 | 3 | 4 | 5] || 0})`;
                         const isActive = reviewFilter === f;
                         return (
                           <button
                             key={String(f)}
-                            className="rev-filter-btn"
-                            onClick={() => { setReviewFilter(f); setVisibleReviewsCount(5); }}
-                            style={{ padding: '7px 14px', borderRadius: '100px', fontSize: '11.5px', fontWeight: 600, fontFamily: "'Jost',sans-serif", letterSpacing: '0.05em', cursor: 'pointer', border: isActive ? '1.5px solid #8B6914' : '1.5px solid rgba(26,18,9,0.12)', background: isActive ? '#8B6914' : '#fff', color: isActive ? '#fff' : 'rgba(26,18,9,0.7)', transition: 'all 0.2s', whiteSpace: 'nowrap' }}
+                            type="button"
+                            className={`rev-filter-btn ${isActive ? 'active' : ''}`}
+                            onClick={(e) => {
+                              setReviewFilter(f);
+                              setVisibleReviewsCount(5);
+                              e.currentTarget.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+                            }}
                           >
                             {label}
                           </button>
@@ -2235,29 +2700,13 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
                         {visibleReviewsCount < filteredRevs.length && (
                           <div style={{ display: 'flex', justifyContent: 'center', marginTop: '32px' }}>
                             <button
+                              type="button"
                               onClick={() => setVisibleReviewsCount(prev => prev + 5)}
-                              style={{
-                                padding: '13px 32px',
-                                background: '#1a1209',
-                                color: '#fff',
-                                border: 'none',
-                                borderRadius: '10px',
-                                fontSize: '11.5px',
-                                fontWeight: 600,
-                                letterSpacing: '0.12em',
-                                textTransform: 'uppercase',
-                                cursor: 'pointer',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '10px',
-                                boxShadow: '0 4px 14px rgba(26,18,9,0.18)',
-                                transition: 'all 0.25s ease'
-                              }}
-                              className="hover:bg-[#8b6914] transition-colors"
+                              className="see-more-rev-btn"
                             >
                               <span>SEE MORE REVIEWS</span>
-                              <span style={{ color: '#dfb15b', fontWeight: 500 }}>({visibleReviewsCount} of {filteredRevs.length})</span>
-                              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#dfb15b" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                              <span style={{ color: 'rgba(255, 255, 255, 0.85)', fontWeight: 500 }}>({visibleReviewsCount} of {filteredRevs.length})</span>
+                              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ transition: 'transform 0.25s ease' }}>
                                 <polyline points="6 9 12 15 18 9" />
                               </svg>
                             </button>
@@ -2323,6 +2772,121 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
               <div>
                 <h4>Secure Payments</h4>
                 <p>100% Secure Checkout with payhere.lk</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Mobile Continuous Smooth Marquee Ticker */}
+          <div className="features-mobile-marquee-wrap">
+            <div className="features-mobile-marquee-track">
+              {/* Track 1 */}
+              <div className="features-marquee-group">
+                <div className="features-marquee-item">
+                  <div className="features-marquee-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                      <rect x="1" y="3" width="15" height="13" />
+                      <polygon points="16 8 20 8 23 11 23 16 16 16 8" />
+                      <circle cx="5.5" cy="18.5" r="2.5" />
+                      <circle cx="18.5" cy="18.5" r="2.5" />
+                    </svg>
+                  </div>
+                  <div className="features-marquee-text">
+                    <h4>FREE ISLAND-WIDE SHIPPING</h4>
+                    <p>Island-wide free delivery in Sri Lanka</p>
+                  </div>
+                </div>
+
+                <div className="features-marquee-item">
+                  <div className="features-marquee-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67" />
+                    </svg>
+                  </div>
+                  <div className="features-marquee-text">
+                    <h4>Easy Returns</h4>
+                    <p>Easy Return Within 14 Days</p>
+                  </div>
+                </div>
+
+                <div className="features-marquee-item">
+                  <div className="features-marquee-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                    </svg>
+                  </div>
+                  <div className="features-marquee-text">
+                    <h4>Genuine Products</h4>
+                    <p>100% Authentic</p>
+                  </div>
+                </div>
+
+                <div className="features-marquee-item">
+                  <div className="features-marquee-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                      <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                    </svg>
+                  </div>
+                  <div className="features-marquee-text">
+                    <h4>Secure Payments</h4>
+                    <p>100% Secure Checkout with payhere.lk</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Track 2 (Duplicate for Seamless Infinite Loop) */}
+              <div className="features-marquee-group" aria-hidden="true">
+                <div className="features-marquee-item">
+                  <div className="features-marquee-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                      <rect x="1" y="3" width="15" height="13" />
+                      <polygon points="16 8 20 8 23 11 23 16 16 16 8" />
+                      <circle cx="5.5" cy="18.5" r="2.5" />
+                      <circle cx="18.5" cy="18.5" r="2.5" />
+                    </svg>
+                  </div>
+                  <div className="features-marquee-text">
+                    <h4>FREE ISLAND-WIDE SHIPPING</h4>
+                    <p>Island-wide free delivery in Sri Lanka</p>
+                  </div>
+                </div>
+
+                <div className="features-marquee-item">
+                  <div className="features-marquee-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67" />
+                    </svg>
+                  </div>
+                  <div className="features-marquee-text">
+                    <h4>Easy Returns</h4>
+                    <p>Easy Return Within 14 Days</p>
+                  </div>
+                </div>
+
+                <div className="features-marquee-item">
+                  <div className="features-marquee-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                    </svg>
+                  </div>
+                  <div className="features-marquee-text">
+                    <h4>Genuine Products</h4>
+                    <p>100% Authentic</p>
+                  </div>
+                </div>
+
+                <div className="features-marquee-item">
+                  <div className="features-marquee-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                      <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                    </svg>
+                  </div>
+                  <div className="features-marquee-text">
+                    <h4>Secure Payments</h4>
+                    <p>100% Secure Checkout with payhere.lk</p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

@@ -624,7 +624,7 @@ export default function Navbar() {
                 <GlobeIcon /><CountryFlag iso={selected.iso} width={16} height={11} /><span>{selected.code}</span><ChevronDn />
               </button>
               <div className="wn-desk-only" style={{ width: '1px', height: '14px', background: div, transition: 'background 0.35s ease' }} />
-
+    
               {/* Right Links - Desktop */}
               {TOP_RIGHT_LINKS.map(l => (
                 <Link key={l.href} href={l.href} className="wn-a wn-desk-only" style={{ fontFamily: "'Jost',sans-serif", fontSize: '11px', letterSpacing: '0.1em', color: tca }}>

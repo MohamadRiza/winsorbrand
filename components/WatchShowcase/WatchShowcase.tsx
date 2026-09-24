@@ -232,7 +232,7 @@ const WatchShowcase = () => {
               </p>
               <div className="pt-1 sm:pt-3">
                 <Link
-                  href="/collections"
+                  href="/customer-care"
                   className="inline-block border border-[#8B6914] text-[#8B6914] hover:bg-[#8B6914] hover:text-white px-3.5 sm:px-5 py-1.5 sm:py-2 text-[9px] sm:text-[10px] lg:text-[11px] font-medium tracking-[0.15em] uppercase transition-all duration-300 rounded-sm"
                 >
                   RESERVE YOURS
