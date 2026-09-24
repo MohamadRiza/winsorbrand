@@ -501,8 +501,8 @@ export default function StoreLocatorPage() {
           max-width: 1300px;
           margin: 0 auto 56px;
           display: grid;
-          grid-template-columns: 460px 1fr;
-          gap: 36px;
+          grid-template-columns: 480px 1fr;
+          gap: 32px;
           align-items: flex-start;
         }
 
@@ -551,7 +551,7 @@ export default function StoreLocatorPage() {
         
         .retailer-card-img-side {
           position: relative;
-          width: 160px;
+          width: 145px;
           height: 100%;
           flex-shrink: 0;
           overflow: hidden;
@@ -592,7 +592,7 @@ export default function StoreLocatorPage() {
         }
 
         .retailer-card-details-side {
-          padding: 18px 20px;
+          padding: 16px 18px;
           flex: 1;
           display: flex;
           flex-direction: column;
@@ -638,19 +638,33 @@ export default function StoreLocatorPage() {
         }
         .retailer-card-distance {
           font-size: 10.5px;
-          font-weight: 700;
+          font-weight: 600;
           color: #8b6914;
-          display: flex;
+          display: inline-flex;
           align-items: center;
           gap: 4px;
+          min-width: 0;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          flex-shrink: 1;
         }
         
+        .retailer-card-footer {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 10px;
+          border-top: 1.5px dashed rgba(184, 142, 60, 0.25);
+          padding-top: 11px;
+          margin-top: auto;
+          width: 100%;
+        }
         .retailer-card-actions {
           display: flex;
+          align-items: center;
           gap: 12px;
-          border-top: 1.5px dashed rgba(184,142,60,0.2);
-          padding-top: 10px;
-          margin-top: auto;
+          flex-shrink: 0;
         }
         .card-action-link {
           font-family: 'Jost', sans-serif;
@@ -662,11 +676,16 @@ export default function StoreLocatorPage() {
           text-decoration: none;
           display: inline-flex;
           align-items: center;
-          gap: 4px;
+          gap: 4.5px;
+          padding: 3px 6px;
+          border-radius: 4px;
           transition: all 0.2s ease;
+          white-space: nowrap;
+          flex-shrink: 0;
         }
         .card-action-link:hover {
           color: #1a1209;
+          background: rgba(139, 105, 20, 0.08);
           transform: translateY(-1px);
         }
 
@@ -1201,23 +1220,26 @@ export default function StoreLocatorPage() {
                               <p className="retailer-card-addr">{r.address}</p>
                             </div>
 
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                              <span className="retailer-card-distance">
-                                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <div className="retailer-card-footer">
+                              <span
+                                className="retailer-card-distance"
+                                title={r.distance !== undefined ? `${r.distance.toFixed(1)} km away` : `${r.city}, ${r.country}`}
+                              >
+                                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ flexShrink: 0 }}>
                                   <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
                                   <circle cx="12" cy="10" r="3" />
                                 </svg>
-                                {r.distance !== undefined ? `${r.distance.toFixed(1)} km away` : `${r.city}, ${r.country}`}
+                                <span>{r.distance !== undefined ? `${r.distance.toFixed(1)} km away` : `${r.city}, ${r.country}`}</span>
                               </span>
 
                               <div className="retailer-card-actions" onClick={(e) => e.stopPropagation()}>
                                 {r.phone && (
-                                  <a href={`tel:${r.phone}`} className="card-action-link">
+                                  <a href={`tel:${r.phone}`} className="card-action-link" title={`Call ${r.name}`}>
                                     <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" /></svg>
                                     Call
                                   </a>
                                 )}
-                                <a href={r.googleMapsLink} target="_blank" rel="noopener noreferrer" className="card-action-link">
+                                <a href={r.googleMapsLink} target="_blank" rel="noopener noreferrer" className="card-action-link" title="Open Google Maps Directions">
                                   <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><polygon points="3 11 22 2 13 21 11 13 3 11" /></svg>
                                   Directions
                                 </a>
