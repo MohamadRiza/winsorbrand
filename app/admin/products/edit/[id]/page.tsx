@@ -25,7 +25,7 @@ export default function EditProductPage() {
   const router = useRouter();
   const params = useParams();
   const productId = params.id as string;
-  
+
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [generatingDescription, setGeneratingDescription] = useState(false);
@@ -114,9 +114,9 @@ export default function EditProductPage() {
     try {
       const res = await fetch(`/api/products/${productId}`);
       const data = await res.json();
-      
+
       if (!res.ok) throw new Error(data.error || 'Failed to fetch product');
-      
+
       const product = data.data;
 
       // Populate staged assets from existing product data
@@ -205,12 +205,12 @@ export default function EditProductPage() {
       });
       const data = await res.json();
       if (!res.ok || !data.success) throw new Error(data.error || 'Request failed');
-      
+
       if (data.warning) {
         toast.error(data.warning, { duration: 6000 });
         return;
       }
-      
+
       if (data.errorsFound && data.correctedText.trim().toLowerCase() !== text.trim().toLowerCase()) {
         setSpellCheckResult({
           field: fieldName,
@@ -271,7 +271,7 @@ export default function EditProductPage() {
       } else {
         toast.success('Description generated successfully!');
       }
-      
+
       setFormData(prev => ({ ...prev, description: data.description }));
     } catch (error: any) {
       console.error('AI Generation error:', error);
@@ -411,7 +411,7 @@ export default function EditProductPage() {
   const updateColorVariant = (index: number, field: keyof ColorVariant, value: any) => {
     setFormData(prev => ({
       ...prev,
-      colorVariants: prev.colorVariants.map((variant, i) => 
+      colorVariants: prev.colorVariants.map((variant, i) =>
         i === index ? { ...variant, [field]: value, inStock: field === 'qty' ? (value as number) > 0 : variant.inStock } : variant
       ),
     }));
@@ -463,7 +463,7 @@ export default function EditProductPage() {
   // ── Form Submit: Real XHR Telemetry Progress Upload & Database Update ────
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData.title?.trim() || !formData.modelNo?.trim() || !formData.price) {
       toast.error('Please fill in all required fields');
       return;
@@ -568,7 +568,7 @@ export default function EditProductPage() {
               // Byte upload covers 0% to 75% of overall process
               const byteFraction = totalBytes > 0 ? currentTotal / totalBytes : 0;
               const bytePct = Math.min(75, Math.max(2, Math.round(byteFraction * 75)));
-              
+
               // Calculate transfer speed and countdown
               const elapsedSecs = Math.max(0.2, (Date.now() - uploadStartTime) / 1000);
               const speed = currentTotal / elapsedSecs;
@@ -599,8 +599,8 @@ export default function EditProductPage() {
             loadedBytes: completedPreviousBytes,
             overallPercent: cloudProcessedPct,
             stage: remainingTasks > 0 ? 'processing' : 'saving',
-            statusMessage: remainingTasks > 0 
-              ? `Optimized ${i + 1} of ${tasks.length} cloud assets...` 
+            statusMessage: remainingTasks > 0
+              ? `Optimized ${i + 1} of ${tasks.length} cloud assets...`
               : 'Cloud assets optimized. Updating database listing...',
             estimatedSecondsRemaining: Math.max(1, Math.ceil(remainingTasks * 0.8 + 1)),
           }));
@@ -727,7 +727,7 @@ export default function EditProductPage() {
         {/* Basic Information */}
         <div className="bg-white rounded-xl border border-[#1a1209]/10 p-6">
           <h3 className="font-['Jost'] font-semibold text-[#1a1209] mb-4">Basic Information</h3>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="md:col-span-2">
               <div className="flex items-center justify-between mb-2">
@@ -843,11 +843,11 @@ export default function EditProductPage() {
                   <label className="flex flex-col items-center justify-center w-32 h-32 border-2 border-dashed border-[#1a1209]/20 rounded-lg cursor-pointer hover:border-[#8B6914] transition-colors bg-[#fbf9f4]">
                     <svg className="w-8 h-8 text-[#1a1209]/40 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                     <span className="text-xs text-[#1a1209]/60 font-medium">Select Image</span>
-                    <input 
-                      type="file" 
-                      accept="image/*" 
-                      onChange={handleThumbnailSelect} 
-                      className="hidden" 
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleThumbnailSelect}
+                      className="hidden"
                     />
                   </label>
                 )}
@@ -876,12 +876,12 @@ export default function EditProductPage() {
                   <label className="flex flex-col items-center justify-center w-24 h-24 border-2 border-dashed border-[#1a1209]/20 rounded-lg cursor-pointer hover:border-[#8B6914] transition-colors bg-[#fbf9f4]">
                     <svg className="w-6 h-6 text-[#1a1209]/40 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
                     <span className="text-xs text-[#1a1209]/60 font-medium">Add Images</span>
-                    <input 
-                      type="file" 
-                      accept="image/*" 
+                    <input
+                      type="file"
+                      accept="image/*"
                       multiple
-                      onChange={handleGallerySelect} 
-                      className="hidden" 
+                      onChange={handleGallerySelect}
+                      className="hidden"
                     />
                   </label>
                 )}
@@ -902,11 +902,11 @@ export default function EditProductPage() {
                   <label className="flex flex-col items-center justify-center w-48 h-32 border-2 border-dashed border-[#1a1209]/20 rounded-lg cursor-pointer hover:border-[#8B6914] transition-colors bg-[#fbf9f4]">
                     <svg className="w-8 h-8 text-[#1a1209]/40 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
                     <span className="text-xs text-[#1a1209]/60 font-medium">Select Video</span>
-                    <input 
-                      type="file" 
-                      accept="video/*" 
-                      onChange={handleVideoSelect} 
-                      className="hidden" 
+                    <input
+                      type="file"
+                      accept="video/*"
+                      onChange={handleVideoSelect}
+                      className="hidden"
                     />
                   </label>
                 )}
@@ -949,7 +949,7 @@ export default function EditProductPage() {
                   {/* Swatch Image Upload */}
                   <div>
                     <label className="block text-[11px] font-semibold tracking-[0.2em] uppercase text-[#1a1209]/70 mb-2">
-                      Swatch Image <span className="text-[#8B6914]">(Displayed on product page)</span>
+                      watch Image <span className="text-[#8B6914]">(Displayed on product page)</span>
                     </label>
                     <div className="flex items-center gap-3">
                       {(variant.previewUrl || variant.image?.url) ? (
@@ -966,7 +966,7 @@ export default function EditProductPage() {
                       ) : (
                         <label className="flex flex-col items-center justify-center w-16 h-16 border-2 border-dashed border-[#8B6914]/40 rounded-lg cursor-pointer hover:border-[#8B6914] hover:bg-[#8B6914]/5 transition-colors bg-white">
                           <svg className="w-5 h-5 text-[#8B6914]/60 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                          <span className="text-[9px] text-[#8B6914]/80 font-semibold text-center leading-tight">Upload<br/>Swatch</span>
+                          <span className="text-[9px] text-[#8B6914]/80 font-semibold text-center leading-tight">Upload<br />watch</span>
                           <input
                             type="file"
                             accept="image/*"
@@ -977,7 +977,7 @@ export default function EditProductPage() {
                       )}
                       {(variant.previewUrl || variant.image?.url) && (
                         <span className="text-xs text-[#1a1209]/60 leading-snug">
-                          Swatch ready for <strong>{variant.colorName || 'this variant'}</strong>
+                          watch ready for <strong>{variant.colorName || 'this variant'}</strong>
                         </span>
                       )}
                       {!(variant.previewUrl || variant.image?.url) && (
@@ -1024,7 +1024,7 @@ export default function EditProductPage() {
         {/* Categories & Sections */}
         <div className="bg-white rounded-xl border border-[#1a1209]/10 p-6">
           <h3 className="font-['Jost'] font-semibold text-[#1a1209] mb-4">Categories & Classification</h3>
-          
+
           {/* Target Watch Audience / Gender Selection */}
           <div className="mb-6 pb-6 border-b border-[#1a1209]/10">
             <label className="block text-[11px] font-semibold tracking-[0.2em] uppercase text-[#1a1209]/70 mb-2">
@@ -1034,50 +1034,47 @@ export default function EditProductPage() {
               Select whether this watch is designed for Men (Gents), Women (Ladies), or Both (Unisex). This powers customer filtering on the website.
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <label className={`flex items-center gap-3 p-3.5 rounded-lg border cursor-pointer transition-all ${
-                targetGender === 'Gents' 
-                  ? 'bg-[#8B6914]/10 border-[#8B6914] text-[#8B6914] font-semibold shadow-sm' 
-                  : 'bg-[#faf7f0] border-[#1a1209]/15 text-[#1a1209]/70 hover:border-[#8B6914]/40'
-              }`}>
-                <input 
-                  type="radio" 
-                  name="targetGenderEdit" 
-                  value="Gents" 
-                  checked={targetGender === 'Gents'} 
-                  onChange={() => setTargetGender('Gents')} 
-                  className="w-4 h-4 text-[#8B6914] border-[#1a1209]/20 focus:ring-[#8B6914]" 
+              <label className={`flex items-center gap-3 p-3.5 rounded-lg border cursor-pointer transition-all ${targetGender === 'Gents'
+                ? 'bg-[#8B6914]/10 border-[#8B6914] text-[#8B6914] font-semibold shadow-sm'
+                : 'bg-[#faf7f0] border-[#1a1209]/15 text-[#1a1209]/70 hover:border-[#8B6914]/40'
+                }`}>
+                <input
+                  type="radio"
+                  name="targetGenderEdit"
+                  value="Gents"
+                  checked={targetGender === 'Gents'}
+                  onChange={() => setTargetGender('Gents')}
+                  className="w-4 h-4 text-[#8B6914] border-[#1a1209]/20 focus:ring-[#8B6914]"
                 />
                 <span className="text-sm font-['Jost'] font-medium">Men's Watch (Gents)</span>
               </label>
 
-              <label className={`flex items-center gap-3 p-3.5 rounded-lg border cursor-pointer transition-all ${
-                targetGender === 'Ladies' 
-                  ? 'bg-[#8B6914]/10 border-[#8B6914] text-[#8B6914] font-semibold shadow-sm' 
-                  : 'bg-[#faf7f0] border-[#1a1209]/15 text-[#1a1209]/70 hover:border-[#8B6914]/40'
-              }`}>
-                <input 
-                  type="radio" 
-                  name="targetGenderEdit" 
-                  value="Ladies" 
-                  checked={targetGender === 'Ladies'} 
-                  onChange={() => setTargetGender('Ladies')} 
-                  className="w-4 h-4 text-[#8B6914] border-[#1a1209]/20 focus:ring-[#8B6914]" 
+              <label className={`flex items-center gap-3 p-3.5 rounded-lg border cursor-pointer transition-all ${targetGender === 'Ladies'
+                ? 'bg-[#8B6914]/10 border-[#8B6914] text-[#8B6914] font-semibold shadow-sm'
+                : 'bg-[#faf7f0] border-[#1a1209]/15 text-[#1a1209]/70 hover:border-[#8B6914]/40'
+                }`}>
+                <input
+                  type="radio"
+                  name="targetGenderEdit"
+                  value="Ladies"
+                  checked={targetGender === 'Ladies'}
+                  onChange={() => setTargetGender('Ladies')}
+                  className="w-4 h-4 text-[#8B6914] border-[#1a1209]/20 focus:ring-[#8B6914]"
                 />
                 <span className="text-sm font-['Jost'] font-medium">Women's Watch (Ladies)</span>
               </label>
 
-              <label className={`flex items-center gap-3 p-3.5 rounded-lg border cursor-pointer transition-all ${
-                targetGender === 'Unisex' 
-                  ? 'bg-[#8B6914]/10 border-[#8B6914] text-[#8B6914] font-semibold shadow-sm' 
-                  : 'bg-[#faf7f0] border-[#1a1209]/15 text-[#1a1209]/70 hover:border-[#8B6914]/40'
-              }`}>
-                <input 
-                  type="radio" 
-                  name="targetGenderEdit" 
-                  value="Unisex" 
-                  checked={targetGender === 'Unisex'} 
-                  onChange={() => setTargetGender('Unisex')} 
-                  className="w-4 h-4 text-[#8B6914] border-[#1a1209]/20 focus:ring-[#8B6914]" 
+              <label className={`flex items-center gap-3 p-3.5 rounded-lg border cursor-pointer transition-all ${targetGender === 'Unisex'
+                ? 'bg-[#8B6914]/10 border-[#8B6914] text-[#8B6914] font-semibold shadow-sm'
+                : 'bg-[#faf7f0] border-[#1a1209]/15 text-[#1a1209]/70 hover:border-[#8B6914]/40'
+                }`}>
+                <input
+                  type="radio"
+                  name="targetGenderEdit"
+                  value="Unisex"
+                  checked={targetGender === 'Unisex'}
+                  onChange={() => setTargetGender('Unisex')}
+                  className="w-4 h-4 text-[#8B6914] border-[#1a1209]/20 focus:ring-[#8B6914]"
                 />
                 <span className="text-sm font-['Jost'] font-medium">Unisex Watch (Both)</span>
               </label>
@@ -1168,18 +1165,17 @@ export default function EditProductPage() {
                   key={suggestion}
                   type="button"
                   onClick={() => setSpecKey(suggestion)}
-                  className={`text-xs px-2.5 py-1 rounded-full border transition-all cursor-pointer ${
-                    specKey === suggestion
-                      ? 'bg-[#8B6914] text-white border-[#8B6914]'
-                      : 'bg-[#faf7f0] text-[#1a1209]/70 border-[#1a1209]/10 hover:border-[#8B6914]/40 hover:text-[#8B6914]'
-                  }`}
+                  className={`text-xs px-2.5 py-1 rounded-full border transition-all cursor-pointer ${specKey === suggestion
+                    ? 'bg-[#8B6914] text-white border-[#8B6914]'
+                    : 'bg-[#faf7f0] text-[#1a1209]/70 border-[#1a1209]/10 hover:border-[#8B6914]/40 hover:text-[#8B6914]'
+                    }`}
                 >
                   + {suggestion}
                 </button>
               ))}
             </div>
           </div>
-          
+
           <div className="flex flex-col sm:flex-row gap-2 mb-4">
             <input
               type="text"
@@ -1261,9 +1257,9 @@ export default function EditProductPage() {
                   )}
                 </button>
               )}
-              <button 
-                type="button" 
-                onClick={generateDescription} 
+              <button
+                type="button"
+                onClick={generateDescription}
                 disabled={generatingDescription || !formData.title?.trim() || !formData.modelNo?.trim()}
                 className="px-3.5 py-1.5 bg-gradient-to-r from-[#8B6914] to-[#a07d1a] text-white text-xs font-medium rounded-lg hover:from-[#6f5410] hover:to-[#8B6914] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 font-['Jost'] shadow-sm cursor-pointer whitespace-nowrap"
               >
@@ -1275,13 +1271,13 @@ export default function EditProductPage() {
               </button>
             </div>
           </div>
-          <textarea 
-            value={formData.description} 
-            onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))} 
-            placeholder="Describe the product features, materials, and craftsmanship... or click 'AI Generate Description' to automatically compose a luxury narrative from all the details above..." 
-            required 
-            rows={8} 
-            className="w-full min-h-[180px] px-4 py-3 bg-[#fbf9f4] border border-[#1a1209]/15 rounded-lg text-[#1a1209] placeholder-[#1a1209]/30 focus:outline-none focus:border-[#8B6914] focus:ring-2 focus:ring-[#8B6914]/20 transition font-['Jost'] text-sm resize-y leading-relaxed" 
+          <textarea
+            value={formData.description}
+            onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+            placeholder="Describe the product features, materials, and craftsmanship... or click 'AI Generate Description' to automatically compose a luxury narrative from all the details above..."
+            required
+            rows={8}
+            className="w-full min-h-[180px] px-4 py-3 bg-[#fbf9f4] border border-[#1a1209]/15 rounded-lg text-[#1a1209] placeholder-[#1a1209]/30 focus:outline-none focus:border-[#8B6914] focus:ring-2 focus:ring-[#8B6914]/20 transition font-['Jost'] text-sm resize-y leading-relaxed"
           />
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 mt-1.5">
             <p className="text-xs text-[#1a1209]/40">Synthesizes color variants, category, collections, occasions, and specifications into fluid paragraphs</p>
@@ -1292,7 +1288,7 @@ export default function EditProductPage() {
         {/* Display Settings */}
         <div className="bg-white rounded-xl border border-[#1a1209]/10 p-6">
           <h3 className="font-['Jost'] font-semibold text-[#1a1209] mb-4">Display Settings</h3>
-          
+
           <div className="space-y-3">
             <label className="flex items-center gap-3 cursor-pointer">
               <input
@@ -1304,31 +1300,29 @@ export default function EditProductPage() {
               <span className="text-sm font-['Jost'] font-medium text-[#1a1209]">Active (Visible on website)</span>
             </label>
 
-            <label className={`flex items-center gap-3 cursor-pointer p-3 rounded-lg border transition-all ${
-              formData.isSoldOut ? 'bg-red-50 border-red-200' : 'bg-[#faf7f0] border-[#1a1209]/10'
-            }`}>
-              <input 
-                type="checkbox" 
-                checked={formData.isSoldOut} 
-                onChange={(e) => setFormData(prev => ({ ...prev, isSoldOut: e.target.checked }))} 
-                className="w-4 h-4 text-red-600 border-red-300 rounded focus:ring-red-600 cursor-pointer" 
+            <label className={`flex items-center gap-3 cursor-pointer p-3 rounded-lg border transition-all ${formData.isSoldOut ? 'bg-red-50 border-red-200' : 'bg-[#faf7f0] border-[#1a1209]/10'
+              }`}>
+              <input
+                type="checkbox"
+                checked={formData.isSoldOut}
+                onChange={(e) => setFormData(prev => ({ ...prev, isSoldOut: e.target.checked }))}
+                className="w-4 h-4 text-red-600 border-red-300 rounded focus:ring-red-600 cursor-pointer"
               />
               <div>
-                <span className={`text-sm font-['Jost'] font-semibold ${
-                  formData.isSoldOut ? 'text-red-700' : 'text-[#1a1209]'
-                }`}>
+                <span className={`text-sm font-['Jost'] font-semibold ${formData.isSoldOut ? 'text-red-700' : 'text-[#1a1209]'
+                  }`}>
                   {formData.isSoldOut ? 'SOLD OUT (Active)' : 'Sold Out Status (Turned Off)'}
                 </span>
                 <p className="text-xs text-[#1a1209]/60">
-                  {formData.isSoldOut 
-                    ? 'Product is marked as Sold Out and cannot be purchased by customers' 
+                  {formData.isSoldOut
+                    ? 'Product is marked as Sold Out and cannot be purchased by customers'
                     : formData.colorVariants.some(v => Number(v.qty) >= 2 || Number(v.qty) > 0)
-                    ? 'In stock — Default turned off because stock quantity is available'
-                    : 'Turned off by default'}
+                      ? 'In stock — Default turned off because stock quantity is available'
+                      : 'Turned off by default'}
                 </p>
               </div>
             </label>
-            
+
             <label className="flex items-center gap-3 cursor-pointer">
               <input
                 type="checkbox"
@@ -1418,7 +1412,7 @@ export default function EditProductPage() {
               </svg>
               <h3 className="font-semibold text-lg">AI Spelling Suggestion</h3>
             </div>
-            
+
             <p className="text-xs text-gray-500 mb-4">
               Reason: {spellCheckResult.errorDetails}
             </p>

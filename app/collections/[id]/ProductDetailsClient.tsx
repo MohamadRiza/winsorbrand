@@ -427,6 +427,12 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
 
   const isSoldOut = !!(product.isSoldOut || (selectedVariant && selectedVariant.qty === 0));
   const specs = Object.entries(product.specifications || {});
+  const whatsappMessage = [
+    `Hello Winsor, I would like to inquire about "${product.title}"`,
+    product.modelNo ? `(Model: ${product.modelNo})` : '',
+    selectedVariant?.colorName ? `- Color: ${selectedVariant.colorName}` : '',
+  ].filter(Boolean).join(' ') + '.';
+  const whatsappContactUrl = `https://wa.me/94770716212?text=${encodeURIComponent(whatsappMessage)}`;
 
   return (
     <>
@@ -1916,7 +1922,7 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
               </span>
             </div>
 
-            {/* Action Buttons: Add to Cart & Buy Now */}
+            {/* Action Buttons: Add to Cart, Buy Now & WhatsApp Contact Us */}
             <div className="grid grid-cols-2 gap-3 mb-6">
               <button
                 onClick={handleAddToCart}
@@ -1935,6 +1941,23 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
               >
                 {isSoldOut ? 'OUT OF STOCK' : 'BUY NOW'}
               </button>
+              <a
+                href={whatsappContactUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Contact Us on WhatsApp (+94 77 071 6212)"
+                className="col-span-2 w-full box-border min-h-[44px] py-[12.5px] px-4 bg-white hover:bg-[#8b6914] text-[#8b6914] hover:text-white border-[1.5px] border-[#8b6914] rounded-xl text-xs font-semibold tracking-wider uppercase transition-all duration-300 shadow-sm hover:shadow-md flex items-center justify-center gap-2 cursor-pointer no-underline group"
+              >
+                <svg
+                  className="w-4 h-4 shrink-0 text-[#25D366] group-hover:text-white transition-colors duration-300"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  aria-hidden="true"
+                >
+                  <path d="M17.472 14.382c-.301-.15-1.78-.877-2.056-.977-.276-.101-.477-.15-.678.15-.2.301-.778.977-.954 1.177-.176.2-.351.226-.652.075-.302-.15-1.272-.469-2.423-1.496-.897-.801-1.503-1.79-1.68-2.091-.176-.301-.019-.464.132-.614.136-.135.302-.351.452-.527.151-.176.201-.301.302-.502.1-.2.05-.376-.025-.526-.075-.15-.678-1.633-.929-2.235-.244-.587-.492-.507-.678-.517-.176-.01-.377-.01-.578-.01s-.527.075-.802.376c-.276.301-1.054 1.03-1.054 2.511s1.079 2.911 1.23 3.112c.151.201 2.124 3.243 5.145 4.547.719.311 1.281.497 1.719.636.722.23 1.378.197 1.898.12.579-.086 1.78-.727 2.031-1.43.251-.703.251-1.305.176-1.43-.076-.126-.276-.201-.577-.351zM12.04 21.75c-1.748 0-3.46-.46-4.96-1.33l-.356-.21-3.684.966.983-3.593-.23-.367A9.774 9.774 0 0 1 2.25 12.04C2.25 6.64 6.64 2.25 12.04 2.25c2.618 0 5.079 1.02 6.93 2.871a9.754 9.754 0 0 1 2.87 6.919c0 5.4-4.39 9.71-9.8 9.71zm0-17.75a7.95 7.95 0 0 0-7.95 7.95c0 1.54.44 3.03 1.28 4.32l.21.32-.57 2.08 2.13-.56.31.18c1.25.75 2.68 1.14 4.14 1.14 4.38 0 7.95-3.57 7.95-7.95 0-2.12-.83-4.12-2.33-5.62A7.904 7.904 0 0 0 12.04 4z" />
+                </svg>
+                <span>CONTACT US</span>
+              </a>
             </div>
 
             {/* Trust Badges Bar */}
