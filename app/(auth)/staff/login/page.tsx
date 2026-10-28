@@ -13,19 +13,12 @@ function StaffLoginContent() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
-  const [sessionTime, setSessionTime] = useState(15);
   const turnstileRef = useRef<TurnstileInstance | null>(null);
 
-  useEffect(() => {
-    fetch('/api/auth/session-config')
-      .then(res => res.json())
-      .then(data => {
-        if (data.success && data.sessionExpiryMinutes) {
-          setSessionTime(data.sessionExpiryMinutes);
-        }
-      })
-      .catch(() => {});
-  }, []);
+  // Session duration popup states
+  const [showSessionModal, setShowSessionModal] = useState(false);
+  const [loginToken, setLoginToken] = useState<string | null>(null);
+  const [sessionDuration, setSessionDuration] = useState('15m');
 
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -99,12 +92,46 @@ function StaffLoginContent() {
         setTurnstileToken(null);
         return;
       }
-      toast.success('Welcome back, staff member');
-      router.push(redirectTo);
+
+      if (data.verified && data.loginToken) {
+        setLoginToken(data.loginToken);
+        setShowSessionModal(true);
+      } else {
+        toast.success('Welcome back, staff member');
+        router.push(redirectTo);
+      }
     } catch {
       toast.error('Something went wrong. Please try again.');
       turnstileRef.current?.reset();
       setTurnstileToken(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleConfirmSession = async (e: FormEvent) => {
+    e.preventDefault();
+    if (!loginToken) return;
+    setLoading(true);
+    try {
+      const res = await fetch('/api/staff/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ loginToken, sessionDuration }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        toast.error(data?.error || data?.message || 'Session setup failed');
+        setShowSessionModal(false);
+        setLoginToken(null);
+        turnstileRef.current?.reset();
+        setTurnstileToken(null);
+        return;
+      }
+      toast.success('Welcome back, staff member');
+      router.push(redirectTo);
+    } catch {
+      toast.error('Could not start session. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -357,7 +384,7 @@ function StaffLoginContent() {
                   <rect x="4" y="11" width="16" height="10" rx="2" />
                   <path d="M8 11V7a4 4 0 118 0v4" />
                 </svg>
-                 Secure connection · {sessionTime} min session · Cloudflare protected
+                Secure connection · 15 min session · Cloudflare protected
               </div>
             </form>
           </div>
@@ -390,6 +417,164 @@ function StaffLoginContent() {
           </div>
         </div>
       </div>
+
+      {/* Session Selection Modal Overlay */}
+      {showSessionModal && (
+        <div style={{
+          position: 'fixed',
+          inset: 0,
+          backgroundColor: 'rgba(26, 18, 9, 0.75)',
+          backdropFilter: 'blur(8px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 9999,
+          padding: '20px',
+        }}>
+          <div style={{
+            width: '100%',
+            maxWidth: '420px',
+            backgroundColor: '#ffffff',
+            border: '1px solid rgba(139, 105, 20, 0.25)',
+            borderRadius: '16px',
+            padding: '32px',
+            boxShadow: '0 24px 50px rgba(0, 0, 0, 0.35)',
+            textAlign: 'center',
+            fontFamily: "'Jost', sans-serif",
+            animation: 'scaleUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both',
+          }}>
+            {/* Clock icon */}
+            <div style={{
+              width: '64px',
+              height: '64px',
+              borderRadius: '50%',
+              backgroundColor: 'rgba(139, 105, 20, 0.08)',
+              border: '2px solid #8B6914',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#8B6914',
+              margin: '0 auto 20px',
+            }}>
+              <svg className="w-7 h-7 text-[#8B6914]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+
+            <h3 style={{
+              fontFamily: "'Cormorant Garamond', serif",
+              fontSize: '24px',
+              fontWeight: 600,
+              color: '#1a1209',
+              margin: '0 0 6px',
+            }}>
+              Session Duration
+            </h3>
+            <p style={{
+              fontSize: '13.5px',
+              color: 'rgba(26, 18, 9, 0.6)',
+              lineHeight: 1.5,
+              margin: '0 0 24px',
+            }}>
+              Please select how long your staff session should remain active before automatic logout.
+            </p>
+
+            <form onSubmit={handleConfirmSession} className="space-y-5">
+              <div style={{ textAlign: 'left' }}>
+                <label style={{
+                  display: 'block',
+                  fontSize: '11px',
+                  fontWeight: 600,
+                  letterSpacing: '0.15em',
+                  textTransform: 'uppercase',
+                  color: 'rgba(26,18,9,0.7)',
+                  marginBottom: '8px',
+                }}>
+                  Duration Limit
+                </label>
+                <select
+                  value={sessionDuration}
+                  onChange={(e) => setSessionDuration(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '12px 16px',
+                    backgroundColor: '#fbf9f4',
+                    border: '1px solid rgba(26,18,9,0.15)',
+                    borderRadius: '8px',
+                    color: '#1a1209',
+                    fontSize: '14px',
+                    outline: 'none',
+                    cursor: 'pointer',
+                    fontFamily: "'Jost', sans-serif",
+                  }}
+                >
+                  <option value="15m">15 Minutes (Recommended)</option>
+                  <option value="30m">30 Minutes</option>
+                  <option value="1h">1 Hour</option>
+                  <option value="2h">2 Hours</option>
+                  <option value="4h">4 Hours</option>
+                  <option value="8h">8 Hours</option>
+                  <option value="12h">12 Hours</option>
+                  <option value="24h">1 Day (24 Hours - Maximum Limit)</option>
+                </select>
+              </div>
+
+              <div style={{ display: 'flex', gap: '12px', marginTop: '28px' }}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowSessionModal(false);
+                    setLoginToken(null);
+                    setTurnstileToken(null);
+                    turnstileRef.current?.reset();
+                  }}
+                  style={{
+                    flex: 1,
+                    padding: '12px',
+                    backgroundColor: 'transparent',
+                    border: '1px solid rgba(26, 18, 9, 0.25)',
+                    borderRadius: '8px',
+                    color: 'rgba(26, 18, 9, 0.7)',
+                    fontSize: '13px',
+                    fontWeight: 500,
+                    cursor: 'pointer',
+                    fontFamily: "'Jost', sans-serif",
+                    transition: 'all 0.2s',
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  style={{
+                    flex: 1,
+                    padding: '12px',
+                    backgroundColor: '#8B6914',
+                    border: 'none',
+                    borderRadius: '8px',
+                    color: '#ffffff',
+                    fontSize: '13px',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    fontFamily: "'Jost', sans-serif",
+                    transition: 'background-color 0.2s',
+                    boxShadow: '0 4px 12px rgba(139, 105, 20, 0.25)',
+                  }}
+                >
+                  {loading ? 'Starting...' : 'Start Session'}
+                </button>
+              </div>
+            </form>
+          </div>
+          <style>{`
+            @keyframes scaleUp {
+              from { opacity: 0; transform: scale(0.95); }
+              to { opacity: 1; transform: scale(1); }
+            }
+          `}</style>
+        </div>
+      )}
     </div>
   );
 }

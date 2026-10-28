@@ -9,15 +9,17 @@ export default async function AdminLayout({ children }: { children: ReactNode })
   // ✅ SERVER-SIDE AUTH CHECK
   const cookieStore = await cookies();
   const accessToken = cookieStore.get('admin_access_token')?.value;
+  const userType = cookieStore.get('winsor_user_type')?.value;
+  const loginPath = userType === 'staff' ? '/staff/login' : '/admin/login';
 
   if (!accessToken) {
-    redirect('/admin/login');
+    redirect(loginPath);
   }
 
   const payload = verifyAccessToken(accessToken);
   
   if (!payload) {
-    redirect('/admin/login');
+    redirect(loginPath);
   }
 
   return (

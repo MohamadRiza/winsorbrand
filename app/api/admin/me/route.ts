@@ -42,6 +42,7 @@ export async function GET(req: NextRequest) {
       isTemporary: user.isTemporary,
       expiresAt: user.expiresAt,
       requiresApproval: !!user.requiresApproval,
+      sessionExpiresAt: payload.exp ? payload.exp * 1000 : null,
     });
   } catch (error: any) {
     console.error('Fetch profile me API error:', error);

@@ -5,6 +5,8 @@ export interface JWTPayload {
   adminId: string;
   username: string;
   role: 'admin' | 'staff';
+  iat?: number;
+  exp?: number;
 }
 
 // 🔴 CRITICAL: Read env vars at runtime, not module load time

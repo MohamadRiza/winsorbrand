@@ -254,7 +254,7 @@ export default function Sidebar({
     try {
       await fetch('/api/admin/logout', { method: 'POST', credentials: 'include' });
       toast.success('Logged out successfully');
-      router.push('/admin/login');
+      router.push(adminRole === 'staff' ? '/staff/login' : '/admin/login');
       router.refresh();
     } catch {
       toast.error('Logout failed');

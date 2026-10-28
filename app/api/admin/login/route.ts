@@ -99,7 +99,7 @@ export async function POST(req: NextRequest) {
       console.log('🔐 [LOGIN] Session duration confirmation received:', sessionDuration);
       
       const decoded = verifyAccessToken(loginToken);
-      if (!decoded) {
+      if (!decoded || decoded.role !== 'admin') {
         return NextResponse.json(
           { success: false, error: 'Login session expired. Please enter credentials again.' },
           { status: 401 }
@@ -108,7 +108,7 @@ export async function POST(req: NextRequest) {
 
       await connectDB();
       const admin = await Admin.findById(decoded.adminId);
-      if (!admin || !admin.isActive) {
+      if (!admin || admin.role !== 'admin' || !admin.isActive) {
         return NextResponse.json(
           { success: false, error: 'Admin account is disabled or does not exist.' },
           { status: 401 }

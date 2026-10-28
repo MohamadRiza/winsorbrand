@@ -1,13 +1,15 @@
 // components/Admin/SidebarClientWrapper.tsx
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
+import { toast } from 'react-hot-toast';
 import Sidebar from './Sidebar';
 import { getUpcomingOccasions, SpecialOccasion } from '@/lib/occasionHelper';
 
 export default function SidebarClientWrapper() {
   const [adminData, setAdminData] = useState<{ name?: string; role?: 'admin' | 'staff'; permissions?: string[] }>({});
+  const [sessionExpiresAt, setSessionExpiresAt] = useState<number | null>(null);
   const [stats, setStats] = useState<any>({
     pendingOrders: 0,
     newMessages: 0,
@@ -21,6 +23,50 @@ export default function SidebarClientWrapper() {
   const [isAuthenticated, setIsAuthenticated] = useState(true);
   const router = useRouter();
   const pathname = usePathname();
+
+  const hasLoggedOutRef = useRef(false);
+  const hadActiveSessionRef = useRef(false);
+  const roleRef = useRef<'admin' | 'staff' | undefined>(undefined);
+
+  const getLoginPath = useCallback((roleHint?: 'admin' | 'staff') => {
+    const resolvedRole = roleHint || roleRef.current;
+    if (resolvedRole === 'staff') return '/staff/login';
+    if (resolvedRole === 'admin') return '/admin/login';
+    if (typeof document !== 'undefined') {
+      const userTypeCookie = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('winsor_user_type='));
+      if (userTypeCookie?.split('=')[1] === 'staff') {
+        return '/staff/login';
+      }
+    }
+    return '/admin/login';
+  }, []);
+
+  const performAutoLogout = useCallback(async (roleHint?: 'admin' | 'staff', notifyExpired = true) => {
+    if (hasLoggedOutRef.current) return;
+    hasLoggedOutRef.current = true;
+    setIsAuthenticated(false);
+
+    const loginBase = getLoginPath(roleHint);
+    const targetUrl =
+      pathname && pathname.startsWith('/admin') && pathname !== '/admin/login'
+        ? `${loginBase}?redirect=${encodeURIComponent(pathname)}`
+        : loginBase;
+
+    try {
+      await fetch('/api/admin/logout', { method: 'POST', credentials: 'include' });
+    } catch {
+      // Ignore network errors while clearing session cookies
+    }
+
+    if (notifyExpired) {
+      toast.error('Session expired. Logged out automatically.', { id: 'session-expired-logout' });
+    }
+
+    router.replace(targetUrl);
+    router.refresh();
+  }, [getLoginPath, pathname, router]);
 
   // Responsive state management
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -67,20 +113,32 @@ export default function SidebarClientWrapper() {
           fetch('/api/admin/dashboard/stats', { credentials: 'include' }),
         ]);
         
-        // Handle 401 Unauthorized
+        // Handle 401 Unauthorized (session expired or logged out)
         if (profileRes.status === 401 || statsRes.status === 401) {
-          setIsAuthenticated(false);
-          router.push('/admin/login');
+          await performAutoLogout(roleRef.current, hadActiveSessionRef.current);
           return;
         }
 
         if (profileRes.ok) {
           const profile = await profileRes.json();
+          hadActiveSessionRef.current = true;
+          roleRef.current = profile.role;
           setAdminData({ 
             name: profile.username, 
             role: profile.role,
             permissions: profile.permissions || []
           });
+
+          if (typeof profile.sessionExpiresAt === 'number') {
+            let effectiveExpiry = profile.sessionExpiresAt;
+            if (profile.role === 'staff' && profile.isTemporary && profile.expiresAt) {
+              const accountExpiryMs = new Date(profile.expiresAt).getTime();
+              if (!Number.isNaN(accountExpiryMs)) {
+                effectiveExpiry = Math.min(effectiveExpiry, accountExpiryMs);
+              }
+            }
+            setSessionExpiresAt(effectiveExpiry);
+          }
         }
         
         if (statsRes.ok) {
@@ -102,7 +160,43 @@ export default function SidebarClientWrapper() {
     // Poll for stats updates every 60 seconds
     const interval = setInterval(fetchData, 60000);
     return () => clearInterval(interval);
-  }, [router]);
+  }, [performAutoLogout]);
+
+  // Exact automatic logout timer when selected session duration elapses
+  useEffect(() => {
+    if (!sessionExpiresAt) return;
+
+    const checkAndLogoutIfExpired = () => {
+      if (Date.now() >= sessionExpiresAt) {
+        performAutoLogout(roleRef.current, true);
+      }
+    };
+
+    const msRemaining = sessionExpiresAt - Date.now();
+    if (msRemaining <= 0) {
+      performAutoLogout(roleRef.current, true);
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      performAutoLogout(roleRef.current, true);
+    }, Math.min(msRemaining, 2147483647));
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        checkAndLogoutIfExpired();
+      }
+    };
+
+    window.addEventListener('focus', checkAndLogoutIfExpired);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('focus', checkAndLogoutIfExpired);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [sessionExpiresAt, performAutoLogout]);
 
   // Check for special occasions on mount
   useEffect(() => {
