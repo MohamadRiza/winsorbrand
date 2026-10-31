@@ -497,21 +497,25 @@ function HeroStage({
             fontWeight: 700,
             letterSpacing: '0.04em',
             textTransform: 'uppercase',
-            fontSize: 'clamp(26px, 4.5vw, 68px)',
-            color: 'rgba(255,255,255,0.18)',
+            fontSize: 'clamp(24px, 4vw, 56px)',
+            color: 'rgba(255,255,255,0.12)',
             whiteSpace: 'nowrap',
             mixBlendMode: 'overlay',
+            transform: 'translateY(-20px)',
           }}
         >
           {categoryLabel}
         </span>
       </div>
 
-      {/* Watch stage — animated swap */}
+      {/* Watch stage — dedicated upper visual zone, safely elevated above the bottom caption area */}
       <div
         style={{
           position: 'absolute',
-          inset: 0,
+          top: 'clamp(14px, 2.5vh, 26px)',
+          left: 'clamp(44px, 5.5vw, 68px)',
+          right: 'clamp(44px, 5.5vw, 68px)',
+          bottom: 'clamp(118px, 24%, 150px)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -523,11 +527,11 @@ function HeroStage({
         <div
           style={{
             position: 'absolute',
-            width: 'min(320px, 50vw)',
-            height: 'min(320px, 50vw)',
+            width: 'min(280px, 45vw)',
+            height: 'min(280px, 45vw)',
             borderRadius: '50%',
             background: 'radial-gradient(circle, rgba(139, 105, 20, 0.22) 0%, rgba(139, 105, 20, 0.06) 50%, rgba(0, 0, 0, 0) 70%)',
-            filter: 'blur(28px)',
+            filter: 'blur(26px)',
             pointerEvents: 'none',
             mixBlendMode: 'screen',
           }}
@@ -538,10 +542,12 @@ function HeroStage({
             className="hero-watch-in"
             data-dir={direction === 1 ? 'right' : 'left'}
             style={{
-              width: 'min(280px, 42vw)',
-              height: 'min(380px, 42vh)',
+              width: '100%',
+              height: '100%',
+              maxWidth: 'min(250px, 38vw)',
+              maxHeight: '100%',
               position: 'relative',
-              filter: 'drop-shadow(0 30px 48px rgba(0,0,0,0.55))',
+              filter: 'drop-shadow(0 26px 42px rgba(0,0,0,0.6))',
             }}
           >
             <Image
@@ -556,40 +562,66 @@ function HeroStage({
         )}
       </div>
 
-      {/* Bottom-left caption */}
+      {/* Bottom luxury boutique caption card — strictly confined in lower zone */}
       <div
+        className="hero-caption-card"
         style={{
           position: 'absolute',
-          left: 'clamp(18px, 3.5vw, 36px)',
-          bottom: 'clamp(18px, 3.5vh, 36px)',
+          left: 'clamp(12px, 2vw, 20px)',
+          bottom: 'clamp(10px, 1.6vh, 16px)',
           color: '#fff',
-          maxWidth: 'calc(100% - 36px)',
-          textShadow: '0 2px 12px rgba(0,0,0,0.5)',
           zIndex: 3,
+          background: 'rgba(12, 9, 6, 0.78)',
+          backdropFilter: 'blur(14px)',
+          WebkitBackdropFilter: 'blur(14px)',
+          border: '1px solid rgba(201, 161, 74, 0.28)',
+          borderRadius: '12px',
+          padding: '8px 14px',
+          boxShadow: '0 10px 28px rgba(0, 0, 0, 0.55)',
+          pointerEvents: 'auto',
+          boxSizing: 'border-box',
         }}
       >
-        <h2
+        <h3
+          title={active?.title ?? `Gifts for ${categoryLabel}`}
           style={{
             fontFamily: "'Jost', sans-serif",
             fontWeight: 600,
-            fontSize: 'clamp(18px, 2.2vw, 28px)',
+            fontSize: 'clamp(12px, 1.05vw, 14.5px)',
             margin: 0,
-            letterSpacing: '0.01em',
+            letterSpacing: '0.015em',
+            lineHeight: 1.25,
+            display: '-webkit-box',
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            wordBreak: 'break-word',
+            overflowWrap: 'anywhere',
+            color: '#ffffff',
+            textShadow: '0 2px 6px rgba(0,0,0,0.6)',
           }}
         >
           {active?.title ?? `Gifts for ${categoryLabel}`}
-        </h2>
+        </h3>
         {(active?.modelNo || categoryTagline) && (
           <p
             style={{
               fontFamily: "'Jost', sans-serif",
-              fontSize: '14px',
-              opacity: 0.9,
-              marginTop: '8px',
-              letterSpacing: '0.05em',
+              fontSize: '10.5px',
+              fontWeight: 500,
+              opacity: 0.95,
+              marginTop: '3px',
+              marginBottom: 0,
+              letterSpacing: '0.08em',
+              textTransform: 'uppercase',
+              color: '#dfb15b',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
             }}
           >
-            {active?.modelNo || categoryTagline}
+            {active?.modelNo ? `Model: ${active.modelNo}` : categoryTagline}
           </p>
         )}
         {active && (
@@ -598,17 +630,18 @@ function HeroStage({
             style={{
               display: 'inline-flex',
               alignItems: 'center',
-              gap: '6px',
-              marginTop: '18px',
-              color: '#fff',
+              gap: '4px',
+              marginTop: '6px',
+              color: '#ffffff',
               fontFamily: "'Jost', sans-serif",
-              fontSize: '13px',
+              fontSize: '10.5px',
+              fontWeight: 500,
               letterSpacing: '0.12em',
               textTransform: 'uppercase',
               textDecoration: 'none',
-              borderBottom: '1px solid rgba(255,255,255,0.6)',
-              paddingBottom: '4px',
-              pointerEvents: 'auto',
+              borderBottom: '1px solid rgba(255,255,255,0.45)',
+              paddingBottom: '1px',
+              transition: 'all 0.2s ease',
             }}
           >
             Discover more ›
@@ -641,12 +674,18 @@ function HeroStage({
         <div
           style={{
             position: 'absolute',
-            bottom: '24px',
-            right: 'clamp(20px, 5vw, 64px)',
+            bottom: 'clamp(14px, 2.2vh, 22px)',
+            right: 'clamp(14px, 2.5vw, 24px)',
             display: 'flex',
-            gap: '8px',
+            gap: '6px',
             alignItems: 'center',
-            zIndex: 3,
+            zIndex: 4,
+            background: 'rgba(12, 9, 6, 0.68)',
+            backdropFilter: 'blur(10px)',
+            WebkitBackdropFilter: 'blur(10px)',
+            border: '1px solid rgba(201, 161, 74, 0.22)',
+            borderRadius: '20px',
+            padding: '6px 12px',
           }}
         >
           <span
@@ -687,16 +726,16 @@ function HeroStage({
 
 const arrowStyle = (side: 'left' | 'right'): React.CSSProperties => ({
   position: 'absolute',
-  top: '50%',
-  [side]: 'clamp(12px, 2vw, 28px)',
+  top: 'clamp(130px, 38%, 220px)',
+  [side]: 'clamp(12px, 2vw, 24px)',
   transform: 'translateY(-50%)',
-  width: '48px',
-  height: '48px',
+  width: '44px',
+  height: '44px',
   borderRadius: '50%',
   border: '1px solid rgba(255,255,255,0.5)',
-  background: 'rgba(0,0,0,0.25)',
+  background: 'rgba(0,0,0,0.3)',
   color: '#fff',
-  fontSize: '24px',
+  fontSize: '22px',
   cursor: 'pointer',
   display: 'flex',
   alignItems: 'center',
@@ -909,6 +948,16 @@ export default function GiftSection() {
           min-height: 600px;
         }
 
+        .hero-caption-card {
+          max-width: min(330px, 50%);
+        }
+        @media (max-width: 640px) {
+          .hero-caption-card {
+            max-width: calc(100% - 96px) !important;
+            padding: 8px 12px !important;
+          }
+        }
+
         .celebrate-left-status {
           padding: 14px 24px;
           background: #120e0a;
@@ -1060,7 +1109,7 @@ export default function GiftSection() {
             margin-top: 20px;
           }
           .celebrate-left-col {
-            min-height: 400px;
+            min-height: 480px;
             height: auto;
           }
           .celebrate-right-col {
@@ -1084,7 +1133,7 @@ export default function GiftSection() {
             padding: 16px;
           }
           .celebrate-left-col {
-            min-height: 350px;
+            min-height: 480px;
           }
         }
       `}</style>
