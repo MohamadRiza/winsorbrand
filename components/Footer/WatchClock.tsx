@@ -2,8 +2,49 @@
 
 import React, { useEffect, useState } from 'react';
 
+function formatLocationLabel(tz: string): string {
+  if (!tz) return 'LOCAL TIME';
+
+  const map: Record<string, string> = {
+    'Asia/Colombo': 'SRI LANKA',
+    'Asia/Kolkata': 'INDIA',
+    'Asia/Dubai': 'DUBAI, UAE',
+    'Europe/London': 'LONDON, UK',
+    'Europe/Paris': 'PARIS, FRANCE',
+    'Europe/Berlin': 'BERLIN, GERMANY',
+    'Europe/Zurich': 'ZURICH, SWITZERLAND',
+    'Europe/Geneva': 'GENEVA, SWITZERLAND',
+    'America/New_York': 'NEW YORK, USA',
+    'America/Los_Angeles': 'LOS ANGELES, USA',
+    'America/Chicago': 'CHICAGO, USA',
+    'America/Denver': 'DENVER, USA',
+    'America/Phoenix': 'PHOENIX, USA',
+    'America/Detroit': 'DETROIT, USA',
+    'America/Indiana/Indianapolis': 'INDIANAPOLIS, USA',
+    'America/Toronto': 'TORONTO, CANADA',
+    'America/Vancouver': 'VANCOUVER, CANADA',
+    'Asia/Singapore': 'SINGAPORE',
+    'Asia/Tokyo': 'TOKYO, JAPAN',
+    'Australia/Sydney': 'SYDNEY, AUSTRALIA',
+    'Australia/Melbourne': 'MELBOURNE, AUSTRALIA',
+  };
+
+  if (map[tz]) return map[tz];
+
+  const parts = tz.split('/');
+  if (parts.length >= 2) {
+    const city = parts[parts.length - 1].replace(/_/g, ' ').toUpperCase();
+    const region = parts[0].replace(/_/g, ' ').toUpperCase();
+    if (region === 'AMERICA') return `${city}, USA`;
+    return `${city}, ${region}`;
+  }
+
+  return tz.toUpperCase();
+}
+
 export default function WatchClock({ size = 180 }: { size?: number }) {
   const [mounted, setMounted] = useState(false);
+  const [locationName, setLocationName] = useState('LOCAL');
   const [time, setTime] = useState<{
     hourDeg: number;
     minDeg: number;
@@ -21,6 +62,10 @@ export default function WatchClock({ size = 180 }: { size?: number }) {
   useEffect(() => {
     setMounted(true);
 
+    // Automatically detect visitor's timezone & city (e.g. "Asia/Colombo", "America/New_York")
+    const detectedTz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
+    setLocationName(formatLocationLabel(detectedTz));
+
     let animId: number;
     const updateTime = () => {
       const now = new Date();
@@ -33,7 +78,7 @@ export default function WatchClock({ size = 180 }: { size?: number }) {
       const minDeg = m * 6;
       const hourDeg = h * 30;
 
-      // Format digital readout e.g. 11:58:32 AM
+      // Exact local digital time with seconds e.g. 12:35:40 PM
       const timeStr = now.toLocaleTimeString('en-US', {
         hour: '2-digit',
         minute: '2-digit',
@@ -97,7 +142,7 @@ export default function WatchClock({ size = 180 }: { size?: number }) {
           loading="eager"
         />
 
-        {/* Date Window Overlay (Authentic 3 o'clock position) */}
+        {/* Date Window Overlay (Authentic 3 o'clock position, reflects visitor's exact local date) */}
         {mounted && (
           <div
             style={{
@@ -201,7 +246,7 @@ export default function WatchClock({ size = 180 }: { size?: number }) {
         />
       </div>
 
-      {/* ── Horology Caption & Live Digital Time ── */}
+      {/* ── Horology Caption & Live Digital Time with Auto-Detected City ── */}
       <div style={{ marginTop: '10px', textAlign: 'center' }}>
         <div
           style={{
@@ -227,7 +272,7 @@ export default function WatchClock({ size = 180 }: { size?: number }) {
             fontVariantNumeric: 'lining-nums'
           }}
         >
-          {mounted ? `${time.timeStr} • LOCAL` : 'LIVE PRECISION'}
+          {mounted ? `${time.timeStr} • ${locationName}` : 'LIVE PRECISION'}
         </div>
       </div>
     </div>
