@@ -73,7 +73,7 @@ function getTimezoneOffsetMs(timeZone: string): number {
   }
 }
 
-export default function WatchClock({ size = 180 }: { size?: number }) {
+export default function WatchClock({ size }: { size?: number }) {
   const { geoInfo } = useCurrency();
   const [mounted, setMounted] = useState(false);
   const [locationName, setLocationName] = useState('LOCAL');
@@ -153,6 +153,8 @@ export default function WatchClock({ size = 180 }: { size?: number }) {
     return () => cancelAnimationFrame(animId);
   }, []);
 
+  const customStyle = size ? ({ '--clock-size': `${size}px` } as React.CSSProperties) : undefined;
+
   return (
     <div
       className="winsor-watch-clock-widget"
@@ -162,16 +164,18 @@ export default function WatchClock({ size = 180 }: { size?: number }) {
         alignItems: 'center',
         justifyContent: 'center',
         userSelect: 'none',
-        pointerEvents: 'none'
+        pointerEvents: 'none',
+        ...customStyle
       }}
       aria-label="Winsor Real-Time Clock"
     >
       {/* ── Watch Case Stage ── */}
       <div
+        className="winsor-clock-case"
         style={{
           position: 'relative',
-          width: `${size}px`,
-          height: `${size}px`,
+          width: 'var(--clock-size, 180px)',
+          height: 'var(--clock-size, 180px)',
           filter: 'drop-shadow(0 10px 24px rgba(26,18,9,0.14)) drop-shadow(0 2px 6px rgba(139,105,20,0.18))',
           transform: 'translateZ(0)',
           willChange: 'transform'
@@ -181,8 +185,6 @@ export default function WatchClock({ size = 180 }: { size?: number }) {
         <img
           src="/clock/watch_dial.png"
           alt="Winsor Precision Dial"
-          width={size}
-          height={size}
           style={{
             position: 'absolute',
             inset: 0,
@@ -208,7 +210,7 @@ export default function WatchClock({ size = 180 }: { size?: number }) {
               alignItems: 'center',
               justifyContent: 'center',
               fontFamily: "'Jost', sans-serif",
-              fontSize: `${Math.max(7, Math.round(size * 0.038))}px`,
+              fontSize: 'calc(var(--clock-size, 180px) * 0.038)',
               fontWeight: 700,
               color: '#1a1209',
               background: '#ffffff',
@@ -226,8 +228,6 @@ export default function WatchClock({ size = 180 }: { size?: number }) {
         <img
           src="/clock/watch_hour.png"
           alt=""
-          width={size}
-          height={size}
           style={{
             position: 'absolute',
             inset: 0,
@@ -246,8 +246,6 @@ export default function WatchClock({ size = 180 }: { size?: number }) {
         <img
           src="/clock/watch_minute.png"
           alt=""
-          width={size}
-          height={size}
           style={{
             position: 'absolute',
             inset: 0,
@@ -266,8 +264,6 @@ export default function WatchClock({ size = 180 }: { size?: number }) {
         <img
           src="/clock/watch_second.png"
           alt=""
-          width={size}
-          height={size}
           style={{
             position: 'absolute',
             inset: 0,
@@ -289,8 +285,8 @@ export default function WatchClock({ size = 180 }: { size?: number }) {
             left: '50%',
             top: '50%',
             transform: 'translate(-50%, -50%)',
-            width: `${Math.max(6, Math.round(size * 0.042))}px`,
-            height: `${Math.max(6, Math.round(size * 0.042))}px`,
+            width: '4.2%',
+            height: '4.2%',
             borderRadius: '50%',
             background: 'radial-gradient(circle at 35% 35%, #fff1b8 0%, #dfb15b 45%, #8b6914 100%)',
             boxShadow: '0 1px 3px rgba(0,0,0,0.45), inset 0 0.5px 1px rgba(255,255,255,0.8)'
