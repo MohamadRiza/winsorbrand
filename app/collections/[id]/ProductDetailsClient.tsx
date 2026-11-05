@@ -1748,7 +1748,7 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
           <span>&gt;</span>
           <Link href="/collections" className="hover:text-[#8b6914] transition-colors">Classic Collection</Link>
           <span>&gt;</span>
-          <span className="text-[#1a1209] font-medium">{product.title}</span>
+          <span className="text-[#1a1209] font-medium capitalize">{product.title}</span>
         </div>
 
         <div className="detail-wrapper">
@@ -1839,7 +1839,7 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
             </div>
 
             {/* Title */}
-            <h1 className="font-['Cinzel',serif] text-3xl md:text-4xl font-medium text-[#1a1209] mb-1.5 tracking-wide lining-nums">
+            <h1 className="font-['Jost',sans-serif] text-2xl sm:text-3xl md:text-4xl font-semibold text-[#1a1209] mb-2 tracking-[-0.015em] leading-tight capitalize lining-nums">
               {product.title}
             </h1>
 
