@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import HeroLiveWatch from './HeroLiveWatch';
+import HeroSportWatch from './HeroSportWatch';
 
 export default function Watch3DAssembly() {
   const [activeSlide, setActiveSlide] = useState(0);
@@ -496,6 +497,8 @@ export default function Watch3DAssembly() {
                   />
                   {idx === 0 ? (
                     <HeroLiveWatch isMobile={isMobile} />
+                  ) : idx === 1 ? (
+                    <HeroSportWatch isMobile={isMobile} />
                   ) : (
                     <Image
                       src={slide.image}
