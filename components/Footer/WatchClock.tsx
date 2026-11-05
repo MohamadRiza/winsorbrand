@@ -181,9 +181,9 @@ export default function WatchClock({ size }: { size?: number }) {
           willChange: 'transform'
         }}
       >
-        {/* Dial Face & Bezel */}
+        {/* Red Sunray Dial Face & Bezel */}
         <img
-          src="/clock/watch_dial.png"
+          src="/clock/red/watch_dial.png"
           alt="Winsor Precision Dial"
           style={{
             position: 'absolute',
@@ -224,9 +224,9 @@ export default function WatchClock({ size }: { size?: number }) {
           </div>
         )}
 
-        {/* Hour Hand (Arrow with lume) */}
+        {/* Gold Arrow Hour Hand */}
         <img
-          src="/clock/watch_hour.png"
+          src="/clock/red/watch_hour.png"
           alt=""
           style={{
             position: 'absolute',
@@ -242,9 +242,9 @@ export default function WatchClock({ size }: { size?: number }) {
           }}
         />
 
-        {/* Minute Hand (Sword with lume) */}
+        {/* Gold Sword Minute Hand */}
         <img
-          src="/clock/watch_minute.png"
+          src="/clock/red/watch_minute.png"
           alt=""
           style={{
             position: 'absolute',
@@ -260,9 +260,9 @@ export default function WatchClock({ size }: { size?: number }) {
           }}
         />
 
-        {/* Second Hand (Needle with cyan tip & yellow cap) */}
+        {/* Needle Second Hand with Cyan Tip */}
         <img
-          src="/clock/watch_second.png"
+          src="/clock/red/watch_second.png"
           alt=""
           style={{
             position: 'absolute',
