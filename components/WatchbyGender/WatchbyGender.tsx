@@ -16,6 +16,10 @@ interface GenderSectionProps {
   buttonText: string;
   buttonType?: 'outline' | 'link';
   objectPosition?: string;
+  sizes?: string;
+  priority?: boolean;
+  quality?: number;
+  useWrapperScale?: boolean;
 }
 
 function GenderSection({
@@ -29,7 +33,11 @@ function GenderSection({
   isMobile,
   buttonText,
   buttonType = 'outline',
-  objectPosition = 'center'
+  objectPosition = 'center',
+  sizes,
+  priority = false,
+  quality = 90,
+  useWrapperScale = true
 }: GenderSectionProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [isVideoLoaded, setIsVideoLoaded] = useState(false);
@@ -124,11 +132,13 @@ function GenderSection({
       <div
         style={{
           position: 'absolute',
-          top: '-25%',
-          left: '-25%',
-          width: '150%',
-          height: '150%',
-          transform: isHovered ? 'scale(0.73)' : 'scale(0.68)',
+          top: useWrapperScale ? '-25%' : '0',
+          left: useWrapperScale ? '-25%' : '0',
+          width: useWrapperScale ? '150%' : '100%',
+          height: useWrapperScale ? '150%' : '100%',
+          transform: useWrapperScale
+            ? (isHovered ? 'scale(0.73)' : 'scale(0.68)')
+            : (isHovered ? 'scale(1.04)' : 'scale(1)'),
           transition: 'transform 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
         }}
       >
@@ -145,9 +155,11 @@ function GenderSection({
             src={image}
             alt={title}
             fill
-            sizes="(max-width: 768px) 100vw, 33vw"
+            sizes={sizes || "(max-width: 768px) 100vw, 50vw"}
+            quality={quality}
+            priority={priority}
+            loading={priority ? 'eager' : 'lazy'}
             style={{ objectFit: 'cover', objectPosition }}
-            loading="lazy"
           />
         </div>
 
@@ -181,7 +193,9 @@ function GenderSection({
         style={{
           position: 'absolute',
           inset: 0,
-          background: 'linear-gradient(to right, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.3) 45%, transparent 90%)',
+          background: isMobile
+            ? 'linear-gradient(to right, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.45) 50%, rgba(0,0,0,0.1) 100%)'
+            : 'linear-gradient(to right, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.3) 45%, transparent 90%)',
           pointerEvents: 'none',
           zIndex: 1,
         }}
@@ -196,7 +210,7 @@ function GenderSection({
           transform: 'translateY(-50%)',
           textAlign: 'left',
           width: '88%',
-          maxWidth: buttonType === 'link' ? '500px' : (isMobile ? '160px' : '420px'),
+          maxWidth: buttonType === 'link' ? (isMobile ? '190px' : '500px') : (isMobile ? '160px' : '420px'),
           zIndex: 2,
           display: 'flex',
           flexDirection: 'column',
@@ -334,8 +348,7 @@ export default function GenderCollectionSection() {
   };
 
   const giftData = {
-    image: '/graduation_gift.png',
-    video: '/winsor_gift_vid.webm',
+    image: '/graduation_gift_hd.webp',
     title: "The Perfect Gift",
   };
 
@@ -417,8 +430,8 @@ export default function GenderCollectionSection() {
         <div
           style={{
             width: '100%',
-            height: isMobile ? '22vh' : '38vh',
-            minHeight: isMobile ? '140px' : '280px',
+            height: isMobile ? '26vh' : '38vh',
+            minHeight: isMobile ? '180px' : '280px',
             position: 'relative',
             zIndex: 2,
             background: '#faf7f0',
@@ -432,10 +445,13 @@ export default function GenderCollectionSection() {
             title={giftData.title}
             description="Give more than time. Give a memory."
             image={giftData.image}
-            video={giftData.video}
             buttonText="Explore Gift Sets →"
             buttonType="link"
-            objectPosition="center 30%"
+            objectPosition={isMobile ? 'center 26%' : 'center 32%'}
+            sizes="100vw"
+            quality={95}
+            priority={true}
+            useWrapperScale={false}
             isMobile={isMobile}
           />
         </div>
