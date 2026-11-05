@@ -1839,7 +1839,7 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
             </div>
 
             {/* Title */}
-            <h1 className="font-['Jost',sans-serif] text-2xl sm:text-3xl md:text-4xl font-semibold text-[#1a1209] mb-2 tracking-[-0.015em] leading-tight capitalize lining-nums">
+            <h1 className="font-['Jost',sans-serif] text-2xl sm:text-3xl md:text-4xl font-normal text-[#1a1209] mb-2 tracking-normal leading-tight capitalize lining-nums">
               {product.title}
             </h1>
 
