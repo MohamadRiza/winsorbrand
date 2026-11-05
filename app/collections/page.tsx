@@ -2230,9 +2230,9 @@ export default function CollectionsPage() {
               className="toolbar-select"
               aria-label="Filter by gender"
             >
-              <option value="all">All Watches (Men &amp; Women)</option>
-              <option value="gents">👨 Gents / Men's Watches</option>
-              <option value="ladies">👩 Ladies / Women's Watches</option>
+              <option value="all">All Watches</option>
+              <option value="gents">Gents Watches</option>
+              <option value="ladies">Ladies Watches</option>
             </select>
 
             {/* Price Sorting */}
