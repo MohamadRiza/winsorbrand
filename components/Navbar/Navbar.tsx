@@ -493,58 +493,121 @@ export default function Navbar() {
           animation: wn-pill-reveal 0.44s cubic-bezier(0.16, 1, 0.3, 1) forwards;
           will-change: transform, opacity, filter;
         }
-        .wn-mob-close-btn{transition:all 0.28s cubic-bezier(0.25, 0.46, 0.45, 0.94);}
-        .wn-mob-close-btn:hover{background:#FFFFFF!important;border-color:rgba(139,105,20,0.5)!important;transform:rotate(90deg) scale(1.08);box-shadow:0 4px 14px rgba(139,105,20,0.15)!important;}
-        .wn-mob-currency-btn{
-          transition:all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-          background: #FFFFFF !important;
-          border: 1px solid rgba(139, 105, 20, 0.20) !important;
-          box-shadow: 0 2px 6px -1px rgba(26, 18, 9, 0.04), inset 0 1px 0 rgba(255, 255, 255, 1) !important;
+        .wn-mob-close-btn {
+          transition: all 0.28s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
-        .wn-mob-currency-btn:hover{border-color:rgba(139,105,20,0.48)!important;box-shadow:0 5px 16px -2px rgba(139,105,20,0.12)!important;transform:translateY(-1.5px);}
-        .wn-mob-col-btn{
-          position:relative;
-          overflow:hidden;
-          transition:all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        .wn-mob-close-btn:hover, .wn-mob-close-btn:active {
           background: #FFFFFF !important;
-          border: 1px solid rgba(139, 105, 20, 0.20) !important;
-          box-shadow: 0 2px 8px -1px rgba(26, 18, 9, 0.05), inset 0 1px 0 rgba(255, 255, 255, 1) !important;
+          border-color: rgba(139, 105, 20, 0.5) !important;
+          transform: rotate(90deg) scale(1.06);
+          box-shadow: 0 4px 14px rgba(139, 105, 20, 0.15) !important;
         }
-        .wn-mob-col-btn::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent 0%,rgba(212,175,55,0.12) 50%,transparent 100%);transform:translateX(-100%);transition:transform 0.6s ease;pointer-events:none;}
-        .wn-mob-col-btn:hover::before,.wn-mob-col-btn:active::before{transform:translateX(100%);}
-        .wn-mob-col-btn:hover{background:#FFFFFF!important;border-color:rgba(139,105,20,0.55)!important;box-shadow:0 6px 18px -2px rgba(139,105,20,0.14),inset 0 1px 0 rgba(255,255,255,1)!important;transform:translateY(-1.5px);}
-        .wn-mob-col-btn:hover span{color:#8B6914!important;}
-        .wn-mob-nav-link{
-          position:relative;
-          overflow:hidden;
-          transition:all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-          background: #FFFFFF !important;
-          border: 1px solid rgba(139, 105, 20, 0.16) !important;
-          box-shadow: 0 2px 6px -1px rgba(26, 18, 9, 0.04), inset 0 1px 0 rgba(255, 255, 255, 1) !important;
+        .wn-mob-currency-btn {
+          transition: all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
-        .wn-mob-nav-link::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent 0%,rgba(212,175,55,0.1) 50%,transparent 100%);transform:translateX(-100%);transition:transform 0.6s ease;pointer-events:none;}
-        .wn-mob-nav-link:hover::before,.wn-mob-nav-link:active::before{transform:translateX(100%);}
-        .wn-mob-nav-link:hover{background:#FFFFFF!important;border-color:rgba(139,105,20,0.48)!important;color:#8B6914!important;box-shadow:0 5px 16px -2px rgba(139,105,20,0.12),inset 0 1px 0 rgba(255,255,255,1)!important;transform:translateY(-1.5px);}
-        .wn-mob-profile-btn{
-          position:relative;
-          overflow:hidden;
-          transition:all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        .wn-mob-currency-btn:hover, .wn-mob-currency-btn:active {
+          border-color: rgba(139, 105, 20, 0.45) !important;
+          box-shadow: 0 4px 14px -2px rgba(139, 105, 20, 0.12) !important;
+        }
+        .wn-mob-col-row {
+          position: relative;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 11px 14px;
+          border-radius: 12px;
+          background: #FFFFFF;
+          border: 1px solid rgba(139, 105, 20, 0.14);
+          box-shadow: 0 2px 8px -2px rgba(26, 18, 9, 0.04);
+          text-decoration: none;
+          transition: all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        .wn-mob-col-row:hover, .wn-mob-col-row:active {
+          transform: translateX(3px);
+          border-color: rgba(139, 105, 20, 0.45);
+          box-shadow: 0 4px 16px -2px rgba(139, 105, 20, 0.12);
+        }
+        .wn-mob-col-row:hover .wn-col-title, .wn-mob-col-row:active .wn-col-title {
+          color: #8B6914 !important;
+        }
+        .wn-mob-col-row:hover .wn-col-arrow, .wn-mob-col-row:active .wn-col-arrow {
+          transform: translateX(3px);
+          color: #8B6914 !important;
+        }
+        .wn-mob-maison-link {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 9.5px 12px;
+          border-radius: 10px;
+          background: #FFFFFF;
+          border: 1px solid rgba(139, 105, 20, 0.13);
+          box-shadow: 0 2px 6px -2px rgba(26, 18, 9, 0.03);
+          text-decoration: none;
+          transition: all 0.22s ease;
+        }
+        .wn-mob-maison-link:hover, .wn-mob-maison-link:active {
+          border-color: rgba(139, 105, 20, 0.42);
+          background: #FFFDF9;
+          transform: translateY(-1px);
+        }
+        .wn-mob-maison-link:hover span {
+          color: #8B6914 !important;
+        }
+        .wn-mob-gift-banner {
+          position: relative;
+          overflow: hidden;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 11px 14px;
+          border-radius: 12px;
+          background: linear-gradient(135deg, rgba(139,105,20,0.08) 0%, rgba(212,175,55,0.12) 100%), #FFFFFF;
+          border: 1px solid rgba(139, 105, 20, 0.28);
+          box-shadow: 0 3px 10px -2px rgba(139, 105, 20, 0.08);
+          text-decoration: none;
+          transition: all 0.25s ease;
+        }
+        .wn-mob-gift-banner:hover, .wn-mob-gift-banner:active {
+          border-color: rgba(139, 105, 20, 0.55);
+          transform: translateX(3px);
+          box-shadow: 0 5px 16px -2px rgba(139, 105, 20, 0.16);
+        }
+        .wn-mob-concierge-card {
+          position: relative;
+          overflow: hidden;
+          background: linear-gradient(145deg, #1f1810 0%, #120e09 100%);
+          border: 1px solid rgba(212, 175, 55, 0.32);
+          border-radius: 14px;
+          padding: 15px 16px;
+          box-shadow: 0 10px 28px -4px rgba(26, 18, 9, 0.22);
+        }
+        .wn-mob-profile-btn {
+          position: relative;
+          overflow: hidden;
+          transition: all 0.25s ease;
           background: #FFFFFF !important;
           border: 1px solid rgba(139, 105, 20, 0.28) !important;
-          box-shadow: 0 2px 6px -1px rgba(26, 18, 9, 0.04), inset 0 1px 0 rgba(255, 255, 255, 1) !important;
+          box-shadow: 0 2px 6px -1px rgba(26, 18, 9, 0.04) !important;
         }
-        .wn-mob-profile-btn:hover{background:#FFFFFF!important;border-color:rgba(139,105,20,0.6)!important;transform:translateY(-1.5px);box-shadow:0 5px 14px rgba(139,105,20,0.14),inset 0 1px 0 rgba(255,255,255,1)!important;}
-        .wn-mob-cart-btn{
-          transition:all 0.28s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-          background: linear-gradient(135deg, #967018 0%, #C8980F 50%, #E2B960 100%) !important;
+        .wn-mob-profile-btn:hover {
+          border-color: rgba(139, 105, 20, 0.6) !important;
+          transform: translateY(-1px);
         }
-        .wn-mob-cart-btn:hover{transform:translateY(-1.5px);box-shadow:0 8px 24px rgba(139,105,20,0.45),inset 0 1.5px 1px rgba(255,255,255,0.45)!important;}
-        .wn-mob-signin-btn{
-          transition:all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-          background: #FFFFFF !important;
-          border: 1px solid rgba(139, 105, 20, 0.28) !important;
+        .wn-mob-cart-btn {
+          transition: all 0.28s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
-        .wn-mob-signin-btn:hover{border-color:rgba(139,105,20,0.55)!important;transform:translateY(-1.5px);box-shadow:0 4px 14px rgba(139,105,20,0.12)!important;}
+        .wn-mob-cart-btn:hover {
+          transform: translateY(-1px);
+          box-shadow: 0 6px 20px rgba(139, 105, 20, 0.45) !important;
+        }
+        .wn-mob-signin-btn {
+          transition: all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        .wn-mob-signin-btn:hover {
+          border-color: rgba(139, 105, 20, 0.55) !important;
+          transform: translateY(-1px);
+        }
         body.wn-mobile-menu-open, html.wn-mobile-menu-open {
           overflow: hidden !important;
           touch-action: none !important;
@@ -893,7 +956,7 @@ export default function Navbar() {
           top: 0,
           right: 0,
           bottom: 0,
-          width: 'min(340px, 86vw)',
+          width: 'min(365px, 90vw)',
           zIndex: 9999,
           background: '#FAF8F5',
           borderLeft: '1px solid rgba(139, 105, 20, 0.16)',
@@ -954,7 +1017,7 @@ export default function Navbar() {
               background: '#FFFFFF',
               border: '1px solid rgba(139, 105, 20, 0.20)',
               boxShadow: '0 2px 6px -1px rgba(26,18,9,0.04), inset 0 1px 0 rgba(255,255,255,1)',
-              borderRadius: '9999px', padding: '7.5px 16px', cursor: 'pointer',
+              borderRadius: '10px', padding: '8.5px 14px', cursor: 'pointer',
               justifyContent: 'space-between', color: '#8B6914',
             }}
           >
@@ -1000,75 +1063,125 @@ export default function Navbar() {
           )}
         </div>
 
-        {/* ── NAV LINKS (STAGGERED CASPER REVEAL) ── */}
+        {/* ── NAV LINKS (HAUTE HORLOGERIE & MAISON) ── */}
         <nav
           key={mobileOpen ? 'nav-open' : 'nav-closed'}
-          style={{ flex: 1, padding: '10px 16px 16px', display: 'flex', flexDirection: 'column', gap: '6px', position: 'relative', zIndex: 1 }}
+          style={{ flex: 1, padding: '12px 18px 20px', display: 'flex', flexDirection: 'column', gap: '8px', position: 'relative', zIndex: 1 }}
         >
 
-          {/* Section label */}
-          <div className="wn-anim-item" style={{ animationDelay: '0.06s', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1px', padding: '0 6px' }}>
-            <span style={{ fontFamily: "'Jost',sans-serif", fontSize: '8px', letterSpacing: '0.28em', color: '#8B6914', fontWeight: 700, textTransform: 'uppercase' }}>
+          {/* Section 1 Header */}
+          <div className="wn-anim-item" style={{ animationDelay: '0.06s', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 4px', marginBottom: '2px' }}>
+            <span style={{ fontFamily: "'Jost',sans-serif", fontSize: '8.5px', letterSpacing: '0.26em', color: '#8B6914', fontWeight: 700, textTransform: 'uppercase' }}>
               HAUTE HORLOGERIE
             </span>
-            <span style={{ fontFamily: "'Jost',sans-serif", fontSize: '8px', letterSpacing: '0.14em', color: 'rgba(26,18,9,0.35)', textTransform: 'uppercase' }}>COLLECTIONS</span>
+            <span style={{ fontFamily: "'Jost',sans-serif", fontSize: '8.5px', letterSpacing: '0.14em', color: 'rgba(26,18,9,0.38)', textTransform: 'uppercase' }}>
+              COLLECTIONS
+            </span>
           </div>
 
-          {/* ── Collection Links (Pure Luminous White Pills, Staggered Reveal, No Arrows) ── */}
-          {COLLECTIONS.map((col, idx) => (
+          {/* ── Collection Links (Bespoke Luxury Rows with Numbers & Subtitles) ── */}
+          {[
+            { key: 'new', num: '01', label: 'New Arrivals 2026', sub: 'Novelties & Masterpieces', href: '/new-arrivals' },
+            { key: 'gents', num: '02', label: 'Gents Timepieces', sub: 'Classic Dress & Chronographs', href: '/mens' },
+            { key: 'ladies', num: '03', label: 'Ladies Collection', sub: 'Grace, Diamonds & Gold', href: '/womens' },
+            { key: 'sport', num: '04', label: 'Sports & Racing', sub: 'Diver 300M & Automatic', href: '/sports' },
+            { key: 'limited', num: '05', label: 'Limited Editions', sub: 'Rare Numbered Atelier Pieces', href: '/limited-edition' },
+          ].map((col, idx) => (
             <Link
               key={col.key}
               href={col.href}
               onClick={() => setMobileOpen(false)}
-              className="wn-anim-item wn-mob-col-btn"
+              className="wn-anim-item wn-mob-col-row"
               style={{
                 animationDelay: `${0.08 + idx * 0.04}s`,
-                display: 'flex',
-                alignItems: 'center',
-                padding: '8px 20px',
-                borderRadius: '9999px',
-                background: '#FFFFFF',
-                border: '1px solid rgba(139, 105, 20, 0.20)',
-                boxShadow: '0 2px 8px -1px rgba(26, 18, 9, 0.05), inset 0 1px 0 rgba(255, 255, 255, 1)',
-                textDecoration: 'none',
               }}
             >
-              <span style={{
-                fontFamily: "'Cormorant Garamond', serif",
-                fontSize: '14.5px',
-                letterSpacing: '0.12em',
-                fontWeight: 600,
-                color: '#1a1209',
-                transition: 'color 0.2s ease',
-              }}>
-                {col.label}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <span style={{
+                  fontFamily: "'Jost', sans-serif",
+                  fontSize: '9.5px',
+                  fontWeight: 600,
+                  color: '#8B6914',
+                  background: 'rgba(139, 105, 20, 0.08)',
+                  padding: '3px 6px',
+                  borderRadius: '5px',
+                  letterSpacing: '0.06em',
+                  display: 'inline-block',
+                  minWidth: '18px',
+                  textAlign: 'center'
+                }}>
+                  {col.num}
+                </span>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1px' }}>
+                  <span
+                    className="wn-col-title"
+                    style={{
+                      fontFamily: "'Cormorant Garamond', serif",
+                      fontSize: '16.5px',
+                      letterSpacing: '0.04em',
+                      fontWeight: 600,
+                      color: '#1a1209',
+                      lineHeight: 1.2,
+                      transition: 'color 0.2s ease',
+                    }}
+                  >
+                    {col.label}
+                  </span>
+                  <span
+                    style={{
+                      fontFamily: "'Jost', sans-serif",
+                      fontSize: '10px',
+                      letterSpacing: '0.03em',
+                      color: 'rgba(26, 18, 9, 0.48)',
+                      fontWeight: 400,
+                      lineHeight: 1.2,
+                    }}
+                  >
+                    {col.sub}
+                  </span>
+                </div>
+              </div>
+              <span
+                className="wn-col-arrow"
+                style={{
+                  fontFamily: "'Jost', sans-serif",
+                  fontSize: '14px',
+                  color: 'rgba(139, 105, 20, 0.65)',
+                  fontWeight: 400,
+                  transition: 'all 0.2s ease',
+                  paddingLeft: '6px',
+                }}
+              >
+                ›
               </span>
             </Link>
           ))}
 
-          {/* EXPLORE MAISON label */}
-          <div className="wn-anim-item" style={{ animationDelay: '0.28s', marginTop: '8px', marginBottom: '1px', padding: '0 6px' }}>
-            <span style={{ fontFamily: "'Jost',sans-serif", fontSize: '8px', letterSpacing: '0.28em', color: '#8B6914', fontWeight: 700, textTransform: 'uppercase' }}>
+          {/* Section 2 Header */}
+          <div className="wn-anim-item" style={{ animationDelay: '0.28s', marginTop: '10px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 4px', marginBottom: '2px' }}>
+            <span style={{ fontFamily: "'Jost',sans-serif", fontSize: '8.5px', letterSpacing: '0.26em', color: '#8B6914', fontWeight: 700, textTransform: 'uppercase' }}>
               EXPLORE MAISON
+            </span>
+            <span style={{ fontFamily: "'Jost',sans-serif", fontSize: '8.5px', letterSpacing: '0.14em', color: 'rgba(26,18,9,0.38)', textTransform: 'uppercase' }}>
+              SERVICES
             </span>
           </div>
 
-          {/* Account quick links */}
+          {/* Account quick links if signed in */}
           {isSignedIn && (
-            <div className="wn-anim-item" style={{ animationDelay: '0.30s', display: 'flex', gap: '6px', marginBottom: '1px' }}>
+            <div className="wn-anim-item" style={{ animationDelay: '0.30s', display: 'flex', gap: '8px', marginBottom: '2px' }}>
               <Link
                 href="/profile"
                 onClick={() => setMobileOpen(false)}
                 className="wn-mob-profile-btn"
                 style={{
-                  flex: 1, padding: '7px 14px', textAlign: 'center',
+                  flex: 1, padding: '8px 12px', textAlign: 'center',
                   background: '#FFFFFF',
-                  border: '1px solid rgba(139, 105, 20, 0.32)',
-                  borderRadius: '9999px',
+                  border: '1px solid rgba(139, 105, 20, 0.28)',
+                  borderRadius: '10px',
                   color: '#8B6914',
-                  fontFamily: "'Jost',sans-serif", fontSize: '10.5px', letterSpacing: '0.1em',
+                  fontFamily: "'Jost',sans-serif", fontSize: '11px', letterSpacing: '0.08em',
                   textDecoration: 'none', fontWeight: 600,
-                  boxShadow: '0 2px 6px -1px rgba(26, 18, 9, 0.04)',
                 }}
               >
                 My Profile
@@ -1078,14 +1191,13 @@ export default function Navbar() {
                 onClick={() => setMobileOpen(false)}
                 className="wn-mob-profile-btn"
                 style={{
-                  flex: 1, padding: '7px 14px', textAlign: 'center',
+                  flex: 1, padding: '8px 12px', textAlign: 'center',
                   background: '#FFFFFF',
-                  border: '1px solid rgba(139, 105, 20, 0.32)',
-                  borderRadius: '9999px',
+                  border: '1px solid rgba(139, 105, 20, 0.28)',
+                  borderRadius: '10px',
                   color: '#8B6914',
-                  fontFamily: "'Jost',sans-serif", fontSize: '10.5px', letterSpacing: '0.1em',
+                  fontFamily: "'Jost',sans-serif", fontSize: '11px', letterSpacing: '0.08em',
                   textDecoration: 'none', fontWeight: 600,
-                  boxShadow: '0 2px 6px -1px rgba(26, 18, 9, 0.04)',
                 }}
               >
                 My Orders
@@ -1093,99 +1205,215 @@ export default function Navbar() {
             </div>
           )}
 
-          {/* Top-level nav links (Pure Luminous White Pills, Staggered Reveal, No Arrows) */}
-          {[...TOP_LEFT_LINKS, ...TOP_RIGHT_LINKS].map((l, idx) => (
+          {/* Maison Services 2-Column Grid */}
+          <div className="wn-anim-item" style={{ animationDelay: '0.32s', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+            {[
+              { label: 'All Collections', href: '/collections' },
+              { label: 'Our Story', href: '/our-story' },
+              { label: 'Retailers', href: '/retailers' },
+              { label: 'Customer Care', href: '/customer-care' },
+            ].map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={() => setMobileOpen(false)}
+                className="wn-mob-maison-link"
+              >
+                <span style={{
+                  fontFamily: "'Jost', sans-serif",
+                  fontSize: '11px',
+                  fontWeight: 500,
+                  letterSpacing: '0.04em',
+                  color: '#1a1209',
+                  transition: 'color 0.2s ease',
+                }}>
+                  {item.label}
+                </span>
+                <span style={{ color: '#8B6914', fontSize: '12px' }}>›</span>
+              </Link>
+            ))}
+          </div>
+
+          {/* Elevated The Perfect Gift Banner Link */}
+          <Link
+            href="/gifts"
+            onClick={() => setMobileOpen(false)}
+            className="wn-anim-item wn-mob-gift-banner"
+            style={{ animationDelay: '0.36s' }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <span style={{ fontSize: '16px' }}>🎁</span>
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <span style={{
+                  fontFamily: "'Cormorant Garamond', serif",
+                  fontSize: '15px',
+                  fontWeight: 600,
+                  color: '#8B6914',
+                  letterSpacing: '0.03em',
+                  lineHeight: 1.2
+                }}>
+                  The Perfect Gift Sets
+                </span>
+                <span style={{
+                  fontFamily: "'Jost', sans-serif",
+                  fontSize: '9.5px',
+                  color: 'rgba(26, 18, 9, 0.55)',
+                  letterSpacing: '0.04em'
+                }}>
+                  Give more than time. Give a memory.
+                </span>
+              </div>
+            </div>
+            <span style={{ fontFamily: "'Jost', sans-serif", fontSize: '13px', color: '#8B6914', fontWeight: 600 }}>→</span>
+          </Link>
+
+          {/* Curated Atelier Excellence Card (Replaces the empty void with prestige) */}
+          <div className="wn-anim-item wn-mob-concierge-card" style={{ animationDelay: '0.40s', marginTop: '4px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '7px' }}>
+                <Image src="/winsor_crest.webp" alt="Winsor Crest" width={16} height={16} style={{ objectFit: 'contain' }} />
+                <span style={{ fontFamily: "'Jost',sans-serif", fontSize: '8.5px', letterSpacing: '0.22em', color: '#D4AF37', fontWeight: 700, textTransform: 'uppercase' }}>
+                  WINSOR ATELIER
+                </span>
+              </div>
+              <span style={{ fontFamily: "'Jost',sans-serif", fontSize: '8px', color: 'rgba(255,255,255,0.45)', letterSpacing: '0.1em' }}>
+                EST. 2022
+              </span>
+            </div>
+            <p style={{
+              fontFamily: "'Cormorant Garamond', serif",
+              fontSize: '14.5px',
+              color: '#FFFFFF',
+              fontWeight: 400,
+              lineHeight: 1.3,
+              marginBottom: '3px',
+              letterSpacing: '0.02em',
+            }}>
+              Haute Horlogerie • 1-Year Global Warranty
+            </p>
+            <p style={{
+              fontFamily: "'Jost', sans-serif",
+              fontSize: '10px',
+              color: 'rgba(255, 255, 255, 0.65)',
+              fontWeight: 300,
+              lineHeight: 1.4,
+              marginBottom: '8px',
+            }}>
+              Complimentary White Glove Delivery & direct boutique concierge.
+            </p>
             <Link
-              key={l.href}
-              href={l.href}
+              href="/customer-care"
               onClick={() => setMobileOpen(false)}
-              className="wn-anim-item wn-mob-nav-link"
               style={{
-                animationDelay: `${0.32 + idx * 0.04}s`,
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
                 fontFamily: "'Jost',sans-serif",
-                fontSize: '11.5px', letterSpacing: '0.08em',
-                color: '#1a1209',
-                fontWeight: 500,
-                padding: '7.5px 20px',
-                borderRadius: '9999px',
+                fontSize: '9.5px',
+                color: '#D4AF37',
+                fontWeight: 600,
+                letterSpacing: '0.12em',
+                textTransform: 'uppercase',
                 textDecoration: 'none',
-                background: '#FFFFFF',
-                border: '1px solid rgba(139, 105, 20, 0.16)',
-                boxShadow: '0 2px 6px -1px rgba(26, 18, 9, 0.04), inset 0 1px 0 rgba(255, 255, 255, 1)',
-                display: 'block'
               }}
             >
-              {l.label}
+              <span>Explore Boutique Services</span>
+              <span>→</span>
             </Link>
-          ))}
+          </div>
+
         </nav>
 
         {/* ── FOOTER BAR ── */}
         <div style={{
-          padding: '10px 16px',
+          padding: '12px 18px',
           borderTop: '1px solid rgba(139,105,20,0.12)',
-          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-          background: '#FAF8F5',
+          background: 'rgba(250, 248, 245, 0.98)',
+          backdropFilter: 'blur(16px)',
+          WebkitBackdropFilter: 'blur(16px)',
           position: 'sticky', bottom: 0, zIndex: 10,
-          boxShadow: '0 -4px 20px rgba(26,18,9,0.04)',
+          boxShadow: '0 -6px 24px rgba(26,18,9,0.05)',
+          display: 'flex', flexDirection: 'column', gap: '8px',
         }}>
-          {!isSignedIn ? (
-            <SignInButton mode="modal">
-              <button
-                className="wn-anim-item wn-mob-signin-btn"
+          <div style={{ display: 'flex', gap: '10px', alignItems: 'center', width: '100%' }}>
+            {!isSignedIn ? (
+              <SignInButton mode="modal">
+                <button
+                  className="wn-anim-item wn-mob-signin-btn"
+                  style={{
+                    flex: 1,
+                    animationDelay: '0.44s',
+                    background: '#FFFFFF',
+                    border: '1.2px solid rgba(139, 105, 20, 0.28)',
+                    padding: '9.5px 14px', borderRadius: '10px', cursor: 'pointer',
+                    color: '#1a1209', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '7px',
+                    boxShadow: '0 2px 8px -2px rgba(26, 18, 9, 0.05)',
+                  }}>
+                  <UserIcon />
+                  <span style={{ fontFamily: "'Jost',sans-serif", fontSize: '11.5px', color: '#1a1209', fontWeight: 600, letterSpacing: '0.04em' }}>Sign In</span>
+                </button>
+              </SignInButton>
+            ) : (
+              <div
+                className="wn-anim-item"
                 style={{
-                  animationDelay: '0.52s',
+                  flex: 1,
+                  animationDelay: '0.44s',
+                  display: 'flex', alignItems: 'center', gap: '8px',
                   background: '#FFFFFF',
-                  border: '1px solid rgba(139, 105, 20, 0.28)',
-                  padding: '8px 15px', borderRadius: '9999px', cursor: 'pointer',
-                  color: '#1a1209', display: 'flex', alignItems: 'center', gap: '6px',
-                  boxShadow: '0 2px 6px -1px rgba(26, 18, 9, 0.04)',
-                }}>
-                <UserIcon />
-                <span style={{ fontFamily: "'Jost',sans-serif", fontSize: '11px', color: '#8B6914', fontWeight: 600 }}>Sign In / Account</span>
-              </button>
-            </SignInButton>
-          ) : (
-            <div className="wn-anim-item" style={{ animationDelay: '0.52s', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <UserButton
-                appearance={{ elements: { avatarBox: { width: '24px', height: '24px', border: '1.5px solid rgba(139,105,20,0.48)' } } }}
+                  border: '1.2px solid rgba(139, 105, 20, 0.24)',
+                  padding: '7px 12px', borderRadius: '10px',
+                }}
               >
-                <UserButton.MenuItems>
-                  <UserButton.Link label="My Profile" labelIcon={<UserIcon />} href="/profile" />
-                  <UserButton.Link label="My Orders" labelIcon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>} href="/orders" />
-                </UserButton.MenuItems>
-              </UserButton>
-              <span style={{ fontFamily: "'Jost',sans-serif", fontSize: '11px', color: '#1a1209', fontWeight: 500 }}>Account</span>
-            </div>
-          )}
+                <UserButton
+                  appearance={{ elements: { avatarBox: { width: '26px', height: '26px', border: '1.5px solid rgba(139,105,20,0.48)' } } }}
+                >
+                  <UserButton.MenuItems>
+                    <UserButton.Link label="My Profile" labelIcon={<UserIcon />} href="/profile" />
+                    <UserButton.Link label="My Orders" labelIcon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>} href="/orders" />
+                  </UserButton.MenuItems>
+                </UserButton>
+                <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.1 }}>
+                  <span style={{ fontFamily: "'Jost',sans-serif", fontSize: '11px', color: '#1a1209', fontWeight: 600 }}>Account</span>
+                  <span style={{ fontFamily: "'Jost',sans-serif", fontSize: '9px', color: 'rgba(26,18,9,0.45)' }}>Profile & Orders</span>
+                </div>
+              </div>
+            )}
 
-          <Link
-            href="/cart"
-            onClick={() => setMobileOpen(false)}
-            className="wn-anim-item wn-mob-cart-btn"
-            style={{
-              animationDelay: '0.52s',
-              position: 'relative', display: 'flex', alignItems: 'center', gap: '6px',
-              background: 'linear-gradient(135deg, #967018 0%, #C8980F 50%, #E2B960 100%)',
-              border: '1.2px solid rgba(255, 255, 255, 0.55)',
-              padding: '8px 18px', borderRadius: '9999px', textDecoration: 'none',
-              boxShadow: '0 5px 18px rgba(139, 105, 20, 0.35), inset 0 1.5px 0 0 rgba(255, 255, 255, 0.45)'
-            }}
-          >
-            <BagIcon />
-            <span style={{ fontFamily: "'Jost',sans-serif", fontSize: '11.5px', color: '#FFFFFF', fontWeight: 700, letterSpacing: '0.06em' }}>Cart</span>
-            <span style={{
-              position: 'absolute', top: '-6px', right: '-6px',
-              width: '18px', height: '18px', borderRadius: '50%',
-              background: '#fff', color: '#8B6914',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: '8.5px', fontFamily: "'Jost',sans-serif", fontWeight: 700,
-              border: '1.5px solid #8B6914',
-              boxShadow: '0 2px 8px rgba(26,18,9,0.18)'
-            }}>
-              {totalItemsCount > 9 ? '9+' : totalItemsCount}
+            <Link
+              href="/cart"
+              onClick={() => setMobileOpen(false)}
+              className="wn-anim-item wn-mob-cart-btn"
+              style={{
+                flex: 1,
+                animationDelay: '0.44s',
+                position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+                background: 'linear-gradient(135deg, #8B6914 0%, #B8860B 50%, #D4AF37 100%)',
+                border: '1px solid rgba(255, 255, 255, 0.45)',
+                padding: '9.5px 16px', borderRadius: '10px', textDecoration: 'none',
+                boxShadow: '0 4px 18px rgba(139, 105, 20, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.4)'
+              }}
+            >
+              <BagIcon />
+              <span style={{ fontFamily: "'Jost',sans-serif", fontSize: '12px', color: '#FFFFFF', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase' }}>Bag</span>
+              <span style={{
+                minWidth: '19px', height: '19px', padding: '0 4px', borderRadius: '9999px',
+                background: '#FFFFFF', color: '#8B6914',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: '9.5px', fontFamily: "'Jost',sans-serif", fontWeight: 700,
+                border: '1px solid #8B6914',
+                boxShadow: '0 2px 6px rgba(26,18,9,0.15)'
+              }}>
+                {totalItemsCount > 9 ? '9+' : totalItemsCount}
+              </span>
+            </Link>
+          </div>
+
+          <div style={{ textAlign: 'center', marginTop: '2px' }}>
+            <span style={{ fontFamily: "'Jost',sans-serif", fontSize: '8px', letterSpacing: '0.22em', color: 'rgba(26,18,9,0.38)', textTransform: 'uppercase' }}>
+              WINSOR • DUBAI ATELIER • JAPAN PRECISION
             </span>
-          </Link>
+          </div>
         </div>
       </div>
     </>
