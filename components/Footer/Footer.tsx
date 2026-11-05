@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { useCurrency, CURRENCIES, CurrencyOption } from '@/app/context/CurrencyContext';
 import { useState } from 'react';
 import CountryFlag from '@/components/CountryFlag';
+import WatchClock from './WatchClock';
 
 // ─────────────────────────────────────────────────────────────
 // ICON COMPONENTS
@@ -295,6 +296,18 @@ export default function Footer() {
         .ft-input:focus {
           border-color: #8B6914 !important;
           outline: none;
+        }
+
+        .ft-desktop-clock {
+          display: flex !important;
+        }
+        .ft-mobile-clock {
+          display: none !important;
+        }
+
+        @media (max-width: 640px) {
+          .ft-desktop-clock { display: none !important; }
+          .ft-mobile-clock  { display: flex !important; }
         }
 
         /* ── DESKTOP & TABLET: ft-links-wrapper uses contents to maintain grid ── */
@@ -590,6 +603,11 @@ export default function Footer() {
                     </Link>
                   ))}
                 </nav>
+
+                {/* Winsor Live Precision Clock Widget (Desktop & Tablet) */}
+                <div className="ft-desktop-clock" style={{ marginTop: '24px', justifyContent: 'center' }}>
+                  <WatchClock size={175} />
+                </div>
               </div>
 
               {/* COL 4: SUPPORT */}
@@ -618,6 +636,11 @@ export default function Footer() {
                   ))}
                 </nav>
               </div>
+            </div>
+
+            {/* Winsor Live Precision Clock Widget (Mobile Center) */}
+            <div className="ft-mobile-clock" style={{ width: '100%', justifyContent: 'center', margin: '4px 0 12px' }}>
+              <WatchClock size={165} />
             </div>
 
             {/* ── COL 5: NEWSLETTER ── */}
