@@ -1,8 +1,27 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
+import { useCurrency } from '@/app/context/CurrencyContext';
 
-function formatLocationLabel(tz: string): string {
+function formatLocationLabel(tz: string, city?: string, countryCode?: string): string {
+  if (city && countryCode) {
+    const c = countryCode.toUpperCase();
+    const ct = city.toUpperCase();
+    if (c === 'LK') return 'SRI LANKA';
+    if (c === 'GB' || c === 'UK') return `${ct}, UK`;
+    if (c === 'US') return `${ct}, USA`;
+    if (c === 'AE') return `${ct}, UAE`;
+    if (c === 'CA') return `${ct}, CANADA`;
+    if (c === 'AU') return `${ct}, AUSTRALIA`;
+    if (c === 'CH') return `${ct}, SWITZERLAND`;
+    if (c === 'FR') return `${ct}, FRANCE`;
+    if (c === 'DE') return `${ct}, GERMANY`;
+    if (c === 'IN') return `${ct}, INDIA`;
+    if (c === 'JP') return `${ct}, JAPAN`;
+    if (c === 'SG') return 'SINGAPORE';
+    return `${ct}, ${c}`;
+  }
+
   if (!tz) return 'LOCAL TIME';
 
   const map: Record<string, string> = {
@@ -33,18 +52,36 @@ function formatLocationLabel(tz: string): string {
 
   const parts = tz.split('/');
   if (parts.length >= 2) {
-    const city = parts[parts.length - 1].replace(/_/g, ' ').toUpperCase();
+    const partCity = parts[parts.length - 1].replace(/_/g, ' ').toUpperCase();
     const region = parts[0].replace(/_/g, ' ').toUpperCase();
-    if (region === 'AMERICA') return `${city}, USA`;
-    return `${city}, ${region}`;
+    if (region === 'AMERICA') return `${partCity}, USA`;
+    return `${partCity}, ${region}`;
   }
 
   return tz.toUpperCase();
 }
 
+// Compute offset in ms between UTC and target timezone
+function getTimezoneOffsetMs(timeZone: string): number {
+  try {
+    const now = new Date();
+    const utcDate = new Date(now.toLocaleString('en-US', { timeZone: 'UTC' }));
+    const tzDate = new Date(now.toLocaleString('en-US', { timeZone }));
+    return tzDate.getTime() - utcDate.getTime();
+  } catch {
+    return 0;
+  }
+}
+
 export default function WatchClock({ size = 180 }: { size?: number }) {
+  const { geoInfo } = useCurrency();
   const [mounted, setMounted] = useState(false);
   const [locationName, setLocationName] = useState('LOCAL');
+
+  // Offset in milliseconds between UTC and the visitor's local timezone
+  const offsetMsRef = useRef<number>(0);
+  const activeTzRef = useRef<string>('Asia/Colombo');
+
   const [time, setTime] = useState<{
     hourDeg: number;
     minDeg: number;
@@ -59,39 +96,54 @@ export default function WatchClock({ size = 180 }: { size?: number }) {
     timeStr: '10:10:35 AM'
   });
 
+  // Keep target timezone and label in sync with geo detection
   useEffect(() => {
     setMounted(true);
 
-    // Automatically detect visitor's timezone & city (e.g. "Asia/Colombo", "America/New_York")
-    const detectedTz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
-    setLocationName(formatLocationLabel(detectedTz));
+    const targetTz = geoInfo?.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone || 'Asia/Colombo';
+    activeTzRef.current = targetTz;
+    offsetMsRef.current = getTimezoneOffsetMs(targetTz);
 
+    setLocationName(formatLocationLabel(targetTz, geoInfo?.city, geoInfo?.countryCode));
+
+    // Refresh offset periodically (every minute) to guard against DST edge transitions
+    const tzInterval = setInterval(() => {
+      offsetMsRef.current = getTimezoneOffsetMs(activeTzRef.current);
+    }, 60000);
+
+    return () => clearInterval(tzInterval);
+  }, [geoInfo]);
+
+  // High-performance 60fps animation loop for watch hands and precision date
+  useEffect(() => {
     let animId: number;
+
     const updateTime = () => {
-      const now = new Date();
-      const ms = now.getMilliseconds();
-      const s = now.getSeconds() + ms / 1000;
-      const m = now.getMinutes() + s / 60;
-      const h = (now.getHours() % 12) + m / 60;
+      const nowUtc = Date.now();
+      const targetDate = new Date(nowUtc + offsetMsRef.current);
+
+      const ms = targetDate.getUTCMilliseconds();
+      const s = targetDate.getUTCSeconds() + ms / 1000;
+      const m = targetDate.getUTCMinutes() + s / 60;
+      const h = (targetDate.getUTCHours() % 12) + m / 60;
 
       const secDeg = s * 6;
       const minDeg = m * 6;
       const hourDeg = h * 30;
 
-      // Exact local digital time with seconds e.g. 12:35:40 PM
-      const timeStr = now.toLocaleTimeString('en-US', {
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-        hour12: true
-      });
+      // Exact 12-hour local digital readout
+      const rawHours = targetDate.getUTCHours();
+      const hour12 = rawHours % 12 || 12;
+      const ampm = rawHours >= 12 ? 'PM' : 'AM';
+      const pad = (n: number) => (n < 10 ? '0' + n : String(n));
+      const timeStr = `${pad(hour12)}:${pad(targetDate.getUTCMinutes())}:${pad(targetDate.getUTCSeconds())} ${ampm}`;
 
       setTime({
         hourDeg,
         minDeg,
         secDeg,
-        day: now.getDate(),
-        timeStr
+        day: targetDate.getUTCDate(),
+        timeStr,
       });
 
       animId = requestAnimationFrame(updateTime);
@@ -142,7 +194,7 @@ export default function WatchClock({ size = 180 }: { size?: number }) {
           loading="eager"
         />
 
-        {/* Date Window Overlay (Authentic 3 o'clock position, reflects visitor's exact local date) */}
+        {/* Date Window Overlay (Authentic 3 o'clock position, reflects visitor's exact local date worldwide) */}
         {mounted && (
           <div
             style={{

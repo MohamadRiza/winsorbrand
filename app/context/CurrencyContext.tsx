@@ -11,6 +11,14 @@ export interface CurrencyOption {
   iso:    string;
 }
 
+export interface GeoInfo {
+  countryCode: string;
+  city:        string;
+  timezone:    string;
+  currency:    string;
+  source?:     string;
+}
+
 export const CURRENCIES: CurrencyOption[] = [
   { code: 'LKR', label: 'Sri Lankan Rupee',      symbol: 'LKR',  flag: '🇱🇰', iso: 'lk' },
   { code: 'USD', label: 'US Dollar',              symbol: 'USD',   flag: '🇺🇸', iso: 'us' },
@@ -32,19 +40,11 @@ export const CURRENCIES: CurrencyOption[] = [
   { code: 'MVR', label: 'Maldivian Rufiyaa',      symbol: 'MVR',  flag: '🇲🇻', iso: 'mv' },
 ];
 
-// Map country currency codes returned by ip-api to our supported list
-const COUNTRY_CURRENCY_MAP: Record<string, string> = {
-  LKR: 'LKR', USD: 'USD', GBP: 'GBP', EUR: 'EUR',
-  AUD: 'AUD', NZD: 'NZD', CAD: 'CAD', CHF: 'CHF',
-  HKD: 'HKD', SGD: 'SGD', MYR: 'MYR', IDR: 'IDR',
-  CNY: 'CNY', JPY: 'JPY', INR: 'INR', AED: 'AED',
-  QAR: 'QAR', MVR: 'MVR',
-};
-
 // ── Context shape ──────────────────────────────────────────────────────────
 interface CurrencyContextValue {
   selected:       CurrencyOption;
-  detectedCode:   string;         // what ip-api detected
+  detectedCode:   string;         // currency code detected e.g. 'GBP' or 'LKR'
+  geoInfo:        GeoInfo | null; // visitor's physical geolocation & timezone
   rates:          Record<string, number>; // LKR → X rates
   loading:        boolean;
   lastUpdated:    Date | null;
@@ -58,50 +58,110 @@ const CurrencyContext = createContext<CurrencyContextValue | null>(null);
 export function CurrencyProvider({ children }: { children: ReactNode }) {
   const [selected,     setSelected]     = useState<CurrencyOption>(CURRENCIES[0]); // default LKR
   const [detectedCode, setDetectedCode] = useState('LKR');
+  const [geoInfo,      setGeoInfo]      = useState<GeoInfo | null>(null);
   const [rates,        setRates]        = useState<Record<string, number>>({});
   const [loading,      setLoading]      = useState(true);
   const [lastUpdated,  setLastUpdated]  = useState<Date | null>(null);
 
-  // 1. Detect user location & currency
+  // 1. Detect user location & currency (Automatic geo-adaptation)
   useEffect(() => {
+    // Immediate pre-hydration check from localStorage for fastest render
+    try {
+      const savedCurrency = localStorage.getItem('winsor_currency');
+      if (savedCurrency) {
+        const found = CURRENCIES.find(c => c.code === savedCurrency);
+        if (found) setSelected(found);
+      }
+    } catch {
+      // localStorage may be disabled
+    }
+
     const detectLocation = async () => {
       try {
-        const res  = await fetch('http://ip-api.com/json/?fields=currency');
-        const data = await res.json();
-        const code = data?.currency as string;
+        // Internal secure HTTPS API endpoint with Vercel edge header inspection & IP detection
+        const res = await fetch('/api/geo');
+        if (res.ok) {
+          const data: GeoInfo = await res.json();
+          if (data && data.currency) {
+            setGeoInfo(data);
+            setDetectedCode(data.currency);
 
-        if (code && COUNTRY_CURRENCY_MAP[code]) {
-          const matched = CURRENCIES.find(c => c.code === COUNTRY_CURRENCY_MAP[code]);
-          if (matched) {
-            setDetectedCode(matched.code);
+            const savedCountry = localStorage.getItem('winsor_user_country');
+            const hasCountryChanged = !savedCountry || savedCountry.toUpperCase() !== data.countryCode.toUpperCase();
 
-            // Only auto-set if no manual preference saved
-            const saved = localStorage.getItem('winsor_currency');
-            if (!saved) setSelected(matched);
+            if (hasCountryChanged) {
+              // Visitor has arrived in a new country (e.g. traveling Sri Lanka -> UK)!
+              // Automatically switch to the new country's currency:
+              const matched = CURRENCIES.find(c => c.code === data.currency);
+              if (matched) {
+                setSelected(matched);
+                localStorage.setItem('winsor_currency', matched.code);
+              }
+              localStorage.setItem('winsor_user_country', data.countryCode.toUpperCase());
+            } else {
+              // Visitor is in the same country. If no saved manual preference exists, use detected currency.
+              const saved = localStorage.getItem('winsor_currency');
+              if (!saved) {
+                const matched = CURRENCIES.find(c => c.code === data.currency);
+                if (matched) {
+                  setSelected(matched);
+                  localStorage.setItem('winsor_currency', matched.code);
+                }
+              }
+            }
+            return;
           }
         }
       } catch {
-        // Silently fall back to LKR
+        // Fallback below
+      }
+
+      // Offline / API fallback using browser timezone hint
+      try {
+        const browserTz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
+        let fallbackCurrency = 'LKR';
+        let fallbackCountry = 'LK';
+
+        if (browserTz.includes('London') || browserTz.includes('Belfast')) {
+          fallbackCurrency = 'GBP';
+          fallbackCountry = 'GB';
+        } else if (browserTz.includes('New_York') || browserTz.includes('Los_Angeles') || browserTz.includes('Chicago') || browserTz.includes('Denver')) {
+          fallbackCurrency = 'USD';
+          fallbackCountry = 'US';
+        } else if (browserTz.includes('Dubai')) {
+          fallbackCurrency = 'AED';
+          fallbackCountry = 'AE';
+        } else if (browserTz.includes('Paris') || browserTz.includes('Berlin') || browserTz.includes('Rome') || browserTz.includes('Madrid')) {
+          fallbackCurrency = 'EUR';
+          fallbackCountry = 'DE';
+        } else if (browserTz.includes('Sydney') || browserTz.includes('Melbourne')) {
+          fallbackCurrency = 'AUD';
+          fallbackCountry = 'AU';
+        }
+
+        const savedCountry = localStorage.getItem('winsor_user_country');
+        if (!savedCountry || savedCountry !== fallbackCountry) {
+          const matched = CURRENCIES.find(c => c.code === fallbackCurrency);
+          if (matched) {
+            setSelected(matched);
+            localStorage.setItem('winsor_currency', matched.code);
+          }
+          localStorage.setItem('winsor_user_country', fallbackCountry);
+        }
+      } catch {
+        // Ignore
       }
     };
-
-    // Restore manual preference from localStorage
-    const saved = localStorage.getItem('winsor_currency');
-    if (saved) {
-      const found = CURRENCIES.find(c => c.code === saved);
-      if (found) setSelected(found);
-    }
 
     detectLocation();
   }, []);
 
   // 2. Fetch exchange rates (LKR as base)
-  //    Using fawazahmed0/currency-api via jsDelivr — no key, no rate limit
   useEffect(() => {
     const fetchRates = async () => {
       setLoading(true);
       try {
-        const res  = await fetch(
+        const res = await fetch(
           'https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/lkr.json'
         );
         const data = await res.json();
@@ -120,7 +180,7 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
         setLastUpdated(new Date());
       } catch {
         // Fallback approximate rates if API fails
-        setRates({ LKR: 1, USD: 0.0033, GBP: 0.0026, EUR: 0.003 });
+        setRates({ LKR: 1, USD: 0.0033, GBP: 0.0026, EUR: 0.003, AED: 0.012 });
       } finally {
         setLoading(false);
       }
@@ -136,9 +196,17 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
     const found = CURRENCIES.find(c => c.code === code);
     if (found) {
       setSelected(found);
-      localStorage.setItem('winsor_currency', code);
+      try {
+        localStorage.setItem('winsor_currency', code);
+        // Bind choice to current country so country transitions still trigger auto-update
+        if (geoInfo?.countryCode) {
+          localStorage.setItem('winsor_user_country', geoInfo.countryCode);
+        }
+      } catch {
+        // Ignore
+      }
     }
-  }, []);
+  }, [geoInfo]);
 
   const convertPrice = useCallback((lkrAmount: number): string => {
     const rate = rates[selected.code] ?? 1;
@@ -154,7 +222,7 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
 
   return (
     <CurrencyContext.Provider value={{
-      selected, detectedCode, rates, loading, lastUpdated, setCurrency, convertPrice,
+      selected, detectedCode, geoInfo, rates, loading, lastUpdated, setCurrency, convertPrice,
     }}>
       {children}
     </CurrencyContext.Provider>
