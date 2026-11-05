@@ -19,21 +19,14 @@ function getTimezoneOffsetMs(timeZone: string): number {
 export default function HeroLiveWatch({ isMobile }: { isMobile: boolean }) {
   const { geoInfo } = useCurrency();
   const [mounted, setMounted] = useState(false);
+  const [day, setDay] = useState<number>(5);
 
   const offsetMsRef = useRef<number>(0);
   const activeTzRef = useRef<string>('Asia/Colombo');
 
-  const [time, setTime] = useState<{
-    hourDeg: number;
-    minDeg: number;
-    secDeg: number;
-    day: number;
-  }>({
-    hourDeg: 305,
-    minDeg: 60,
-    secDeg: 210,
-    day: 5,
-  });
+  const hourRef = useRef<HTMLImageElement>(null);
+  const minRef = useRef<HTMLImageElement>(null);
+  const secRef = useRef<HTMLImageElement>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -50,6 +43,7 @@ export default function HeroLiveWatch({ isMobile }: { isMobile: boolean }) {
 
   useEffect(() => {
     let animId: number;
+    let lastDay = -1;
 
     const updateTime = () => {
       const nowUtc = Date.now();
@@ -64,12 +58,22 @@ export default function HeroLiveWatch({ isMobile }: { isMobile: boolean }) {
       const minDeg = m * 6;
       const hourDeg = h * 30;
 
-      setTime({
-        hourDeg,
-        minDeg,
-        secDeg,
-        day: targetDate.getUTCDate(),
-      });
+      // Direct DOM transforms for silky 60fps sweep without React re-renders
+      if (secRef.current) {
+        secRef.current.style.transform = `rotate(${secDeg}deg)`;
+      }
+      if (minRef.current) {
+        minRef.current.style.transform = `rotate(${minDeg}deg)`;
+      }
+      if (hourRef.current) {
+        hourRef.current.style.transform = `rotate(${hourDeg}deg)`;
+      }
+
+      const currentDay = targetDate.getUTCDate();
+      if (currentDay !== lastDay) {
+        lastDay = currentDay;
+        setDay(currentDay);
+      }
 
       animId = requestAnimationFrame(updateTime);
     };
@@ -80,13 +84,15 @@ export default function HeroLiveWatch({ isMobile }: { isMobile: boolean }) {
 
   return (
     <div
-      className="floating-watch relative select-none"
+      className="relative select-none"
       style={{
         width: isMobile ? '160px' : '520px',
         height: isMobile ? '160px' : '520px',
         maxWidth: '100%',
         position: 'relative',
         filter: 'drop-shadow(0 20px 30px rgba(26,18,9,0.14))',
+        // Stable position - no jumping or vertical bobbing
+        transform: 'none',
       }}
     >
       {/* 1. Stainless Steel Watch Case & Bracelet Base */}
@@ -105,14 +111,15 @@ export default function HeroLiveWatch({ isMobile }: { isMobile: boolean }) {
         }}
       />
 
-      {/* 2. Live Rotating Dial & Hands Stage (Overlayed on Case) */}
+      {/* 2. Calibrated Live Rotating Dial & Hands Stage */}
+      {/* Exact center of watch bezel: cx = 48.145%, cy = 45.801%, scale: 37.02% */}
       <div
         className="absolute z-20 pointer-events-none"
         style={{
-          left: '50%',
-          top: '45.703%',
-          width: '48.05%',
-          height: '48.05%',
+          left: '48.145%',
+          top: '45.801%',
+          width: '37.02%',
+          height: '37.02%',
           transform: 'translate(-50%, -50%)',
           position: 'absolute',
         }}
@@ -137,16 +144,16 @@ export default function HeroLiveWatch({ isMobile }: { isMobile: boolean }) {
           <div
             style={{
               position: 'absolute',
-              left: '72.5%',
-              top: '50.33%',
+              left: '72.25%',
+              top: '50.0%',
               transform: 'translate(-50%, -50%)',
-              width: '5.2%',
-              height: '3.6%',
+              width: '6.2%',
+              height: '4.8%',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               fontFamily: "'Jost', sans-serif",
-              fontSize: isMobile ? '5.5px' : '10px',
+              fontSize: isMobile ? '4.5px' : '8.5px',
               fontWeight: 700,
               color: '#1a1209',
               background: '#ffffff',
@@ -156,12 +163,13 @@ export default function HeroLiveWatch({ isMobile }: { isMobile: boolean }) {
               zIndex: 1,
             }}
           >
-            {time.day}
+            {day}
           </div>
         )}
 
         {/* Silver Arrow Hour Hand */}
         <img
+          ref={hourRef}
           src="/clock/black/watch_hour.png"
           alt=""
           style={{
@@ -171,7 +179,7 @@ export default function HeroLiveWatch({ isMobile }: { isMobile: boolean }) {
             height: '100%',
             objectFit: 'contain',
             display: 'block',
-            transform: `rotate(${time.hourDeg}deg)`,
+            transform: 'rotate(0deg)',
             transformOrigin: '50% 50%',
             filter: 'drop-shadow(0 2px 3px rgba(0,0,0,0.32))',
             willChange: 'transform',
@@ -180,6 +188,7 @@ export default function HeroLiveWatch({ isMobile }: { isMobile: boolean }) {
 
         {/* Silver Sword Minute Hand */}
         <img
+          ref={minRef}
           src="/clock/black/watch_minute.png"
           alt=""
           style={{
@@ -189,7 +198,7 @@ export default function HeroLiveWatch({ isMobile }: { isMobile: boolean }) {
             height: '100%',
             objectFit: 'contain',
             display: 'block',
-            transform: `rotate(${time.minDeg}deg)`,
+            transform: 'rotate(0deg)',
             transformOrigin: '50% 50%',
             filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.36))',
             willChange: 'transform',
@@ -198,6 +207,7 @@ export default function HeroLiveWatch({ isMobile }: { isMobile: boolean }) {
 
         {/* Silver Second Hand with Smooth 60fps Sweep */}
         <img
+          ref={secRef}
           src="/clock/black/watch_second.png"
           alt=""
           style={{
@@ -207,7 +217,7 @@ export default function HeroLiveWatch({ isMobile }: { isMobile: boolean }) {
             height: '100%',
             objectFit: 'contain',
             display: 'block',
-            transform: `rotate(${time.secDeg}deg)`,
+            transform: 'rotate(0deg)',
             transformOrigin: '50% 50%',
             filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.42))',
             willChange: 'transform',
