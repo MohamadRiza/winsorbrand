@@ -283,9 +283,12 @@ export default function Footer() {
           outline: none;
         }
 
-        /* ── Horology Pre-Footer Brand Showcase ── */
+        /* ── Horology Pre-Footer Brand Showcase (TAG Heuer Style) ── */
         .ft-banner-logo-link {
           transition: opacity 0.25s ease, transform 0.25s ease;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
         }
         .ft-banner-logo-link:hover {
           opacity: 0.82;
@@ -296,12 +299,29 @@ export default function Footer() {
           --clock-size: 185px;
         }
 
+        .ft-horology-container {
+          max-width: 900px;
+          margin: 0 auto;
+          padding: 34px 24px 28px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 56px;
+          position: relative;
+          z-index: 2;
+        }
+
+        .ft-banner-logo-img {
+          width: 155px;
+          height: auto;
+          display: block;
+          object-fit: contain;
+        }
+
         @media (max-width: 1024px) {
-          .ft-horology-hairline {
-            display: none !important;
-          }
           .ft-horology-container {
-            padding: 32px 28px !important;
+            gap: 40px !important;
+            padding: 28px 20px 24px !important;
           }
           .ft-banner-logo-img {
             width: 130px !important;
@@ -313,38 +333,27 @@ export default function Footer() {
 
         @media (max-width: 640px) {
           .ft-horology-container {
-            padding: 24px 12px !important;
-            gap: 6px !important;
+            gap: 16px !important;
+            padding: 22px 14px 18px !important;
           }
           .ft-banner-logo-img {
-            width: 88px !important;
+            width: 82px !important;
           }
           .winsor-watch-clock-widget {
-            --clock-size: 140px;
-          }
-          .ft-banner-wing-caption {
-            font-size: 8px !important;
-            letter-spacing: 0.12em !important;
-            margin-top: 6px !important;
-          }
-          .ft-banner-wing-sub {
-            display: none !important;
-          }
-          .ft-horology-wing {
-            padding: 0 4px !important;
+            --clock-size: 138px;
           }
         }
 
         @media (max-width: 380px) {
+          .ft-horology-container {
+            gap: 10px !important;
+            padding: 18px 8px 16px !important;
+          }
           .ft-banner-logo-img {
-            width: 74px !important;
+            width: 70px !important;
           }
           .winsor-watch-clock-widget {
-            --clock-size: 125px;
-          }
-          .ft-banner-wing-caption {
-            font-size: 7px !important;
-            letter-spacing: 0.08em !important;
+            --clock-size: 124px;
           }
         }
 
@@ -488,101 +497,26 @@ export default function Footer() {
           }}
           aria-label="Winsor Real-Time Horology Showcase"
         >
-          <div
-            className="ft-horology-container"
-            style={{
-              maxWidth: '1400px',
-              margin: '0 auto',
-              padding: '36px 48px 30px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              position: 'relative',
-              zIndex: 2,
-            }}
-          >
-            {/* ── Left Wing: Winsor Brand Logo & Atelier Statement ── */}
+          <div className="ft-horology-container">
+            {/* ── Left Side: Pure Clean Winsor Brand Logo ── */}
             <div
               className="ft-horology-wing ft-horology-wing-left"
               style={{
-                flex: 1,
                 display: 'flex',
-                flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'center',
-                textAlign: 'center',
               }}
             >
-              <Link href="/" className="ft-banner-logo-link" style={{ display: 'inline-block' }} aria-label="Winsor Maison Home">
+              <Link href="/" className="ft-banner-logo-link" aria-label="Winsor Maison Home">
                 <Image
                   src="/yellow.webp"
                   alt="Winsor Luxury Timepieces"
                   width={160}
                   height={52}
                   className="ft-banner-logo-img"
-                  style={{ objectFit: 'contain', height: 'auto', display: 'block' }}
                   priority
                 />
               </Link>
-              <div
-                className="ft-banner-wing-caption"
-                style={{
-                  fontFamily: "'Jost', sans-serif",
-                  fontSize: '10px',
-                  fontWeight: 600,
-                  letterSpacing: '0.24em',
-                  textTransform: 'uppercase',
-                  color: '#8B6914',
-                  marginTop: '10px',
-                  lineHeight: 1.4,
-                }}
-              >
-                Dubai Atelier • Japan Precision
-              </div>
-              <div
-                className="ft-banner-wing-sub"
-                style={{
-                  fontFamily: "'Cormorant Garamond', serif",
-                  fontStyle: 'italic',
-                  fontSize: '12.5px',
-                  color: 'rgba(26,18,9,0.5)',
-                  marginTop: '2px',
-                  letterSpacing: '0.04em',
-                }}
-              >
-                Haute Horlogerie & Precision Craft
-              </div>
-            </div>
-
-            {/* ── Left Hairline Connector (Desktop) ── */}
-            <div
-              className="ft-horology-hairline ft-horology-hairline-left"
-              style={{
-                flex: '0 1 140px',
-                display: 'flex',
-                alignItems: 'center',
-                margin: '0 24px',
-              }}
-              aria-hidden="true"
-            >
-              <span
-                style={{
-                  flex: 1,
-                  height: '1px',
-                  background: 'linear-gradient(to right, rgba(139,105,20,0.04), rgba(139,105,20,0.35))',
-                }}
-              />
-              <span
-                style={{
-                  width: '4px',
-                  height: '4px',
-                  background: '#8B6914',
-                  transform: 'rotate(45deg)',
-                  opacity: 0.7,
-                  marginLeft: '4px',
-                  flexShrink: 0,
-                }}
-              />
             </div>
 
             {/* ── Center Stage: Live Precision Watch Clock ── */}
@@ -594,94 +528,30 @@ export default function Footer() {
                 flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'center',
-                padding: '0 8px',
               }}
             >
               <WatchClock />
             </div>
 
-            {/* ── Right Hairline Connector (Desktop) ── */}
-            <div
-              className="ft-horology-hairline ft-horology-hairline-right"
-              style={{
-                flex: '0 1 140px',
-                display: 'flex',
-                alignItems: 'center',
-                margin: '0 24px',
-              }}
-              aria-hidden="true"
-            >
-              <span
-                style={{
-                  width: '4px',
-                  height: '4px',
-                  background: '#8B6914',
-                  transform: 'rotate(45deg)',
-                  opacity: 0.7,
-                  marginRight: '4px',
-                  flexShrink: 0,
-                }}
-              />
-              <span
-                style={{
-                  flex: 1,
-                  height: '1px',
-                  background: 'linear-gradient(to left, rgba(139,105,20,0.04), rgba(139,105,20,0.35))',
-                }}
-              />
-            </div>
-
-            {/* ── Right Wing: Winsor Brand Logo & Tag Heuer-style Balance ── */}
+            {/* ── Right Side: Pure Clean Winsor Brand Logo (Symmetrical Balance) ── */}
             <div
               className="ft-horology-wing ft-horology-wing-right"
               style={{
-                flex: 1,
                 display: 'flex',
-                flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'center',
-                textAlign: 'center',
               }}
             >
-              <Link href="/" className="ft-banner-logo-link" style={{ display: 'inline-block' }} aria-label="Winsor Maison Home">
+              <Link href="/" className="ft-banner-logo-link" aria-label="Winsor Maison Home">
                 <Image
                   src="/yellow.webp"
                   alt="Winsor Maison"
                   width={160}
                   height={52}
                   className="ft-banner-logo-img"
-                  style={{ objectFit: 'contain', height: 'auto', display: 'block' }}
                   priority
                 />
               </Link>
-              <div
-                className="ft-banner-wing-caption"
-                style={{
-                  fontFamily: "'Jost', sans-serif",
-                  fontSize: '10px',
-                  fontWeight: 600,
-                  letterSpacing: '0.24em',
-                  textTransform: 'uppercase',
-                  color: '#8B6914',
-                  marginTop: '10px',
-                  lineHeight: 1.4,
-                }}
-              >
-                Ride Your Moment • Est. 2022
-              </div>
-              <div
-                className="ft-banner-wing-sub"
-                style={{
-                  fontFamily: "'Cormorant Garamond', serif",
-                  fontStyle: 'italic',
-                  fontSize: '12.5px',
-                  color: 'rgba(26,18,9,0.5)',
-                  marginTop: '2px',
-                  letterSpacing: '0.04em',
-                }}
-              >
-                1-Year International Warranty
-              </div>
             </div>
           </div>
         </section>
