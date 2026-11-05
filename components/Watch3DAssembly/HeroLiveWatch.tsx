@@ -111,90 +111,70 @@ export default function HeroLiveWatch({ isMobile }: { isMobile: boolean }) {
         }}
       />
 
-      {/* 2. Inner Dial Face Stage (Clipped circle inside bezel crystal - ZERO BEZEL OVERLAY) */}
-      {/* Center of dial: cx = 48.145%, cy = 45.801%, inner diameter: 26.56% */}
+      {/* 2. Calibrated live dial stage.
+          The photo's real bezel outer edge measures ~391px on the 1024px source,
+          centred at (511.5, 470). The dial artwork (bezel spans 554 of its 600px frame)
+          is scaled so its bezel covers the photo bezel exactly - one single bezel, no gap. */}
       <div
         className="absolute pointer-events-none"
         style={{
-          left: '48.145%',
-          top: '45.801%',
-          width: '26.56%',
-          height: '26.56%',
+          left: '49.951%',
+          top: '45.898%',
+          width: '41.36%',
+          height: '41.36%',
           transform: 'translate(-50%, -50%)',
-          borderRadius: '50%',
-          overflow: 'hidden',
           zIndex: 15,
-          boxShadow: 'inset 0 2px 5px rgba(0,0,0,0.45)',
         }}
       >
-        {/* Dial Face Artwork (scaled 157.9% so only the inner dial fits, bezel is 100% clipped) */}
+        {/* Dial face + bezel artwork */}
+        <img
+          src="/clock/black/watch_dial.png"
+          alt=""
+          style={{
+            position: 'absolute',
+            inset: 0,
+            width: '100%',
+            height: '100%',
+            objectFit: 'contain',
+            display: 'block',
+          }}
+          loading="eager"
+        />
+
+        {/* Live date window (3 o'clock) - covers the baked-in date inside the blue frame */}
+        {mounted && (
+          <div
+            style={{
+              position: 'absolute',
+              left: '72.25%',
+              top: '50.0%',
+              transform: 'translate(-50%, -50%)',
+              width: '6.5%',
+              height: '4.7%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontFamily: "'Jost', sans-serif",
+              fontSize: isMobile ? '3px' : '9px',
+              fontWeight: 600,
+              color: '#111111',
+              background: '#ffffff',
+              lineHeight: 1,
+              zIndex: 2,
+            }}
+          >
+            {day}
+          </div>
+        )}
+
+        {/* Hands layer (same 600px frame as the dial so the pivot matches the dial centre) */}
         <div
           style={{
             position: 'absolute',
-            left: '50%',
-            top: '50%',
-            width: '157.9%',
-            height: '157.9%',
-            transform: 'translate(-50%, -50%)',
+            inset: 0,
+            zIndex: 20,
           }}
         >
-          <img
-            src="/clock/black/watch_dial.png"
-            alt=""
-            style={{
-              position: 'absolute',
-              inset: 0,
-              width: '100%',
-              height: '100%',
-              objectFit: 'contain',
-              display: 'block',
-            }}
-            loading="eager"
-          />
-
-          {/* Live Date Window (3 o'clock position on the dial face) */}
-          {mounted && (
-            <div
-              style={{
-                position: 'absolute',
-                left: '72.25%',
-                top: '50.0%',
-                transform: 'translate(-50%, -50%)',
-                width: '6.2%',
-                height: '4.8%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontFamily: "'Jost', sans-serif",
-                fontSize: isMobile ? '4.5px' : '8.5px',
-                fontWeight: 700,
-                color: '#1a1209',
-                background: '#ffffff',
-                borderRadius: '0px',
-                lineHeight: 1,
-                letterSpacing: '-0.02em',
-                zIndex: 2,
-              }}
-            >
-              {day}
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* 3. Live Rotating Mechanical Hands Stage */}
-      {/* Sized in exact proportion to the dial face: 26.56% * 1.579 = 41.94% */}
-      <div
-        className="absolute pointer-events-none"
-        style={{
-          left: '48.145%',
-          top: '45.801%',
-          width: '41.94%',
-          height: '41.94%',
-          transform: 'translate(-50%, -50%)',
-          zIndex: 20,
-        }}
-      >
         {/* Silver Arrow Hour Hand */}
         <img
           ref={hourRef}
@@ -267,6 +247,7 @@ export default function HeroLiveWatch({ isMobile }: { isMobile: boolean }) {
             zIndex: 10,
           }}
         />
+        </div>
       </div>
     </div>
   );
