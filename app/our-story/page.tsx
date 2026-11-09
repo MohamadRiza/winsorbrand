@@ -6,11 +6,11 @@ import StoryHeroTypewriter from "./StoryHeroTypewriter";
 import AwardsGallery from "./AwardsGallery";
 
 export const metadata = {
-  title: "Our Story — Winsor Maison | Ride Your Moment",
+  title: "Our Story — Winsor | Ride Your Moment",
   description:
-    "Discover the story of WINSOR — a Dubai-registered luxury watchmaker committed to genuine craftsmanship, dependable precision, nationwide fixed MRP, and 1-year international warranty. Ride Your Moment.",
+    "Discover the story of WINSOR — a Dubai-registered watch brand committed to genuine craftsmanship, dependable precision, nationwide fixed MRP, and 1-year international warranty. Ride Your Moment.",
   openGraph: {
-    title: "Our Story — Winsor Maison | Ride Your Moment",
+    title: "Our Story — Winsor | Ride Your Moment",
     description:
       "Registered in Dubai in 2023, WINSOR is Sri Lanka's fastest-growing watch brand, bringing original timepieces, nationwide fixed MRP, and 1-year international warranty.",
     type: "website",
@@ -21,7 +21,7 @@ const TIMELINE = [
   {
     year: "2023",
     badge: "FOUNDATION",
-    title: "Registered in Dubai & Maison Creation",
+    title: "Registered in Dubai & Brand Foundation",
     text: "WINSOR was officially registered in Dubai with a singular vision: to make genuine, stylish, and high-precision watches accessible to everyone — bridging the gap between inexpensive imitation watches and overpriced luxury brands.",
   },
   {
@@ -34,7 +34,7 @@ const TIMELINE = [
     year: "2025",
     badge: "HONORS",
     title: "The Crown of Precision Award in Sri Lanka",
-    text: "Conferred 'The Crown of Precision Award in Sri Lanka' at the People's Excellency Awards 2025 (Waters Edge Hotel, Colombo), recognizing Winsor Watches for horological craftsmanship and dependable precision.",
+    text: "Conferred 'The Crown of Precision Award in Sri Lanka' at the People's Excellency Awards 2025 (Waters Edge Hotel, Colombo), recognizing Winsor Watches for watchmaking craftsmanship and dependable precision.",
   },
   {
     year: "2026",
@@ -51,7 +51,7 @@ const TIMELINE = [
 ];
 
 const STATS = [
-  { value: "2023", label: "Registered in Dubai", sub: "International Horology Maison" },
+  { value: "2023", label: "Registered in Dubai", sub: "International Watch Brand" },
   { value: "1 YEAR", label: "Official Warranty", sub: "Comprehensive Care & Service" },
   { value: "FIXED MRP", label: "Nationwide Sri Lanka", sub: "Complete Price Transparency" },
   { value: "100%", label: "Genuine Quality", sub: "Surgical 316L Steel & Sapphire" },
@@ -71,7 +71,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 
 export default function OurStoryPage() {
   return (
-    <div className="min-h-screen bg-[#faf7f0] text-[#1a1209] font-['Jost'] selection:bg-[#8B6914]/20 selection:text-[#1a1209]">
+    <div className="min-h-screen bg-[#ffffff] text-[#141414] font-['Jost'] selection:bg-[#8B6914]/20 selection:text-[#141414]">
       <style>{`
         .ws-award-card {
           transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease;
@@ -92,7 +92,7 @@ export default function OurStoryPage() {
         <div className="absolute inset-0 z-0">
           <Image
             src="/hero_bg_marble.jpg"
-            alt="Winsor Maison Heritage"
+            alt="Winsor Heritage"
             fill
             priority
             className="object-cover object-center opacity-35 mix-blend-luminosity scale-105"
@@ -103,13 +103,11 @@ export default function OurStoryPage() {
 
         {/* Hero Content */}
         <div className="relative z-10 max-w-3xl mx-auto text-center text-white px-2">
-          {/* Prestige Maison Crest */}
+          {/* Brand Crest */}
           <div className="flex items-center justify-center gap-3 mb-4 sm:mb-5">
             <span className="w-6 sm:w-10 h-[1px] bg-gradient-to-r from-transparent via-[#dfb15b] to-[#dfb15b]" />
             <div className="flex items-center gap-1.5 text-[9px] sm:text-[10px] tracking-[0.28em] uppercase text-[#dfb15b] font-medium">
-              <span>✦</span>
               <span>DUBAI REGISTERED • EST. 2023</span>
-              <span>✦</span>
             </div>
             <span className="w-6 sm:w-10 h-[1px] bg-gradient-to-l from-transparent via-[#dfb15b] to-[#dfb15b]" />
           </div>
@@ -195,11 +193,11 @@ export default function OurStoryPage() {
       </section>
 
       {/* ── 3. FOUR CORE PILLARS (STATS) ── */}
-      <section className="py-10 sm:py-14 bg-[#f4efe4] border-y border-[#8B6914]/15 px-4 sm:px-6 lg:px-8">
+      <section className="py-10 sm:py-14 bg-[#F8F7F4] border-y border-black/[0.08] px-4 sm:px-6 lg:px-8">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-8">
             <SectionLabel>Uncompromising Standards</SectionLabel>
-            <h3 className="font-serif text-xl sm:text-2xl md:text-3xl font-normal text-[#1a1209]">
+            <h3 className="font-serif text-xl sm:text-2xl md:text-3xl font-normal text-[#141414]">
               The Four Cornerstones of WINSOR
             </h3>
           </div>
@@ -208,15 +206,15 @@ export default function OurStoryPage() {
             {STATS.map((s, idx) => (
               <div
                 key={idx}
-                className="bg-[#faf7f0] rounded-xl p-5 sm:p-6 border border-[#8B6914]/20 shadow-[0_2px_12px_rgba(26,18,9,0.02)] text-center transition-all duration-300 hover:border-[#8B6914]/50 hover:shadow-md hover:-translate-y-0.5"
+                className="bg-[#ffffff] rounded-xl p-5 sm:p-6 border border-black/[0.08] shadow-[0_2px_12px_rgba(0,0,0,0.02)] text-center transition-all duration-300 hover:border-[#8B6914]/50 hover:shadow-md hover:-translate-y-0.5"
               >
-                <div className="font-['Cinzel'] text-xl sm:text-2xl md:text-3xl font-semibold text-[#8B6914] tracking-wider mb-1.5">
+                <div className="font-['Cormorant_Garamond'] text-xl sm:text-2xl md:text-3xl font-semibold text-[#8B6914] tracking-wider mb-1.5">
                   {s.value}
                 </div>
-                <div className="font-['Jost'] text-[10.5px] sm:text-[11px] font-semibold tracking-[0.16em] text-[#1a1209] uppercase mb-1">
+                <div className="font-['Jost'] text-[10.5px] sm:text-[11px] font-semibold tracking-[0.16em] text-[#141414] uppercase mb-1">
                   {s.label}
                 </div>
-                <div className="font-serif italic text-[11px] sm:text-xs text-[#1a1209]/60">
+                <div className="font-serif italic text-[11px] sm:text-xs text-[#141414]/60">
                   {s.sub}
                 </div>
               </div>
@@ -278,14 +276,14 @@ export default function OurStoryPage() {
         </div>
       </section>
 
-      {/* ── 5. INTERACTIVE ATELIER CINEMA ── */}
+      {/* ── 5. INTERACTIVE BRAND FILM ── */}
       <section className="py-14 sm:py-20 bg-[#120d08] text-white px-4 sm:px-6 lg:px-8">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-8 sm:mb-10">
             <div className="flex items-center justify-center gap-2.5 mb-3">
               <span className="w-6 sm:w-10 h-[1px] bg-[#dfb15b]/50" />
               <span className="font-['Jost'] text-[9.5px] sm:text-[10.5px] tracking-[0.28em] uppercase font-semibold text-[#dfb15b]">
-                INSIDE WINSOR ATELIER
+                WINSOR CRAFTSMANSHIP
               </span>
               <span className="w-6 sm:w-10 h-[1px] bg-[#dfb15b]/50" />
             </div>
@@ -386,7 +384,7 @@ export default function OurStoryPage() {
           <div className="max-w-xl text-white">
             <div className="inline-flex items-center gap-2 mb-3 text-[#dfb15b]">
               <span className="font-['Jost'] text-[10px] tracking-[0.25em] uppercase font-semibold">
-                THE EXPANDING MAISON
+                LIFESTYLE COLLECTION
               </span>
             </div>
 
@@ -395,7 +393,7 @@ export default function OurStoryPage() {
             </h2>
 
             <p className="font-serif text-xs sm:text-sm md:text-base text-white/85 font-light leading-relaxed mb-6">
-              As WINSOR cements its reputation in horology, our artisans are translating the same philosophy into curated lifestyle essentials — including executive leather wallets, handcrafted belts, bespoke fragrances, and refined travel accessories engineered to accompany your life's greatest journeys.
+              As WINSOR expands its watchmaking presence, our designers are translating the same philosophy into curated lifestyle essentials — including executive leather wallets, handcrafted belts, bespoke fragrances, and refined travel accessories engineered to accompany your life's greatest journeys.
             </p>
 
             <Link
@@ -410,36 +408,36 @@ export default function OurStoryPage() {
 
       {/* ── 9. AUTHORIZED DEALERSHIP & PARTNERSHIP CTA ── */}
       <section className="py-14 sm:py-20 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto">
-        <div className="bg-gradient-to-br from-[#FAF4E8] to-[#f4efe4] rounded-2xl p-6 sm:p-10 border border-[#8B6914]/20 shadow-lg grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+        <div className="bg-[#F8F7F4] rounded-2xl p-6 sm:p-10 border border-black/[0.08] shadow-sm grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
           <div>
             <SectionLabel>B2B Partnerships</SectionLabel>
-            <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl font-normal text-[#1a1209] mb-4">
-              Join the Fastest-Growing Horology Network
+            <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl font-normal text-[#141414] mb-4">
+              Join Our Authorized Retail Network
             </h2>
-            <p className="font-serif text-xs sm:text-sm text-[#1a1209]/75 font-light leading-relaxed mb-4">
-              We are the exclusive supplier of WINSOR timepieces in Sri Lanka. Established retail businesses and luxury boutiques are invited to become Authorized WINSOR Dealers.
+            <p className="font-serif text-xs sm:text-sm text-[#141414]/75 font-light leading-relaxed mb-4">
+              We are the exclusive supplier of WINSOR timepieces in Sri Lanka. Established retail businesses and watch showrooms are invited to become Authorized WINSOR Dealers.
             </p>
-            <p className="font-serif text-xs sm:text-sm text-[#1a1209]/75 font-light leading-relaxed mb-6">
+            <p className="font-serif text-xs sm:text-sm text-[#141414]/75 font-light leading-relaxed mb-6">
               Approved partners receive preferential wholesale pricing, dedicated display merchandising, full warranty coverage support, and marketing collaboration.
             </p>
 
             <div className="flex flex-wrap gap-3">
               <Link
                 href="/retailers"
-                className="px-6 py-2.5 bg-gradient-to-r from-[#8B6914] via-[#c9a14a] to-[#8B6914] hover:from-[#a67c1e] hover:to-[#a67c1e] text-white text-[11px] tracking-[0.18em] uppercase font-semibold rounded-full shadow-[0_4px_16px_rgba(139,105,20,0.25)] transition-all duration-300 hover:scale-[1.02]"
+                className="px-6 py-2.5 bg-[#141414] hover:bg-[#8B6914] text-white text-[11px] tracking-[0.18em] uppercase font-semibold rounded-[4px] transition-all duration-300"
               >
                 Find Retailers
               </Link>
               <Link
                 href="/customer-care"
-                className="px-6 py-2.5 bg-white/90 hover:bg-white text-[#1a1209] border border-[#8B6914]/40 hover:border-[#8B6914] text-[11px] tracking-[0.18em] uppercase font-semibold rounded-full transition-all duration-300 shadow-sm hover:scale-[1.02]"
+                className="px-6 py-2.5 bg-white hover:bg-[#141414] text-[#141414] hover:text-white border border-black/[0.14] text-[11px] tracking-[0.18em] uppercase font-semibold rounded-[4px] transition-all duration-300"
               >
                 Dealer Inquiries
               </Link>
             </div>
           </div>
 
-          <div className="relative aspect-[4/3] rounded-xl overflow-hidden shadow-md border border-[#8B6914]/20">
+          <div className="relative aspect-[4/3] rounded-xl overflow-hidden shadow-md border border-black/[0.08]">
             <Image
               src="/discover-partners.jpg"
               alt="Winsor Authorized Retail Partnership"
@@ -457,12 +455,12 @@ export default function OurStoryPage() {
           <span className="font-serif text-base text-[#8B6914]">W</span>
         </div>
 
-        <blockquote className="font-serif italic text-lg sm:text-xl md:text-2xl text-[#1a1209] font-normal leading-relaxed mb-5">
+        <blockquote className="font-serif italic text-lg sm:text-xl md:text-2xl text-[#141414] font-normal leading-relaxed mb-5">
           "At WINSOR, we do not merely build watches — we craft instruments of distinction that honor every milestone, triumph, and unforgettable moment of your life."
         </blockquote>
 
         <div className="font-['Jost'] text-[10.5px] sm:text-xs tracking-[0.3em] text-[#8B6914] font-semibold uppercase">
-          RIDE YOUR MOMENT • WINSOR MAISON
+          RIDE YOUR MOMENT • WINSOR WATCHES
         </div>
       </section>
     </div>

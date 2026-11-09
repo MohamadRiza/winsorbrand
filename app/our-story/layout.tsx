@@ -3,7 +3,7 @@ import { Metadata } from 'next';
 const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://winsorbrand.com';
 
 export const metadata: Metadata = {
-  title: 'Our Story — Dubai Heritage, Japan Movement & Horological Vision | Winsor',
+  title: 'Our Story — Dubai Heritage, Japan Movement & Watchmaking Vision | Winsor',
   description:
     'Discover the story of Winsor — founded in Dubai in 2023, powered by precision Japan movements, crafted across Dubai, India, and Sri Lanka with nationwide fixed MRP and 1-year international warranty.',
   keywords: [
@@ -30,11 +30,11 @@ export default function OurStoryLayout({ children }: { children: React.ReactNode
     '@type': 'AboutPage',
     'name': 'Our Story — Dubai Heritage & Japan Movement Precision',
     'description':
-      'The story of Winsor Maison — founded in Dubai in 2023, delivering precision Japan movements and transparent luxury watchmaking across Dubai, India, and Sri Lanka.',
+      'The story of Winsor Watches — founded in Dubai in 2023, delivering precision Japan movements and transparent luxury watchmaking across Dubai, India, and Sri Lanka.',
     'url': `${baseUrl}/our-story`,
     'mainEntity': {
       '@type': 'Organization',
-      'name': 'Winsor Maison',
+      'name': 'Winsor Watches',
       'foundingDate': '2023',
       'foundingLocation': {
         '@type': 'Place',

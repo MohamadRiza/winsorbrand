@@ -128,18 +128,18 @@ export default function VideoPlayer({ src = "/winsor_video.webm" }: VideoPlayerP
         muted
         preload="metadata"
         className="w-full h-full object-cover"
-        title="Winsor Horology Craftsmanship Film"
+        title="Winsor Craftsmanship Film"
       >
         <source src={src} type="video/webm" />
       </video>
 
-      {/* Luxury Cinematic Gradient Overlay */}
+      {/* Gradient Overlay */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/20 pointer-events-none" />
 
       {/* Center Play Button Overlay (visible when paused) */}
       {!isPlaying && (
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-[#1a1209]/80 backdrop-blur-md border border-[#dfb15b]/60 flex items-center justify-center text-[#dfb15b] shadow-2xl transition-transform transform group-hover:scale-110">
+          <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-[#141414]/80 backdrop-blur-md border border-[#dfb15b]/60 flex items-center justify-center text-[#dfb15b] shadow-2xl transition-transform transform group-hover:scale-110">
             <PlayIcon />
           </div>
         </div>
@@ -147,9 +147,9 @@ export default function VideoPlayer({ src = "/winsor_video.webm" }: VideoPlayerP
 
       {/* Top Left Label */}
       <div className="absolute top-4 left-4 md:top-6 md:left-6 flex items-center gap-2 pointer-events-none">
-        <span className="w-2 h-2 rounded-full bg-[#dfb15b] animate-ping" />
-        <span className="font-['Jost'] text-[10px] md:text-xs tracking-[0.25em] uppercase text-white/90 font-medium">
-          WINSOR ATELIER CINEMA
+        <span className="w-2 h-2 rounded-full bg-[#dfb15b]" />
+        <span className="font-['Jost'] text-[10px] md:text-xs tracking-[0.22em] uppercase text-white/90 font-medium">
+          WINSOR CRAFTSMANSHIP FILM
         </span>
       </div>
 

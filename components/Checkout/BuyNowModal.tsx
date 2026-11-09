@@ -290,14 +290,14 @@ export default function BuyNowModal({
         }
 
         .bnm-dialog {
-          background: #faf7f0;
-          border: 1px solid rgba(184, 142, 60, 0.25);
-          border-radius: 24px;
+          background: #ffffff;
+          border: 1px solid rgba(20, 20, 20, 0.1);
+          border-radius: 16px;
           width: 100%;
           max-width: 480px;
           max-height: 90vh;
           overflow-y: auto;
-          box-shadow: 0 24px 60px rgba(0, 0, 0, 0.25);
+          box-shadow: 0 24px 60px rgba(0, 0, 0, 0.2);
           animation: bnm-fade-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
           font-family: 'Jost', sans-serif;
           scrollbar-width: thin;
@@ -315,7 +315,7 @@ export default function BuyNowModal({
           justify-content: space-between;
           position: sticky;
           top: 0;
-          background: #faf7f0;
+          background: #ffffff;
           z-index: 5;
         }
 

@@ -45,7 +45,7 @@ export default function RetailersMap({
     // Add zoom control in top right
     L.control.zoom({ position: 'topright' }).addTo(map);
 
-    // OpenStreetMap - 100% Free & Open (No API key required, zero watermarks)
+    // OpenStreetMap
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> contributors',
       maxZoom: 19,
@@ -70,32 +70,32 @@ export default function RetailersMap({
     Object.values(markersRef.current).forEach(m => m.remove());
     markersRef.current = {};
 
-    // Custom Winsor Pin Icon
+    // Custom Winsor Pin Icon - Sleek minimalist Swiss pin
     const winsorIcon = L.divIcon({
       className: 'winsor-leaflet-pin',
       html: `
         <div style="
-          background: #1a1209;
-          border: 2px solid #8b6914;
-          width: 38px;
-          height: 38px;
+          background: #141414;
+          border: 1.5px solid #ffffff;
+          width: 28px;
+          height: 28px;
           border-radius: 50%;
           display: flex;
           align-items: center;
           justify-content: center;
-          color: #fff;
-          box-shadow: 0 4px 15px rgba(26,18,9,0.3);
-          transition: all 0.3s ease;
+          color: #ffffff;
+          box-shadow: 0 3px 10px rgba(0,0,0,0.22);
+          transition: transform 0.2s ease;
           cursor: pointer;
         " class="marker-pin-inner">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-            <circle cx="12" cy="11" r="3"/>
+            <circle cx="12" cy="11" r="2.5"/>
           </svg>
         </div>
       `,
-      iconSize: [38, 38],
-      iconAnchor: [19, 19],
+      iconSize: [28, 28],
+      iconAnchor: [14, 14],
     });
 
     // Custom Active Pin Icon
@@ -103,28 +103,27 @@ export default function RetailersMap({
       className: 'winsor-leaflet-pin-active',
       html: `
         <div style="
-          background: #8b6914;
-          border: 2px solid #ffffff;
-          width: 44px;
-          height: 44px;
+          background: #141414;
+          border: 2px solid #8B6914;
+          width: 34px;
+          height: 34px;
           border-radius: 50%;
           display: flex;
           align-items: center;
           justify-content: center;
-          color: #fff;
-          box-shadow: 0 0 20px rgba(139,105,20,0.6);
-          transition: all 0.3s ease;
-          transform: scale(1.1);
+          color: #8B6914;
+          box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+          transition: transform 0.2s ease;
           cursor: pointer;
         " class="marker-pin-inner-active">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-            <circle cx="12" cy="11" r="3"/>
+            <circle cx="12" cy="11" r="2.5"/>
           </svg>
         </div>
       `,
-      iconSize: [44, 44],
-      iconAnchor: [22, 22],
+      iconSize: [34, 34],
+      iconAnchor: [17, 17],
     });
 
     // Populate Retailer Markers
@@ -136,11 +135,11 @@ export default function RetailersMap({
 
         // Bind luxury popup
         marker.bindPopup(`
-          <div style="font-family: 'Jost', sans-serif; padding: 6px 10px; color: #1a1209;">
-            <p style="font-weight: 600; font-size: 13px; margin: 0 0 4px; text-transform: uppercase; color: #8b6914;">
+          <div style="font-family: 'Jost', sans-serif; padding: 4px 6px; color: #141414;">
+            <p style="font-weight: 500; font-size: 13px; margin: 0 0 3px; color: #141414; line-height: 1.35;">
               ${r.name}
             </p>
-            <p style="font-size: 11px; margin: 0; color: rgba(26,18,9,0.7); line-height: 1.4;">
+            <p style="font-size: 11px; margin: 0; color: #666666; line-height: 1.4;">
               ${r.address}
             </p>
           </div>
@@ -197,25 +196,25 @@ export default function RetailersMap({
       const userIcon = L.divIcon({
         className: 'user-location-pulse',
         html: `
-          <div style="position: relative; width: 24px; height: 24px;">
+          <div style="position: relative; width: 22px; height: 22px;">
             <div style="
               position: absolute;
-              top: 4px;
-              left: 4px;
+              top: 3px;
+              left: 3px;
               width: 16px;
               height: 16px;
               border-radius: 50%;
-              background: #007aff;
+              background: #141414;
               border: 2px solid #ffffff;
-              box-shadow: 0 0 10px rgba(0,122,255,0.5);
+              box-shadow: 0 0 10px rgba(0,0,0,0.3);
               z-index: 10;
             "></div>
             <div style="
               position: absolute;
-              width: 24px;
-              height: 24px;
+              width: 22px;
+              height: 22px;
               border-radius: 50%;
-              background: rgba(0,122,255,0.25);
+              background: rgba(20,20,20,0.18);
               animation: user-pulse 1.8s infinite ease-out;
               z-index: 1;
             "></div>
@@ -227,8 +226,8 @@ export default function RetailersMap({
             }
           </style>
         `,
-        iconSize: [24, 24],
-        iconAnchor: [12, 12],
+        iconSize: [22, 22],
+        iconAnchor: [11, 11],
       });
 
       const marker = L.marker([userCoords.latitude, userCoords.longitude], {
@@ -250,9 +249,9 @@ export default function RetailersMap({
           filter: saturate(0.85) contrast(1.02) brightness(1.01);
         }
         .retailers-map-wrapper .leaflet-popup-content-wrapper {
-          border-radius: 14px;
-          box-shadow: 0 10px 25px rgba(26, 18, 9, 0.18);
-          border: 1px solid rgba(139, 105, 20, 0.25);
+          border-radius: 8px;
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+          border: 1px solid rgba(20, 20, 20, 0.08);
           background: #ffffff;
         }
         .retailers-map-wrapper .leaflet-popup-tip {

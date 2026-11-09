@@ -97,7 +97,7 @@ function FormattedMessageText({ content }: { content: string }) {
         if (isBullet) {
           return (
             <div key={lineIdx} style={{ display: 'flex', gap: '6px', alignItems: 'flex-start', margin: '2px 0' }}>
-              <span style={{ color: '#8b6914', fontSize: '11px', lineHeight: 1.6, flexShrink: 0 }}>✦</span>
+              <span style={{ color: '#8b6914', fontSize: '12px', lineHeight: 1.5, flexShrink: 0 }}>•</span>
               <div style={{ flex: 1, minWidth: 0 }}>{renderedLine}</div>
             </div>
           );
@@ -991,7 +991,7 @@ export default function AIAssistant() {
               color: '#8B6914',
               marginTop: '2px',
             }}>
-              Instant horology guidance
+              Instant watch assistance
             </span>
           </span>
         </button>

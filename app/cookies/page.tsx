@@ -386,7 +386,7 @@ export default function CookiePolicyPage() {
         <nav className="legal-breadcrumb" aria-label="Breadcrumb">
           <Link href="/">Home</Link>
           <span>/</span>
-          <Link href="/collections">Maison</Link>
+          <Link href="/collections">Collections</Link>
           <span>/</span>
           <span>Cookie Policy</span>
         </nav>
@@ -546,7 +546,7 @@ export default function CookiePolicyPage() {
                     </tr>
                     <tr>
                       <td><strong>Performance & Speed</strong></td>
-                      <td>Anonymous traffic routing metrics to optimize horology image load speeds.</td>
+                      <td>Anonymous traffic routing metrics to optimize product image load speeds.</td>
                       <td><code>_ga</code>, <code>_gid</code></td>
                     </tr>
                   </tbody>

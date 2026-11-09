@@ -68,20 +68,20 @@ const CloseIcon = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="no
 function CurrencyPanel({ onClose }: { onClose: () => void }) {
   const { selected, detectedCode, setCurrency, lastUpdated, loading } = useCurrency();
   return (
-    <div style={{ padding: '22px 40px', borderBottom: '1px solid rgba(26,18,9,0.07)', background: 'rgba(250,247,240,0.98)' }}>
+    <div style={{ padding: '22px 40px', borderBottom: '1px solid rgba(20,20,20,0.07)', background: 'rgba(255,255,255,0.98)' }}>
       <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '7px' }}>
             <GlobeIcon />
             <span style={{ fontFamily: "'Jost',sans-serif", fontSize: '10px', letterSpacing: '0.22em', color: '#8B6914', fontWeight: 500 }}>DISPLAY CURRENCY</span>
           </div>
-          <span style={{ fontFamily: "'Jost',sans-serif", fontSize: '10px', color: 'rgba(26,18,9,0.3)' }}>
+          <span style={{ fontFamily: "'Jost',sans-serif", fontSize: '10px', color: 'rgba(20,20,20,0.35)' }}>
             {loading ? 'updating rates…' : lastUpdated ? `rates as of ${lastUpdated.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}` : ''}
           </span>
         </div>
         {detectedCode !== 'LKR' && (
-          <p style={{ fontFamily: "'Jost',sans-serif", fontSize: '11px', color: 'rgba(26,18,9,0.45)', marginBottom: '14px' }}>
-            Your location uses <strong style={{ color: '#1a1209' }}>{detectedCode}</strong>. Select a currency to view converted prices — checkout is always in LKR.
+          <p style={{ fontFamily: "'Jost',sans-serif", fontSize: '11px', color: 'rgba(20,20,20,0.5)', marginBottom: '14px' }}>
+            Your location uses <strong style={{ color: '#141414' }}>{detectedCode}</strong>. Select a currency to view converted prices — checkout is always in LKR.
           </p>
         )}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(9,1fr)', gap: '5px' }}>
@@ -90,16 +90,16 @@ function CurrencyPanel({ onClose }: { onClose: () => void }) {
             const isDet = c.code === detectedCode;
             return (
               <button key={c.code} onClick={() => { setCurrency(c.code); onClose(); }}
-                style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3px', padding: '8px 4px', border: isSel ? '1px solid #8B6914' : '1px solid rgba(26,18,9,0.07)', borderRadius: '5px', background: isSel ? 'rgba(139,105,20,0.06)' : 'transparent', cursor: 'pointer', transition: 'all 0.18s ease', position: 'relative' }}>
+                style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3px', padding: '8px 4px', border: isSel ? '1px solid #8B6914' : '1px solid rgba(20,20,20,0.08)', borderRadius: '5px', background: isSel ? 'rgba(139,105,20,0.06)' : 'transparent', cursor: 'pointer', transition: 'all 0.18s ease', position: 'relative' }}>
                 {isDet && !isSel && <span style={{ position: 'absolute', top: '-5px', right: '-4px', background: '#8B6914', color: '#fff', fontSize: '7px', padding: '1px 4px', borderRadius: '3px', fontFamily: "'Jost',sans-serif" }}>AUTO</span>}
                 <CountryFlag iso={c.iso} width={20} height={14} />
-                <span style={{ fontFamily: "'Jost',sans-serif", fontSize: '10px', fontWeight: 500, color: isSel ? '#8B6914' : '#1a1209', letterSpacing: '0.05em' }}>{c.code}</span>
-                <span style={{ fontFamily: "'Jost',sans-serif", fontSize: '9px', color: 'rgba(26,18,9,0.38)' }}>{c.symbol}</span>
+                <span style={{ fontFamily: "'Jost',sans-serif", fontSize: '10px', fontWeight: 500, color: isSel ? '#8B6914' : '#141414', letterSpacing: '0.05em' }}>{c.code}</span>
+                <span style={{ fontFamily: "'Jost',sans-serif", fontSize: '9px', color: 'rgba(20,20,20,0.45)' }}>{c.symbol}</span>
               </button>
             );
           })}
         </div>
-        <p style={{ fontFamily: "'Jost',sans-serif", fontSize: '10px', color: 'rgba(26,18,9,0.32)', marginTop: '12px' }}>
+        <p style={{ fontFamily: "'Jost',sans-serif", fontSize: '10px', color: 'rgba(20,20,20,0.38)', marginTop: '12px' }}>
           Converted prices are indicative only. Final checkout price is in Sri Lankan Rupees (LKR).
         </p>
       </div>
@@ -111,7 +111,7 @@ function MegaMenu({ visible, showCurrency, onClose }: { visible: boolean; showCu
   const show = visible && showCurrency;
   if (!show) return null;
   return (
-    <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: 'rgba(250,247,240,0.98)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', borderTop: '1px solid rgba(26,18,9,0.07)', borderBottom: '1px solid rgba(26,18,9,0.07)', boxShadow: '0 16px 48px rgba(26,18,9,0.07)', opacity: show ? 1 : 0, transform: show ? 'translateY(0)' : 'translateY(-8px)', pointerEvents: show ? 'auto' : 'none', transition: 'opacity 0.25s ease, transform 0.25s ease', zIndex: 10 }}>
+    <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: 'rgba(255,255,255,0.98)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', borderTop: '1px solid rgba(20,20,20,0.07)', borderBottom: '1px solid rgba(20,20,20,0.07)', boxShadow: '0 16px 48px rgba(0,0,0,0.06)', opacity: show ? 1 : 0, transform: show ? 'translateY(0)' : 'translateY(-8px)', pointerEvents: show ? 'auto' : 'none', transition: 'opacity 0.25s ease, transform 0.25s ease', zIndex: 10 }}>
       {showCurrency && <CurrencyPanel onClose={onClose} />}
     </div>
   );
@@ -411,9 +411,9 @@ export default function Navbar() {
   // whenever it is being used (hovered or displaying an interactive panel).
   const useSolidSurface = !isTransparent || isNavbarHovered || megaVisible || searchOpen;
   const isWhite = !useSolidSurface && !isHomepageLightSlide;
-  const tc = isWhite ? '#f3eee6' : '#1a1209';
-  const tca = isWhite ? 'rgba(243,238,230,0.85)' : 'rgba(26,18,9,0.65)';
-  const div = isWhite ? 'rgba(243,238,230,0.15)' : 'rgba(26,18,9,0.1)';
+  const tc = isWhite ? '#ffffff' : '#141414';
+  const tca = isWhite ? 'rgba(255,255,255,0.85)' : 'rgba(20,20,20,0.72)';
+  const div = isWhite ? 'rgba(255,255,255,0.15)' : 'rgba(20,20,20,0.08)';
   const ibS: React.CSSProperties = { background: 'none', border: 'none', cursor: 'pointer', padding: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'opacity 0.2s ease', color: tc };
 
   // ✅ Logo paths (place in /public folder)
@@ -565,13 +565,14 @@ export default function Navbar() {
           zIndex: 9990,
           willChange: 'transform',
           transform: isVisible ? 'translateY(0)' : 'translateY(-100%)',
-          transition: 'transform 0.42s cubic-bezier(0.25,0.46,0.45,0.94), background 0.35s ease, border-color 0.35s ease',
+          transition: 'transform 0.42s cubic-bezier(0.25,0.46,0.45,0.94), background 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease',
           background: useSolidSurface
-            ? 'rgba(250, 247, 240, 0.98)'
-            : (isHomepageLightSlide ? 'rgba(26, 18, 9, 0.05)' : 'rgba(15, 12, 9, 0.28)'),
+            ? 'rgba(255, 255, 255, 0.98)'
+            : (isHomepageLightSlide ? 'rgba(255, 255, 255, 0.72)' : 'rgba(15, 12, 9, 0.28)'),
           backdropFilter: useSolidSurface ? 'blur(14px)' : 'blur(12px)',
           WebkitBackdropFilter: useSolidSurface ? 'blur(14px)' : 'blur(12px)',
-          borderBottom: `1px solid ${useSolidSurface ? 'rgba(26,18,9,0.09)' : (isHomepageLightSlide ? 'rgba(26,18,9,0.06)' : 'rgba(243,238,230,0.1)')}`
+          borderBottom: `1px solid ${useSolidSurface ? 'rgba(20,20,20,0.08)' : (isHomepageLightSlide ? 'rgba(20,20,20,0.06)' : 'rgba(255,255,255,0.1)')}`,
+          boxShadow: useSolidSurface ? '0 2px 16px rgba(0, 0, 0, 0.04)' : 'none',
         }}
       >
         {/* TOP ROW */}
@@ -667,12 +668,12 @@ export default function Navbar() {
                       top: 'calc(100% + 8px)',
                       right: 0,
                       width: '300px',
-                      background: 'rgba(250, 247, 240, 0.98)',
+                      background: 'rgba(255, 255, 255, 0.99)',
                       backdropFilter: 'blur(16px)',
                       WebkitBackdropFilter: 'blur(16px)',
-                      border: '1px solid rgba(139, 105, 20, 0.15)',
+                      border: '1px solid rgba(20, 20, 20, 0.1)',
                       borderRadius: '8px',
-                      boxShadow: '0 12px 32px rgba(26, 18, 9, 0.15)',
+                      boxShadow: '0 12px 32px rgba(0, 0, 0, 0.1)',
                       zIndex: 100,
                       overflow: 'hidden',
                       transition: 'all 0.2s ease',
@@ -685,8 +686,8 @@ export default function Navbar() {
                       </div>
                     ) : filteredProducts.length > 0 ? (
                       <div style={{ display: 'flex', flexDirection: 'column' }}>
-                        <div style={{ padding: '10px 14px', borderBottom: '1px solid rgba(26, 18, 9, 0.06)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                          <span style={{ fontFamily: "'Jost', sans-serif", fontSize: '9px', letterSpacing: '0.15em', color: 'rgba(26, 18, 9, 0.4)', fontWeight: 600 }}>SEARCH RESULTS</span>
+                        <div style={{ padding: '10px 14px', borderBottom: '1px solid rgba(20, 20, 20, 0.06)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <span style={{ fontFamily: "'Jost', sans-serif", fontSize: '9px', letterSpacing: '0.15em', color: 'rgba(20, 20, 20, 0.45)', fontWeight: 600 }}>SEARCH RESULTS</span>
                           <span style={{ fontFamily: "'Jost', sans-serif", fontSize: '9px', color: '#8B6914' }}>{filteredProducts.length} found</span>
                         </div>
                         <div style={{ maxHeight: '320px', overflowY: 'auto' }}>
@@ -703,14 +704,14 @@ export default function Navbar() {
                                 alignItems: 'center',
                                 gap: '12px',
                                 padding: '12px 14px',
-                                borderBottom: '1px solid rgba(26, 18, 9, 0.04)',
+                                borderBottom: '1px solid rgba(20, 20, 20, 0.04)',
                                 textDecoration: 'none',
                                 transition: 'background 0.2s ease',
                               }}
                               className="wn-search-item"
                             >
                               {p.thumbnail?.url && (
-                                <div style={{ width: '40px', height: '40px', position: 'relative', borderRadius: '4px', overflow: 'hidden', background: '#fff', border: '1px solid rgba(26, 18, 9, 0.06)', flexShrink: 0 }}>
+                                <div style={{ width: '40px', height: '40px', position: 'relative', borderRadius: '4px', overflow: 'hidden', background: '#F6F5F2', border: '1px solid rgba(20, 20, 20, 0.06)', flexShrink: 0 }}>
                                   <Image
                                     src={p.thumbnail.url}
                                     alt={p.title || 'watch'}
@@ -721,14 +722,14 @@ export default function Navbar() {
                                 </div>
                               )}
                               <div style={{ flex: 1, minWidth: 0 }}>
-                                <h4 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '14px', fontWeight: 600, color: '#1a1209', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', lineHeight: 1.2 }}>
+                                <h4 style={{ fontFamily: "'Jost', sans-serif", fontSize: '13px', fontWeight: 500, color: '#141414', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', lineHeight: 1.2 }}>
                                   {p.title}
                                 </h4>
-                                <p style={{ fontFamily: "'Jost', sans-serif", fontSize: '10px', color: 'rgba(26, 18, 9, 0.45)', margin: '2px 0 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                <p style={{ fontFamily: "'Jost', sans-serif", fontSize: '10px', color: 'rgba(20, 20, 20, 0.5)', margin: '2px 0 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                                   Model: {p.modelNo}
                                 </p>
                               </div>
-                              <div style={{ fontFamily: "'Jost', sans-serif", fontSize: '12px', fontWeight: 500, color: '#8B6914', flexShrink: 0 }}>
+                              <div style={{ fontFamily: "'Jost', sans-serif", fontSize: '12px', fontWeight: 600, color: '#141414', flexShrink: 0 }}>
                                 {convertPrice(p.price)}
                               </div>
                             </Link>
@@ -736,8 +737,8 @@ export default function Navbar() {
                         </div>
                       </div>
                     ) : (
-                      <div style={{ padding: '24px 16px', textAlign: 'center', color: 'rgba(26, 18, 9, 0.5)', fontFamily: "'Jost', sans-serif", fontSize: '12px' }}>
-                        No timepieces found matching <span style={{ color: '#1a1209', fontWeight: 500 }}>"{searchQuery}"</span>
+                      <div style={{ padding: '24px 16px', textAlign: 'center', color: 'rgba(20, 20, 20, 0.5)', fontFamily: "'Jost', sans-serif", fontSize: '12px' }}>
+                        No watches found matching <span style={{ color: '#141414', fontWeight: 500 }}>"{searchQuery}"</span>
                       </div>
                     )}
                   </div>
@@ -881,7 +882,7 @@ export default function Navbar() {
         }}
       />
 
-      {/* ── MOBILE DRAWER (FROSTED CRYSTAL GLASS WITH NATIVE SWIPE-TO-DISMISS) ── */}
+      {/* ── MOBILE DRAWER ── */}
       <div
         aria-hidden={!mobileOpen}
         inert={!mobileOpen}
@@ -895,13 +896,13 @@ export default function Navbar() {
           bottom: 0,
           width: 'min(340px, 86vw)',
           zIndex: 9999,
-          background: '#FAF8F5',
-          borderLeft: '1px solid rgba(139, 105, 20, 0.16)',
-          boxShadow: '-14px 0 50px rgba(26, 18, 9, 0.16)',
+          background: '#FFFFFF',
+          borderLeft: '1px solid rgba(20, 20, 20, 0.08)',
+          boxShadow: '-12px 0 40px rgba(0, 0, 0, 0.12)',
           transform: !mobileOpen
             ? 'translateX(100%)'
             : (isDrawerDragging && drawerDragX > 0 ? `translateX(${drawerDragX}px)` : 'translateX(0)'),
-          transition: isDrawerDragging ? 'none' : 'transform 0.38s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+          transition: isDrawerDragging ? 'none' : 'transform 0.36s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
           display: 'flex',
           flexDirection: 'column',
           overflowY: 'auto',
@@ -909,32 +910,28 @@ export default function Navbar() {
           overscrollBehavior: 'contain',
           WebkitOverflowScrolling: 'touch',
           touchAction: 'pan-y',
-          color: '#1a1209'
+          color: '#141414'
         }}
       >
-        {/* Subtle ambient gold glow - safely positioned without horizontal overflow */}
-        <div style={{ position: 'absolute', top: '-50px', right: 0, width: '200px', height: '200px', background: 'radial-gradient(circle, rgba(139,105,20,0.07) 0%, transparent 70%)', pointerEvents: 'none', zIndex: 0 }} />
-
         {/* ── HEADER ── */}
         <div style={{
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          padding: '13px 18px',
-          borderBottom: '1px solid rgba(139, 105, 20, 0.12)',
-          background: '#FAF8F5',
+          padding: '14px 20px',
+          borderBottom: '1px solid rgba(20, 20, 20, 0.08)',
+          background: '#FFFFFF',
           position: 'sticky', top: 0, zIndex: 10
         }}>
           <Link href="/" className="wn-logo-link" style={{ flex: 1, justifyContent: 'flex-start' }} onClick={() => setMobileOpen(false)}>
             <Image src={LOGO_SOLID} alt="Winsor Logo" width={140} height={46}
-              style={{ objectFit: 'contain', height: 'auto', maxWidth: '125px' }} priority />
+              style={{ objectFit: 'contain', height: 'auto', maxWidth: '122px' }} priority />
           </Link>
           <button
             className="wn-mob-close-btn"
             style={{
-              background: '#FFFFFF',
-              border: '1px solid rgba(139, 105, 20, 0.22)',
-              color: '#8B6914', padding: '7.5px', borderRadius: '50%',
+              background: '#F8F7F4',
+              border: '1px solid rgba(20, 20, 20, 0.1)',
+              color: '#141414', padding: '7.5px', borderRadius: '6px',
               cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
-              boxShadow: '0 2px 8px rgba(26,18,9,0.06)',
             }}
             onClick={() => setMobileOpen(false)}
             aria-label="Close navigation menu"
@@ -944,24 +941,23 @@ export default function Navbar() {
         </div>
 
         {/* ── CURRENCY SELECTOR ── */}
-        <div style={{ padding: '8px 16px', borderBottom: '1px solid rgba(139, 105, 20, 0.08)', position: 'relative', zIndex: 1, background: '#FAF8F5' }}>
+        <div style={{ padding: '12px 20px', borderBottom: '1px solid rgba(20, 20, 20, 0.06)', position: 'relative', zIndex: 1, background: '#FFFFFF' }}>
           <button
             className="wn-anim-item wn-mob-currency-btn"
             onClick={() => setMobileCurrencyOpen(v => !v)}
             style={{
               animationDelay: '0.04s',
               display: 'flex', alignItems: 'center', gap: '8px', width: '100%',
-              background: '#FFFFFF',
-              border: '1px solid rgba(139, 105, 20, 0.20)',
-              boxShadow: '0 2px 6px -1px rgba(26,18,9,0.04), inset 0 1px 0 rgba(255,255,255,1)',
-              borderRadius: '9999px', padding: '7.5px 16px', cursor: 'pointer',
-              justifyContent: 'space-between', color: '#8B6914',
+              background: '#F8F7F4',
+              border: '1px solid rgba(20, 20, 20, 0.1)',
+              borderRadius: '6px', padding: '9px 14px', cursor: 'pointer',
+              justifyContent: 'space-between', color: '#141414',
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <GlobeIcon />
               <CountryFlag iso={selected.iso} width={18} height={13} />
-              <span style={{ fontFamily: "'Jost',sans-serif", fontSize: '11.5px', color: '#1a1209', fontWeight: 500 }}>
+              <span style={{ fontFamily: "'Jost',sans-serif", fontSize: '12px', color: '#141414', fontWeight: 500 }}>
                 {selected.code} — {selected.label}
               </span>
             </div>
@@ -971,10 +967,9 @@ export default function Navbar() {
           {mobileCurrencyOpen && (
             <div style={{
               marginTop: '8px', maxHeight: '240px', overflowY: 'auto', padding: '6px',
-              background: 'rgba(252, 249, 243, 0.97)',
-              backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)',
-              border: '1px solid rgba(139, 105, 20, 0.16)',
-              borderRadius: '16px', boxShadow: '0 14px 36px rgba(26,18,9,0.14)'
+              background: '#FFFFFF',
+              border: '1px solid rgba(20, 20, 20, 0.1)',
+              borderRadius: '8px', boxShadow: '0 12px 32px rgba(0, 0, 0, 0.08)'
             }}>
               {CURRENCIES.map((c: CurrencyOption) => (
                 <button
@@ -982,39 +977,38 @@ export default function Navbar() {
                   onClick={() => { setCurrency(c.code); setMobileCurrencyOpen(false); }}
                   style={{
                     display: 'flex', alignItems: 'center', gap: '12px', width: '100%',
-                    padding: '9px 14px',
-                    background: selected.code === c.code ? 'rgba(139,105,20,0.1)' : 'transparent',
-                    border: 'none', borderBottom: '1px solid rgba(26,18,9,0.05)',
-                    borderRadius: '8px',
+                    padding: '9px 12px',
+                    background: selected.code === c.code ? 'rgba(139,105,20,0.08)' : 'transparent',
+                    border: 'none', borderBottom: '1px solid rgba(20,20,20,0.04)',
+                    borderRadius: '4px',
                     cursor: 'pointer',
-                    color: selected.code === c.code ? '#8B6914' : 'rgba(26,18,9,0.75)',
+                    color: selected.code === c.code ? '#8B6914' : '#141414',
                     transition: 'background 0.15s ease'
                   }}
                 >
                   <CountryFlag iso={c.iso} width={20} height={14} />
-                  <span style={{ fontFamily: "'Jost',sans-serif", fontSize: '13px', fontWeight: selected.code === c.code ? 600 : 400 }}>{c.code}</span>
-                  <span style={{ fontFamily: "'Jost',sans-serif", fontSize: '11px', color: 'rgba(26,18,9,0.42)', marginLeft: 'auto' }}>{c.label}</span>
+                  <span style={{ fontFamily: "'Jost',sans-serif", fontSize: '12.5px', fontWeight: selected.code === c.code ? 600 : 400 }}>{c.code}</span>
+                  <span style={{ fontFamily: "'Jost',sans-serif", fontSize: '11px', color: 'rgba(20,20,20,0.5)', marginLeft: 'auto' }}>{c.label}</span>
                 </button>
               ))}
             </div>
           )}
         </div>
 
-        {/* ── NAV LINKS (STAGGERED CASPER REVEAL) ── */}
+        {/* ── NAV LINKS ── */}
         <nav
           key={mobileOpen ? 'nav-open' : 'nav-closed'}
-          style={{ flex: 1, padding: '10px 16px 16px', display: 'flex', flexDirection: 'column', gap: '6px', position: 'relative', zIndex: 1 }}
+          style={{ flex: 1, padding: '14px 20px 20px', display: 'flex', flexDirection: 'column', gap: '6px', position: 'relative', zIndex: 1 }}
         >
 
           {/* Section label */}
-          <div className="wn-anim-item" style={{ animationDelay: '0.06s', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1px', padding: '0 6px' }}>
-            <span style={{ fontFamily: "'Jost',sans-serif", fontSize: '8px', letterSpacing: '0.28em', color: '#8B6914', fontWeight: 700, textTransform: 'uppercase' }}>
-              HAUTE HORLOGERIE
+          <div className="wn-anim-item" style={{ animationDelay: '0.06s', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px', padding: '0 2px' }}>
+            <span style={{ fontFamily: "'Jost',sans-serif", fontSize: '10px', letterSpacing: '0.2em', color: '#8B6914', fontWeight: 600, textTransform: 'uppercase' }}>
+              COLLECTIONS
             </span>
-            <span style={{ fontFamily: "'Jost',sans-serif", fontSize: '8px', letterSpacing: '0.14em', color: 'rgba(26,18,9,0.35)', textTransform: 'uppercase' }}>COLLECTIONS</span>
           </div>
 
-          {/* ── Collection Links (Pure Luminous White Pills, Staggered Reveal, No Arrows) ── */}
+          {/* ── Collection Links ── */}
           {COLLECTIONS.map((col, idx) => (
             <Link
               key={col.key}
@@ -1022,53 +1016,53 @@ export default function Navbar() {
               onClick={() => setMobileOpen(false)}
               className="wn-anim-item wn-mob-col-btn"
               style={{
-                animationDelay: `${0.08 + idx * 0.04}s`,
+                animationDelay: `${0.08 + idx * 0.03}s`,
                 display: 'flex',
                 alignItems: 'center',
-                padding: '8px 20px',
-                borderRadius: '9999px',
+                justifyContent: 'space-between',
+                padding: '10px 14px',
+                borderRadius: '6px',
                 background: '#FFFFFF',
-                border: '1px solid rgba(139, 105, 20, 0.20)',
-                boxShadow: '0 2px 8px -1px rgba(26, 18, 9, 0.05), inset 0 1px 0 rgba(255, 255, 255, 1)',
+                border: '1px solid rgba(20, 20, 20, 0.08)',
                 textDecoration: 'none',
               }}
             >
               <span style={{
-                fontFamily: "'Cormorant Garamond', serif",
-                fontSize: '14.5px',
-                letterSpacing: '0.12em',
-                fontWeight: 600,
-                color: '#1a1209',
+                fontFamily: "'Jost', sans-serif",
+                fontSize: '12.5px',
+                letterSpacing: '0.14em',
+                fontWeight: 500,
+                color: '#141414',
                 transition: 'color 0.2s ease',
               }}>
                 {col.label}
               </span>
+              <span style={{ color: 'rgba(20,20,20,0.35)', fontSize: '14px', lineHeight: 1 }}>›</span>
             </Link>
           ))}
 
-          {/* EXPLORE MAISON label */}
-          <div className="wn-anim-item" style={{ animationDelay: '0.28s', marginTop: '8px', marginBottom: '1px', padding: '0 6px' }}>
-            <span style={{ fontFamily: "'Jost',sans-serif", fontSize: '8px', letterSpacing: '0.28em', color: '#8B6914', fontWeight: 700, textTransform: 'uppercase' }}>
-              EXPLORE MAISON
+          {/* DISCOVER WINSOR label */}
+          <div className="wn-anim-item" style={{ animationDelay: '0.24s', marginTop: '12px', marginBottom: '4px', padding: '0 2px' }}>
+            <span style={{ fontFamily: "'Jost',sans-serif", fontSize: '10px', letterSpacing: '0.2em', color: '#8B6914', fontWeight: 600, textTransform: 'uppercase' }}>
+              DISCOVER WINSOR
             </span>
           </div>
 
           {/* Account quick links */}
           {isSignedIn && (
-            <div className="wn-anim-item" style={{ animationDelay: '0.30s', display: 'flex', gap: '6px', marginBottom: '1px' }}>
+            <div className="wn-anim-item" style={{ animationDelay: '0.26s', display: 'flex', gap: '8px', marginBottom: '4px' }}>
               <Link
                 href="/profile"
                 onClick={() => setMobileOpen(false)}
                 className="wn-mob-profile-btn"
                 style={{
-                  flex: 1, padding: '7px 14px', textAlign: 'center',
-                  background: '#FFFFFF',
-                  border: '1px solid rgba(139, 105, 20, 0.32)',
-                  borderRadius: '9999px',
-                  color: '#8B6914',
-                  fontFamily: "'Jost',sans-serif", fontSize: '10.5px', letterSpacing: '0.1em',
-                  textDecoration: 'none', fontWeight: 600,
-                  boxShadow: '0 2px 6px -1px rgba(26, 18, 9, 0.04)',
+                  flex: 1, padding: '8px 12px', textAlign: 'center',
+                  background: '#F8F7F4',
+                  border: '1px solid rgba(20, 20, 20, 0.1)',
+                  borderRadius: '6px',
+                  color: '#141414',
+                  fontFamily: "'Jost',sans-serif", fontSize: '11px', letterSpacing: '0.08em',
+                  textDecoration: 'none', fontWeight: 500,
                 }}
               >
                 My Profile
@@ -1078,14 +1072,13 @@ export default function Navbar() {
                 onClick={() => setMobileOpen(false)}
                 className="wn-mob-profile-btn"
                 style={{
-                  flex: 1, padding: '7px 14px', textAlign: 'center',
-                  background: '#FFFFFF',
-                  border: '1px solid rgba(139, 105, 20, 0.32)',
-                  borderRadius: '9999px',
-                  color: '#8B6914',
-                  fontFamily: "'Jost',sans-serif", fontSize: '10.5px', letterSpacing: '0.1em',
-                  textDecoration: 'none', fontWeight: 600,
-                  boxShadow: '0 2px 6px -1px rgba(26, 18, 9, 0.04)',
+                  flex: 1, padding: '8px 12px', textAlign: 'center',
+                  background: '#F8F7F4',
+                  border: '1px solid rgba(20, 20, 20, 0.1)',
+                  borderRadius: '6px',
+                  color: '#141414',
+                  fontFamily: "'Jost',sans-serif", fontSize: '11px', letterSpacing: '0.08em',
+                  textDecoration: 'none', fontWeight: 500,
                 }}
               >
                 My Orders
@@ -1093,7 +1086,7 @@ export default function Navbar() {
             </div>
           )}
 
-          {/* Top-level nav links (Pure Luminous White Pills, Staggered Reveal, No Arrows) */}
+          {/* Top-level nav links */}
           {[...TOP_LEFT_LINKS, ...TOP_RIGHT_LINKS].map((l, idx) => (
             <Link
               key={l.href}
@@ -1101,87 +1094,85 @@ export default function Navbar() {
               onClick={() => setMobileOpen(false)}
               className="wn-anim-item wn-mob-nav-link"
               style={{
-                animationDelay: `${0.32 + idx * 0.04}s`,
+                animationDelay: `${0.28 + idx * 0.03}s`,
                 fontFamily: "'Jost',sans-serif",
-                fontSize: '11.5px', letterSpacing: '0.08em',
-                color: '#1a1209',
-                fontWeight: 500,
-                padding: '7.5px 20px',
-                borderRadius: '9999px',
+                fontSize: '12px', letterSpacing: '0.06em',
+                color: '#141414',
+                fontWeight: 400,
+                padding: '9px 14px',
+                borderRadius: '6px',
                 textDecoration: 'none',
                 background: '#FFFFFF',
-                border: '1px solid rgba(139, 105, 20, 0.16)',
-                boxShadow: '0 2px 6px -1px rgba(26, 18, 9, 0.04), inset 0 1px 0 rgba(255, 255, 255, 1)',
-                display: 'block'
+                border: '1px solid rgba(20, 20, 20, 0.07)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between'
               }}
             >
-              {l.label}
+              <span>{l.label}</span>
+              <span style={{ color: 'rgba(20,20,20,0.3)', fontSize: '14px', lineHeight: 1 }}>›</span>
             </Link>
           ))}
         </nav>
 
         {/* ── FOOTER BAR ── */}
         <div style={{
-          padding: '10px 16px',
-          borderTop: '1px solid rgba(139,105,20,0.12)',
+          padding: '12px 20px',
+          borderTop: '1px solid rgba(20, 20, 20, 0.08)',
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-          background: '#FAF8F5',
+          background: '#FFFFFF',
           position: 'sticky', bottom: 0, zIndex: 10,
-          boxShadow: '0 -4px 20px rgba(26,18,9,0.04)',
         }}>
           {!isSignedIn ? (
             <SignInButton mode="modal">
               <button
                 className="wn-anim-item wn-mob-signin-btn"
                 style={{
-                  animationDelay: '0.52s',
-                  background: '#FFFFFF',
-                  border: '1px solid rgba(139, 105, 20, 0.28)',
-                  padding: '8px 15px', borderRadius: '9999px', cursor: 'pointer',
-                  color: '#1a1209', display: 'flex', alignItems: 'center', gap: '6px',
-                  boxShadow: '0 2px 6px -1px rgba(26, 18, 9, 0.04)',
+                  animationDelay: '0.45s',
+                  background: '#F8F7F4',
+                  border: '1px solid rgba(20, 20, 20, 0.12)',
+                  padding: '9px 14px', borderRadius: '6px', cursor: 'pointer',
+                  color: '#141414', display: 'flex', alignItems: 'center', gap: '6px',
                 }}>
                 <UserIcon />
-                <span style={{ fontFamily: "'Jost',sans-serif", fontSize: '11px', color: '#8B6914', fontWeight: 600 }}>Sign In / Account</span>
+                <span style={{ fontFamily: "'Jost',sans-serif", fontSize: '11.5px', color: '#141414', fontWeight: 500 }}>Sign In / Account</span>
               </button>
             </SignInButton>
           ) : (
-            <div className="wn-anim-item" style={{ animationDelay: '0.52s', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div className="wn-anim-item" style={{ animationDelay: '0.45s', display: 'flex', alignItems: 'center', gap: '8px' }}>
               <UserButton
-                appearance={{ elements: { avatarBox: { width: '24px', height: '24px', border: '1.5px solid rgba(139,105,20,0.48)' } } }}
+                appearance={{ elements: { avatarBox: { width: '24px', height: '24px', border: '1px solid rgba(20,20,20,0.2)' } } }}
               >
                 <UserButton.MenuItems>
                   <UserButton.Link label="My Profile" labelIcon={<UserIcon />} href="/profile" />
                   <UserButton.Link label="My Orders" labelIcon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>} href="/orders" />
                 </UserButton.MenuItems>
               </UserButton>
-              <span style={{ fontFamily: "'Jost',sans-serif", fontSize: '11px', color: '#1a1209', fontWeight: 500 }}>Account</span>
+              <span style={{ fontFamily: "'Jost',sans-serif", fontSize: '11.5px', color: '#141414', fontWeight: 500 }}>Account</span>
             </div>
           )}
 
           <Link
             href="/cart"
             onClick={() => setMobileOpen(false)}
-            className="wn-anim-item wn-mob-cart-btn"
+            className="wn-anim-item"
             style={{
-              animationDelay: '0.52s',
-              position: 'relative', display: 'flex', alignItems: 'center', gap: '6px',
-              background: 'linear-gradient(135deg, #967018 0%, #C8980F 50%, #E2B960 100%)',
-              border: '1.2px solid rgba(255, 255, 255, 0.55)',
-              padding: '8px 18px', borderRadius: '9999px', textDecoration: 'none',
-              boxShadow: '0 5px 18px rgba(139, 105, 20, 0.35), inset 0 1.5px 0 0 rgba(255, 255, 255, 0.45)'
+              animationDelay: '0.45s',
+              position: 'relative', display: 'flex', alignItems: 'center', gap: '8px',
+              background: '#141414',
+              border: '1px solid #141414',
+              padding: '9px 18px', borderRadius: '6px', textDecoration: 'none',
             }}
           >
             <BagIcon />
-            <span style={{ fontFamily: "'Jost',sans-serif", fontSize: '11.5px', color: '#FFFFFF', fontWeight: 700, letterSpacing: '0.06em' }}>Cart</span>
+            <span style={{ fontFamily: "'Jost',sans-serif", fontSize: '11.5px', color: '#FFFFFF', fontWeight: 500, letterSpacing: '0.08em', textTransform: 'uppercase' }}>Bag</span>
             <span style={{
               position: 'absolute', top: '-6px', right: '-6px',
               width: '18px', height: '18px', borderRadius: '50%',
-              background: '#fff', color: '#8B6914',
+              background: '#8B6914', color: '#fff',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: '8.5px', fontFamily: "'Jost',sans-serif", fontWeight: 700,
-              border: '1.5px solid #8B6914',
-              boxShadow: '0 2px 8px rgba(26,18,9,0.18)'
+              fontSize: '9px', fontFamily: "'Jost',sans-serif", fontWeight: 600,
+              border: '1.5px solid #FFFFFF',
             }}>
               {totalItemsCount > 9 ? '9+' : totalItemsCount}
             </span>

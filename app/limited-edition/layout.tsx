@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     canonical: `${baseUrl}/limited-edition`,
   },
   openGraph: {
-    title: 'Limited Edition Timepieces | Japan Movement — Winsor Maison',
+    title: 'Limited Edition Timepieces | Japan Movement — Winsor Watches',
     description:
       'Explore rare collector watches, skeletonized dials, and numbered limited editions powered by Japan movements.',
     url: `${baseUrl}/limited-edition`,

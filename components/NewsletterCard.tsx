@@ -49,7 +49,7 @@ export default function NewsletterCard({
   };
 
   return (
-    <div className="w-full relative pt-6 pb-12" style={{ backgroundColor: '#FAF7F0' }}>
+    <div className="w-full relative pt-6 pb-12" style={{ backgroundColor: '#ffffff' }}>
       <style>{`
         @keyframes newsletter-marquee {
           0% { transform: translate3d(0, 0, 0); }
@@ -57,9 +57,9 @@ export default function NewsletterCard({
         }
 
         .newsletter-marquee-wrapper {
-          background: #000000;
+          background: #141414;
           color: #ffffff;
-          padding: 18px 0;
+          padding: 16px 0;
           overflow: hidden;
           width: 100vw;
           position: relative;
@@ -98,25 +98,25 @@ export default function NewsletterCard({
         .newsletter-card-container {
           display: grid;
           grid-template-columns: 1fr 1fr;
-          border-radius: 24px;
+          border-radius: 12px;
           overflow: hidden;
-          border: 1px solid rgba(139, 105, 20, 0.25);
-          background: linear-gradient(135deg, #ffffff 0%, #faf7f0 100%);
+          border: 1px solid rgba(20, 20, 20, 0.08);
+          background: #F8F7F4;
           max-width: 1320px;
           width: 100%;
           margin: 0 auto;
-          box-shadow: 0 20px 50px -15px rgba(26, 18, 9, 0.08), 0 8px 20px -6px rgba(139, 105, 20, 0.12);
-          transition: transform 0.4s ease, box-shadow 0.4s ease;
+          box-shadow: 0 12px 32px -12px rgba(20, 20, 20, 0.06);
+          transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
         .newsletter-card-container:hover {
-          box-shadow: 0 25px 60px -15px rgba(26, 18, 9, 0.12), 0 10px 25px -5px rgba(139, 105, 20, 0.18);
+          box-shadow: 0 16px 40px -12px rgba(20, 20, 20, 0.1);
         }
 
         .newsletter-img-block {
           height: 100%;
           position: relative;
-          min-height: 440px;
+          min-height: 420px;
           overflow: hidden;
         }
 
@@ -128,29 +128,28 @@ export default function NewsletterCard({
         }
 
         .newsletter-card-container:hover .newsletter-img-block img {
-          transform: scale(1.04);
+          transform: scale(1.03);
         }
 
         .newsletter-img-overlay {
           position: absolute;
           inset: 0;
-          background: linear-gradient(to right, rgba(26, 18, 9, 0.15), rgba(26, 18, 9, 0.5));
+          background: linear-gradient(to right, rgba(20, 20, 20, 0.15), rgba(20, 20, 20, 0.45));
         }
 
         .newsletter-img-badge {
           position: absolute;
           bottom: 24px;
           left: 24px;
-          background: rgba(26, 18, 9, 0.85);
+          background: rgba(20, 20, 20, 0.88);
           backdrop-filter: blur(8px);
-          border: 1px solid rgba(217, 184, 120, 0.4);
-          padding: 8px 16px;
-          border-radius: 30px;
+          border: 1px solid rgba(255, 255, 255, 0.18);
+          padding: 7px 14px;
+          border-radius: 6px;
           display: flex;
           align-items: center;
           gap: 8px;
-          color: #f3e3b8;
-          box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+          color: #ffffff;
         }
 
         .newsletter-badge-dot {
@@ -158,7 +157,6 @@ export default function NewsletterCard({
           height: 6px;
           border-radius: 50%;
           background: #8b6914;
-          box-shadow: 0 0 8px #8b6914;
         }
 
         .newsletter-form-block {
@@ -167,7 +165,7 @@ export default function NewsletterCard({
           flex-direction: column;
           justify-content: center;
           position: relative;
-          background: radial-gradient(circle at top right, rgba(139, 105, 20, 0.06), transparent 60%);
+          background: #F8F7F4;
         }
 
         .newsletter-tag-container {
@@ -186,24 +184,24 @@ export default function NewsletterCard({
         .newsletter-tag-text {
           font-size: 10.5px;
           color: #8b6914;
-          letter-spacing: 0.25em;
-          font-weight: 700;
+          letter-spacing: 0.22em;
+          font-weight: 600;
           text-transform: uppercase;
         }
 
         .newsletter-main-title {
-          font-family: 'Cinzel', 'Cormorant Garamond', Georgia, serif;
+          font-family: 'Cormorant Garamond', Georgia, serif;
           font-size: 32px;
-          font-weight: 600;
-          color: #1a1209;
+          font-weight: 500;
+          color: #141414;
           margin: 0 0 10px;
-          letter-spacing: -0.01em;
+          letter-spacing: 0.01em;
           line-height: 1.15;
         }
 
         .newsletter-main-desc {
           font-size: 13px;
-          color: rgba(26, 18, 9, 0.65);
+          color: #555555;
           line-height: 1.6;
           margin: 0 0 24px;
         }
@@ -219,17 +217,17 @@ export default function NewsletterCard({
           display: flex;
           align-items: center;
           gap: 10px;
-          background: rgba(250, 247, 240, 0.7);
-          border: 1px solid rgba(139, 105, 20, 0.18);
+          background: #ffffff;
+          border: 1px solid rgba(20, 20, 20, 0.08);
           padding: 10px 14px;
-          border-radius: 12px;
+          border-radius: 8px;
         }
 
         .newsletter-perk-icon {
           width: 32px;
           height: 32px;
-          border-radius: 8px;
-          background: rgba(139, 105, 20, 0.1);
+          border-radius: 6px;
+          background: #F8F7F4;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -238,15 +236,15 @@ export default function NewsletterCard({
 
         .newsletter-perk-title {
           font-size: 11px;
-          font-weight: 700;
-          color: #1a1209;
+          font-weight: 600;
+          color: #141414;
           text-transform: uppercase;
           letter-spacing: 0.05em;
         }
 
         .newsletter-perk-desc {
           font-size: 10px;
-          color: rgba(26, 18, 9, 0.55);
+          color: #666666;
           margin: 0;
           line-height: 1.2;
         }
@@ -270,53 +268,49 @@ export default function NewsletterCard({
           transform: translateY(-50%);
           width: 16px;
           height: 16px;
-          color: rgba(26, 18, 9, 0.4);
+          color: rgba(20, 20, 20, 0.4);
           pointer-events: none;
         }
 
         .newsletter-input-field {
           width: 100%;
           background: #ffffff;
-          border: 1px solid rgba(26, 18, 9, 0.18);
+          border: 1px solid rgba(20, 20, 20, 0.14);
           padding: 13px 16px 13px 42px;
           font-size: 13px;
           font-family: inherit;
-          border-radius: 12px;
-          color: #1a1209;
+          border-radius: 6px;
+          color: #141414;
           transition: all 0.25s ease;
         }
 
         .newsletter-input-field:focus {
           outline: none;
-          border-color: #8b6914;
-          box-shadow: 0 0 0 3px rgba(139, 105, 20, 0.12);
+          border-color: #141414;
         }
 
         .newsletter-submit-btn {
-          background: #1a1209;
-          color: #faf7f0;
-          border: 1px solid #1a1209;
+          background: #141414;
+          color: #ffffff;
+          border: 1px solid #141414;
           padding: 13px 22px;
           font-size: 11px;
           letter-spacing: 0.15em;
           text-transform: uppercase;
-          font-weight: 700;
+          font-weight: 600;
           cursor: pointer;
-          transition: all 0.3s ease;
-          border-radius: 12px;
+          transition: all 0.25s ease;
+          border-radius: 6px;
           display: flex;
           align-items: center;
           gap: 8px;
           white-space: nowrap;
-          box-shadow: 0 4px 12px rgba(26, 18, 9, 0.15);
         }
 
         .newsletter-submit-btn:hover {
           background: #8b6914;
           border-color: #8b6914;
           color: #ffffff;
-          transform: translateY(-1px);
-          box-shadow: 0 6px 16px rgba(139, 105, 20, 0.25);
         }
 
         .newsletter-footer-note {
@@ -324,7 +318,7 @@ export default function NewsletterCard({
           align-items: center;
           gap: 6px;
           font-size: 11px;
-          color: rgba(26, 18, 9, 0.5);
+          color: #666666;
         }
 
         @media (max-width: 1024px) {
@@ -412,8 +406,7 @@ export default function NewsletterCard({
         <div className="newsletter-form-block">
           <div className="newsletter-tag-container">
             <span className="newsletter-gold-line" />
-            <span className="newsletter-tag-text">✦ STAY IN THE LOOP ✦</span>
-            <span className="newsletter-gold-line" />
+            <span className="newsletter-tag-text">STAY IN THE LOOP</span>
           </div>
 
           <h3 className="newsletter-main-title">Subscribe To Winsor Updates</h3>

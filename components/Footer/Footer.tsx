@@ -129,14 +129,14 @@ function CurrencySelectorCompact() {
           bottom: '100%',
           left: 0,
           marginBottom: '8px',
-          background: '#faf7f0',
-          border: '1px solid rgba(26,18,9,0.1)',
+          background: '#ffffff',
+          border: '1px solid rgba(20,20,20,0.08)',
           borderRadius: '6px',
           padding: '8px',
           minWidth: '150px',
           maxHeight: '200px',
           overflowY: 'auto',
-          boxShadow: '0 -4px 20px rgba(26,18,9,0.08)',
+          boxShadow: '0 -4px 20px rgba(20,20,20,0.08)',
           zIndex: 20
         }}>
           {CURRENCIES.map((c: CurrencyOption) => (
@@ -453,26 +453,34 @@ export default function Footer() {
 
         .ft-watermark-bg {
           position: absolute;
-          top: 40%;
+          top: 50%;
           left: 50%;
           transform: translate(-50%, -50%);
           width: 520px;
-          max-width: 85vw;
+          max-width: 82vw;
           pointer-events: none;
           user-select: none;
           z-index: 0;
           display: flex;
           align-items: center;
           justify-content: center;
-          opacity: 0.045;
+          opacity: 0.042;
+        }
+
+        @media (max-width: 1024px) {
+          .ft-watermark-bg {
+            width: 420px;
+            max-width: 80vw;
+            opacity: 0.045;
+          }
         }
 
         @media (max-width: 640px) {
           .ft-watermark-bg {
             width: 270px;
-            max-width: 78vw;
-            top: 42%;
-            opacity: 0.055;
+            max-width: 76vw;
+            top: 50%;
+            opacity: 0.048;
           }
         }
       `}</style>
@@ -480,22 +488,22 @@ export default function Footer() {
       <footer style={{
         position: 'relative',
         overflow: 'hidden',
-        background: '#faf7f0',
+        background: '#F8F7F4',
         fontFamily: "'Jost',sans-serif",
-        color: '#1a1209'
+        color: '#141414'
       }}>
 
-        {/* ───────── HOROLOGY TIMEPIECE BRAND BANNER (Above Footer Links) ───────── */}
+        {/* ───────── TIMEPIECE BRAND BANNER (Above Footer Links) ───────── */}
         <section
           className="ft-horology-banner"
           style={{
             position: 'relative',
-            borderTop: '1px solid rgba(139,105,20,0.18)',
-            borderBottom: '1px solid rgba(139,105,20,0.18)',
-            background: 'radial-gradient(ellipse at 50% 50%, rgba(255,255,255,0.85) 0%, #faf7f0 85%)',
+            borderTop: '1px solid rgba(20,20,20,0.08)',
+            borderBottom: '1px solid rgba(20,20,20,0.08)',
+            background: '#ffffff',
             overflow: 'hidden',
           }}
-          aria-label="Winsor Real-Time Horology Showcase"
+          aria-label="Winsor Real-Time Precision Showcase"
         >
           <div className="ft-horology-container">
             {/* ── Left Side: Pure Clean Winsor Brand Logo ── */}
@@ -507,10 +515,10 @@ export default function Footer() {
                 justifyContent: 'center',
               }}
             >
-              <Link href="/" className="ft-banner-logo-link" aria-label="Winsor Maison Home">
+              <Link href="/" className="ft-banner-logo-link" aria-label="Winsor Watches Home">
                 <Image
                   src="/yellow.webp"
-                  alt="Winsor Luxury Timepieces"
+                  alt="Winsor Watches"
                   width={160}
                   height={52}
                   className="ft-banner-logo-img"
@@ -542,10 +550,10 @@ export default function Footer() {
                 justifyContent: 'center',
               }}
             >
-              <Link href="/" className="ft-banner-logo-link" aria-label="Winsor Maison Home">
+              <Link href="/" className="ft-banner-logo-link" aria-label="Winsor Watches Home">
                 <Image
                   src="/yellow.webp"
-                  alt="Winsor Maison"
+                  alt="Winsor Watches"
                   width={160}
                   height={52}
                   className="ft-banner-logo-img"
@@ -556,25 +564,33 @@ export default function Footer() {
           </div>
         </section>
 
-        {/* Faded Luxury Winsor Logo Watermark in Background */}
-        <div className="ft-watermark-bg" aria-hidden="true">
-          <Image
-            src="/winsor_watermark_centered.webp"
-            alt=""
-            width={1200}
-            height={400}
-            loading="lazy"
-            style={{
-              width: '100%',
-              height: 'auto',
-              objectFit: 'contain',
-              filter: 'grayscale(25%)',
-            }}
-          />
-        </div>
+        {/* ───────── MAIN FOOTER CONTENT SECTION (With Perfectly Centered Luxury Watermark) ───────── */}
+        <section
+          className="ft-main-section"
+          style={{
+            position: 'relative',
+            overflow: 'hidden',
+            width: '100%',
+          }}
+          aria-label="Footer Navigation"
+        >
+          {/* Faded Luxury Winsor Logo Watermark in Background - Exactly Centered */}
+          <div className="ft-watermark-bg" aria-hidden="true">
+            <Image
+              src="/winsor_watermark_clean_hd.webp"
+              alt=""
+              width={1005}
+              height={780}
+              loading="lazy"
+              style={{
+                width: '100%',
+                height: 'auto',
+                objectFit: 'contain',
+              }}
+            />
+          </div>
 
-        {/* ───────── MAIN FOOTER CONTENT ───────── */}
-        <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '56px 48px 40px', position: 'relative', zIndex: 1 }}>
+          <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '56px 48px 40px', position: 'relative', zIndex: 1 }}>
           <div className="ft-main-grid">
 
             {/* ── COL 1: BRAND / CONTACT / SOCIAL ── */}
@@ -593,12 +609,12 @@ export default function Footer() {
               <p style={{
                 fontFamily: "'Cormorant Garamond',serif",
                 fontSize: '14px',
-                color: '#1a1209',
+                color: '#141414',
                 lineHeight: 1.7,
                 marginBottom: '28px',
                 maxWidth: '280px'
               }}>
-                A trusted luxury timepiece curator since 2022.
+                Precision timepieces designed for everyday elegance since 2022.
               </p>
 
               {/* Contact Details */}
@@ -835,8 +851,9 @@ export default function Footer() {
 
           </div>
         </div>
+      </section>
 
-        {/* ───────── BOTTOM BAR ───────── */}
+      {/* ───────── BOTTOM BAR ───────── */}
         <div style={{
           borderTop: '1px solid rgba(26,18,9,0.07)',
           background: 'rgba(26,18,9,0.02)',

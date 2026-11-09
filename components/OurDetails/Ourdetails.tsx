@@ -21,7 +21,7 @@ const items = [
   },
   {
     title: "OUR RETAIL PARTNERS",
-    description: "Connect with authorized Winsor retailers to discover authentic horology.",
+    description: "Connect with authorized Winsor retail partners across Sri Lanka.",
     image: "/r_partners.webp",
     alt: "Our retail partners",
     href: "/retailers",
@@ -31,7 +31,7 @@ const items = [
 const Card = ({ item }: { item: (typeof items)[number] }) => (
   <Link
     href={item.href}
-    className="group relative block w-full aspect-[3/4] sm:aspect-[4/5] rounded-2xl overflow-hidden shadow-lg transition-all duration-700 hover:shadow-2xl hover:-translate-y-2 border border-black/10 hover:border-[#8B6914]/50"
+    className="group relative block w-full aspect-[3/4] sm:aspect-[4/5] rounded-xl overflow-hidden shadow-md transition-all duration-500 hover:shadow-xl hover:-translate-y-1.5 border border-black/10"
     style={{ textDecoration: 'none' }}
   >
     {/* Full Cover Background Image */}
@@ -97,12 +97,12 @@ const Ourdetaills = () => {
   };
 
   return (
-    <section className="py-16 sm:py-20 lg:py-28" style={{ background: '#faf7f0', color: '#1a1209' }}>
+    <section className="py-16 sm:py-20 lg:py-24" style={{ background: '#ffffff', color: '#141414' }}>
       <div className="mx-auto max-w-3xl px-4 text-center sm:px-6">
         <span className="text-[9px] tracking-[0.35em] text-[#8B6914] uppercase font-semibold mb-3 block">
           THE WINSOR EXPERIENCE
         </span>
-        <h2 className="font-serif text-[26px] font-normal leading-tight tracking-tight sm:text-3xl md:text-[40px] uppercase" style={{ color: '#1a1209', letterSpacing: '0.04em', margin: 0 }}>
+        <h2 className="font-serif text-[26px] font-normal leading-tight tracking-tight sm:text-3xl md:text-[40px] uppercase" style={{ color: '#141414', letterSpacing: '0.04em', margin: 0 }}>
           Discover the World of WINSOR
         </h2>
         <div className="mx-auto mt-4 w-12 h-[1px] bg-[#8B6914]/40" />

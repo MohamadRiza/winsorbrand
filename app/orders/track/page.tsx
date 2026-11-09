@@ -222,10 +222,10 @@ function OrderTrackingContent() {
         
         .track-page-container {
           min-height: 100vh;
-          background: #faf7f0;
+          background: #F8F7F4;
           padding: 40px 20px 90px;
           font-family: 'Jost', sans-serif;
-          color: #1a1209;
+          color: #141414;
         }
 
         .track-wrapper {
@@ -233,36 +233,36 @@ function OrderTrackingContent() {
           margin: 0 auto;
         }
 
-        /* ── Luxury Card Container ── */
+        /* ── Card Container ── */
         .track-card {
-          background: #FAF7F0;
-          border: 1.5px solid rgba(184, 142, 60, 0.22);
-          border-radius: 20px;
+          background: #FFFFFF;
+          border: 1px solid rgba(20, 20, 20, 0.08);
+          border-radius: 12px;
           padding: 36px;
-          box-shadow: 0 12px 40px rgba(26, 18, 9, 0.04);
-          transition: all 0.3s ease;
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+          transition: all 0.25s ease;
         }
 
         .track-input {
           width: 100%;
           box-sizing: border-box;
-          background: #faf7f0;
-          border: 1px solid rgba(26, 18, 9, 0.12);
-          border-radius: 12px;
+          background: #F8F7F4;
+          border: 1px solid rgba(20, 20, 20, 0.12);
+          border-radius: 6px;
           padding: 14px 16px;
           font-family: 'Jost', sans-serif;
           font-size: 14px;
-          color: #1a1209;
+          color: #141414;
           outline: none;
-          transition: all 0.25s ease;
+          transition: all 0.2s ease;
         }
         .track-input:focus {
-          border-color: #8b6914;
+          border-color: #141414;
           background: #ffffff;
-          box-shadow: 0 0 0 3px rgba(139, 105, 20, 0.12);
+          box-shadow: 0 0 0 3px rgba(20, 20, 20, 0.06);
         }
         .track-input::placeholder {
-          color: rgba(26,18,9,0.38);
+          color: rgba(20, 20, 20, 0.38);
         }
 
         .track-label {
@@ -271,7 +271,7 @@ function OrderTrackingContent() {
           gap: 6px;
           font-size: 10.5px;
           font-weight: 600;
-          color: #1a1209;
+          color: #141414;
           text-transform: uppercase;
           letter-spacing: 0.14em;
           margin-bottom: 8px;
@@ -279,29 +279,26 @@ function OrderTrackingContent() {
 
         .track-btn {
           width: 100%;
-          padding: 16px;
-          background: #1a1209;
+          padding: 15px;
+          background: #141414;
           color: #ffffff;
-          border: 1px solid #1a1209;
-          border-radius: 12px;
+          border: 1px solid #141414;
+          border-radius: 6px;
           cursor: pointer;
           font-family: 'Jost', sans-serif;
-          font-size: 12px;
+          font-size: 11.5px;
           font-weight: 600;
           letter-spacing: 0.16em;
           text-transform: uppercase;
-          transition: all 0.3s ease;
+          transition: all 0.25s ease;
           display: flex;
           align-items: center;
           justify-content: center;
           gap: 10px;
-          box-shadow: 0 6px 20px rgba(26,18,9,0.12);
         }
         .track-btn:hover:not(:disabled) {
-          background: #8b6914;
-          border-color: #8b6914;
-          box-shadow: 0 10px 28px rgba(139,105,20,0.3);
-          transform: translateY(-1px);
+          background: #2C2C2C;
+          border-color: #2C2C2C;
         }
         .track-btn:disabled {
           opacity: 0.65;
@@ -313,7 +310,7 @@ function OrderTrackingContent() {
           gap: 14px;
           align-items: center;
           padding: 14px 0;
-          border-bottom: 1px solid rgba(26,18,9,0.06);
+          border-bottom: 1px solid rgba(20, 20, 20, 0.08);
         }
         .item-card-row:last-child {
           border-bottom: none;
@@ -329,30 +326,29 @@ function OrderTrackingContent() {
 
         @media (max-width: 640px) {
           .track-page-container { padding: 30px 14px 60px; }
-          .track-card { padding: 24px 18px; border-radius: 16px; }
+          .track-card { padding: 24px 18px; border-radius: 10px; }
         }
       `}</style>
 
-      {/* 🌟 LUXURY HERO BANNER WITH ATELIER BENCH PHOTO */}
+      {/* 🌟 HERO BANNER */}
       <section className="order-tracking-hero relative w-full min-h-[380px] sm:min-h-[440px] bg-[#0a0a0a] overflow-hidden flex items-center justify-center text-center pt-28 sm:pt-36 pb-16 sm:pb-24">
         <Image
           src="/order_tracking_hero.jpg"
-          alt="Winsor Haute Horlogerie Atelier"
+          alt="Winsor Order Tracking"
           fill
           priority
           sizes="100vw"
           className="object-cover object-center opacity-70"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#faf7f0] via-black/45 to-black/70" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/45 to-black/70" />
         
         <div className="relative z-10 max-w-2xl px-6">
-          <div className="inline-flex items-center gap-2 bg-[#8B6914]/25 border border-[#8B6914]/40 backdrop-blur-md px-4 py-1.5 rounded-full mb-4">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#8B6914] animate-pulse" />
-            <span className="text-[10px] font-semibold text-[#d4af37] tracking-[0.25em] uppercase" style={{ fontFamily: "'Jost', sans-serif" }}>
-              WINSOR MAISON HOROLOGY LOGISTICS
+          <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 backdrop-blur-md px-4 py-1.5 rounded-full mb-4">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#D4AF37]" />
+            <span className="text-[10px] font-semibold text-[#d4af37] tracking-[0.22em] uppercase" style={{ fontFamily: "'Jost', sans-serif" }}>
+              WINSOR ORDER TRACKING
             </span>
           </div>
-          {/* Animated Hero Title & Subtitle with Luxury Typewriter & Erase Effect */}
           <TrackHeroTypewriter />
         </div>
       </section>

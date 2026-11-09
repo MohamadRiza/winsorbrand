@@ -36,11 +36,11 @@ export default function ReturnLayout({
     '@context': 'https://schema.org',
     '@type': 'WebPage',
     'name': 'Return & Refund Policy — Winsor Brand',
-    'description': 'Official 14-Day return and refund policy for Winsor luxury timepieces and bespoke horology products.',
+    'description': 'Official 14-Day return and refund policy for Winsor luxury timepieces and bespoke timepieces.',
     'url': `${baseUrl}/return`,
     'publisher': {
       '@type': 'Organization',
-      'name': 'Winsor Maison',
+      'name': 'Winsor Watches',
       'logo': `${baseUrl}/icon.png`,
     },
   };

@@ -125,7 +125,7 @@ function GenderSection({
         height: '100%',
         overflow: 'hidden',
         cursor: 'pointer',
-        borderRadius: '16px',
+        borderRadius: '10px',
       }}
     >
       {/* Zoomable Media Container Wrapper */}
@@ -339,7 +339,7 @@ export default function GenderCollectionSection() {
     image: '/winsor_man.png',
     video: '/Winsor_men_vid.webm',
     title: "Engineered for those who never settle.",
-  }; ``
+  };
 
   const womenData = {
     image: '/winsor_girl_G.png',
@@ -356,7 +356,7 @@ export default function GenderCollectionSection() {
     <section
       style={{
         width: '100%',
-        background: '#faf7f0',
+        background: '#ffffff',
       }}
     >
       <div
@@ -434,9 +434,9 @@ export default function GenderCollectionSection() {
             minHeight: isMobile ? '180px' : '280px',
             position: 'relative',
             zIndex: 2,
-            background: '#faf7f0',
-            borderRadius: '16px',
-            boxShadow: '0 -20px 40px rgba(26,18,9,0.05), 0 10px 30px rgba(0,0,0,0.02)',
+            background: '#ffffff',
+            borderRadius: '10px',
+            boxShadow: '0 -16px 36px rgba(20,20,20,0.06), 0 8px 24px rgba(0,0,0,0.03)',
           }}
         >
           <GenderSection

@@ -15,7 +15,7 @@ if (process.env.NODE_ENV === 'development') {
 const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://winsorbrand.com';
 
 export const viewport: Viewport = {
-  themeColor: '#FAF7F0',
+  themeColor: '#FFFFFF',
   width: 'device-width',
   initialScale: 1,
   maximumScale: 5,
@@ -24,11 +24,11 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),
   title: {
-    default: 'Winsor — Luxury Timepieces | Japan Movement & Dubai Atelier',
-    template: '%s | Winsor Maison',
+    default: 'Winsor — Precision Timepieces | Official Online Store',
+    template: '%s | Winsor Watches',
   },
   description:
-    'Discover luxury Winsor timepieces powered by precision Japan movements. Registered in Dubai, meticulously crafted across Dubai, India, and Sri Lanka. Fixed MRP & 1-year international warranty.',
+    'Discover Winsor watches powered by precision Japanese movements. Registered in Dubai and crafted for lasting accuracy, sapphire crystal clarity, and everyday elegance. 1-year international warranty.',
   keywords: [
     'Winsor watches',
     'Japan movement watch',
@@ -47,9 +47,9 @@ export const metadata: Metadata = {
     'gents watch Sri Lanka',
     'ladies watch Sri Lanka',
   ],
-  authors: [{ name: 'Winsor Maison' }],
-  creator: 'Winsor Maison',
-  publisher: 'Winsor Maison',
+  authors: [{ name: 'Winsor' }],
+  creator: 'Winsor',
+  publisher: 'Winsor',
   robots: {
     index: true,
     follow: true,
@@ -65,24 +65,24 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'en_US',
     url: baseUrl,
-    siteName: 'Winsor Maison — Fine Horology',
-    title: 'Winsor — Luxury Timepieces | Japan Movement & Dubai Atelier',
+    siteName: 'Winsor Watches',
+    title: 'Winsor — Precision Timepieces | Official Online Store',
     description:
-      'Explore hand-assembled Japan movement watches, prestige chronographs, and limited edition horology collections by Winsor Maison. Nationwide fixed MRP & 1-year international warranty.',
+      'Explore Japanese movement watches, sports chronographs, and limited edition collections by Winsor. Nationwide fixed MRP & 1-year international warranty.',
     images: [
       {
         url: '/hero_bg_marble.jpg',
         width: 1200,
         height: 630,
-        alt: 'Winsor Luxury Timepieces Header',
+        alt: 'Winsor Timepieces Header',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Winsor — Luxury Timepieces | Japan Movement & Dubai Atelier',
+    title: 'Winsor — Precision Timepieces | Official Online Store',
     description:
-      'Explore hand-assembled Japan movement watches, prestige chronographs, and limited edition horology by Winsor Maison.',
+      'Explore Japanese movement watches, sports chronographs, and limited edition collections by Winsor.',
     images: ['/hero_bg_marble.jpg'],
     creator: '@winsorbrand',
   },
@@ -106,12 +106,12 @@ export default function RootLayout({
       {
         '@type': 'Organization',
         '@id': `${baseUrl}/#organization`,
-        'name': 'Winsor Maison',
+        'name': 'Winsor',
         'alternateName': ['Winsor Brand', 'WINSOR'],
         'url': baseUrl,
         'logo': `${baseUrl}/icon.png`,
         'description':
-          'Dubai-registered luxury watch brand crafting accessible luxury timepieces powered by high-precision Japan movements, meticulously crafted and assembled across Dubai, India, and Sri Lanka.',
+          'Dubai-registered watch brand crafting precision timepieces powered by reliable Japanese movements, with official retail and after-sales service across Dubai, India, and Sri Lanka.',
         'foundingDate': '2023',
         'foundingLocation': {
           '@type': 'Place',
@@ -129,7 +129,7 @@ export default function RootLayout({
         '@type': 'WebSite',
         '@id': `${baseUrl}/#website`,
         'url': baseUrl,
-        'name': 'Winsor — Luxury Timepieces',
+        'name': 'Winsor Watches',
         'publisher': {
           '@id': `${baseUrl}/#organization`,
         },
@@ -145,14 +145,14 @@ export default function RootLayout({
         'name': 'Winsor',
         'logo': `${baseUrl}/icon.png`,
         'description':
-          'Luxury timepiece maison specializing in precision Japan movement sports chronographs, automatic dress watches, and limited edition horology crafted across Dubai, India, and Sri Lanka.',
+          'International watch brand specializing in precision Japanese movement sports chronographs, classic dress watches, and numbered limited editions.',
       },
     ],
   };
 
   return (
     <ClerkProvider afterSignOutUrl="/">
-      <html lang="en" style={{ backgroundColor: '#FAF7F0' }}>
+      <html lang="en" style={{ backgroundColor: '#FFFFFF' }}>
         <head>
           <link rel="preconnect" href="https://fonts.googleapis.com" />
           <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
@@ -161,7 +161,7 @@ export default function RootLayout({
             dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
           />
         </head>
-        <body style={{ backgroundColor: '#FAF7F0', color: '#1a1209' }}>
+        <body style={{ backgroundColor: '#FFFFFF', color: '#141414' }}>
           <CurrencyProvider>
             <CartProvider>
               <LayoutShell>
@@ -172,24 +172,24 @@ export default function RootLayout({
                 containerClassName="winsor-toaster"
                 toastOptions={{
                   style: {
-                    background: '#faf7f0',
-                    color: '#1a1209',
-                    border: '1px solid #8B6914',
+                    background: '#ffffff',
+                    color: '#141414',
+                    border: '1px solid rgba(20, 20, 20, 0.12)',
                     fontFamily: "'Jost', sans-serif",
                     fontSize: '13px',
                     borderRadius: '4px',
-                    boxShadow: '0 4px 12px rgba(26,18,9,0.08)',
+                    boxShadow: '0 8px 24px rgba(0, 0, 0, 0.08)',
                   },
                   success: {
                     iconTheme: {
                       primary: '#8B6914',
-                      secondary: '#faf7f0',
+                      secondary: '#ffffff',
                     },
                   },
                   error: {
                     iconTheme: {
                       primary: '#c62828',
-                      secondary: '#faf7f0',
+                      secondary: '#ffffff',
                     },
                   },
                 }}

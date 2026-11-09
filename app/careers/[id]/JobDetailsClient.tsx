@@ -354,7 +354,7 @@ export default function JobDetailsClient({ id }: { id: string }) {
                 <span className="font-bold block text-[#8B6914] uppercase tracking-wider text-[9px] mb-0.5">Accommodation Facilities</span>
                 {vacancy.accommodationProvided ? (
                   <>
-                    <strong className="text-emerald-700 block mb-1 font-semibold">Accommodation Provided by Maison</strong>
+                    <strong className="text-emerald-700 block mb-1 font-semibold">Accommodation Provided</strong>
                     {vacancy.accommodationDetails && (
                       <p className="text-[#1a1209]/70 bg-[#faf7f0] p-3 rounded-xl border border-[#1a1209]/6 mt-1 font-light italic text-[11px] leading-normal">
                         "{vacancy.accommodationDetails}"

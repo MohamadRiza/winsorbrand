@@ -294,7 +294,7 @@ export default function WatchClock({ size }: { size?: number }) {
         />
       </div>
 
-      {/* ── Horology Caption & Live Digital Time with Auto-Detected City ── */}
+      {/* ── Precision Caption & Live Digital Time with Auto-Detected City ── */}
       <div style={{ marginTop: '10px', textAlign: 'center' }}>
         <div
           style={{
@@ -315,7 +315,7 @@ export default function WatchClock({ size }: { size?: number }) {
             fontSize: '9.5px',
             fontWeight: 400,
             letterSpacing: '0.08em',
-            color: 'rgba(26,18,9,0.5)',
+            color: 'rgba(20,20,20,0.55)',
             marginTop: '2px',
             fontVariantNumeric: 'lining-nums'
           }}

@@ -396,11 +396,11 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
 
   if (loading) {
     return (
-      <div style={{ minHeight: '80vh', background: '#faf7f0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Jost', sans-serif" }}>
+      <div style={{ minHeight: '80vh', background: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Jost', sans-serif" }}>
         <h1 className="sr-only">Timepiece Details</h1>
         <div style={{ textAlign: 'center' }}>
           <div className="shimmer-circle" style={{ width: '48px', height: '48px', borderRadius: '50%', border: '3px solid rgba(139,105,20,0.1)', borderTopColor: '#8B6914', animation: 'spin 1s linear infinite', margin: '0 auto 16px' }} />
-          <p style={{ color: 'rgba(26,18,9,0.5)', fontSize: '13px', letterSpacing: '0.05em' }}>Loading Timepiece...</p>
+          <p style={{ color: 'rgba(20,20,20,0.5)', fontSize: '13px', letterSpacing: '0.05em' }}>Loading Timepiece...</p>
         </div>
         <style>{`
           @keyframes spin {
@@ -413,11 +413,11 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
 
   if (error || !product) {
     return (
-      <div style={{ minHeight: '80vh', background: '#faf7f0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Jost', sans-serif" }}>
+      <div style={{ minHeight: '80vh', background: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Jost', sans-serif" }}>
         <div style={{ textAlign: 'center', padding: '40px' }}>
-          <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '32px', color: '#1a1209', marginBottom: '12px' }}>Timepiece Not Found</h2>
-          <p style={{ color: 'rgba(26,18,9,0.6)', marginBottom: '24px' }}>{error || 'The requested timepiece could not be found.'}</p>
-          <Link href="/collections" style={{ background: '#1a1209', color: '#fff', textDecoration: 'none', padding: '12px 28px', fontSize: '11px', letterSpacing: '0.15em', textTransform: 'uppercase', borderRadius: '4px', cursor: 'pointer' }}>
+          <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '32px', color: '#141414', marginBottom: '12px' }}>Timepiece Not Found</h2>
+          <p style={{ color: 'rgba(20,20,20,0.6)', marginBottom: '24px' }}>{error || 'The requested timepiece could not be found.'}</p>
+          <Link href="/collections" style={{ background: '#141414', color: '#fff', textDecoration: 'none', padding: '12px 28px', fontSize: '11px', letterSpacing: '0.15em', textTransform: 'uppercase', borderRadius: '4px', cursor: 'pointer' }}>
             Back to Collections
           </Link>
         </div>
@@ -440,11 +440,11 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
         @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=Jost:wght@300;400;500;600&display=swap');
 
         .detail-container {
-          background-color: #faf7f0;
+          background-color: #ffffff;
           min-height: 100vh;
           padding: 130px 40px 80px;
           font-family: 'Jost', sans-serif;
-          color: #1a1209;
+          color: #141414;
         }
         .detail-wrapper {
           max-width: 1300px;
@@ -475,19 +475,19 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
         .thumbnail-item {
           aspect-ratio: 1;
           border-radius: 8px;
-          border: 1px solid rgba(26, 18, 9, 0.1);
-          background: transparent;
+          border: 1px solid rgba(20, 20, 20, 0.08);
+          background: #F6F5F2;
           cursor: pointer;
           position: relative;
           overflow: hidden;
           transition: all 0.3s;
         }
         .thumbnail-item.active {
-          border-color: #8B6914;
-          box-shadow: 0 0 6px rgba(139, 105, 20, 0.15);
+          border-color: #141414;
+          box-shadow: 0 0 0 1px #141414;
         }
         .thumbnail-item:hover {
-          border-color: #8b6914;
+          border-color: rgba(20, 20, 20, 0.35);
         }
         .main-image-view {
           flex-grow: 1;
@@ -495,8 +495,8 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
           max-height: 560px;
           position: relative;
           border-radius: 12px;
-          border: none;
-          background: transparent;
+          border: 1px solid rgba(20, 20, 20, 0.06);
+          background: #F6F5F2;
           overflow: hidden;
           isolation: isolate;
         }
@@ -1155,13 +1155,13 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
             margin-left: -24px !important;
             margin-right: -24px !important;
             position: relative !important;
-            border-top: 1px solid rgba(26,18,9,0.08) !important;
-            border-bottom: 1px solid rgba(26,18,9,0.08) !important;
+            border-top: 1px solid rgba(20,20,20,0.08) !important;
+            border-bottom: 1px solid rgba(20,20,20,0.08) !important;
             padding: 16px 0 !important;
             margin-top: 36px !important;
             user-select: none !important;
             -webkit-user-select: none !important;
-            background: #FAF7F0 !important;
+            background: #F8F7F4 !important;
           }
           .features-mobile-marquee-wrap::before,
           .features-mobile-marquee-wrap::after {
@@ -1175,11 +1175,11 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
           }
           .features-mobile-marquee-wrap::before {
             left: 0;
-            background: linear-gradient(to right, #FAF7F0 0%, rgba(250, 247, 240, 0) 100%);
+            background: linear-gradient(to right, #F8F7F4 0%, rgba(248, 247, 244, 0) 100%);
           }
           .features-mobile-marquee-wrap::after {
             right: 0;
-            background: linear-gradient(to left, #FAF7F0 0%, rgba(250, 247, 240, 0) 100%);
+            background: linear-gradient(to left, #F8F7F4 0%, rgba(248, 247, 244, 0) 100%);
           }
           .features-mobile-marquee-track {
             display: flex !important;
@@ -1249,9 +1249,9 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
           width: 32px;
           height: 32px;
           border-radius: 50%;
-          border: 1px solid rgba(26, 18, 9, 0.15);
-          background: #FAF7F0;
-          color: #1a1209;
+          border: 1px solid rgba(20, 20, 20, 0.12);
+          background: #F8F7F4;
+          color: #141414;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -1278,7 +1278,7 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
           height: 6px;
           width: 6px;
           border-radius: 50%;
-          background: rgba(26, 18, 9, 0.2);
+          background: rgba(20, 20, 20, 0.2);
           border: none;
           padding: 0;
           cursor: pointer;
@@ -1293,18 +1293,18 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
         .pairing-card {
           display: flex;
           flex-direction: column;
-          background: #FAF7F0;
-          border-radius: 12px;
+          background: #ffffff;
+          border-radius: 10px;
           overflow: hidden;
-          border: 1px solid rgba(26,18,9,0.05);
+          border: 1px solid rgba(20, 20, 20, 0.08);
           text-decoration: none;
           color: inherit;
-          transition: all 0.4s;
+          transition: all 0.35s;
         }
         .pairing-card:hover {
-          transform: translateY(-5px);
-          box-shadow: 0 12px 30px rgba(139,105,20,0.06);
-          border-color: rgba(139,105,20,0.25);
+          transform: translateY(-4px);
+          box-shadow: 0 12px 30px rgba(0, 0, 0, 0.06);
+          border-color: rgba(20, 20, 20, 0.16);
         }
         .pairing-img-container {
           position: relative;
@@ -1332,12 +1332,12 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
           font-size: 13px;
           font-weight: 600;
           letter-spacing: 0.05em;
-          color: #1a1209;
+          color: #141414;
           margin: 0 0 4px 0;
         }
         .pairing-card-desc {
           font-size: 11px;
-          color: rgba(26,18,9,0.5);
+          color: rgba(20, 20, 20, 0.52);
           margin: 0 0 12px 0;
         }
         .pairing-card-link {
@@ -1350,14 +1350,14 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
           transition: all 0.3s;
         }
         .pairing-card:hover .pairing-card-link {
-          color: #1a1209;
-          border-color: #1a1209;
+          color: #141414;
+          border-color: #141414;
         }
 
         /* SUGGESTIONS SECTION (LUXURY CARDS) */
         .suggestions-section {
           margin-top: 80px;
-          border-top: 1px solid rgba(26,18,9,0.08);
+          border-top: 1px solid rgba(20, 20, 20, 0.08);
           padding-top: 60px;
           margin-bottom: 40px;
         }
@@ -1389,11 +1389,11 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
         .suggested-card {
           display: flex;
           flex-direction: column;
-          background: #FAF7F0;
-          border: 1px solid rgba(184, 142, 60, 0.22);
-          border-radius: 16px;
+          background: #ffffff;
+          border: 1px solid rgba(20, 20, 20, 0.08);
+          border-radius: 10px;
           padding: 14px;
-          box-shadow: 0 4px 18px rgba(26, 18, 9, 0.03);
+          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
           transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
           text-decoration: none;
           color: inherit;
@@ -1401,17 +1401,17 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
           box-sizing: border-box;
         }
         .suggested-card:hover {
-          transform: translateY(-5px);
-          background: #FAF7F0;
-          border-color: #b88e3c;
-          box-shadow: 0 12px 32px rgba(184, 142, 60, 0.15);
+          transform: translateY(-4px);
+          background: #ffffff;
+          border-color: rgba(20, 20, 20, 0.16);
+          box-shadow: 0 14px 32px rgba(0, 0, 0, 0.06);
         }
         .suggested-img-container {
           position: relative;
           aspect-ratio: 1;
-          border-radius: 12px;
+          border-radius: 8px;
           overflow: hidden;
-          background: transparent;
+          background: #F6F5F2;
         }
         .suggested-img {
           transition: transform 0.5s ease;
@@ -1461,10 +1461,10 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
           top: 30px;
           right: 30px;
           z-index: 100;
-          background: #faf7f0;
-          border: 1px solid #8B6914;
-          box-shadow: 0 10px 30px rgba(139,105,20,0.15);
-          border-radius: 6px;
+          background: #ffffff;
+          border: 1px solid rgba(20, 20, 20, 0.12);
+          box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
+          border-radius: 8px;
           padding: 16px 24px;
           max-width: 380px;
           display: flex;
@@ -1833,18 +1833,18 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
           <div className="info-container">
             {/* Sticker / Badge */}
             <div className="mb-3">
-              <span className="inline-block bg-[#f4ebd0] text-[#8b6914] border border-[#8b6914]/30 text-[10px] font-semibold tracking-[0.2em] uppercase px-3 py-1 rounded-full">
+              <span className="inline-block bg-[#141414] text-white text-[9.5px] font-medium tracking-[0.18em] uppercase px-3 py-1 rounded-[2px]">
                 {product.stickerEnabled && product.stickerText ? product.stickerText : 'NEW ARRIVAL'}
               </span>
             </div>
 
             {/* Title */}
-            <h1 className="font-['Jost',sans-serif] text-2xl sm:text-3xl md:text-4xl font-normal text-[#1a1209] mb-2 tracking-normal leading-tight capitalize lining-nums">
+            <h1 className="font-['Cormorant_Garamond',serif] text-2xl sm:text-3xl md:text-4xl font-normal text-[#141414] mb-2 tracking-normal leading-tight capitalize lining-nums">
               {product.title}
             </h1>
 
             {/* Sub-header */}
-            <p className="text-xs md:text-sm text-[#1a1209]/60 mb-4 font-['Jost',sans-serif]">
+            <p className="text-xs md:text-sm text-[#141414]/60 mb-4 font-['Jost',sans-serif]">
               {getProductGender(product) === 'Ladies' ? "Women's Watch" : "Men's Watch"} | Classic Collection
             </p>
 
@@ -1857,17 +1857,17 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
                   if (el) el.scrollIntoView({ behavior: 'smooth' });
                 }}
               >
-                <div className="flex gap-0.5 text-[#dfb15b]">
+                <div className="flex gap-0.5 text-[#8B6914]">
                   {Array.from({ length: 5 }).map((_, i) => (
                     <span key={i} className="text-sm">
                       {i < Math.round(reviewsStats.average) ? '★' : '☆'}
                     </span>
                   ))}
                 </div>
-                <span className="font-semibold text-[#1a1209]">
+                <span className="font-semibold text-[#141414]">
                   {reviewsStats.average}
                 </span>
-                <span className="text-[#1a1209]/50">
+                <span className="text-[#141414]/50">
                   ({reviewsStats.count} {reviewsStats.count === 1 ? 'review' : 'reviews'})
                 </span>
               </div>
@@ -1875,10 +1875,10 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
 
             {/* Price Tag & Tax Notice */}
             <div className="mb-6">
-              <div className="font-['Cinzel',serif] text-2xl md:text-3xl font-semibold text-[#8b6914] lining-nums">
+              <div className="font-['Jost',sans-serif] text-2xl md:text-3xl font-semibold text-[#141414] lining-nums">
                 {convertPrice(product.price)}
               </div>
-              <span className="text-[11px] text-[#1a1209]/50 italic block mt-0.5">
+              <span className="text-[11px] text-[#141414]/50 block mt-0.5">
                 Inclusive of all taxes
               </span>
             </div>
@@ -2081,8 +2081,8 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
         </div>
 
         {/* ── LOWER SECTION: THE TIMEPIECE IN FOCUS ── */}
-        <section className="max-w-[1300px] mx-auto mt-20 mb-16 pt-12 border-t border-[#8b6914]/20 text-center">
-          <h2 className="font-['Cinzel',serif] text-2xl md:text-4xl font-medium text-[#1a1209] mb-8 tracking-wide">
+        <section className="max-w-[1300px] mx-auto mt-20 mb-16 pt-12 border-t border-black/[0.08] text-center">
+          <h2 className="font-['Cormorant_Garamond',serif] text-2xl md:text-4xl font-normal text-[#141414] mb-8 tracking-wide">
             The Timepiece in Focus
           </h2>
 
@@ -2510,8 +2510,8 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
                 <div className="reviews-layout-grid" style={{ display: 'grid', gridTemplateColumns: '300px 1fr', gap: '48px', alignItems: 'flex-start' }}>
 
                   {/* ── LEFT: Summary Sidebar ── */}
-                  <div className="rev-summary-sidebar" style={{ background: '#FAF7F0', border: '1px solid rgba(26,18,9,0.07)', borderRadius: '16px', padding: '28px', position: 'sticky', top: '100px' }}>
-                    <h4 style={{ margin: '0 0 20px 0', fontSize: '13px', fontWeight: 700, letterSpacing: '0.15em', textTransform: 'uppercase', color: '#1a1209', borderBottom: '1px solid rgba(26,18,9,0.07)', paddingBottom: '14px' }}>Rating Summary</h4>
+                  <div className="rev-summary-sidebar" style={{ background: '#F8F7F4', border: '1px solid rgba(20,20,20,0.08)', borderRadius: '12px', padding: '28px', position: 'sticky', top: '100px' }}>
+                    <h4 style={{ margin: '0 0 20px 0', fontSize: '13px', fontWeight: 700, letterSpacing: '0.15em', textTransform: 'uppercase', color: '#141414', borderBottom: '1px solid rgba(20,20,20,0.08)', paddingBottom: '14px' }}>Rating Summary</h4>
 
                     {/* Big score */}
                     <div style={{ textAlign: 'center', marginBottom: '20px' }}>

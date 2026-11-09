@@ -204,7 +204,7 @@ function WomensCollectionContent() {
   }, [products, searchQuery, selectedSection, selectedGift, priceSort]);
 
   return (
-    <div style={{ backgroundColor: '#faf7f0', color: '#1a1209', minHeight: '100vh', fontFamily: "'Jost', sans-serif", paddingBottom: '20px' }}>
+    <div style={{ backgroundColor: '#ffffff', color: '#141414', minHeight: '100vh', fontFamily: "'Jost', sans-serif", paddingBottom: '20px' }}>
       <style>{`
         .womens-hero-grid {
           display: grid;
@@ -220,20 +220,20 @@ function WomensCollectionContent() {
         .womens-hero-img-card {
           position: relative;
           height: 380px;
-          border-radius: 14px;
+          border-radius: 10px;
           overflow: hidden;
-          border: 1px solid rgba(139,105,20,0.4);
-          box-shadow: 0 24px 60px rgba(0,0,0,0.6);
-          transition: transform 0.4s ease, border-color 0.4s ease;
+          border: 1px solid rgba(255,255,255,0.16);
+          box-shadow: 0 24px 60px rgba(0,0,0,0.5);
+          transition: transform 0.35s ease, border-color 0.35s ease;
         }
         .womens-hero-img-card:hover {
-          transform: translateY(-4px) scale(1.015);
-          border-color: rgba(223,177,91,0.8);
+          transform: translateY(-3px);
+          border-color: rgba(255,255,255,0.3);
         }
         .womens-toolbar-container {
           background: #ffffff;
-          border: 1px solid rgba(26,18,9,0.06);
-          border-radius: 12px;
+          border: 1px solid rgba(20, 20, 20, 0.08);
+          border-radius: 10px;
           padding: 18px 24px;
           margin-bottom: 36px;
           display: flex;
@@ -267,18 +267,19 @@ function WomensCollectionContent() {
         }
         .womens-toolbar-select {
           padding: 9px 14px;
-          border-radius: 8px;
-          border: 1px solid rgba(26,18,9,0.14);
+          border-radius: 6px;
+          border: 1px solid rgba(20, 20, 20, 0.1);
           font-size: 12px;
-          background: #faf7f0;
-          color: #1a1209;
+          background: #F8F7F4;
+          color: #141414;
           cursor: pointer;
           outline: none;
           height: 40px;
           transition: border-color 0.2s ease;
         }
         .womens-toolbar-select:focus {
-          border-color: #8b6914;
+          border-color: #141414;
+          background: #ffffff;
         }
         @media (max-width: 900px) {
           .womens-hero-section {
@@ -312,7 +313,7 @@ function WomensCollectionContent() {
           }
           .womens-hero-img-card {
             height: 220px;
-            border-radius: 12px;
+            border-radius: 10px;
           }
           .womens-hero-card-bottom {
             bottom: 12px !important;
@@ -381,29 +382,29 @@ function WomensCollectionContent() {
           gap: 30px;
         }
         .watch-card-container {
-          background: #faf7f0;
-          border-radius: 16px;
-          border: 1.5px solid rgba(26, 18, 9, 0.08);
+          background: #ffffff;
+          border-radius: 10px;
+          border: 1px solid rgba(20, 20, 20, 0.08);
           overflow: hidden;
           display: flex;
           flex-direction: column;
           height: 100%;
-          transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-          box-shadow: 0 4px 16px rgba(26, 18, 9, 0.02);
+          transition: all 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
           text-decoration: none;
           color: inherit;
           position: relative;
         }
         .watch-card-container:hover {
-          transform: translateY(-6px);
-          box-shadow: 0 16px 36px rgba(26, 18, 9, 0.08);
-          border-color: rgba(139, 105, 20, 0.35);
+          transform: translateY(-4px);
+          box-shadow: 0 14px 32px rgba(0, 0, 0, 0.06);
+          border-color: rgba(20, 20, 20, 0.18);
           background: #ffffff;
         }
         .watch-img-container {
           position: relative;
           aspect-ratio: 1;
-          background: transparent;
+          background: #F6F5F2;
           padding: 24px;
           display: flex;
           align-items: center;
@@ -414,50 +415,49 @@ function WomensCollectionContent() {
           width: 100%;
           height: 100%;
           object-fit: contain;
-          transition: transform 0.6s ease;
+          transition: transform 0.5s ease;
         }
         .watch-card-container:hover .watch-card-image {
-          transform: scale(1.06);
+          transform: scale(1.04);
         }
         .watch-card-badge {
           position: absolute;
-          left: 16px;
-          top: 16px;
-          background: #1a1209;
+          left: 14px;
+          top: 14px;
+          background: #141414;
           color: #fff;
           font-size: 9px;
-          font-weight: 600;
-          letter-spacing: 0.12em;
-          padding: 4px 10px;
-          border-radius: 4px;
+          font-weight: 500;
+          letter-spacing: 0.14em;
+          padding: 4px 9px;
+          border-radius: 2px;
           z-index: 2;
           text-transform: uppercase;
-          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
         }
         .watch-card-info {
-          padding: 20px;
+          padding: 18px 20px;
           flex: 1;
           display: flex;
           flex-direction: column;
           justify-content: space-between;
-          background: transparent;
+          background: #ffffff;
         }
         .watch-card-title-link {
           text-decoration: none;
           color: inherit;
         }
         .watch-card-title {
-          font-size: 15.5px;
+          font-size: 14.5px;
           font-weight: 500;
           margin: 0 0 6px;
-          color: #1a1209;
+          color: #141414;
           letter-spacing: 0.01em;
           font-variant-numeric: lining-nums;
           font-feature-settings: "lnum" 1;
         }
         .watch-card-specs {
-          font-size: 12px;
-          color: rgba(26, 18, 9, 0.5);
+          font-size: 11.5px;
+          color: #666666;
           margin: 0;
         }
         .watch-card-footer {
@@ -465,13 +465,13 @@ function WomensCollectionContent() {
           justify-content: space-between;
           align-items: center;
           margin-top: 16px;
-          border-top: 1px solid rgba(26, 18, 9, 0.05);
+          border-top: 1px solid rgba(20, 20, 20, 0.06);
           padding-top: 14px;
         }
         .watch-card-price {
-          font-size: 14.5px;
+          font-size: 14px;
           font-weight: 600;
-          color: #8b6914;
+          color: #141414;
         }
         .watch-card-actions {
           display: flex;
@@ -480,21 +480,21 @@ function WomensCollectionContent() {
         }
         .card-action-btn {
           background: transparent;
-          border: 1px solid rgba(26, 18, 9, 0.1);
+          border: 1px solid rgba(20, 20, 20, 0.1);
           width: 32px;
           height: 32px;
           border-radius: 50%;
           display: flex;
           align-items: center;
           justify-content: center;
-          color: rgba(26, 18, 9, 0.7);
+          color: rgba(20, 20, 20, 0.7);
           cursor: pointer;
-          transition: all 0.3s ease;
+          transition: all 0.25s ease;
         }
         .card-action-btn:hover {
-          background: rgba(26, 18, 9, 0.04);
-          color: #1a1209;
-          border-color: #1a1209;
+          background: rgba(20, 20, 20, 0.04);
+          color: #141414;
+          border-color: #141414;
         }
         .card-action-btn.active {
           background: #ffebeb;
@@ -502,9 +502,9 @@ function WomensCollectionContent() {
           border-color: #ff3b30;
         }
         .card-action-btn.highlight:hover {
-          background: #1a1209;
+          background: #141414;
           color: #fff;
-          border-color: #1a1209;
+          border-color: #141414;
         }
 
         /* ── ATTACHED BENEFITS BAR ── */
@@ -703,12 +703,12 @@ function WomensCollectionContent() {
           {/* Left Column: Text & Badge */}
           <div style={{ textAlign: 'left' }} className="womens-hero-text-block">
             <div style={{ fontSize: '10px', letterSpacing: '0.28em', color: '#dfb15b', textTransform: 'uppercase', fontWeight: 600, marginBottom: '12px' }}>
-              ELEGANCE & REFINED GRACE
+              WINSOR WOMEN'S COLLECTION
             </div>
-            {/* Animated Hero Title & Subtitle with Luxury Typewriter & Erase Effect */}
+            {/* Clean Editorial Hero Title & Subtitle */}
             <WomensHeroTypewriter />
             <div className="womens-hero-pills-row" style={{ display: 'flex', gap: '14px', flexWrap: 'wrap', alignItems: 'center' }}>
-              <div style={{ padding: '8px 18px', background: 'rgba(139,105,20,0.2)', border: '1px solid rgba(223,177,91,0.45)', borderRadius: '20px', fontSize: '10px', letterSpacing: '0.18em', textTransform: 'uppercase', fontWeight: 600, color: '#dfb15b' }}>
+              <div style={{ padding: '8px 18px', background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '4px', fontSize: '10px', letterSpacing: '0.18em', textTransform: 'uppercase', fontWeight: 500, color: '#ffffff' }}>
                 {loading ? 'CURATED TIMEPIECES AVAILABLE' : `${filteredProducts.length} WOMEN'S TIMEPIECES AVAILABLE`}
               </div>
             </div>
@@ -730,7 +730,7 @@ function WomensCollectionContent() {
                 <span style={{ fontSize: '9px', letterSpacing: '0.25em', color: '#dfb15b', textTransform: 'uppercase', fontWeight: 600, display: 'block' }}>LADIES ELEGANCE</span>
                 <span className="womens-hero-card-title" style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '20px', color: '#ffffff', fontWeight: 500 }}>Timeless & Graceful</span>
               </div>
-              <span className="womens-hero-card-badge" style={{ fontSize: '10px', letterSpacing: '0.15em', color: 'rgba(255,255,255,0.7)', border: '1px solid rgba(255,255,255,0.2)', padding: '4px 10px', borderRadius: '4px' }}>DUBAI 2023</span>
+              <span className="womens-hero-card-badge" style={{ fontSize: '10px', letterSpacing: '0.15em', color: 'rgba(255,255,255,0.7)', border: '1px solid rgba(255,255,255,0.2)', padding: '4px 10px', borderRadius: '4px' }}>EST. 2022</span>
             </div>
           </div>
         </div>
@@ -830,7 +830,6 @@ function WomensCollectionContent() {
       </div>
 
       {/* ── MAIN CONTENT ── */}
-      {/* ── MAIN CONTENT ── */}
       <div id="womens-catalog" style={{ maxWidth: '1400px', margin: '0 auto', padding: '20px 24px 100px' }}>
 
         {/* ── FILTER TOOLBAR ── */}
@@ -851,11 +850,11 @@ function WomensCollectionContent() {
                   boxSizing: 'border-box',
                   padding: '10px 14px 10px 38px',
                   borderRadius: '6px',
-                  border: '1px solid rgba(26,18,9,0.15)',
+                  border: '1px solid rgba(20,20,20,0.1)',
                   fontSize: '12.5px',
                   outline: 'none',
-                  background: '#faf7f0',
-                  color: '#1a1209',
+                  background: '#F8F7F4',
+                  color: '#141414',
                   display: 'block'
                 }}
               />
@@ -864,7 +863,7 @@ function WomensCollectionContent() {
                 height="15" 
                 viewBox="0 0 24 24" 
                 fill="none" 
-                stroke="rgba(26,18,9,0.4)" 
+                stroke="rgba(20,20,20,0.45)" 
                 strokeWidth="2"
                 style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }}
               >
@@ -881,15 +880,15 @@ function WomensCollectionContent() {
                 key={sec}
                 onClick={() => setSelectedSection(sec)}
                 style={{
-                  padding: '7px 16px',
-                  borderRadius: '100px',
+                  padding: '8px 16px',
+                  borderRadius: '6px',
                   fontSize: '11px',
-                  fontWeight: 600,
-                  letterSpacing: '0.05em',
+                  fontWeight: 500,
+                  letterSpacing: '0.1em',
                   cursor: 'pointer',
-                  border: selectedSection === sec ? '1.5px solid #8b6914' : '1px solid rgba(26,18,9,0.12)',
-                  background: selectedSection === sec ? '#8b6914' : '#ffffff',
-                  color: selectedSection === sec ? '#ffffff' : 'rgba(26,18,9,0.7)',
+                  border: selectedSection === sec ? '1px solid #141414' : '1px solid rgba(20,20,20,0.1)',
+                  background: selectedSection === sec ? '#141414' : '#F8F7F4',
+                  color: selectedSection === sec ? '#ffffff' : '#555555',
                   transition: 'all 0.2s ease',
                   textTransform: 'uppercase',
                   whiteSpace: 'nowrap',

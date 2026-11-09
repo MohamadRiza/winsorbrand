@@ -1572,7 +1572,7 @@ export default function ProfilePage() {
 
             <h1 className="patron-name">{fullName || 'WINSOR PATRON'}</h1>
             <span className="member-since">
-              Member since {user.createdAt ? new Date(user.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long' }) : new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long' })} • Verified Winsor Maison Client
+              Member since {user.createdAt ? new Date(user.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long' }) : new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long' })} • Verified Winsor Watches Client
             </span>
 
             {/* Professional Numbers Hero Stats Grid */}
@@ -2177,7 +2177,7 @@ export default function ProfilePage() {
                           <span className="benefit-check-icon">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg>
                           </span>
-                          <span style={{ color: '#ffffff', fontSize: '12px' }}>Complimentary lifetime horology maintenance</span>
+                          <span style={{ color: '#ffffff', fontSize: '12px' }}>Complimentary lifetime timepiece maintenance</span>
                         </div>
                         <div className="benefit-check-item">
                           <span className="benefit-check-icon">
@@ -2784,7 +2784,7 @@ export default function ProfilePage() {
                   ✦ WRITE TIMEPIECE REVIEW ✦
                 </h2>
                 <p style={{ margin: '3px 0 0 0', fontSize: '11px', color: 'rgba(243,227,184,0.7)', letterSpacing: '0.05em' }}>
-                  Share your experience with the Winsor horology community
+                  Share your experience with the Winsor watch community
                 </p>
               </div>
               <button
@@ -2864,7 +2864,7 @@ export default function ProfilePage() {
                   <textarea
                     required
                     rows={4}
-                    placeholder="Describe your experience with the timepiece's craftsmanship, movement precision, packaging presentation, and overall horology details..."
+                    placeholder="Describe your experience with the timepiece's craftsmanship, movement precision, packaging presentation, and overall timepiece details..."
                     value={reviewComment}
                     onChange={(e) => setReviewComment(e.target.value)}
                     style={{

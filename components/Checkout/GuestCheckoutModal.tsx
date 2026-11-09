@@ -989,13 +989,13 @@ export default function GuestCheckoutModal({
                       <span style={{ fontWeight: 600, color: '#1a1209' }}>LKR {subtotal.toLocaleString()}</span>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '12px', color: '#7a6e5d' }}>
-                      <span>Insured Atelier Delivery</span>
+                      <span>Insured Express Delivery</span>
                       <span style={{ fontWeight: 700, color: '#2e7d32', textTransform: 'uppercase', fontSize: '11px', letterSpacing: '0.04em' }}>Free / Complimentary</span>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: 8, marginTop: 4, borderTop: '1.5px solid rgba(184,142,60,0.2)' }}>
                       <div>
-                        <div style={{ fontSize: '13px', fontWeight: 800, color: '#1a1209', letterSpacing: '0.04em', textTransform: 'uppercase' }}>Total Investment</div>
-                        <div style={{ fontSize: '10.5px', color: '#7a6e5d' }}>Inclusive of all luxury taxes & insurance</div>
+                        <div style={{ fontSize: '13px', fontWeight: 800, color: '#141414', letterSpacing: '0.04em', textTransform: 'uppercase' }}>Order Total</div>
+                        <div style={{ fontSize: '10.5px', color: '#7a6e5d' }}>Inclusive of taxes & insured delivery</div>
                       </div>
                       <span style={{ fontSize: '20px', fontWeight: 800, color: '#b88e3c', fontFamily: "'Jost', monospace", fontVariantNumeric: 'tabular-nums' }}>
                         LKR {subtotal.toLocaleString()}

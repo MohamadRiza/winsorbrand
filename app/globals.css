@@ -2,8 +2,8 @@
 @import "tailwindcss";
 
 :root {
-  --background: #faf7f0;
-  --foreground: #1a1209;
+  --background: #ffffff;
+  --foreground: #141414;
 }
 
 @theme inline {
@@ -30,8 +30,8 @@ html {
 }
 
 html, body {
-  background-color: #faf7f0 !important;
-  color: #1a1209;
+  background-color: #ffffff !important;
+  color: #141414;
   font-family: 'Jost', Arial, Helvetica, sans-serif;
   font-variant-numeric: lining-nums;
   margin: 0;

@@ -402,7 +402,7 @@ export default function PrivacyPolicyPage() {
         <nav className="legal-breadcrumb" aria-label="Breadcrumb">
           <Link href="/">Home</Link>
           <span>/</span>
-          <Link href="/collections">Maison</Link>
+          <Link href="/collections">Collections</Link>
           <span>/</span>
           <span>Privacy Policy</span>
         </nav>
@@ -515,7 +515,7 @@ export default function PrivacyPolicyPage() {
                 <h2 className="legal-section-title">1. Introduction & Scope</h2>
               </div>
               <p className="legal-paragraph">
-                Welcome to <strong>Winsor Brand</strong> ("Winsor", "we", "us", or "our"). We hold the privacy and trust of our patrons in the highest regard. This Privacy Policy details how our luxury watch maison collects, uses, safeguards, and manages personal data when you interact with our digital boutique, reserve timepieces, register an international warranty, or visit authorized showroom locations.
+                Welcome to <strong>Winsor Brand</strong> ("Winsor", "we", "us", or "our"). We hold the privacy and trust of our patrons in the highest regard. This Privacy Policy details how our luxury watch brand collects, uses, safeguards, and manages personal data when you interact with our digital boutique, reserve timepieces, register an international warranty, or visit authorized showroom locations.
               </p>
               <div className="legal-callout">
                 <strong>Confidentiality Guarantee:</strong> We apply bank-grade encryption protocols and strict internal governance to ensure that your personal records and collector histories remain secure and private at all times.
@@ -537,7 +537,7 @@ export default function PrivacyPolicyPage() {
                 <h2 className="legal-section-title">2. Information We Collect</h2>
               </div>
               <p className="legal-paragraph">
-                In order to provide our patrons with bespoke horology services and white-glove delivery, we collect the following categories of data:
+                In order to provide our patrons with bespoke timepiece services and white-glove delivery, we collect the following categories of data:
               </p>
               <ul className="legal-list">
                 <li className="legal-list-item">

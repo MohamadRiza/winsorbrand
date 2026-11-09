@@ -449,7 +449,7 @@ export default function ReturnPolicyPage() {
         <nav className="legal-breadcrumb" aria-label="Breadcrumb">
           <Link href="/">Home</Link>
           <span>/</span>
-          <Link href="/collections">Maison</Link>
+          <Link href="/collections">Collections</Link>
           <span>/</span>
           <span>Return Policy</span>
         </nav>
@@ -508,7 +508,7 @@ export default function ReturnPolicyPage() {
               onClick={() => scrollToSection('inspection')}
               className={`sidebar-nav-btn ${activeSection === 'inspection' ? 'active' : ''}`}
             >
-              5. Horology Inspection
+              5. Quality Inspection
             </button>
             <button
               onClick={() => scrollToSection('refunds')}
@@ -560,10 +560,10 @@ export default function ReturnPolicyPage() {
                 <h2 className="legal-section-title">1. 14-Day Boutique Return Guarantee</h2>
               </div>
               <p className="legal-paragraph">
-                At <strong>Winsor Brand</strong>, we are committed to delivering horological perfection in every timepiece we assemble and finish. We understand that acquiring a luxury watch is an intimate decision. If your timepiece does not meet your personal preferences or expectations, you may return or exchange it within <strong>14 calendar days</strong> from the official delivery date.
+                At <strong>Winsor Brand</strong>, we are committed to delivering dependable quality in every timepiece we assemble and finish. We understand that acquiring a luxury watch is an intimate decision. If your timepiece does not meet your personal preferences or expectations, you may return or exchange it within <strong>14 calendar days</strong> from the official delivery date.
               </p>
               <div className="legal-callout">
-                <strong>Quality Assurance Commitment:</strong> Every returned timepiece is handled with white-glove care and undergoes a comprehensive inspection at our regional atelier by certified horologists before a refund or exchange is authorized.
+                <strong>Quality Assurance Commitment:</strong> Every returned timepiece is handled with white-glove care and undergoes a comprehensive inspection at our service center by certified watch technicians before a refund or exchange is authorized.
               </div>
             </section>
 
@@ -710,7 +710,7 @@ export default function ReturnPolicyPage() {
                     <line x1="21" y1="21" x2="16.65" y2="16.65" />
                   </svg>
                 </div>
-                <h2 className="legal-section-title">5. Horology Quality Inspection</h2>
+                <h2 className="legal-section-title">5. Timepiece Quality Inspection</h2>
               </div>
               <p className="legal-paragraph">
                 Upon delivery at our distribution facility, your returned timepiece is inspected within <strong>48 to 72 business hours</strong>:
@@ -743,7 +743,7 @@ export default function ReturnPolicyPage() {
                 <h2 className="legal-section-title">6. Refunds & Reimbursement Timelines</h2>
               </div>
               <p className="legal-paragraph">
-                Once the returned timepiece successfully passes horological inspection:
+                Once the returned timepiece successfully passes quality inspection:
               </p>
               <ul className="legal-list">
                 <li className="legal-list-item">

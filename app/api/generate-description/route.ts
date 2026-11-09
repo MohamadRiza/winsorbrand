@@ -53,7 +53,7 @@ const generateFallback = ({
   } else if (isGents) {
     p1 = `Engineered with commanding poise for the modern gentleman, the ${title} effortlessly balances masculine sophistication with everyday versatility. Centered around a distinguished ${shape} case profile, it delivers an authoritative wrist presence that transitions seamlessly from corporate boardroom settings to relaxed weekend pursuits.`;
   } else {
-    p1 = `Crafted with universal appeal and harmonious proportions, the ${title} represents horological versatility at its finest. Featuring an impeccably balanced ${shape} silhouette, this timepiece adapts effortlessly to any wardrobe, delivering an understated statement of confidence, precision, and modern luxury.`;
+    p1 = `Crafted with universal appeal and harmonious proportions, the ${title} represents timeless versatility at its finest. Featuring an impeccably balanced ${shape} silhouette, this timepiece adapts effortlessly to any wardrobe, delivering an understated statement of confidence, precision, and modern luxury.`;
   }
 
   // 2. Second paragraph: Color Variants & Craftsmanship
@@ -80,7 +80,7 @@ const generateFallback = ({
   } else if (isSports) {
     collectionContext = `Infused with the dynamic spirit of our Sports collection, it pairs active durability with sophisticated luxury.`;
   } else if (isLuxury) {
-    collectionContext = `Occupying a proud place within our premier Luxury collection, it exemplifies the highest standards of our horology maison.`;
+    collectionContext = `Occupying a proud place within our premier Luxury collection, it exemplifies the highest standards of our watch brand.`;
   } else if (isBestseller) {
     collectionContext = `Celebrated as a perennial favorite in our Bestsellers lineup, it has earned widespread admiration for its dependability and allure.`;
   } else if (isNew) {
@@ -154,7 +154,7 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    const prompt = `You are a master luxury horology copywriter for Winsor, an esteemed watch maison in Sri Lanka.
+    const prompt = `You are a master luxury watch copywriter for Winsor, an esteemed watch brand in Sri Lanka.
 Write a captivating, high-converting product description for a wristwatch in 2 to 3 fluid, elegant paragraphs.
 
 Product Context:

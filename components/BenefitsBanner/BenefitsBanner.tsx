@@ -71,7 +71,7 @@ export default function BenefitsBanner() {
   const duplicatedBenefits = [...benefits, ...benefits];
 
   return (
-    <section className="bg-[#FAF4E8] border-y border-[#8B6914]/20 py-4 overflow-hidden">
+    <section className="bg-[#F8F7F4] border-y border-black/[0.08] py-4 overflow-hidden">
       <style>{`
         @keyframes marquee {
           0% { transform: translateX(0); }
@@ -98,20 +98,20 @@ export default function BenefitsBanner() {
             <div
               key={idx}
               className={`group flex items-center gap-3 px-3 lg:px-6 
-                ${idx < 3 ? 'lg:border-r border-[#8B6914]/15' : ''} 
-                ${idx % 2 === 0 ? 'sm:border-r sm:border-[#8B6914]/15 lg:border-r-0 lg:border-r border-[#8B6914]/15' : ''} 
-                ${idx === 1 ? 'sm:border-r-0 lg:border-r border-[#8B6914]/15' : ''}
+                ${idx < 3 ? 'lg:border-r border-black/[0.08]' : ''} 
+                ${idx % 2 === 0 ? 'sm:border-r sm:border-black/[0.08] lg:border-r-0 lg:border-r border-black/[0.08]' : ''} 
+                ${idx === 1 ? 'sm:border-r-0 lg:border-r border-black/[0.08]' : ''}
               `}
             >
               {/* Icon Container */}
-              <div className="flex-shrink-0 flex items-center justify-center p-1.5 rounded-lg bg-white border border-[#8B6914]/20 transition-colors duration-300 group-hover:bg-white group-hover:border-[#8B6914]/40">
+              <div className="flex-shrink-0 flex items-center justify-center p-1.5 rounded-lg bg-white border border-black/[0.08] transition-colors duration-300 group-hover:bg-white group-hover:border-[#8B6914]/40">
                 {benefit.icon}
               </div>
 
               {/* Text Content */}
               <div className="flex flex-col">
                 <h3
-                  className="text-[#1a1209] text-[10.5px] md:text-[11px] lg:text-[11.5px] font-medium tracking-[0.12em] uppercase transition-colors duration-300 group-hover:text-[#8B6914]"
+                  className="text-[#141414] text-[10.5px] md:text-[11px] lg:text-[11.5px] font-medium tracking-[0.12em] uppercase transition-colors duration-300 group-hover:text-[#8B6914]"
                   style={{ fontFamily: "'Jost', sans-serif" }}
                 >
                   {benefit.title}
@@ -130,8 +130,8 @@ export default function BenefitsBanner() {
         {/* Mobile View (Slow Continuous Marquee) */}
         <div className="block sm:hidden overflow-hidden w-full relative">
           {/* Faders for premium overlay look at edges */}
-          <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-[#FAF4E8] to-transparent z-10 pointer-events-none" />
-          <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-[#FAF4E8] to-transparent z-10 pointer-events-none" />
+          <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-[#F8F7F4] to-transparent z-10 pointer-events-none" />
+          <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-[#F8F7F4] to-transparent z-10 pointer-events-none" />
 
           <div className="marquee-wrapper">
             {duplicatedBenefits.map((benefit, idx) => (
@@ -140,14 +140,14 @@ export default function BenefitsBanner() {
                 className="flex items-center gap-3.5 shrink-0"
               >
                 {/* Icon Container */}
-                <div className="flex-shrink-0 flex items-center justify-center p-1.5 rounded-lg bg-white border border-[#8B6914]/20">
+                <div className="flex-shrink-0 flex items-center justify-center p-1.5 rounded-lg bg-white border border-black/[0.08]">
                   {benefit.icon}
                 </div>
 
                 {/* Text Content */}
                 <div className="flex flex-col">
                   <h3
-                    className="text-[#1a1209] text-[11px] font-medium tracking-[0.12em] uppercase whitespace-nowrap"
+                    className="text-[#141414] text-[11px] font-medium tracking-[0.12em] uppercase whitespace-nowrap"
                     style={{ fontFamily: "'Jost', sans-serif" }}
                   >
                     {benefit.title}

@@ -306,7 +306,7 @@ export default function SidebarClientWrapper() {
               letterSpacing: '0.08em',
               textTransform: 'uppercase'
             }}>
-              WINSOR MAISON
+              WINSOR WATCHES
             </span>
           </div>
 

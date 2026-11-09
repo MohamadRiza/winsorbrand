@@ -3,7 +3,7 @@ import { Metadata } from 'next';
 const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://winsorbrand.com';
 
 export const metadata: Metadata = {
-  title: 'Frequently Asked Questions & Horology Assistance',
+  title: 'Frequently Asked Questions & Customer Assistance',
   description: 'Find answers regarding Winsor luxury timepiece craftsmanship, movement servicing, international shipping, warranty registration, and bespoke gifting.',
   keywords: [
     'Winsor FAQ',

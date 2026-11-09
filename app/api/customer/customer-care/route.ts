@@ -65,7 +65,49 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (message.length > 1000) {
+    // 1. Username / Name: maximum 100 characters
+    if (typeof name !== 'string' || name.trim().length > 100) {
+      return NextResponse.json(
+        { success: false, error: 'Username / Full Name cannot exceed 100 characters.' },
+        { status: 400 }
+      );
+    }
+
+    // 2. Email: must contain '@' and follow valid email format
+    const emailStr = typeof email === 'string' ? email.trim() : '';
+    if (!emailStr.includes('@') || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailStr)) {
+      return NextResponse.json(
+        { success: false, error: 'A valid email address containing "@" is required.' },
+        { status: 400 }
+      );
+    }
+
+    // 3. Mobile: must contain valid numbers only
+    const mobileStr = typeof mobile === 'string' ? mobile.trim() : '';
+    const mobileDigits = mobileStr.replace(/^\+\d+\s*/, '').replace(/\s+/g, '');
+    if (!/^\d+$/.test(mobileDigits)) {
+      return NextResponse.json(
+        { success: false, error: 'Mobile number must contain digits only.' },
+        { status: 400 }
+      );
+    }
+    if (mobileDigits.length < 6 || mobileDigits.length > 15) {
+      return NextResponse.json(
+        { success: false, error: 'Mobile number must contain between 6 and 15 digits.' },
+        { status: 400 }
+      );
+    }
+
+    // 4. Subject: maximum 200 characters
+    if (typeof subject !== 'string' || subject.trim().length > 200) {
+      return NextResponse.json(
+        { success: false, error: 'Subject cannot exceed 200 characters.' },
+        { status: 400 }
+      );
+    }
+
+    // 5. Message: maximum 1000 characters
+    if (typeof message !== 'string' || message.trim().length > 1000) {
       return NextResponse.json(
         { success: false, error: 'Message cannot exceed 1000 characters.' },
         { status: 400 }

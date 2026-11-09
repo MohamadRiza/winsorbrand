@@ -16,12 +16,12 @@ export async function generateMetadata({
     const vacancy: any = await Vacancy.findById(id).lean();
     if (!vacancy) {
       return {
-        title: 'Career Vacancy | Winsor Maison',
+        title: 'Career Vacancy | Winsor Watches',
       };
     }
 
-    const title = `${vacancy.jobTitle} — Careers at Winsor Maison`;
-    const description = `${vacancy.department || 'Boutique Operations'} career opportunity: Join Winsor Maison as a ${vacancy.jobTitle} in ${vacancy.location || 'Colombo'}. ${vacancy.employmentType || 'Full-time'} position.`;
+    const title = `${vacancy.jobTitle} — Careers at Winsor Watches`;
+    const description = `${vacancy.department || 'Boutique Operations'} career opportunity: Join Winsor Watches as a ${vacancy.jobTitle} in ${vacancy.location || 'Colombo'}. ${vacancy.employmentType || 'Full-time'} position.`;
 
     return {
       title,
@@ -34,7 +34,7 @@ export async function generateMetadata({
     };
   } catch (err) {
     return {
-      title: 'Careers & Horology Vacancies | Winsor Maison',
+      title: 'Careers & Watchmaking & Retail Vacancies | Winsor Watches',
     };
   }
 }
@@ -57,12 +57,12 @@ export default async function JobDetailsPage({
         '@context': 'https://schema.org/',
         '@type': 'JobPosting',
         'title': vacancy.jobTitle,
-        'description': vacancy.description || `Join Winsor Maison as ${vacancy.jobTitle}`,
+        'description': vacancy.description || `Join Winsor Watches as ${vacancy.jobTitle}`,
         'datePosted': vacancy.createdAt ? new Date(vacancy.createdAt).toISOString() : new Date().toISOString(),
         'employmentType': (vacancy.employmentType || 'FULL_TIME').toUpperCase().replace('-', '_'),
         'hiringOrganization': {
           '@type': 'Organization',
-          'name': 'Winsor Maison',
+          'name': 'Winsor Watches',
           'sameAs': baseUrl,
           'logo': `${baseUrl}/icon.png`,
         },

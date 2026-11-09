@@ -332,15 +332,15 @@ function WatchCard({ product, index }: { product: WatchProduct; index: number })
         minWidth: cardWidth,
         maxWidth: cardWidth,
         flexShrink: 0,
-        borderRadius: '16px',
+        borderRadius: '8px',
         overflow: 'hidden',
         animationDelay: `${index * 80}ms`,
-        background: '#faf7f0',
-        transition: 'transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.4s ease, border-color 0.4s ease',
-        transform: (!isMobile && cardHovered) ? 'translateY(-6px)' : 'none',
-        boxShadow: (!isMobile && cardHovered) ? '0 16px 32px rgba(26, 18, 9, 0.06)' : '0 4px 12px rgba(0,0,0,0.02)',
-        border: '1px solid rgba(26, 18, 9, 0.06)',
-        borderColor: (!isMobile && cardHovered) ? '#8B6914' : 'rgba(26, 18, 9, 0.06)',
+        background: '#ffffff',
+        transition: 'transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.35s ease, border-color 0.35s ease',
+        transform: (!isMobile && cardHovered) ? 'translateY(-4px)' : 'none',
+        boxShadow: (!isMobile && cardHovered) ? '0 14px 30px rgba(0, 0, 0, 0.06)' : '0 2px 8px rgba(0, 0, 0, 0.02)',
+        border: '1px solid',
+        borderColor: (!isMobile && cardHovered) ? 'rgba(20, 20, 20, 0.22)' : 'rgba(20, 20, 20, 0.08)',
         boxSizing: 'border-box',
       }}
       className="wn-card-fade"
@@ -353,7 +353,7 @@ function WatchCard({ product, index }: { product: WatchProduct; index: number })
           position: 'relative',
           width: '100%',
           height: isMobile ? '200px' : '270px',
-          background: '#faf7f0',
+          background: '#F6F5F2',
           overflow: 'hidden',
           display: 'flex',
           alignItems: 'center',
@@ -378,21 +378,21 @@ function WatchCard({ product, index }: { product: WatchProduct; index: number })
           onClick={toggleWishlist}
           style={{
             position: 'absolute',
-            top: '16px',
-            right: '16px',
+            top: '12px',
+            right: '12px',
             width: '32px',
             height: '32px',
             borderRadius: '50%',
-            background: isFav ? '#8B6914' : 'rgba(255,255,255,0.9)',
-            border: '1px solid rgba(26,18,9,0.06)',
-            boxShadow: '0 4px 12px rgba(26,18,9,0.06)',
+            background: isFav ? '#141414' : 'rgba(255,255,255,0.92)',
+            border: '1px solid rgba(20,20,20,0.08)',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             cursor: 'pointer',
             zIndex: 4,
-            color: isFav ? '#ffffff' : '#1a1209',
-            transition: 'all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+            color: isFav ? '#ffffff' : '#141414',
+            transition: 'all 0.25s ease',
           }}
           className="wn-wishlist-btn"
           aria-label="Toggle Wishlist"
@@ -406,18 +406,18 @@ function WatchCard({ product, index }: { product: WatchProduct; index: number })
         {product.stickerEnabled && product.stickerText && (
           <div style={{
             position: 'absolute',
-            top: '16px',
-            left: '16px',
-            background: '#8B6914',
+            top: '12px',
+            left: '12px',
+            background: '#141414',
             color: '#ffffff',
             fontFamily: "'Jost', sans-serif",
             fontSize: '9px',
             fontWeight: 600,
-            letterSpacing: '0.1em',
-            padding: '4px 8px',
+            letterSpacing: '0.12em',
+            padding: '4px 9px',
             textTransform: 'uppercase',
             zIndex: 2,
-            borderRadius: '4px',
+            borderRadius: '2px',
           }}>
             {product.stickerText}
           </div>
@@ -475,7 +475,8 @@ function WatchCard({ product, index }: { product: WatchProduct; index: number })
           maxHeight: cardHovered ? '48px' : '0px',
           transition: 'all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
           overflowY: 'hidden',
-          background: '#faf7f0',
+          background: '#F6F5F2',
+          borderTop: cardHovered ? '1px solid rgba(20, 20, 20, 0.05)' : 'none',
         }}>
           {allImages.slice(0, 5).map((imgUrl, i) => {
             const isActive = i === imgIndex;
@@ -490,7 +491,7 @@ function WatchCard({ product, index }: { product: WatchProduct; index: number })
                 style={{
                   width: '32px',
                   height: '32px',
-                  border: isActive ? '1px solid #8B6914' : '1px solid rgba(26, 18, 9, 0.12)',
+                  border: isActive ? '1px solid #141414' : '1px solid rgba(20, 20, 20, 0.1)',
                   borderRadius: '4px',
                   background: '#ffffff',
                   padding: '2px',
@@ -519,26 +520,27 @@ function WatchCard({ product, index }: { product: WatchProduct; index: number })
       {/* Bottom Content Area */}
       <Link href={`/collections/${product._id}`} style={{ textDecoration: 'none' }}>
         <div style={{
-          padding: '20px 20px 24px 20px',
+          padding: isMobile ? '14px 14px 18px' : '18px 20px 22px',
           display: 'flex',
           flexDirection: 'column',
           textAlign: 'left',
           boxSizing: 'border-box',
-          background: '#faf7f0',
+          background: '#ffffff',
+          borderTop: '1px solid rgba(20, 20, 20, 0.05)',
         }}>
           {/* Watch Title */}
           <h3 style={{
             fontFamily: "'Jost', sans-serif",
             fontSize: '13px',
             fontWeight: 600,
-            color: cardHovered ? '#8B6914' : '#1a1209',
-            letterSpacing: '0.08em',
+            color: cardHovered ? '#8B6914' : '#141414',
+            letterSpacing: '0.06em',
             textTransform: 'uppercase',
             lineHeight: '1.4',
             margin: '0 0 6px 0',
-            minHeight: '38px',
+            minHeight: '36px',
             overflow: 'hidden',
-            transition: 'color 0.3s ease',
+            transition: 'color 0.25s ease',
           }}>
             {product.title}
           </h3>
@@ -546,56 +548,58 @@ function WatchCard({ product, index }: { product: WatchProduct; index: number })
           {/* Specifications subtitle */}
           <p style={{
             fontFamily: "'Jost', sans-serif",
-            fontSize: '12px',
+            fontSize: '11.5px',
             fontWeight: 400,
-            letterSpacing: '0.04em',
-            color: '#666666',
-            margin: '0 0 10px 0',
+            letterSpacing: '0.02em',
+            color: 'rgba(20, 20, 20, 0.55)',
+            margin: '0 0 12px 0',
             lineHeight: 1.4,
-            minHeight: '34px',
+            minHeight: '32px',
             overflow: 'hidden',
           }}>
             {formattedSpecs}
           </p>
 
-          {/* Pricing */}
-          <p style={{
-            fontFamily: "'Jost', sans-serif",
-            fontSize: '14px',
-            fontWeight: 600,
-            color: '#8B6914',
-            margin: '0 0 6px 0',
-          }}>
-            {convertPrice(product.price).replace('.00', '')}
-          </p>
+          {/* Pricing & Rating Row */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: '10px', borderTop: '1px solid rgba(20, 20, 20, 0.05)' }}>
+            <p style={{
+              fontFamily: "'Jost', sans-serif",
+              fontSize: '14.5px',
+              fontWeight: 600,
+              color: '#141414',
+              margin: 0,
+            }}>
+              {convertPrice(product.price).replace('.00', '')}
+            </p>
 
-          {/* Rating Stars - Only displayed if real reviews exist */}
-          {ratingStats.count > 0 && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginTop: '2px' }}>
-              <div style={{ display: 'flex', gap: '2px' }}>
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <span
-                    key={i}
-                    style={{
-                      color: i < ratingStats.average ? '#c9a14a' : 'rgba(26,18,9,0.12)',
-                      fontSize: '12px',
-                      lineHeight: 1
-                    }}
-                  >
-                    ★
-                  </span>
-                ))}
+            {/* Rating Stars - Only displayed if real reviews exist */}
+            {ratingStats.count > 0 && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
+                <div style={{ display: 'flex', gap: '1px' }}>
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <span
+                      key={i}
+                      style={{
+                        color: i < ratingStats.average ? '#8B6914' : 'rgba(20,20,20,0.14)',
+                        fontSize: '11px',
+                        lineHeight: 1
+                      }}
+                    >
+                      ★
+                    </span>
+                  ))}
+                </div>
+                <span style={{
+                  fontSize: '10px',
+                  fontWeight: 500,
+                  color: 'rgba(20,20,20,0.45)',
+                  fontFamily: "'Jost', sans-serif"
+                }}>
+                  ({ratingStats.count})
+                </span>
               </div>
-              <span style={{
-                fontSize: '10.5px',
-                fontWeight: 500,
-                color: 'rgba(26,18,9,0.4)',
-                fontFamily: "'Jost', sans-serif"
-              }}>
-                ({ratingStats.count})
-              </span>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </Link>
     </div>
@@ -789,10 +793,10 @@ export default function CollectionsSection() {
 
   return (
     <section id="collections" style={{
-      background: '#faf7f0',
-      padding: '0 0 54px',
+      background: '#ffffff',
+      padding: '0 0 64px',
       fontFamily: "'Jost', sans-serif",
-      borderBottom: '1px solid rgba(26,18,9,0.06)',
+      borderBottom: '1px solid rgba(20, 20, 20, 0.06)',
     }}>
       <style>{`
         @keyframes wn-pulse {
@@ -822,22 +826,22 @@ export default function CollectionsSection() {
           }
         }
         .wn-cat-card {
-          transition: all 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+          transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
         .wn-cat-card:hover {
-          background: rgba(201, 161, 74, 0.12) !important;
-          border-color: #8B6914 !important;
-          box-shadow: 0 14px 36px rgba(139,105,20,0.22), 0 4px 12px rgba(0,0,0,0.06) !important;
-          transform: translateY(-6px) !important;
+          background: #ffffff !important;
+          border-color: rgba(20, 20, 20, 0.25) !important;
+          box-shadow: 0 12px 28px rgba(0, 0, 0, 0.07) !important;
+          transform: translateY(-4px) !important;
         }
         .wn-cat-card:hover .wn-cat-img {
-          transform: scale(1.08) !important;
+          transform: scale(1.06) !important;
         }
         .wn-wishlist-btn:hover {
-          transform: scale(1.08) !important;
-          background: #8B6914 !important;
+          transform: scale(1.06) !important;
+          background: #141414 !important;
           color: #ffffff !important;
-          border-color: #8B6914 !important;
+          border-color: #141414 !important;
         }
       `}</style>
 
@@ -880,15 +884,15 @@ export default function CollectionsSection() {
                     alignItems: 'center',
                     justifyContent: 'space-between',
                     background: isActive
-                      ? 'rgba(201, 161, 74, 0.14)'
-                      : 'rgba(250, 247, 240, 0.65)',
+                      ? '#ffffff'
+                      : 'rgba(255, 255, 255, 0.92)',
                     backdropFilter: 'blur(16px)',
                     WebkitBackdropFilter: 'blur(16px)',
-                    borderRadius: isMobile ? '12px' : '16px',
-                    border: isActive ? '2px solid #8B6914' : '1px solid rgba(139, 105, 20, 0.2)',
+                    borderRadius: isMobile ? '8px' : '10px',
+                    border: isActive ? '1.5px solid #141414' : '1px solid rgba(20, 20, 20, 0.08)',
                     boxShadow: isActive
-                      ? '0 12px 32px rgba(139, 105, 20, 0.22), 0 4px 12px rgba(0,0,0,0.06)'
-                      : '0 8px 24px rgba(0, 0, 0, 0.06), 0 2px 6px rgba(0,0,0,0.03)',
+                      ? '0 10px 28px rgba(0, 0, 0, 0.08)'
+                      : '0 4px 16px rgba(0, 0, 0, 0.04)',
                     padding: isMobile ? '8px 4px 7px' : '18px 12px 14px',
                     cursor: 'pointer',
                     outline: 'none',
@@ -898,7 +902,7 @@ export default function CollectionsSection() {
                     minHeight: isMobile ? '118px' : '210px',
                     height: isMobile ? '118px' : 'auto',
                     boxSizing: 'border-box',
-                    transition: 'all 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+                    transition: 'all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
                     transform: (!isMobile && isActive) ? 'translateY(-4px)' : 'none',
                   }}
                   className="wn-cat-card"
@@ -922,7 +926,7 @@ export default function CollectionsSection() {
                         maxHeight: '100%',
                         maxWidth: '100%',
                         objectFit: 'contain',
-                        transform: isActive ? 'scale(1.08)' : 'scale(1)',
+                        transform: isActive ? 'scale(1.06)' : 'scale(1)',
                         transition: 'transform 0.4s ease',
                       }}
                       className="wn-cat-img"
@@ -942,11 +946,11 @@ export default function CollectionsSection() {
                     <span style={{
                       display: 'block',
                       fontFamily: "'Jost', sans-serif",
-                      fontSize: isMobile ? '8.5px' : '12px',
+                      fontSize: isMobile ? '8.5px' : '11.5px',
                       fontWeight: 600,
                       textTransform: 'uppercase',
-                      letterSpacing: isMobile ? '0.02em' : '0.08em',
-                      color: isActive ? '#8B6914' : '#1a1209',
+                      letterSpacing: isMobile ? '0.03em' : '0.1em',
+                      color: isActive ? '#141414' : 'rgba(20, 20, 20, 0.75)',
                       transition: 'color 0.3s ease',
                       lineHeight: 1.15,
                     }}>
@@ -958,8 +962,8 @@ export default function CollectionsSection() {
                       fontSize: isMobile ? '7px' : '9px',
                       fontWeight: 500,
                       textTransform: 'uppercase',
-                      letterSpacing: '0.1em',
-                      color: isActive ? '#8B6914' : 'rgba(26, 18, 9, 0.5)',
+                      letterSpacing: '0.12em',
+                      color: isActive ? '#8B6914' : 'rgba(20, 20, 20, 0.45)',
                       transition: 'color 0.3s ease',
                     }}>
                       {cat.subLabel}
@@ -978,42 +982,42 @@ export default function CollectionsSection() {
           justifyContent: 'space-between',
           padding: isMobile ? '0 16px' : '0 80px',
           marginBottom: '24px',
-          marginTop: '20px',
+          marginTop: '24px',
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
             <h2 style={{
               fontFamily: "'Cormorant Garamond', serif",
-              fontSize: isMobile ? '18px' : '24px',
+              fontSize: isMobile ? '20px' : '28px',
               fontWeight: 500,
               textTransform: 'uppercase',
-              letterSpacing: '0.08em',
-              color: '#1a1209',
+              letterSpacing: '0.06em',
+              color: '#141414',
               margin: 0
             }}>
               {activeSectionLabel}
             </h2>
-            <div style={{ width: '40px', height: '1.5px', background: '#c9a14a' }} />
+            <div style={{ width: '36px', height: '1px', background: 'rgba(20, 20, 20, 0.2)' }} />
           </div>
           <Link href="/collections" style={{
             fontFamily: "'Jost', sans-serif",
             fontSize: '11px',
             fontWeight: 600,
             textTransform: 'uppercase',
-            letterSpacing: '0.08em',
-            color: '#8B6914',
+            letterSpacing: '0.1em',
+            color: '#141414',
             textDecoration: 'none',
             display: 'flex',
             alignItems: 'center',
-            gap: '4px',
+            gap: '6px',
           }}>
-            View All <span style={{ fontSize: '12px' }}>→</span>
+            View All <span style={{ fontSize: '12px', color: '#8B6914' }}>→</span>
           </Link>
         </div>
 
         {/* Horizontal Carousel */}
         <div style={{
           position: 'relative',
-          background: '#faf7f0',
+          background: '#ffffff',
           padding: '10px 0 24px',
         }}>
           {/* Scroll Container */}
@@ -1140,9 +1144,9 @@ const bottomArrowStyle: React.CSSProperties = {
   width: '40px',
   height: '40px',
   borderRadius: '50%',
-  border: '1px solid rgba(26, 18, 9, 0.12)',
-  background: '#faf7f0',
-  color: '#1a1209',
+  border: '1px solid rgba(20, 20, 20, 0.12)',
+  background: '#ffffff',
+  color: '#141414',
   fontSize: '18px',
   cursor: 'pointer',
   display: 'flex',

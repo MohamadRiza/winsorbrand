@@ -37,9 +37,9 @@ export default function Watch3DAssembly() {
     {
       preTitle: "THE HERITAGE SERIES",
       titleLine1: "Designed for",
-      titleLine2: "Ultimate",
-      titleLine3: "Prestige",
-      description: "Elegance in every tick. Hand-finished details for the discerning collector.",
+      titleLine2: "Everyday",
+      titleLine3: "Precision",
+      description: "Engineered for durability, accuracy, and modern performance.",
       cta: "VIEW HERITAGE",
       link: "#collections",
       image: "/winsor_hero_backgroundremoved_sport.webp"
@@ -49,64 +49,26 @@ export default function Watch3DAssembly() {
       titleLine1: "Where Precision",
       titleLine2: "Meets",
       titleLine3: "Elegance",
-      description: "Experience the deconstructed art of automatic timepiece movements.",
+      description: "Experience the mechanical artistry of Japanese timepiece movements.",
       cta: "DISCOVER MASTER",
       link: "#collections",
       isVideo: true
     }
   ];
 
-  // Typewriter effect state for slide headings
-  const [charIndex, setCharIndex] = useState(0);
-  const [phase, setPhase] = useState<'typing' | 'pausing' | 'deleting'>('typing');
-  const [mounted, setMounted] = useState(false);
-
+  // Composed Slide Rotation Timer
   useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  // Synchronized Typewriter & Slide Transition State Machine
-  const currentSlide = slides[activeSlide];
-  const totalChars = currentSlide.titleLine1.length + currentSlide.titleLine2.length + currentSlide.titleLine3.length;
-
-  useEffect(() => {
-    let timeoutId: NodeJS.Timeout;
-
-    if (phase === 'typing') {
-      if (charIndex < totalChars) {
-        timeoutId = setTimeout(() => {
-          setCharIndex((c) => c + 1);
-        }, 40); // 40ms typing pace per char
-      } else {
-        // Pause after fully typing: 14s for video slide, 2.6s for image slides
-        const pauseTime = activeSlide === 2 ? 14000 : 2600;
-        timeoutId = setTimeout(() => {
-          setPhase('deleting');
-        }, pauseTime);
-      }
-    } else if (phase === 'deleting') {
-      if (charIndex > 0) {
-        timeoutId = setTimeout(() => {
-          setCharIndex((c) => c - 1);
-        }, 38); // Slower, smooth and readable deletion pace (relaxed backspace)
-      } else {
-        // Gentle pause on blank before smoothly advancing to the next slide
-        timeoutId = setTimeout(() => {
-          setActiveSlide((prev) => (prev + 1) % 3);
-          setCharIndex(0);
-          setPhase('typing');
-        }, 220);
-      }
-    }
+    const duration = activeSlide === 2 ? 15000 : 6500;
+    const timeoutId = setTimeout(() => {
+      setActiveSlide((prev) => (prev + 1) % 3);
+    }, duration);
 
     return () => clearTimeout(timeoutId);
-  }, [phase, charIndex, totalChars, activeSlide]);
+  }, [activeSlide]);
 
   const handleSelectSlide = (idx: number) => {
     if (idx === activeSlide) return;
     setActiveSlide(idx);
-    setCharIndex(0);
-    setPhase('typing');
   };
 
   // Dispatch custom window event when slide changes to allow Navbar to sync contrast
@@ -141,68 +103,15 @@ export default function Watch3DAssembly() {
 
   const isDarkSlide = activeSlide === 2;
 
-  // Helper to render title with typing & backspace animation
-  const renderTypedTitle = (slide: SlideData, count: number, isCurrentActive: boolean) => {
-    if (!isCurrentActive) {
-      return (
-        <>
-          {slide.titleLine1}<br />
-          {slide.titleLine2} <span style={{ color: isDarkSlide ? '#dfb15b' : '#8b6914', fontStyle: 'italic' }}>{slide.titleLine3}</span>
-        </>
-      );
-    }
-
-    const l1 = slide.titleLine1;
-    const l2 = slide.titleLine2;
-    const l3 = slide.titleLine3;
-    const len1 = l1.length;
-    const len2 = l2.length;
-    const len3 = l3.length;
-
-    const t1 = l1.slice(0, Math.min(count, len1));
-    const isCursorInLine1 = count <= len1;
-
-    let t2 = '';
-    let isCursorInLine2 = false;
-    if (count > len1) {
-      const rem1 = count - len1;
-      t2 = l2.slice(0, Math.min(rem1, len2));
-      isCursorInLine2 = rem1 <= len2;
-    }
-
-    let t3 = '';
-    let isCursorInLine3 = false;
-    if (count > len1 + len2) {
-      const rem2 = count - (len1 + len2);
-      t3 = l3.slice(0, Math.min(rem2, len3));
-      isCursorInLine3 = true;
-    }
-
-    return (
-      <>
-        {t1}
-        {isCursorInLine1 && <span className="wn-type-cursor" style={{ color: isDarkSlide ? '#dfb15b' : '#8b6914' }}>|</span>}
-        {count > len1 && <br />}
-        {t2}
-        {isCursorInLine2 && <span className="wn-type-cursor" style={{ color: isDarkSlide ? '#dfb15b' : '#8b6914' }}>|</span>}
-        {count > len1 + len2 && ' '}
-        <span style={{ color: isDarkSlide ? '#dfb15b' : '#8b6914', fontStyle: 'italic' }}>
-          {t3}
-        </span>
-        {isCursorInLine3 && <span className="wn-type-cursor" style={{ color: isDarkSlide ? '#dfb15b' : '#8b6914' }}>|</span>}
-      </>
-    );
-  };
-
   return (
     <div
       id="hero"
       className="relative w-full overflow-clip"
       style={{
         height: isMobile ? '380px' : '100vh',
-        backgroundColor: isDarkSlide ? '#050302' : '#faf7f0',
+        backgroundColor: isDarkSlide ? '#050302' : '#F8F7F4',
         transition: 'background-color 0.8s cubic-bezier(0.25, 1, 0.5, 1)',
-        borderBottom: `1px solid ${isDarkSlide ? 'rgba(201, 161, 74, 0.2)' : 'rgba(139, 105, 20, 0.12)'}`
+        borderBottom: `1px solid ${isDarkSlide ? 'rgba(201, 161, 74, 0.2)' : 'rgba(20, 20, 20, 0.08)'}`
       }}
     >
       {/* BACKGROUND GRAPHICS */}
@@ -234,7 +143,7 @@ export default function Watch3DAssembly() {
         />
       )}
 
-      {/* Slide 1 & 2 Golden Arcs & Marble Texture Backdrop (Light Mode Backdrop) */}
+      {/* Slide 1 & 2 Studio & Subtle Architectural Backdrop (Light Mode Backdrop) */}
       <div
         className="absolute inset-0 pointer-events-none overflow-hidden"
         style={{
@@ -244,28 +153,28 @@ export default function Watch3DAssembly() {
           zIndex: 1
         }}
       >
-        {/* Photorealistic Marble & Gold Backdrop Image */}
+        {/* Subtle Architectural Marble Texture */}
         <Image
           src="/hero_bg_marble.jpg"
-          alt="Winsor Luxury Marble Backdrop"
+          alt="Winsor Studio Backdrop"
           fill
           priority
           sizes="100vw"
           className="object-cover object-center"
-          style={{ opacity: 0.95 }}
+          style={{ opacity: 0.35, filter: 'saturate(0.35) brightness(1.06)' }}
         />
 
-        {/* Soft Backlight Glow behind watch */}
+        {/* Soft Studio Light Veil */}
         <div
           className="absolute inset-0"
           style={{
             background: isMobile
-              ? 'radial-gradient(circle at 75% 45%, rgba(255,255,255,0.7) 0%, transparent 70%)'
-              : 'radial-gradient(circle at 70% 50%, rgba(255,255,255,0.6) 0%, transparent 65%)'
+              ? 'radial-gradient(circle at 75% 45%, rgba(255,255,255,0.92) 0%, rgba(248,247,244,0.65) 100%)'
+              : 'radial-gradient(circle at 68% 50%, rgba(255,255,255,0.92) 0%, rgba(248,247,244,0.6) 100%)'
           }}
         />
 
-        {/* SVG Vector Backdrop: Gold Arcs & Concentric Circles */}
+        {/* Restrained Architectural Dial Circles */}
         <svg
           className="absolute inset-0 w-full h-full"
           viewBox="0 0 1440 900"
@@ -273,33 +182,8 @@ export default function Watch3DAssembly() {
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
         >
-          {/* Top-Right Concentric Arcs behind Watch */}
-          <circle cx="1180" cy="220" r="280" stroke="url(#goldGradLight)" strokeWidth="1.2" opacity="0.32" />
-          <circle cx="1180" cy="220" r="360" stroke="url(#goldGradLight)" strokeWidth="1" opacity="0.24" />
-          <circle cx="1180" cy="220" r="450" stroke="url(#goldGradLight)" strokeWidth="0.8" opacity="0.16" />
-          <circle cx="1180" cy="220" r="540" stroke="url(#goldGradLight)" strokeWidth="0.6" opacity="0.1" />
-
-          {/* Sweeping Bottom-Left to Center Gold Lines */}
-          <path
-            d="M -100 850 C 350 820, 750 680, 1250 280"
-            stroke="url(#goldGradLight)"
-            strokeWidth="1.8"
-            opacity="0.4"
-          />
-          <path
-            d="M -50 920 C 420 890, 850 720, 1380 340"
-            stroke="url(#goldGradLight)"
-            strokeWidth="1"
-            opacity="0.25"
-          />
-
-          <defs>
-            <linearGradient id="goldGradLight" x1="0%" y1="100%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="#8b6914" />
-              <stop offset="50%" stopColor="#dfb15b" />
-              <stop offset="100%" stopColor="#f3e3b8" />
-            </linearGradient>
-          </defs>
+          <circle cx="1050" cy="430" r="260" stroke="rgba(20, 20, 20, 0.045)" strokeWidth="1" />
+          <circle cx="1050" cy="430" r="360" stroke="rgba(20, 20, 20, 0.03)" strokeWidth="1" />
         </svg>
       </div>
 
@@ -325,84 +209,68 @@ export default function Watch3DAssembly() {
                 style={{
                   zIndex: 20,
                   width: isMobile ? '55%' : 'auto',
-                  maxWidth: isMobile ? 'none' : '560px',
-                  transform: isActive ? 'translateY(0)' : 'translateY(15px)',
+                  maxWidth: isMobile ? 'none' : '540px',
+                  transform: isActive ? 'translateY(0)' : 'translateY(12px)',
                   transition: 'transform 0.8s cubic-bezier(0.25, 1, 0.5, 1)',
-                  animationDelay: '0.1s'
                 }}
               >
                 {/* Pre-Title Label */}
                 <p
-                  className="tracking-[0.18em] mb-1.5 font-semibold"
+                  className="tracking-[0.22em] mb-2 font-semibold uppercase"
                   style={{
                     fontFamily: "'Jost', sans-serif",
-                    fontSize: isMobile ? '7.5px' : '12px',
+                    fontSize: isMobile ? '7.5px' : '11px',
                     color: isDarkSlide ? '#dfb15b' : '#8b6914'
                   }}
                 >
                   {slide.preTitle}
                 </p>
 
-                {/* Big Serif Heading with Synchronized Typewriter Effect */}
+                {/* Composed Editorial Heading */}
                 {idx === 0 ? (
                   <h1
-                    className="mb-2 font-normal"
+                    className="mb-3 font-normal"
                     style={{
                       fontFamily: "'Cormorant Garamond', serif",
-                      fontSize: isMobile ? '20px' : '62px',
-                      lineHeight: 1.15,
-                      color: isDarkSlide ? '#ffffff' : '#1a1209',
-                      minHeight: isMobile ? '48px' : '145px',
+                      fontSize: isMobile ? '21px' : '58px',
+                      lineHeight: 1.12,
+                      letterSpacing: '-0.01em',
+                      color: isDarkSlide ? '#ffffff' : '#141414',
                     }}
                   >
-                    <span className="sr-only">
-                      {slide.titleLine1} {slide.titleLine2} {slide.titleLine3}
-                    </span>
-                    <span aria-hidden="true">
-                      {!mounted ? (
-                        <>
-                          {slide.titleLine1}<br />
-                          {slide.titleLine2} <span style={{ color: isDarkSlide ? '#dfb15b' : '#8b6914', fontStyle: 'italic' }}>{slide.titleLine3}</span>
-                        </>
-                      ) : (
-                        renderTypedTitle(slide, charIndex, isActive)
-                      )}
+                    {slide.titleLine1}<br />
+                    {slide.titleLine2}{' '}
+                    <span style={{ color: isDarkSlide ? '#dfb15b' : '#8b6914', fontStyle: 'italic' }}>
+                      {slide.titleLine3}
                     </span>
                   </h1>
                 ) : (
                   <h2
-                    className="mb-2 font-normal"
+                    className="mb-3 font-normal"
                     style={{
                       fontFamily: "'Cormorant Garamond', serif",
-                      fontSize: isMobile ? '20px' : '62px',
-                      lineHeight: 1.15,
-                      color: isDarkSlide ? '#ffffff' : '#1a1209',
-                      minHeight: isMobile ? '48px' : '145px',
+                      fontSize: isMobile ? '21px' : '58px',
+                      lineHeight: 1.12,
+                      letterSpacing: '-0.01em',
+                      color: isDarkSlide ? '#ffffff' : '#141414',
                     }}
                   >
-                    <span className="sr-only">
-                      {slide.titleLine1} {slide.titleLine2} {slide.titleLine3}
-                    </span>
-                    <span aria-hidden="true">
-                      {!mounted ? (
-                        <>
-                          {slide.titleLine1}<br />
-                          {slide.titleLine2} <span style={{ color: isDarkSlide ? '#dfb15b' : '#8b6914', fontStyle: 'italic' }}>{slide.titleLine3}</span>
-                        </>
-                      ) : (
-                        renderTypedTitle(slide, charIndex, isActive)
-                      )}
+                    {slide.titleLine1}<br />
+                    {slide.titleLine2}{' '}
+                    <span style={{ color: isDarkSlide ? '#dfb15b' : '#8b6914', fontStyle: 'italic' }}>
+                      {slide.titleLine3}
                     </span>
                   </h2>
                 )}
 
                 {/* Tagline Description */}
                 <p
-                  className="leading-relaxed mb-4 font-light"
+                  className="leading-relaxed mb-5 font-normal"
                   style={{
                     fontFamily: "'Jost', sans-serif",
-                    fontSize: isMobile ? '9px' : '13.5px',
-                    color: isDarkSlide ? 'rgba(255,255,255,0.75)' : 'rgba(26,18,9,0.7)'
+                    fontSize: isMobile ? '9.5px' : '14px',
+                    color: isDarkSlide ? 'rgba(255,255,255,0.75)' : 'rgba(20,20,20,0.68)',
+                    maxWidth: '420px',
                   }}
                 >
                   {slide.description}
@@ -412,23 +280,26 @@ export default function Watch3DAssembly() {
                 <div>
                   <a
                     href={slide.link}
-                    className="inline-block transition-all duration-300 font-medium tracking-[0.15em]"
+                    className="inline-block transition-all duration-300 font-medium tracking-[0.16em]"
                     style={{
-                      border: `${isMobile ? '1px' : '1.5px'} solid ${isDarkSlide ? '#dfb15b' : '#8b6914'}`,
-                      color: isDarkSlide ? '#dfb15b' : '#8b6914',
-                      padding: isMobile ? '5px 12px' : '12px 28px',
-                      fontSize: isMobile ? '8px' : '11.5px',
-                      borderRadius: '0px',
+                      backgroundColor: isDarkSlide ? '#dfb15b' : '#141414',
+                      border: `1px solid ${isDarkSlide ? '#dfb15b' : '#141414'}`,
+                      color: isDarkSlide ? '#050302' : '#ffffff',
+                      padding: isMobile ? '6px 14px' : '13px 32px',
+                      fontSize: isMobile ? '8px' : '11px',
+                      borderRadius: '2px',
                       textDecoration: 'none',
                       fontFamily: "'Jost', sans-serif",
                     }}
                     onMouseOver={(e) => {
-                      e.currentTarget.style.backgroundColor = isDarkSlide ? '#dfb15b' : '#8b6914';
-                      e.currentTarget.style.color = isDarkSlide ? '#050302' : '#ffffff';
+                      e.currentTarget.style.backgroundColor = '#8b6914';
+                      e.currentTarget.style.borderColor = '#8b6914';
+                      e.currentTarget.style.color = '#ffffff';
                     }}
                     onMouseOut={(e) => {
-                      e.currentTarget.style.backgroundColor = 'transparent';
-                      e.currentTarget.style.color = isDarkSlide ? '#dfb15b' : '#8b6914';
+                      e.currentTarget.style.backgroundColor = isDarkSlide ? '#dfb15b' : '#141414';
+                      e.currentTarget.style.borderColor = isDarkSlide ? '#dfb15b' : '#141414';
+                      e.currentTarget.style.color = isDarkSlide ? '#050302' : '#ffffff';
                     }}
                   >
                     {slide.cta}

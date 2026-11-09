@@ -105,7 +105,26 @@ export default function CustomerCarePage() {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    if (name === 'message' && value.length > 1000) return; // Enforce max 1000 chars
+
+    // 1. Username / Name: maximum 100 characters
+    if (name === 'name' && value.length > 100) return;
+
+    // 2. Mobile: strictly allow digits only, maximum 15 digits
+    if (name === 'mobile') {
+      const digitsOnly = value.replace(/\D/g, '');
+      if (digitsOnly.length > 15) return;
+      setFormData(prev => ({
+        ...prev,
+        mobile: digitsOnly,
+      }));
+      return;
+    }
+
+    // 3. Subject: maximum 200 characters
+    if (name === 'subject' && value.length > 200) return;
+
+    // 4. Message: maximum 1000 characters
+    if (name === 'message' && value.length > 1000) return;
 
     setFormData(prev => ({
       ...prev,
@@ -120,6 +139,47 @@ export default function CustomerCarePage() {
 
     if (!name.trim() || !email.trim() || !mobile.trim() || !subject.trim() || !message.trim()) {
       toast.error('Please fill in all fields.');
+      return;
+    }
+
+    // Username / Name validation (max 100 characters)
+    if (name.trim().length > 100) {
+      toast.error('Username cannot exceed 100 characters.');
+      return;
+    }
+
+    // Mobile validation (strictly numbers only)
+    if (!/^\d+$/.test(mobile.trim())) {
+      toast.error('Mobile number can only contain numbers.');
+      return;
+    }
+
+    if (mobile.trim().length < 6 || mobile.trim().length > 15) {
+      toast.error('Please enter a valid mobile number (6 to 15 digits).');
+      return;
+    }
+
+    // Email validation (must contain '@' and follow valid email pattern)
+    if (!email.includes('@')) {
+      toast.error('Email address must contain an "@" symbol.');
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email.trim())) {
+      toast.error('Please enter a valid email address (e.g. name@example.com).');
+      return;
+    }
+
+    // Subject validation (max 200 characters)
+    if (subject.trim().length > 200) {
+      toast.error('Subject cannot exceed 200 characters.');
+      return;
+    }
+
+    // Message validation (max 1000 characters)
+    if (message.trim().length > 1000) {
+      toast.error('Message cannot exceed 1000 characters.');
       return;
     }
 
@@ -173,22 +233,7 @@ export default function CustomerCarePage() {
     }
   };
 
-  if (!userLoaded || profileLoading) {
-    return (
-      <div style={{ minHeight: '80vh', background: '#faf7f0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Jost', sans-serif" }}>
-        <h1 className="sr-only">Customer Care &amp; Support</h1>
-        <div style={{ textAlign: 'center' }}>
-          <div className="shimmer-circle" style={{ width: '48px', height: '48px', borderRadius: '50%', border: '3px solid rgba(139,105,20,0.1)', borderTopColor: '#8B6914', animation: 'spin 1s linear infinite', margin: '0 auto 16px' }} />
-          <p style={{ color: 'rgba(26,18,9,0.8)', fontSize: '13px', letterSpacing: '0.05em' }}>Connecting to Customer Care Concierge...</p>
-        </div>
-        <style>{`
-          @keyframes spin {
-            to { transform: rotate(360deg); }
-          }
-        `}</style>
-      </div>
-    );
-  }
+
 
   return (
     <main>
@@ -1154,7 +1199,7 @@ export default function CustomerCarePage() {
                   <div className="details-header-tag">OFFICIAL BRAND CARE</div>
                   <h3 className="details-title">Care Boutique</h3>
                   <p className="details-paragraph">
-                    For over three decades, Winsor has provided handcrafted horological excellence. Our concierge team stands ready to assist with servicing, inquiries, warranty registrations, wholesale registrations, and shop purchases.
+                    Winsor is dedicated to dependable watchmaking and lasting customer service. Our support team stands ready to assist with servicing, inquiries, warranty registrations, wholesale partnerships, and showroom purchases.
                   </p>
 
                   <div className="contact-info-block">
@@ -1238,6 +1283,7 @@ export default function CustomerCarePage() {
                           name="name"
                           value={formData.name}
                           onChange={handleInputChange}
+                          maxLength={100}
                           className="input-field"
                           required
                           placeholder="Your full name"
@@ -1268,14 +1314,30 @@ export default function CustomerCarePage() {
                           </select>
                           <input
                             id="mobile"
-                            type="text"
+                            type="tel"
+                            inputMode="numeric"
+                            pattern="[0-9]*"
                             name="mobile"
                             value={formData.mobile}
                             onChange={handleInputChange}
+                            onKeyDown={(e) => {
+                              const allowedKeys = ['Backspace', 'Delete', 'Tab', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Enter', 'Home', 'End'];
+                              if (allowedKeys.includes(e.key) || e.ctrlKey || e.metaKey) return;
+                              if (!/^[0-9]$/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                            onPaste={(e) => {
+                              e.preventDefault();
+                              const pasted = e.clipboardData.getData('text');
+                              const numeric = pasted.replace(/\D/g, '').slice(0, 15);
+                              setFormData(prev => ({ ...prev, mobile: numeric }));
+                            }}
+                            maxLength={15}
                             className="input-field"
                             style={{ flex: 1, minWidth: 0 }}
                             required
-                            placeholder="77 123 4567"
+                            placeholder="771234567"
                             disabled={loading}
                           />
                         </div>
@@ -1294,9 +1356,10 @@ export default function CustomerCarePage() {
                         name="email"
                         value={formData.email}
                         onChange={handleInputChange}
+                        maxLength={150}
                         className="input-field"
                         required
-                        placeholder="Your email address"
+                        placeholder="Your email address (e.g. name@example.com)"
                         disabled={isSignedIn || loading}
                         style={isSignedIn ? { paddingRight: '40px' } : undefined}
                       />
@@ -1319,11 +1382,15 @@ export default function CustomerCarePage() {
                         name="subject"
                         value={formData.subject}
                         onChange={handleInputChange}
+                        maxLength={200}
                         className="input-field"
                         required
                         placeholder="e.g. Timepiece servicing inquiry"
                         disabled={loading}
                       />
+                      <div className="char-counter" style={{ fontSize: '10.5px', marginTop: '4px' }}>
+                        {formData.subject.length} / 200 Characters
+                      </div>
                     </div>
 
                     {/* Message */}
@@ -1337,6 +1404,7 @@ export default function CustomerCarePage() {
                         name="message"
                         value={formData.message}
                         onChange={handleInputChange}
+                        maxLength={1000}
                         className="textarea-field"
                         required
                         placeholder="Detail your inquiry here (maximum 1000 characters)..."

@@ -58,8 +58,8 @@ export async function POST(req: Request) {
 
     // Comprehensive official website system instructions with strict high-risk guardrails
     // Comprehensive official website system instructions aligning 100% with WINSOR client specification
-    const systemPrompt = `You are WINSI, the official WINSOR Watch Assistant and Horology Shopping Concierge for WINSOR.
-You represent the brand with warmth, refined horological sophistication, helpfulness, and professional luxury etiquette.
+    const systemPrompt = `You are WINSI, the official WINSOR Watch Assistant and Watch Shopping Assistant for WINSOR.
+You represent the brand with warmth, refined watchmaking expertise, helpfulness, and professional luxury etiquette.
 Your slogan is "RIDE YOUR MOMENT."
 
 You must strictly adhere to the following 10 core categories and guidelines:
@@ -229,7 +229,7 @@ Escalate these questions politely to our human support team via WhatsApp (077 07
 - Exact real-time warehouse inventory counts.
 - Custom or bespoke design orders.
 - Final warranty decisions (Must be formally evaluated by our technical watchmakers).
-- Final refund decisions (Subject to atelier inspection).
+- Final refund decisions (Subject to quality inspection).
 - Specific courier delays (Escalate to human team to contact the courier).
 - Wholesale quotations (Direct to wholesale team on 077 071 6212).
 
@@ -286,7 +286,7 @@ ${retailerContext}`;
         },
         {
           role: 'model',
-          parts: [{ text: 'Understood. Hello! I am Winsi, your personal Winsor Brand Horology Concierge. How may I assist you with our luxury timepieces today?' }]
+          parts: [{ text: 'Understood. Hello! I am Winsi, your personal Winsor Brand Watch Specialist. How may I assist you with our luxury timepieces today?' }]
         },
         ...formattedContents
       ],

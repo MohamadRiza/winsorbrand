@@ -5,11 +5,11 @@ const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://winsorbrand.com';
 export const metadata: Metadata = {
   title: 'Customer Care & Support',
   description:
-    'Connect with Winsor Maison customer care. Inquire about timepiece orders, 1-year international warranty services, authorized boutique fittings, and luxury horology concierge assistance.',
+    'Connect with Winsor Watches customer care. Inquire about timepiece orders, 1-year international warranty services, authorized boutique fittings, and luxury customer care assistance.',
   openGraph: {
-    title: 'Customer Care & Support | Winsor Maison',
+    title: 'Customer Care & Support | Winsor Watches',
     description:
-      'Connect with Winsor Maison customer care. Dedicated luxury timepiece assistance, order support, and warranty servicing.',
+      'Connect with Winsor Watches customer care. Dedicated luxury timepiece assistance, order support, and warranty servicing.',
     url: `${baseUrl}/customer-care`,
     type: 'website',
   },

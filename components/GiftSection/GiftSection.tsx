@@ -75,7 +75,7 @@ const CRAFTSMANSHIP_PILLARS = [
   {
     num: '04',
     title: 'Premium Quality',
-    badge: 'ATELIER CRAFT',
+    badge: 'STAINLESS STEEL',
     image: '/craftsmanship/premium_craft.webp',
   },
 ];
@@ -856,7 +856,7 @@ export default function GiftSection() {
   }, [activeCat]);
 
   return (
-    <section style={{ background: '#faf7f0' }}>
+    <section style={{ background: '#ffffff' }}>
       <style>{`
         @keyframes hero-watch-from-right {
           from { opacity: 0; transform: translateX(60px) scale(0.96); }
@@ -883,33 +883,32 @@ export default function GiftSection() {
           display: none;
         }
         .gift-tab-btn {
-          background: #fff;
-          border: 1px solid rgba(26, 18, 9, 0.08);
-          color: #1a1209;
+          background: #F8F7F4;
+          border: 1px solid rgba(20, 20, 20, 0.08);
+          color: #141414;
           padding: 8px 18px;
           font-family: 'Jost', sans-serif;
-          font-size: 12px;
+          font-size: 11.5px;
           font-weight: 500;
-          letter-spacing: 0.08em;
+          letter-spacing: 0.1em;
           text-transform: uppercase;
-          border-radius: 30px;
+          border-radius: 6px;
           cursor: pointer;
-          transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+          transition: all 0.25s ease;
           white-space: nowrap;
           display: flex;
           align-items: center;
           gap: 6px;
         }
         .gift-tab-btn.active {
-          background: #8B6914;
-          border-color: #8B6914;
+          background: #141414;
+          border-color: #141414;
           color: #fff;
-          box-shadow: 0 4px 15px rgba(139, 105, 20, 0.25);
         }
         .gift-tab-btn:hover:not(.active) {
-          border-color: #8B6914;
-          color: #8B6914;
-          background: rgba(139, 105, 20, 0.04);
+          border-color: #141414;
+          color: #141414;
+          background: #ffffff;
         }
         @media (max-width: 768px) {
           .gift-tabs {
@@ -1182,14 +1181,14 @@ export default function GiftSection() {
       <div style={{
         padding: '48px 20px 32px',
         textAlign: 'center',
-        background: '#faf7f0',
+        background: '#ffffff',
       }}>
         <h2 style={{
           fontFamily: "'Cormorant Garamond', serif",
           fontSize: 'clamp(28px, 5vw, 42px)',
-          fontWeight: 300,
-          color: '#1a1a1a',
-          letterSpacing: '0.06em',
+          fontWeight: 400,
+          color: '#141414',
+          letterSpacing: '0.04em',
           margin: '0 0 10px 0',
           textTransform: 'uppercase',
           lineHeight: 1.2,
@@ -1211,8 +1210,8 @@ export default function GiftSection() {
 
       <div
         style={{
-          borderBottom: '1px solid rgba(26, 18, 9, 0.05)',
-          background: '#faf7f0',
+          borderBottom: '1px solid rgba(20, 20, 20, 0.06)',
+          background: '#ffffff',
           position: 'sticky',
           top: 0,
           zIndex: 20,

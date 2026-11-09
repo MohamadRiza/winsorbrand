@@ -23,7 +23,7 @@ export async function generateMetadata({
 
   if (!id || !mongoose.isValidObjectId(id)) {
     return {
-      title: 'Timepiece Not Found | Winsor Maison',
+      title: 'Timepiece Not Found | Winsor',
       robots: {
         index: false,
         follow: false,
@@ -41,7 +41,7 @@ export async function generateMetadata({
 
     if (!product || product.isActive === false) {
       return {
-        title: 'Timepiece Not Found | Winsor Maison',
+        title: 'Timepiece Not Found | Winsor',
         robots: {
           index: false,
           follow: false,
@@ -102,7 +102,7 @@ export async function generateMetadata({
         title,
         description,
         url: canonicalUrl,
-        siteName: 'Winsor Maison',
+        siteName: 'Winsor',
         locale: 'en_US',
         type: 'website',
         images: imageList.slice(0, 6).map((url) => ({
@@ -129,7 +129,7 @@ export async function generateMetadata({
     };
   } catch (err) {
     return {
-      title: 'Luxury Timepiece Collection | Winsor Maison',
+      title: 'Timepiece Collection | Winsor',
       robots: {
         index: false,
         follow: false,
@@ -259,7 +259,7 @@ export default async function ProductPage({
               : 'https://schema.org/InStock',
             seller: {
               '@type': 'Organization',
-              name: 'Winsor Maison',
+              name: 'Winsor',
               url: baseUrl,
             },
             hasMerchantReturnPolicy: {

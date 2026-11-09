@@ -9,7 +9,7 @@ import Link from 'next/link';
 // ─────────────────────────────────────────────────────────────
 const FAQ_CATEGORIES = [
   { id: 'all', label: 'All Questions' },
-  { id: 'brand', label: 'Maison & Timepieces' },
+  { id: 'brand', label: 'Brand & Timepieces' },
   { id: 'orders', label: 'Orders & Shipping' },
   { id: 'warranty', label: 'Warranty & Care' },
 ];

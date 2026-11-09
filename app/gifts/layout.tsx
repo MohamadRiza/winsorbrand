@@ -4,7 +4,7 @@ const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://winsorbrand.com';
 
 export const metadata: Metadata = {
   title: 'Bespoke Luxury Watch Gifts & Curated Timepiece Box Sets',
-  description: 'Discover curated luxury watch gifts, anniversary timepieces, corporate gifts, and bespoke box sets by Winsor Maison with complimentary gift wrapping.',
+  description: 'Discover curated luxury watch gifts, anniversary timepieces, corporate gifts, and bespoke box sets by Winsor Watches with complimentary gift wrapping.',
   keywords: [
     'Winsor luxury gifts',
     'watch gift set',
@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     canonical: `${baseUrl}/gifts`,
   },
   openGraph: {
-    title: 'Luxury Watch Gifts & Curated Box Sets | Winsor Maison',
+    title: 'Luxury Watch Gifts & Curated Box Sets | Winsor Watches',
     description: 'Explore bespoke watch gift sets and luxury timepiece gifts for special occasions.',
     url: `${baseUrl}/gifts`,
     type: 'website',

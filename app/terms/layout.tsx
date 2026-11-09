@@ -3,7 +3,7 @@ import { Metadata } from 'next';
 const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://winsorbrand.com';
 
 export const metadata: Metadata = {
-  title: 'Terms and Conditions — Official Maison Commercial Agreement',
+  title: 'Terms and Conditions — Official Commercial Agreement',
   description: 'Review the official Terms and Conditions governing timepiece purchases, boutique reservations, transit liabilities, and customer agreements with Winsor Brand.',
   keywords: [
     'Winsor terms and conditions',
@@ -40,7 +40,7 @@ export default function TermsLayout({
     'url': `${baseUrl}/terms`,
     'publisher': {
       '@type': 'Organization',
-      'name': 'Winsor Maison',
+      'name': 'Winsor Watches',
       'logo': `${baseUrl}/icon.png`,
     },
   };

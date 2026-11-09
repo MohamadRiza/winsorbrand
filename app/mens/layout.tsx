@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     canonical: `${baseUrl}/mens`,
   },
   openGraph: {
-    title: "Gents Luxury Timepieces | Japan Movement — Winsor Maison",
+    title: "Gents Luxury Timepieces | Japan Movement — Winsor Watches",
     description:
       "Discover prestige men's Japan movement chronographs, automatic watches, and luxury dress pieces by Winsor.",
     url: `${baseUrl}/mens`,

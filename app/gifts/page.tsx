@@ -178,7 +178,7 @@ export default function GiftsPage() {
   }
 
   return (
-    <main style={{ backgroundColor: '#faf7f0', minHeight: '100vh', width: '100%', paddingBottom: '20px' }}>
+    <main style={{ backgroundColor: '#ffffff', minHeight: '100vh', width: '100%', paddingBottom: '20px' }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300&family=Jost:wght@300;400;500;600&display=swap');
 
@@ -247,10 +247,10 @@ export default function GiftsPage() {
 
         /* ── BODY CONTAINER ── */
         .gifts-container {
-          background-color: #faf7f0;
+          background-color: #ffffff;
           min-height: 100vh;
           font-family: 'Jost', sans-serif;
-          color: #1a1209;
+          color: #141414;
           padding: 0 4% 60px;
         }
 
@@ -546,26 +546,26 @@ export default function GiftsPage() {
           gap: 28px;
         }
         .watch-card-container {
-          background: #faf7f0;
-          border-radius: 16px;
-          border: 1px solid rgba(26, 18, 9, 0.08);
+          background: #ffffff;
+          border-radius: 10px;
+          border: 1px solid rgba(20, 20, 20, 0.08);
           overflow: hidden;
           display: flex;
           flex-direction: column;
-          transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+          transition: all 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
           position: relative;
-          box-shadow: 0 4px 16px rgba(26,18,9,0.02);
+          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
         }
         .watch-card-container:hover {
-          transform: translateY(-6px);
-          box-shadow: 0 16px 36px rgba(26,18,9,0.08);
-          border-color: rgba(139,105,20,0.3);
+          transform: translateY(-4px);
+          box-shadow: 0 14px 32px rgba(0, 0, 0, 0.06);
+          border-color: rgba(20, 20, 20, 0.16);
           background: #ffffff;
         }
         .watch-img-container {
           position: relative;
           aspect-ratio: 1;
-          background: transparent;
+          background: #F6F5F2;
           padding: 24px;
           display: flex;
           align-items: center;
@@ -584,18 +584,17 @@ export default function GiftsPage() {
         }
         .watch-card-badge {
           position: absolute;
-          left: 16px;
-          top: 16px;
-          background: #1a1209;
+          left: 14px;
+          top: 14px;
+          background: #141414;
           color: #fff;
           font-size: 9px;
-          font-weight: 600;
-          letter-spacing: 0.12em;
+          font-weight: 500;
+          letter-spacing: 0.14em;
           padding: 4px 10px;
-          border-radius: 4px;
+          border-radius: 2px;
           z-index: 2;
           text-transform: uppercase;
-          box-shadow: 0 2px 8px rgba(0,0,0,0.15);
         }
         .watch-card-info {
           padding: 20px;
@@ -603,22 +602,22 @@ export default function GiftsPage() {
           display: flex;
           flex-direction: column;
           justify-content: space-between;
-          background: transparent;
+          background: #ffffff;
         }
         .watch-card-title-link {
           text-decoration: none;
           color: inherit;
         }
         .watch-card-title {
-          font-size: 15.5px;
+          font-size: 15px;
           font-weight: 500;
           margin: 0 0 6px;
-          color: #1a1209;
+          color: #141414;
           letter-spacing: 0.01em;
         }
         .watch-card-specs {
-          font-size: 12px;
-          color: rgba(26,18,9,0.5);
+          font-size: 11.5px;
+          color: rgba(20, 20, 20, 0.52);
           margin: 0;
         }
         .watch-card-footer {
@@ -626,13 +625,13 @@ export default function GiftsPage() {
           justify-content: space-between;
           align-items: center;
           margin-top: 16px;
-          border-top: 1px solid rgba(26,18,9,0.05);
+          border-top: 1px solid rgba(20, 20, 20, 0.06);
           padding-top: 14px;
         }
         .watch-card-price {
           font-size: 14.5px;
           font-weight: 600;
-          color: #8b6914;
+          color: #141414;
         }
         .watch-card-actions {
           display: flex;
@@ -804,12 +803,12 @@ export default function GiftsPage() {
         }
         .search-input {
           width: 100%;
-          background: #faf7f0;
-          border: 1px solid rgba(26, 18, 9, 0.08);
+          background: #F8F7F4;
+          border: 1px solid rgba(20, 20, 20, 0.1);
           border-radius: 6px;
           padding: 10px 16px 10px 38px;
           font-size: 12.5px;
-          color: #1a1209;
+          color: #141414;
           font-family: inherit;
         }
         .search-input:focus {
@@ -821,16 +820,16 @@ export default function GiftsPage() {
           left: 14px;
           top: 50%;
           transform: translateY(-50%);
-          color: rgba(26, 18, 9, 0.4);
+          color: rgba(20, 20, 20, 0.4);
           pointer-events: none;
         }
         .toolbar-select {
-          background: #faf7f0;
-          border: 1px solid rgba(26, 18, 9, 0.08);
+          background: #F8F7F4;
+          border: 1px solid rgba(20, 20, 20, 0.1);
           border-radius: 6px;
           padding: 10px 16px;
           font-size: 12.5px;
-          color: #1a1209;
+          color: #141414;
           cursor: pointer;
           font-family: inherit;
           min-width: 160px;

@@ -403,7 +403,7 @@ export default function TermsOfServicePage() {
         <nav className="legal-breadcrumb" aria-label="Breadcrumb">
           <Link href="/">Home</Link>
           <span>/</span>
-          <Link href="/collections">Maison</Link>
+          <Link href="/collections">Collections</Link>
           <span>/</span>
           <span>Terms & Conditions</span>
         </nav>
@@ -419,7 +419,7 @@ export default function TermsOfServicePage() {
           </div>
           <h1 className="legal-hero-title">Terms & Conditions</h1>
           <p className="legal-hero-subtitle">
-            These terms govern the reservation, acquisition, transit, and ownership of Winsor Brand luxury timepieces and bespoke horology services.
+            These terms govern the reservation, acquisition, transit, and ownership of Winsor Brand luxury timepieces and bespoke timepiece services.
           </p>
           <div className="legal-meta-pills">
             <span>Charter Reference: WB-TOS-2026</span>
@@ -524,7 +524,7 @@ export default function TermsOfServicePage() {
                 <h2 className="legal-section-title">1. Acceptance of Terms & Commercial Agreement</h2>
               </div>
               <p className="legal-paragraph">
-                These Terms and Conditions constitute a legally binding agreement between you ("Patron", "Client", or "Purchaser") and <strong>Winsor Brand</strong> ("Winsor", "Maison", "we", "us", or "our"). By browsing our catalog, reserving timepieces, or making acquisitions through our online boutique, authorized retail partners, or telephone concierge, you acknowledge having read, understood, and agreed to be governed by these terms.
+                These Terms and Conditions constitute a legally binding agreement between you ("Patron", "Client", or "Purchaser") and <strong>Winsor Brand</strong> ("Winsor", "we", "us", or "our"). By browsing our catalog, reserving timepieces, or making acquisitions through our online boutique, authorized retail partners, or telephone concierge, you acknowledge having read, understood, and agreed to be governed by these terms.
               </p>
               <div className="legal-callout">
                 If you do not accept these terms in their entirety, you should immediately discontinue the use of our digital platform and services.
@@ -737,7 +737,7 @@ export default function TermsOfServicePage() {
                 <h2 className="legal-section-title">9. Limitation of Liability</h2>
               </div>
               <p className="legal-paragraph">
-                To the fullest extent permitted by law, Winsor Brand, its directors, horologists, and logistics partners shall not be held liable for indirect, punitive, or consequential damages resulting from website downtime or third-party courier transit delays.
+                To the fullest extent permitted by law, Winsor Brand, its directors, watchmakers, and logistics partners shall not be held liable for indirect, punitive, or consequential damages resulting from website downtime or third-party courier transit delays.
               </p>
               <p className="legal-paragraph">
                 In all events, our total aggregate liability arising out of any timepiece acquisition shall not exceed the total purchase price actually paid by the patron for the specific product in question.

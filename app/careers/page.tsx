@@ -67,7 +67,7 @@ export default function CareersPage() {
   }, [vacancies, searchQuery, selectedLocation]);
 
   return (
-    <div className="min-h-screen bg-[#faf7f0] text-[#1a1209] flex flex-col" style={{ fontFamily: "'Jost', sans-serif" }}>
+    <div className="min-h-screen bg-[#ffffff] text-[#141414] flex flex-col" style={{ fontFamily: "'Jost', sans-serif" }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=Jost:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300&display=swap');
       `}</style>
@@ -77,20 +77,20 @@ export default function CareersPage() {
       <section className="careers-hero-banner relative w-full pt-28 sm:pt-36 pb-20 lg:pb-28 min-h-[400px] sm:min-h-[480px] flex items-center justify-center overflow-hidden bg-gradient-to-b from-[#0a0a0a] via-[#1a140d] to-[#0a0a0a] text-white">
         <Image
           src="/hmebnr1.webp"
-          alt="Careers at Winsor Atelier"
+          alt="Careers at Winsor"
           fill
           priority
           className="object-cover opacity-40 scale-105"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-[#faf7f0] z-0" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/75 z-0" />
         
         <div className="relative z-10 text-center px-6 max-w-4xl space-y-4">
-          <span className="text-[10px] lg:text-[11px] font-semibold tracking-[0.35em] text-[#8B6914] uppercase block animate-fadeIn" style={{ fontFamily: "'Jost', sans-serif" }}>
-            JOIN THE MAISON
+          <span className="text-[10px] lg:text-[11px] font-semibold tracking-[0.28em] text-[#8B6914] uppercase block" style={{ fontFamily: "'Jost', sans-serif" }}>
+            CAREERS AT WINSOR
           </span>
           <CareersHeroTypewriter
-            title="Careers at Winsor Atelier"
-            subtitle="Crafting the future of haute horlogerie. Explore opportunities within our design, operations, and client relations sectors."
+            title="Careers at Winsor"
+            subtitle="Explore opportunities across our design, retail operations, and customer care teams."
           />
         </div>
       </section>
@@ -99,7 +99,7 @@ export default function CareersPage() {
       <section className="max-w-7xl mx-auto w-full px-6 lg:px-12 -mt-12 relative z-20 space-y-8">
         
         {/* Search & Location Toolbar */}
-        <div className="bg-white/95 backdrop-blur-md border border-[#1a1209]/10 rounded-2xl p-5 lg:p-6 shadow-xl flex flex-col md:flex-row gap-4 items-center justify-between">
+        <div className="bg-white/95 backdrop-blur-md border border-black/[0.08] rounded-xl p-5 lg:p-6 shadow-xl flex flex-col md:flex-row gap-4 items-center justify-between">
           
           {/* Live Search */}
           <div className="relative w-full md:w-1/2">
@@ -112,7 +112,7 @@ export default function CareersPage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               style={{ fontFamily: "'Jost', sans-serif" }}
-              className="w-full pl-11 pr-4 py-3 bg-[#fbf9f4] border border-[#1a1209]/12 rounded-xl text-sm placeholder-[#1a1209]/40 focus:outline-none focus:border-[#8B6914] focus:ring-1 focus:ring-[#8B6914] transition-all text-[#1a1209]"
+              className="w-full pl-11 pr-4 py-3 bg-[#F8F7F4] border border-black/[0.08] rounded-lg text-sm placeholder-[#141414]/40 focus:outline-none focus:border-[#141414] transition-all text-[#141414]"
             />
           </div>
 
@@ -122,7 +122,7 @@ export default function CareersPage() {
               value={selectedLocation}
               onChange={(e) => setSelectedLocation(e.target.value)}
               style={{ fontFamily: "'Jost', sans-serif" }}
-              className="w-full px-4 py-3 bg-[#fbf9f4] border border-[#1a1209]/12 rounded-xl text-sm text-[#1a1209] focus:outline-none focus:border-[#8B6914] transition-all appearance-none cursor-pointer pr-10"
+              className="w-full px-4 py-3 bg-[#F8F7F4] border border-black/[0.08] rounded-lg text-sm text-[#141414] focus:outline-none focus:border-[#141414] transition-all appearance-none cursor-pointer pr-10"
             >
               <option value="">All Locations</option>
               {locations.map((loc) => (
@@ -131,7 +131,7 @@ export default function CareersPage() {
                 </option>
               ))}
             </select>
-            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[#1a1209]/40 pointer-events-none">
+            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[#141414]/40 pointer-events-none">
               <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
             </span>
           </div>
@@ -144,7 +144,7 @@ export default function CareersPage() {
                 setSelectedLocation('');
               }}
               style={{ fontFamily: "'Jost', sans-serif" }}
-              className="text-xs text-[#8B6914] font-semibold hover:text-[#1a1209] transition-colors whitespace-nowrap px-2"
+              className="text-xs text-[#8B6914] font-semibold hover:text-[#141414] transition-colors whitespace-nowrap px-2"
             >
               Clear Filters
             </button>
@@ -152,29 +152,29 @@ export default function CareersPage() {
         </div>
 
         {/* 🌟 STATS COUNTER BANNER (Compact 4-column single-row layout for mobile & desktop) */}
-        <div className="py-4 sm:py-6 px-1 sm:px-4 border-t border-b border-[#1a1209]/10 my-4 grid grid-cols-4 divide-x divide-[#1a1209]/10">
+        <div className="py-4 sm:py-6 px-1 sm:px-4 border-t border-b border-black/[0.08] my-4 grid grid-cols-4 divide-x divide-black/[0.08]">
           <div className="text-center px-1 sm:px-2 space-y-1">
             <div className="text-lg sm:text-2xl lg:text-3xl font-light text-[#8B6914] leading-none tracking-wide" style={{ fontFamily: "'Cinzel', serif", fontVariantNumeric: 'lining-nums tabular-nums', fontFeatureSettings: '"lnum" 1, "tnum" 1' }}>2023</div>
-            <div className="text-[9px] sm:text-[10.5px] font-semibold tracking-wider text-[#1a1209] uppercase leading-tight" style={{ fontFamily: "'Jost', sans-serif" }}>Registered in Dubai</div>
-            <div className="text-[8px] sm:text-[9.5px] text-[#1a1209]/50 font-light hidden sm:block" style={{ fontFamily: "'Jost', sans-serif" }}>International Maison Foundation</div>
+            <div className="text-[9px] sm:text-[10.5px] font-semibold tracking-wider text-[#141414] uppercase leading-tight" style={{ fontFamily: "'Jost', sans-serif" }}>Registered in Dubai</div>
+            <div className="text-[8px] sm:text-[9.5px] text-[#141414]/50 font-light hidden sm:block" style={{ fontFamily: "'Jost', sans-serif" }}>International Brand Foundation</div>
           </div>
 
           <div className="text-center px-1 sm:px-2 space-y-1">
             <div className="text-lg sm:text-2xl lg:text-3xl font-light text-[#8B6914] leading-none tracking-wide" style={{ fontFamily: "'Cinzel', serif", fontVariantNumeric: 'lining-nums tabular-nums', fontFeatureSettings: '"lnum" 1, "tnum" 1' }}>12+</div>
-            <div className="text-[9px] sm:text-[10.5px] font-semibold tracking-wider text-[#1a1209] uppercase leading-tight" style={{ fontFamily: "'Jost', sans-serif" }}>Boutique Locations</div>
-            <div className="text-[8px] sm:text-[9.5px] text-[#1a1209]/50 font-light hidden sm:block" style={{ fontFamily: "'Jost', sans-serif" }}>Authorized Retail Network</div>
+            <div className="text-[9px] sm:text-[10.5px] font-semibold tracking-wider text-[#141414] uppercase leading-tight" style={{ fontFamily: "'Jost', sans-serif" }}>Boutique Locations</div>
+            <div className="text-[8px] sm:text-[9.5px] text-[#141414]/50 font-light hidden sm:block" style={{ fontFamily: "'Jost', sans-serif" }}>Authorized Retail Network</div>
           </div>
 
           <div className="text-center px-1 sm:px-2 space-y-1">
             <div className="text-lg sm:text-2xl lg:text-3xl font-light text-[#8B6914] leading-none tracking-wide" style={{ fontFamily: "'Cinzel', serif", fontVariantNumeric: 'lining-nums tabular-nums', fontFeatureSettings: '"lnum" 1, "tnum" 1' }}>100%</div>
-            <div className="text-[9px] sm:text-[10.5px] font-semibold tracking-wider text-[#1a1209] uppercase leading-tight" style={{ fontFamily: "'Jost', sans-serif" }}>Precision Movement</div>
-            <div className="text-[8px] sm:text-[9.5px] text-[#1a1209]/50 font-light hidden sm:block" style={{ fontFamily: "'Jost', sans-serif" }}>Japanese Precision Engineering</div>
+            <div className="text-[9px] sm:text-[10.5px] font-semibold tracking-wider text-[#141414] uppercase leading-tight" style={{ fontFamily: "'Jost', sans-serif" }}>Precision Movement</div>
+            <div className="text-[8px] sm:text-[9.5px] text-[#141414]/50 font-light hidden sm:block" style={{ fontFamily: "'Jost', sans-serif" }}>Japanese Precision Engineering</div>
           </div>
 
           <div className="text-center px-1 sm:px-2 space-y-1">
             <div className="text-lg sm:text-2xl lg:text-3xl font-light text-[#8B6914] leading-none tracking-wide" style={{ fontFamily: "'Cinzel', serif", fontVariantNumeric: 'lining-nums tabular-nums', fontFeatureSettings: '"lnum" 1, "tnum" 1' }}>1 YEAR</div>
-            <div className="text-[9px] sm:text-[10.5px] font-semibold tracking-wider text-[#1a1209] uppercase leading-tight" style={{ fontFamily: "'Jost', sans-serif" }}>Official Warranty</div>
-            <div className="text-[8px] sm:text-[9.5px] text-[#1a1209]/50 font-light hidden sm:block" style={{ fontFamily: "'Jost', sans-serif" }}>Comprehensive Care & Service</div>
+            <div className="text-[9px] sm:text-[10.5px] font-semibold tracking-wider text-[#141414] uppercase leading-tight" style={{ fontFamily: "'Jost', sans-serif" }}>Official Warranty</div>
+            <div className="text-[8px] sm:text-[9.5px] text-[#141414]/50 font-light hidden sm:block" style={{ fontFamily: "'Jost', sans-serif" }}>Comprehensive Care & Service</div>
           </div>
         </div>
 
@@ -182,12 +182,12 @@ export default function CareersPage() {
 
       {/* Main Openings List */}
       <main className="max-w-7xl mx-auto w-full px-6 lg:px-12 py-10 flex-1">
-        <div className="flex items-center justify-between border-b border-[#1a1209]/10 pb-4 mb-8">
+        <div className="flex items-center justify-between border-b border-black/[0.08] pb-4 mb-8">
           <div>
-            <h2 className="text-2xl lg:text-3xl font-semibold text-[#1a1209]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+            <h2 className="text-2xl lg:text-3xl font-semibold text-[#141414]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
               Current Open Positions
             </h2>
-            <p className="text-xs text-[#1a1209]/50 mt-1" style={{ fontFamily: "'Jost', sans-serif" }}>Explore career opportunities and apply online.</p>
+            <p className="text-xs text-[#141414]/50 mt-1" style={{ fontFamily: "'Jost', sans-serif" }}>Explore career opportunities and apply online.</p>
           </div>
           <span className="text-xs text-[#8B6914] font-semibold uppercase tracking-wider bg-[#8B6914]/10 px-3 py-1.5 rounded-full" style={{ fontFamily: "'Jost', sans-serif" }}>
             {filteredVacancies.length} Position{filteredVacancies.length !== 1 ? 's' : ''} Open
@@ -197,16 +197,16 @@ export default function CareersPage() {
         {loading ? (
           <div className="flex flex-col items-center justify-center py-20 space-y-4">
             <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#8B6914]"></div>
-            <p className="text-xs text-[#1a1209]/60 tracking-widest uppercase" style={{ fontFamily: "'Jost', sans-serif" }}>Loading Openings…</p>
+            <p className="text-xs text-[#141414]/60 tracking-widest uppercase" style={{ fontFamily: "'Jost', sans-serif" }}>Loading Openings…</p>
           </div>
         ) : filteredVacancies.length === 0 ? (
-          <div className="text-center py-20 bg-white border border-[#1a1209]/10 rounded-2xl shadow-sm p-8">
+          <div className="text-center py-20 bg-white border border-black/[0.08] rounded-xl shadow-sm p-8">
             <svg className="w-12 h-12 text-[#8B6914]/40 mx-auto mb-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
               <rect x="2" y="7" width="20" height="14" rx="2" ry="2"/>
               <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
             </svg>
-            <h3 className="text-2xl font-semibold text-[#1a1209]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>No Current Openings</h3>
-            <p className="text-sm text-[#1a1209]/50 max-w-sm mx-auto mt-2 leading-relaxed" style={{ fontFamily: "'Jost', sans-serif" }}>
+            <h3 className="text-2xl font-semibold text-[#141414]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>No Current Openings</h3>
+            <p className="text-sm text-[#141414]/50 max-w-sm mx-auto mt-2 leading-relaxed" style={{ fontFamily: "'Jost', sans-serif" }}>
               We don't have any active openings matching your search criteria. Please check back later or contact our HR team.
             </p>
           </div>
@@ -217,7 +217,7 @@ export default function CareersPage() {
               return (
                 <div 
                   key={job._id}
-                  className="bg-white border border-[#1a1209]/10 rounded-2xl p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 hover:border-[#8B6914]/30 transition-all duration-300 flex flex-col justify-between"
+                  className="bg-white border border-black/[0.08] rounded-xl p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 hover:border-black/20 transition-all duration-300 flex flex-col justify-between"
                 >
                   <div className="space-y-4">
                     {/* Header: Locations & Rotate badge */}
@@ -227,7 +227,7 @@ export default function CareersPage() {
                           <span 
                             key={loc} 
                             style={{ fontFamily: "'Jost', sans-serif" }}
-                            className="inline-flex items-center px-2.5 py-1 bg-[#fbf9f4] border border-[#1a1209]/10 rounded-md text-[10px] font-semibold text-[#1a1209]/75 uppercase tracking-wider"
+                            className="inline-flex items-center px-2.5 py-1 bg-[#F8F7F4] border border-black/[0.08] rounded-md text-[10px] font-semibold text-[#141414]/75 uppercase tracking-wider"
                           >
                             <svg className="w-3 h-3 text-[#8B6914] mr-1 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
                             {loc}
@@ -245,7 +245,7 @@ export default function CareersPage() {
 
                     {/* Job Title */}
                     <div>
-                      <h3 className="text-2xl font-bold text-[#1a1209] leading-snug" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+                      <h3 className="text-2xl font-bold text-[#141414] leading-snug" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
                         {job.title}
                       </h3>
                       {job.salary && (
@@ -256,7 +256,7 @@ export default function CareersPage() {
                     </div>
 
                     {/* Accommodation indicators */}
-                    <div className="flex gap-4 text-xs text-[#1a1209]/60 border-t border-[#1a1209]/6 pt-3" style={{ fontFamily: "'Jost', sans-serif" }}>
+                    <div className="flex gap-4 text-xs text-[#141414]/60 border-t border-black/[0.06] pt-3" style={{ fontFamily: "'Jost', sans-serif" }}>
                       <div className="flex items-center gap-1.5">
                         <svg className="w-3.5 h-3.5 text-[#8B6914] flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 21h18M9 8h1M9 12h1M9 16h1M14 8h1M14 12h1M14 16h1M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16"/></svg>
                         <span>
@@ -266,15 +266,15 @@ export default function CareersPage() {
                     </div>
 
                     {/* Description preview */}
-                    <p className="text-xs text-[#1a1209]/75 line-clamp-3 leading-relaxed" style={{ fontFamily: "'Jost', sans-serif" }}>
+                    <p className="text-xs text-[#141414]/75 line-clamp-3 leading-relaxed" style={{ fontFamily: "'Jost', sans-serif" }}>
                       {job.description.replace(/<[^>]*>/g, '')}
                     </p>
                   </div>
 
                   {/* Actions */}
-                  <div className="mt-6 pt-4 border-t border-[#1a1209]/6 flex items-center justify-between">
+                  <div className="mt-6 pt-4 border-t border-black/[0.06] flex items-center justify-between">
                     {hasMultipleLocations && (
-                      <span className="text-[10px] text-[#1a1209]/45 italic max-w-[150px] leading-tight" style={{ fontFamily: "'Jost', sans-serif" }}>
+                      <span className="text-[10px] text-[#141414]/45 italic max-w-[150px] leading-tight" style={{ fontFamily: "'Jost', sans-serif" }}>
                         *Subject to rotated deployment across branches.
                       </span>
                     )}
@@ -282,7 +282,7 @@ export default function CareersPage() {
                     <Link
                       href={`/careers/${job._id}`}
                       style={{ fontFamily: "'Jost', sans-serif" }}
-                      className="ml-auto px-4 py-2.5 bg-[#1a1209] hover:bg-[#8B6914] text-white text-[11px] font-semibold uppercase tracking-widest rounded-lg transition-colors shadow-sm"
+                      className="ml-auto px-4 py-2.5 bg-[#141414] hover:bg-[#2C2C2C] text-white text-[11px] font-semibold uppercase tracking-widest rounded-md transition-colors shadow-sm"
                     >
                       View & Apply
                     </Link>
@@ -295,46 +295,46 @@ export default function CareersPage() {
       </main>
 
       {/* 🏛️ WHY WINSOR? SECTION */}
-      <section className="bg-white border-t border-b border-[#1a1209]/8 py-16 lg:py-24">
+      <section className="bg-[#F8F7F4] border-t border-b border-black/[0.08] py-16 lg:py-24">
         <div className="max-w-7xl mx-auto px-6 lg:px-12 space-y-12">
           
           <div className="text-center max-w-2xl mx-auto space-y-3">
-            <span className="text-[10px] font-semibold tracking-[0.3em] text-[#8B6914] uppercase block" style={{ fontFamily: "'Jost', sans-serif" }}>
+            <span className="text-[10px] font-semibold tracking-[0.28em] text-[#8B6914] uppercase block" style={{ fontFamily: "'Jost', sans-serif" }}>
               OUR CULTURE & VALUES
             </span>
-            <h2 className="text-3xl lg:text-4xl font-light text-[#1a1209] tracking-wide" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
-              Why Choose Winsor Atelier?
+            <h2 className="text-3xl lg:text-4xl font-light text-[#141414] tracking-wide" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+              Why Choose Winsor?
             </h2>
             <div className="w-12 h-0.5 bg-[#8B6914] mx-auto mt-2" />
-            <p className="text-xs sm:text-sm text-[#1a1209]/60 font-light leading-relaxed" style={{ fontFamily: "'Jost', sans-serif" }}>
-              At Winsor, we empower our passionate team with an environment dedicated to horological craftsmanship, professional development, and retail excellence.
+            <p className="text-xs sm:text-sm text-[#141414]/60 font-light leading-relaxed" style={{ fontFamily: "'Jost', sans-serif" }}>
+              At Winsor, we empower our team with an environment dedicated to watchmaking craftsmanship, professional development, and retail excellence.
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             
             {/* Value 1 */}
-            <div className="group bg-[#faf7f0]/60 border border-[#1a1209]/10 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:border-[#8B6914]/40 transition-all duration-300 flex flex-col">
+            <div className="group bg-white border border-black/[0.08] rounded-xl overflow-hidden shadow-sm hover:shadow-xl hover:border-black/20 transition-all duration-300 flex flex-col">
               <div className="relative h-44 w-full overflow-hidden">
                 <Image
                   src="/careers/horological_precision.jpg"
-                  alt="Horological Precision"
+                  alt="Watchmaking Precision"
                   fill
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
                   className="object-cover group-hover:scale-108 transition-transform duration-500"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                <span className="absolute bottom-3 left-3 bg-[#8B6914]/90 backdrop-blur-md text-white text-[9px] font-semibold tracking-widest uppercase px-2.5 py-1 rounded-md" style={{ fontFamily: "'Jost', sans-serif" }}>
+                <span className="absolute bottom-3 left-3 bg-[#141414]/90 backdrop-blur-md text-white text-[9px] font-semibold tracking-widest uppercase px-2.5 py-1 rounded" style={{ fontFamily: "'Jost', sans-serif" }}>
                   PRECISION
                 </span>
               </div>
               <div className="p-5 lg:p-6 space-y-2 flex-1 flex flex-col justify-between">
                 <div>
-                  <h3 className="text-xl font-bold text-[#1a1209] leading-snug" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
-                    Horological Precision
+                  <h3 className="text-xl font-bold text-[#141414] leading-snug" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+                    Watchmaking Precision
                   </h3>
-                  <p className="text-xs text-[#1a1209]/70 font-light leading-relaxed mt-2" style={{ fontFamily: "'Jost', sans-serif" }}>
-                    Work alongside master horologists with Japanese precision movements and refined artisan watchmaking heritage.
+                  <p className="text-xs text-[#141414]/70 font-light leading-relaxed mt-2" style={{ fontFamily: "'Jost', sans-serif" }}>
+                    Work alongside experienced watchmakers with Japanese precision movements and dependable watch assembly standards.
                   </p>
                 </div>
               </div>

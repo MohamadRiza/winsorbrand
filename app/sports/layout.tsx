@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     canonical: `${baseUrl}/sports`,
   },
   openGraph: {
-    title: 'Sports Chronographs & Active Timepieces | Winsor Maison',
+    title: 'Sports Chronographs & Active Timepieces | Winsor Watches',
     description:
       'High-performance sports chronographs engineered with precision Japan movements and water-resistant cases.',
     url: `${baseUrl}/sports`,

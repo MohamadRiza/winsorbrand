@@ -18,9 +18,9 @@ const SECTIONS: { key: CollectionSection; label: string }[] = [
 ];
 
 /**
- * Luxury Typewriter Hero Animation
- * Seamlessly types, pauses, erases (removes), and loops the brand statement
- * with zero layout shifts and bespoke gold caret pulsing.
+ * Clean Editorial Hero Statement
+ * Displays the slide headline and description with composed typography
+ * and advances the slide timer smoothly.
  */
 interface TypewriterHeroTextProps {
   titleL1?: string;
@@ -34,204 +34,26 @@ function TypewriterHeroText({
   titleL1 = 'Timeless Craft.',
   titleL2 = 'Modern Legacy.',
   descL1 = 'Precision, heritage and excellence —',
-  descL2 = 'crafted for Dubai/UAE Registered brand.',
+  descL2 = 'crafted with Japanese precision movements and sapphire crystal glass.',
   onCycleComplete,
 }: TypewriterHeroTextProps) {
-  const [t1, setT1] = useState('');
-  const [t2, setT2] = useState('');
-  const [d1, setD1] = useState('');
-  const [d2, setD2] = useState('');
-  const [cursorPos, setCursorPos] = useState<'t1' | 't2' | 'd1' | 'd2' | 'none'>('t1');
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
-
   useEffect(() => {
-    if (typeof window !== 'undefined' && window.matchMedia) {
-      setPrefersReducedMotion(window.matchMedia('(prefers-reduced-motion: reduce)').matches);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (prefersReducedMotion) {
-      setT1(titleL1);
-      setT2(titleL2);
-      setD1(descL1);
-      setD2(descL2);
-      setCursorPos('none');
-      const timer = setTimeout(() => {
-        if (onCycleComplete) onCycleComplete();
-      }, 7000);
-      return () => clearTimeout(timer);
-    }
-
-    let isCancelled = false;
-    let activeTimer: any = null;
-
-    const wait = (ms: number) =>
-      new Promise<void>((resolve) => {
-        if (isCancelled) return resolve();
-        activeTimer = setTimeout(() => {
-          activeTimer = null;
-          resolve();
-        }, ms);
-      });
-
-    const runLoop = async () => {
-      while (!isCancelled) {
-        // 1. Initial breathing pause with cursor blinking at line 1
-        setT1('');
-        setT2('');
-        setD1('');
-        setD2('');
-        setCursorPos('t1');
-        await wait(450);
-        if (isCancelled) return;
-
-        // 2. Type Title Line 1
-        for (let i = 1; i <= titleL1.length; i++) {
-          if (isCancelled) return;
-          setT1(titleL1.slice(0, i));
-          const char = titleL1[i - 1];
-          await wait(char === '.' ? 220 : (char === ' ' ? 70 : 50));
-        }
-        if (isCancelled) return;
-        await wait(200);
-
-        // 3. Move cursor to Title Line 2 and type
-        setCursorPos('t2');
-        for (let i = 1; i <= titleL2.length; i++) {
-          if (isCancelled) return;
-          setT2(titleL2.slice(0, i));
-          const char = titleL2[i - 1];
-          await wait(char === '.' ? 240 : (char === ' ' ? 70 : 50));
-        }
-        if (isCancelled) return;
-        await wait(320);
-
-        // 4. Move cursor to Description Line 1 and type
-        setCursorPos('d1');
-        for (let i = 1; i <= descL1.length; i++) {
-          if (isCancelled) return;
-          setD1(descL1.slice(0, i));
-          const char = descL1[i - 1];
-          await wait(char === '—' ? 240 : (char === ',' ? 140 : 28));
-        }
-        if (isCancelled) return;
-        await wait(180);
-
-        // 5. Move cursor to Description Line 2 and type
-        setCursorPos('d2');
-        for (let i = 1; i <= descL2.length; i++) {
-          if (isCancelled) return;
-          setD2(descL2.slice(0, i));
-          const char = descL2[i - 1];
-          await wait(char === '.' ? 220 : (char === '/' ? 120 : 28));
-        }
-        if (isCancelled) return;
-
-        // 6. Hold Complete for generous reading period (4.2 seconds)
-        await wait(4200);
-        if (isCancelled) return;
-
-        // 7. Slow Removal: Erase Description Line 2 deliberately
-        setCursorPos('d2');
-        for (let i = descL2.length - 1; i >= 0; i--) {
-          if (isCancelled) return;
-          setD2(descL2.slice(0, i));
-          await wait(36);
-        }
-        if (isCancelled) return;
-        await wait(140);
-
-        // 8. Slow Removal: Erase Description Line 1 deliberately
-        setCursorPos('d1');
-        for (let i = descL1.length - 1; i >= 0; i--) {
-          if (isCancelled) return;
-          setD1(descL1.slice(0, i));
-          await wait(36);
-        }
-        if (isCancelled) return;
-        await wait(200);
-
-        // 9. Slow Removal: Erase Title Line 2 deliberately
-        setCursorPos('t2');
-        for (let i = titleL2.length - 1; i >= 0; i--) {
-          if (isCancelled) return;
-          setT2(titleL2.slice(0, i));
-          await wait(44);
-        }
-        if (isCancelled) return;
-        await wait(140);
-
-        // 10. Slow Removal: Erase Title Line 1 deliberately
-        setCursorPos('t1');
-        for (let i = titleL1.length - 1; i >= 0; i--) {
-          if (isCancelled) return;
-          setT1(titleL1.slice(0, i));
-          await wait(44);
-        }
-        if (isCancelled) return;
-
-        // 11. Empty pause with pulsing cursor on clean canvas
-        setCursorPos('t1');
-        await wait(450);
-        if (isCancelled) return;
-
-        // 12. Trigger synchronized transition to the next hero image
-        if (onCycleComplete) {
-          onCycleComplete();
-          return;
-        }
-
-        await wait(550);
-      }
-    };
-
-    runLoop();
-
-    return () => {
-      isCancelled = true;
-      if (activeTimer) clearTimeout(activeTimer);
-    };
-  }, [titleL1, titleL2, descL1, descL2, prefersReducedMotion, onCycleComplete]);
+    const timer = setTimeout(() => {
+      if (onCycleComplete) onCycleComplete();
+    }, 6500);
+    return () => clearTimeout(timer);
+  }, [titleL1, titleL2, descL1, descL2, onCycleComplete]);
 
   return (
     <>
-      {/* Screen-reader text for SEO and Accessibility */}
-      <span
-        style={{
-          position: 'absolute',
-          width: '1px',
-          height: '1px',
-          padding: 0,
-          margin: '-1px',
-          overflow: 'hidden',
-          clip: 'rect(0,0,0,0)',
-          border: 0,
-        }}
-      >
-        {titleL1} {titleL2} {descL1} {descL2}
-      </span>
-
-      <h1 className="hero-banner-title" aria-hidden="true">
-        <span className="typewriter-line">
-          {t1 ? t1 : (cursorPos === 't1' ? null : <span style={{ opacity: 0, userSelect: 'none' }}>&nbsp;</span>)}
-          {cursorPos === 't1' && <span className="typewriter-cursor" />}
-        </span>
-        <span className="typewriter-line">
-          {t2 ? t2 : (cursorPos === 't2' ? null : <span style={{ opacity: 0, userSelect: 'none' }}>&nbsp;</span>)}
-          {cursorPos === 't2' && <span className="typewriter-cursor" />}
-        </span>
+      <h1 className="hero-banner-title">
+        <span className="typewriter-line">{titleL1}</span>
+        <span className="typewriter-line">{titleL2}</span>
       </h1>
 
-      <div className="hero-banner-desc" aria-hidden="true" style={{ marginBottom: '36px' }}>
-        <span className="typewriter-desc-line">
-          {d1 ? d1 : (cursorPos === 'd1' ? null : <span style={{ opacity: 0, userSelect: 'none' }}>&nbsp;</span>)}
-          {cursorPos === 'd1' && <span className="typewriter-cursor typewriter-cursor-desc" />}
-        </span>
-        <span className="typewriter-desc-line">
-          {d2 ? d2 : (cursorPos === 'd2' ? null : <span style={{ opacity: 0, userSelect: 'none' }}>&nbsp;</span>)}
-          {cursorPos === 'd2' && <span className="typewriter-cursor typewriter-cursor-desc" />}
-        </span>
+      <div className="hero-banner-desc" style={{ marginBottom: '36px' }}>
+        <span className="typewriter-desc-line">{descL1}</span>
+        <span className="typewriter-desc-line">{descL2}</span>
       </div>
     </>
   );
@@ -257,9 +79,9 @@ export default function CollectionsPage() {
       titleL1: 'Timeless Craft.',
       titleL2: 'Modern Legacy.',
       descL1: 'Precision, heritage and excellence —',
-      descL2: 'crafted for Dubai/UAE Registered brand.',
+      descL2: 'crafted with Japanese precision movements and sapphire crystal glass.',
       title: <>Timeless Craft.<br />Modern Legacy.</>,
-      desc: <>Precision, heritage and excellence —<br />crafted for Dubai/UAE Registered brand.</>,
+      desc: <>Precision, heritage and excellence —<br />crafted with Japanese precision movements and sapphire crystal glass.</>,
     },
     {
       type: 'image',
@@ -530,17 +352,17 @@ export default function CollectionsPage() {
         @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap');
         
         .col-container {
-          background-color: #faf7f0;
+          background-color: #ffffff;
           min-height: 100vh;
           font-family: 'Jost', sans-serif;
-          color: #1a1209;
+          color: #141414;
           padding-bottom: 20px;
         }
 
         /* ── HERO BANNER ── */
         .collections-hero-banner {
           position: relative;
-          background: radial-gradient(circle at right, #242220 0%, #0a0a0a 100%);
+          background: radial-gradient(circle at right, #1e1e1e 0%, #0d0d0d 100%);
           color: #fff;
           display: flex;
           align-items: center;
@@ -568,18 +390,18 @@ export default function CollectionsPage() {
           font-family: 'Cormorant Garamond', serif;
           font-size: clamp(32px, 4vw, 56px);
           line-height: 1.15;
-          font-weight: 300;
-          letter-spacing: 0.02em;
+          font-weight: 400;
+          letter-spacing: 0.01em;
           margin-bottom: 20px;
           color: #fff;
           min-height: calc(2 * 1.15em);
         }
         .hero-banner-desc {
-          font-family: 'Cormorant Garamond', serif;
-          font-style: italic;
-          font-size: clamp(15px, 2vw, 20px);
-          color: rgba(255,255,255,0.7);
-          line-height: 1.45;
+          font-family: 'Jost', sans-serif;
+          font-size: clamp(14px, 1.5vw, 16px);
+          font-weight: 300;
+          color: rgba(255,255,255,0.75);
+          line-height: 1.6;
           margin-bottom: 36px;
           min-height: calc(2 * 1.45em);
         }
@@ -593,82 +415,47 @@ export default function CollectionsPage() {
           min-height: 1.45em;
           line-height: 1.45;
         }
-        .typewriter-cursor {
-          display: inline-block;
-          width: 2.5px;
-          height: 0.85em;
-          margin-left: 5px;
-          vertical-align: -0.05em;
-          background: linear-gradient(180deg, #F3E3B8 0%, #D4AF37 50%, #8B6914 100%);
-          box-shadow: 0 0 10px rgba(212, 175, 55, 0.8), 0 0 20px rgba(212, 175, 55, 0.35);
-          border-radius: 1px;
-          animation: winsor-caret-pulse 0.85s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-        }
-        .typewriter-cursor-desc {
-          width: 1.8px;
-          height: 0.88em;
-          margin-left: 5px;
-          vertical-align: -0.05em;
-          background: linear-gradient(180deg, #F3E3B8 0%, #D4AF37 70%, #8B6914 100%);
-          box-shadow: 0 0 8px rgba(212, 175, 55, 0.6);
-        }
-        @keyframes winsor-caret-pulse {
-          0%, 100% {
-            opacity: 1;
-            transform: scaleY(1);
-          }
-          50% {
-            opacity: 0.15;
-            transform: scaleY(0.85);
-          }
-        }
-        @media (prefers-reduced-motion: reduce) {
-          .typewriter-cursor {
-            display: none !important;
-          }
-        }
         .hero-banner-actions {
           display: flex;
           gap: 16px;
           align-items: center;
         }
         .hero-btn-primary {
-          background: #8b6914;
-          color: #fff;
+          background: #ffffff;
+          color: #141414;
           border: none;
           padding: 14px 30px;
           font-size: 11px;
-          letter-spacing: 0.15em;
+          letter-spacing: 0.16em;
           text-transform: uppercase;
           font-weight: 500;
           cursor: pointer;
-          transition: all 0.3s ease;
-          border-radius: 4px;
+          transition: all 0.25s ease;
+          border-radius: 2px;
         }
         .hero-btn-primary:hover {
-          background: #a37c17;
-          transform: translateY(-2px);
+          background: #8b6914;
+          color: #fff;
         }
         .hero-btn-secondary {
           background: transparent;
           color: #fff;
-          border: 1px solid rgba(255,255,255,0.25);
+          border: 1px solid rgba(255,255,255,0.28);
           padding: 14px 30px;
           font-size: 11px;
-          letter-spacing: 0.15em;
+          letter-spacing: 0.16em;
           text-transform: uppercase;
           font-weight: 500;
           cursor: pointer;
-          transition: all 0.3s ease;
+          transition: all 0.25s ease;
           display: flex;
           align-items: center;
           gap: 8px;
-          border-radius: 4px;
+          border-radius: 2px;
         }
         .hero-btn-secondary:hover {
           border-color: #fff;
-          background: rgba(255,255,255,0.05);
-          transform: translateY(-2px);
+          background: rgba(255,255,255,0.06);
         }
         .hero-banner-image-container {
           position: absolute;
@@ -973,16 +760,17 @@ export default function CollectionsPage() {
           justify-content: space-between;
           align-items: baseline;
           margin-bottom: 24px;
-          border-bottom: 1px solid rgba(26, 18, 9, 0.08);
+          border-bottom: 1px solid rgba(20, 20, 20, 0.08);
           padding-bottom: 16px;
         }
         .featured-title {
           font-family: 'Cormorant Garamond', serif;
           font-size: 28px;
-          letter-spacing: 0.06em;
-          font-weight: 400;
+          letter-spacing: 0.04em;
+          font-weight: 500;
           text-transform: uppercase;
           margin: 0;
+          color: #141414;
         }
         .view-all-link {
           font-size: 12px;
@@ -995,7 +783,7 @@ export default function CollectionsPage() {
           gap: 4px;
         }
         .view-all-link:hover {
-          color: #1a1209;
+          color: #141414;
         }
 
         /* ── CAPSULE FILTER ROW ── */
@@ -1006,26 +794,26 @@ export default function CollectionsPage() {
           margin-bottom: 32px;
         }
         .capsule-btn {
-          background: transparent;
-          color: #1a1209;
-          border: 1px solid rgba(26, 18, 9, 0.15);
-          padding: 10px 24px;
+          background: #F8F7F4;
+          color: #555555;
+          border: 1px solid rgba(20, 20, 20, 0.08);
+          padding: 10px 22px;
           font-size: 10.5px;
-          letter-spacing: 0.12em;
+          letter-spacing: 0.14em;
           font-weight: 500;
           text-transform: uppercase;
-          border-radius: 30px;
+          border-radius: 6px;
           cursor: pointer;
-          transition: all 0.3s ease;
+          transition: all 0.25s ease;
         }
         .capsule-btn.active {
-          background: #1a1209;
+          background: #141414;
           color: #fff;
-          border-color: #1a1209;
+          border-color: #141414;
         }
         .capsule-btn:hover:not(.active) {
-          border-color: #1a1209;
-          background: rgba(26, 18, 9, 0.03);
+          border-color: rgba(20, 20, 20, 0.22);
+          color: #141414;
         }
 
         /* ── TOOLBAR CONTROLS ── */
@@ -1037,8 +825,8 @@ export default function CollectionsPage() {
           margin: 0 auto 36px;
           padding: 16px 24px;
           background-color: #fff;
-          border: 1px solid rgba(26, 18, 9, 0.06);
-          border-radius: 12px;
+          border: 1px solid rgba(20, 20, 20, 0.08);
+          border-radius: 10px;
           max-width: 1400px;
           width: 100%;
         }
@@ -1050,45 +838,47 @@ export default function CollectionsPage() {
         }
         .search-input {
           width: 100%;
-          background: #faf7f0;
-          border: 1px solid rgba(26, 18, 9, 0.08);
+          background: #F8F7F4;
+          border: 1px solid rgba(20, 20, 20, 0.08);
           border-radius: 6px;
           padding: 10px 16px 10px 38px;
           font-size: 12.5px;
-          color: #1a1209;
+          color: #141414;
           font-family: inherit;
         }
         .search-input:focus {
           outline: none;
-          border-color: #8b6914;
+          border-color: #141414;
+          background: #ffffff;
         }
         .search-icon {
           position: absolute;
           left: 14px;
           top: 50%;
           transform: translateY(-50%);
-          color: rgba(26, 18, 9, 0.4);
+          color: rgba(20, 20, 20, 0.45);
           pointer-events: none;
         }
         .toolbar-select {
-          background: #faf7f0;
-          border: 1px solid rgba(26, 18, 9, 0.08);
+          background: #F8F7F4;
+          border: 1px solid rgba(20, 20, 20, 0.08);
           border-radius: 6px;
           padding: 10px 16px;
           font-size: 12.5px;
-          color: #1a1209;
+          color: #141414;
           cursor: pointer;
           font-family: inherit;
           min-width: 160px;
         }
         .toolbar-select:focus {
           outline: none;
-          border-color: #8b6914;
+          border-color: #141414;
+          background: #ffffff;
         }
         .toolbar-reset-btn {
           background: transparent;
-          border: 1px dashed rgba(26,18,9,0.25);
-          color: rgba(26, 18, 9, 0.7);
+          border: 1px solid rgba(20, 20, 20, 0.16);
+          color: rgba(20, 20, 20, 0.7);
           padding: 10px 20px;
           font-size: 11px;
           letter-spacing: 0.1em;
@@ -1099,9 +889,9 @@ export default function CollectionsPage() {
           margin-left: auto;
         }
         .toolbar-reset-btn:hover {
-          border-color: #1a1209;
-          color: #1a1209;
-          background: rgba(26,18,9,0.02);
+          border-color: #141414;
+          color: #141414;
+          background: #F8F7F4;
         }
 
         /* ── PRODUCT GRID ── */
@@ -1118,29 +908,29 @@ export default function CollectionsPage() {
         
         /* ── WATCH CARD CONTAINER ── */
         .watch-card-container {
-          background: #faf7f0;
-          border-radius: 16px;
-          border: 1px solid rgba(26,18,9,0.08);
+          background: #ffffff;
+          border-radius: 10px;
+          border: 1px solid rgba(20, 20, 20, 0.08);
           overflow: hidden;
           display: flex;
           flex-direction: column;
           height: 100%;
-          transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-          box-shadow: 0 4px 16px rgba(26,18,9,0.02);
+          transition: all 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
           text-decoration: none;
           color: inherit;
           position: relative;
         }
         .watch-card-container:hover {
-          transform: translateY(-6px);
-          box-shadow: 0 16px 36px rgba(26,18,9,0.08);
-          border-color: rgba(139,105,20,0.3);
+          transform: translateY(-4px);
+          box-shadow: 0 14px 32px rgba(0, 0, 0, 0.06);
+          border-color: rgba(20, 20, 20, 0.18);
           background: #ffffff;
         }
         .watch-img-container {
           position: relative;
           aspect-ratio: 1;
-          background: transparent;
+          background: #F6F5F2;
           padding: 24px;
           display: flex;
           align-items: center;
@@ -1151,50 +941,49 @@ export default function CollectionsPage() {
           width: 100%;
           height: 100%;
           object-fit: contain;
-          transition: transform 0.6s ease;
+          transition: transform 0.5s ease;
         }
         .watch-card-container:hover .watch-card-image {
-          transform: scale(1.06);
+          transform: scale(1.04);
         }
         .watch-card-badge {
           position: absolute;
-          left: 16px;
-          top: 16px;
-          background: #1a1209;
+          left: 14px;
+          top: 14px;
+          background: #141414;
           color: #fff;
           font-size: 9px;
-          font-weight: 600;
-          letter-spacing: 0.12em;
-          padding: 4px 10px;
-          border-radius: 4px;
+          font-weight: 500;
+          letter-spacing: 0.14em;
+          padding: 4px 9px;
+          border-radius: 2px;
           z-index: 2;
           text-transform: uppercase;
-          box-shadow: 0 2px 8px rgba(0,0,0,0.15);
         }
         .watch-card-info {
-          padding: 20px;
+          padding: 18px 20px;
           flex: 1;
           display: flex;
           flex-direction: column;
           justify-content: space-between;
-          background: transparent;
+          background: #ffffff;
         }
         .watch-card-title-link {
           text-decoration: none;
           color: inherit;
         }
         .watch-card-title {
-          font-size: 15.5px;
+          font-size: 14.5px;
           font-weight: 500;
           margin: 0 0 6px;
-          color: #1a1209;
+          color: #141414;
           letter-spacing: 0.01em;
           font-variant-numeric: lining-nums;
           font-feature-settings: "lnum" 1;
         }
         .watch-card-specs {
-          font-size: 12px;
-          color: rgba(26,18,9,0.5);
+          font-size: 11.5px;
+          color: #666666;
           margin: 0;
         }
         .watch-card-footer {
@@ -1202,13 +991,13 @@ export default function CollectionsPage() {
           justify-content: space-between;
           align-items: center;
           margin-top: 16px;
-          border-top: 1px solid rgba(26,18,9,0.05);
+          border-top: 1px solid rgba(20, 20, 20, 0.06);
           padding-top: 14px;
         }
         .watch-card-price {
-          font-size: 14.5px;
+          font-size: 14px;
           font-weight: 600;
-          color: #8b6914;
+          color: #141414;
         }
         .watch-card-actions {
           display: flex;
@@ -1217,21 +1006,21 @@ export default function CollectionsPage() {
         }
         .card-action-btn {
           background: transparent;
-          border: 1px solid rgba(26,18,9,0.1);
+          border: 1px solid rgba(20, 20, 20, 0.1);
           width: 32px;
           height: 32px;
           border-radius: 50%;
           display: flex;
           align-items: center;
           justify-content: center;
-          color: rgba(26, 18, 9, 0.7);
+          color: rgba(20, 20, 20, 0.7);
           cursor: pointer;
-          transition: all 0.3s ease;
+          transition: all 0.25s ease;
         }
         .card-action-btn:hover {
-          background: rgba(26, 18, 9, 0.04);
-          color: #1a1209;
-          border-color: #1a1209;
+          background: rgba(20, 20, 20, 0.04);
+          color: #141414;
+          border-color: #141414;
         }
         .card-action-btn.active {
           background: #ffebeb;
@@ -1239,14 +1028,14 @@ export default function CollectionsPage() {
           border-color: #ff3b30;
         }
         .card-action-btn.highlight:hover {
-          background: #1a1209;
+          background: #141414;
           color: #fff;
-          border-color: #1a1209;
+          border-color: #141414;
         }
 
         /* ── BLACK RIBBON BANNER ── */
         .ribbon-banner {
-          background: #000000;
+          background: #141414;
           color: #fff;
           padding: 22px 0;
           overflow: hidden;
@@ -1298,18 +1087,18 @@ export default function CollectionsPage() {
         .newsletter-banner {
           display: grid;
           grid-template-columns: 1fr 1fr;
-          border-radius: 24px;
+          border-radius: 12px;
           overflow: hidden;
-          border: 1px solid rgba(139, 105, 20, 0.25);
-          background: linear-gradient(135deg, #ffffff 0%, #faf7f0 100%);
+          border: 1px solid rgba(20, 20, 20, 0.08);
+          background: #F8F7F4;
           margin: 40px auto 30px;
           max-width: 1350px;
           width: 100%;
-          box-shadow: 0 20px 50px -15px rgba(26, 18, 9, 0.08), 0 8px 20px -6px rgba(139, 105, 20, 0.12);
-          transition: transform 0.4s ease, box-shadow 0.4s ease;
+          box-shadow: 0 12px 36px -12px rgba(0, 0, 0, 0.05);
+          transition: transform 0.35s ease, box-shadow 0.35s ease;
         }
         .newsletter-banner:hover {
-          box-shadow: 0 25px 60px -15px rgba(26, 18, 9, 0.12), 0 10px 25px -5px rgba(139, 105, 20, 0.18);
+          box-shadow: 0 16px 42px -12px rgba(0, 0, 0, 0.08);
         }
         .newsletter-image-block {
           height: 100%;
@@ -1324,26 +1113,26 @@ export default function CollectionsPage() {
           transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
         .newsletter-banner:hover .newsletter-image-block img {
-          transform: scale(1.04);
+          transform: scale(1.03);
         }
         .newsletter-image-overlay {
           position: absolute;
           inset: 0;
-          background: linear-gradient(to right, rgba(26, 18, 9, 0.15), rgba(26, 18, 9, 0.5));
+          background: linear-gradient(to right, rgba(20, 20, 20, 0.1), rgba(20, 20, 20, 0.45));
         }
         .newsletter-image-badge {
           position: absolute;
           bottom: 24px;
           left: 24px;
-          background: rgba(26, 18, 9, 0.85);
+          background: rgba(20, 20, 20, 0.88);
           backdrop-filter: blur(8px);
-          border: 1px solid rgba(217, 184, 120, 0.4);
+          border: 1px solid rgba(255, 255, 255, 0.18);
           padding: 8px 16px;
-          border-radius: 30px;
+          border-radius: 4px;
           display: flex;
           align-items: center;
           gap: 8px;
-          color: #f3e3b8;
+          color: #ffffff;
           box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         }
         .badge-gold-dot {
@@ -1351,7 +1140,6 @@ export default function CollectionsPage() {
           height: 6px;
           border-radius: 50%;
           background: #8B6914;
-          box-shadow: 0 0 8px #8B6914;
         }
 
         .newsletter-form-block {
@@ -1360,7 +1148,7 @@ export default function CollectionsPage() {
           flex-direction: column;
           justify-content: center;
           position: relative;
-          background: radial-gradient(circle at top right, rgba(139, 105, 20, 0.06), transparent 60%);
+          background: #F8F7F4;
         }
         .newsletter-tag-container {
           display: flex;
@@ -1377,21 +1165,21 @@ export default function CollectionsPage() {
           font-size: 10.5px;
           color: #8B6914;
           letter-spacing: 0.25em;
-          font-weight: 700;
+          font-weight: 600;
           text-transform: uppercase;
         }
         .newsletter-title {
           font-family: 'Cormorant Garamond', serif;
           font-size: 34px;
-          font-weight: 600;
-          color: #1a1209;
+          font-weight: 500;
+          color: #141414;
           margin: 0 0 10px;
           letter-spacing: -0.01em;
           line-height: 1.15;
         }
         .newsletter-desc {
           font-size: 13.5px;
-          color: rgba(26, 18, 9, 0.65);
+          color: rgba(20, 20, 20, 0.65);
           line-height: 1.6;
           margin: 0 0 24px;
         }
@@ -1406,16 +1194,16 @@ export default function CollectionsPage() {
           display: flex;
           align-items: center;
           gap: 10px;
-          background: rgba(250, 247, 240, 0.7);
-          border: 1px solid rgba(139, 105, 20, 0.18);
+          background: #ffffff;
+          border: 1px solid rgba(20, 20, 20, 0.08);
           padding: 10px 14px;
-          border-radius: 12px;
+          border-radius: 8px;
         }
         .perk-icon {
           width: 32px;
           height: 32px;
-          border-radius: 8px;
-          background: rgba(139, 105, 20, 0.1);
+          border-radius: 6px;
+          background: rgba(139, 105, 20, 0.08);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -1423,14 +1211,14 @@ export default function CollectionsPage() {
         }
         .perk-title {
           font-size: 11px;
-          font-weight: 700;
-          color: #1a1209;
+          font-weight: 600;
+          color: #141414;
           text-transform: uppercase;
           letter-spacing: 0.05em;
         }
         .perk-desc {
           font-size: 10.5px;
-          color: rgba(26, 18, 9, 0.55);
+          color: rgba(20, 20, 20, 0.55);
           margin: 0;
           line-height: 1.2;
         }
@@ -1452,50 +1240,46 @@ export default function CollectionsPage() {
           transform: translateY(-50%);
           width: 16px;
           height: 16px;
-          color: rgba(26, 18, 9, 0.4);
+          color: rgba(20, 20, 20, 0.4);
           pointer-events: none;
         }
         .input-wrapper input {
           width: 100%;
           background: #ffffff;
-          border: 1px solid rgba(26, 18, 9, 0.18);
+          border: 1px solid rgba(20, 20, 20, 0.14);
           padding: 14px 16px 14px 42px;
           font-size: 13px;
           font-family: inherit;
-          border-radius: 12px;
-          color: #1a1209;
+          border-radius: 6px;
+          color: #141414;
           transition: all 0.25s ease;
         }
         .input-wrapper input:focus {
           outline: none;
-          border-color: #8B6914;
-          box-shadow: 0 0 0 3px rgba(139, 105, 20, 0.12);
+          border-color: #141414;
           background: #ffffff;
         }
         .newsletter-submit-btn {
-          background: #1a1209;
-          color: #faf7f0;
-          border: 1px solid #1a1209;
+          background: #141414;
+          color: #ffffff;
+          border: 1px solid #141414;
           padding: 14px 24px;
           font-size: 11px;
           letter-spacing: 0.15em;
           text-transform: uppercase;
-          font-weight: 700;
+          font-weight: 500;
           cursor: pointer;
-          transition: all 0.3s ease;
-          border-radius: 12px;
+          transition: all 0.25s ease;
+          border-radius: 6px;
           display: flex;
           align-items: center;
           gap: 8px;
           white-space: nowrap;
-          box-shadow: 0 4px 12px rgba(26, 18, 9, 0.15);
         }
         .newsletter-submit-btn:hover {
           background: #8B6914;
           border-color: #8B6914;
           color: #ffffff;
-          transform: translateY(-1px);
-          box-shadow: 0 6px 16px rgba(139, 105, 20, 0.25);
         }
 
         .newsletter-footer-note {
@@ -1503,7 +1287,7 @@ export default function CollectionsPage() {
           align-items: center;
           gap: 6px;
           font-size: 11px;
-          color: rgba(26, 18, 9, 0.5);
+          color: rgba(20, 20, 20, 0.5);
         }
 
         .hero-video-mute-btn {
@@ -2454,7 +2238,7 @@ export default function CollectionsPage() {
           {/* NEWSLETTER BANNER — SUBSCRIBE FOR UPDATES */}
           <div className="newsletter-banner shadow-2xl">
             <div className="newsletter-image-block">
-              <Image src="/collections_pg.webp" alt="Winsor Maison Timepiece Collection" width={600} height={400} className="w-full h-full object-cover" />
+              <Image src="/collections_pg.webp" alt="Winsor Timepiece Collection" width={600} height={400} className="w-full h-full object-cover" />
               <div className="newsletter-image-overlay" />
               <div className="newsletter-image-badge">
                 <span className="badge-gold-dot" />
@@ -2466,7 +2250,7 @@ export default function CollectionsPage() {
               <div className="newsletter-header">
                 <div className="newsletter-tag-container">
                   <span className="gold-line" />
-                  <span className="newsletter-tag">✦ STAY IN THE LOOP ✦</span>
+                  <span className="newsletter-tag">STAY IN THE LOOP</span>
                   <span className="gold-line" />
                 </div>
                 <h3 className="newsletter-title font-serif">Subscribe To Winsor Updates</h3>
@@ -2540,13 +2324,13 @@ export default function CollectionsPage() {
           __html: JSON.stringify({
             '@context': 'https://schema.org',
             '@type': 'CollectionPage',
-            name: 'Luxury Timepiece Collections | Japan Movement Watches',
+            name: 'Winsor Watch Collections | Japanese Movement Timepieces',
             description:
-              'Explore hand-assembled Japan movement watches, prestige sports chronographs, and limited edition horology masterpieces by Winsor Maison.',
+              'Explore precision Japanese movement watches, sports chronographs, and limited edition timepieces by Winsor.',
             url: `${process.env.NEXT_PUBLIC_APP_URL || 'https://winsorbrand.com'}/collections`,
             publisher: {
               '@type': 'Organization',
-              name: 'Winsor Maison',
+              name: 'Winsor Watches',
               logo: `${process.env.NEXT_PUBLIC_APP_URL || 'https://winsorbrand.com'}/icon.png`,
             },
           }),

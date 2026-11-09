@@ -4,7 +4,7 @@ const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://winsorbrand.com';
 
 export const metadata: Metadata = {
   title: 'Boutique Locations & Authorized Retailers — Store Locator',
-  description: 'Locate official Winsor horology boutiques and authorized luxury retail partners worldwide for bespoke watch fittings and maintenance.',
+  description: 'Locate official Winsor watch boutiques and authorized luxury retail partners worldwide for bespoke watch fittings and maintenance.',
   keywords: [
     'Winsor store locator',
     'Winsor boutiques',
@@ -36,8 +36,8 @@ export default function RetailersLayout({
   const storeJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Store',
-    'name': 'Winsor Maison Flagship Boutique',
-    'description': 'Official flagship showroom and luxury horology fitting center for Winsor Maison.',
+    'name': 'Winsor Watches Flagship Boutique',
+    'description': 'Official flagship showroom and luxury watch showroom for Winsor Watches.',
     'url': `${baseUrl}/retailers`,
     'telephone': '+94-77-071-6212',
     'logo': `${baseUrl}/icon.png`,

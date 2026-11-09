@@ -15,7 +15,7 @@ export const metadata: Metadata = {
     'genuine watch guarantee',
   ],
   openGraph: {
-    title: '1-Year International Warranty & Horology Care | Winsor Maison',
+    title: '1-Year International Warranty & Timepiece Care | Winsor Watches',
     description:
       'Comprehensive 1-year international warranty honored across Sri Lanka & UAE for Winsor Japan movement watches.',
     url: `${baseUrl}/warranty`,
@@ -34,7 +34,7 @@ export default function WarrantyLayout({
     'name': 'Winsor 1-Year International Movement Warranty & Support',
     'provider': {
       '@type': 'Organization',
-      'name': 'Winsor Maison',
+      'name': 'Winsor Watches',
       'logo': `${baseUrl}/icon.png`,
     },
     'serviceType': 'Timepiece Movement Warranty & Servicing',

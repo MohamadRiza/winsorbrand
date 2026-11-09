@@ -36,11 +36,11 @@ export default function PrivacyLayout({
     '@context': 'https://schema.org',
     '@type': 'WebPage',
     'name': 'Privacy Policy — Winsor Brand',
-    'description': 'Official data protection and privacy policy for Winsor Brand patrons and horology clients.',
+    'description': 'Official data protection and privacy policy for Winsor Brand patrons and watch clients.',
     'url': `${baseUrl}/privacy`,
     'publisher': {
       '@type': 'Organization',
-      'name': 'Winsor Maison',
+      'name': 'Winsor Watches',
       'logo': `${baseUrl}/icon.png`,
     },
   };

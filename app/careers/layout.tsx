@@ -3,18 +3,18 @@ import { Metadata } from 'next';
 const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://winsorbrand.com';
 
 export const metadata: Metadata = {
-  title: 'Careers & Vacancies at Winsor Maison — Join Our Atelier',
-  description: 'Explore career opportunities in horology, watch design, boutique management, and digital marketing at Winsor Maison.',
+  title: 'Careers & Vacancies at Winsor Watches — Join Our Team',
+  description: 'Explore career opportunities in watchmaking, watch design, boutique management, and digital marketing at Winsor Watches.',
   keywords: [
     'Winsor careers',
     'watchmaker jobs',
     'luxury boutique jobs',
-    'horology vacancies',
+    'watchmaking vacancies',
     'Winsor hiring',
   ],
   openGraph: {
-    title: 'Careers at Winsor Maison',
-    description: 'Join the team behind luxury horology and prestige watchmaking.',
+    title: 'Careers at Winsor Watches',
+    description: 'Join the team behind fine watchmaking and prestige watchmaking.',
     url: `${baseUrl}/careers`,
     type: 'website',
   },

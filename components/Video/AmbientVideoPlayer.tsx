@@ -34,7 +34,7 @@ export default function AmbientVideoPlayer({
   roundedClassName = 'rounded-[22px] sm:rounded-[28px]',
   borderClassName = 'border border-[#c5a059]/40',
   showAmbientToggle = true,
-  title = 'Winsor Horology Timepiece Video',
+  title = 'Winsor Timepiece Video',
   defaultAmbientOn = true,
 }: AmbientVideoPlayerProps) {
   const mainVideoRef = useRef<HTMLVideoElement>(null);
