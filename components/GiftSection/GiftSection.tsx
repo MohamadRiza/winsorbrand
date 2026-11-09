@@ -55,27 +55,27 @@ const OCCASION_BACKGROUNDS: Record<string, string> = {
 // ── Winsor Watch Craftsmanship Highlights ─────────────────────────────────
 const CRAFTSMANSHIP_PILLARS = [
   {
-    number: '01',
+    num: '01',
     title: 'Sapphire Glass',
-    tag: 'Scratch Resistant',
+    badge: 'SCRATCH RESISTANT',
     image: '/craftsmanship/sapphire_crystal1.webp',
   },
   {
-    number: '02',
+    num: '02',
     title: 'Automatic & Quartz',
-    tag: 'Precision Movements',
+    badge: 'PRECISION CALIBRE',
     image: '/craftsmanship/precision_movement.webp',
   },
   {
-    number: '03',
+    num: '03',
     title: 'Water Resistant',
-    tag: 'Daily Resistance',
-    image: '/craftsmanship/water_resistant.webp',
+    badge: 'DAILY RESISTANCE',
+    image: '/craftsmanship/water_resistant1.webp',
   },
   {
-    number: '04',
+    num: '04',
     title: 'Premium Quality',
-    tag: 'Maison Craftsmanship',
+    badge: 'ATELIER CRAFT',
     image: '/craftsmanship/premium_craft.webp',
   },
 ];
@@ -1002,31 +1002,32 @@ export default function GiftSection() {
           border-radius: 16px;
           overflow: hidden;
           background: #0c0805;
-          border: 1px solid rgba(139, 105, 20, 0.22);
-          box-shadow: 0 10px 30px rgba(26, 18, 9, 0.08);
+          border: 1px solid rgba(139, 105, 20, 0.28);
+          box-shadow: 0 10px 30px rgba(26, 18, 9, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.06);
           transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
           display: flex;
           flex-direction: column;
           justify-content: space-between;
-          padding: 20px;
+          padding: 22px;
           min-height: 285px;
           box-sizing: border-box;
+          cursor: default;
         }
 
         .craft-card:hover {
           transform: translateY(-4px);
-          border-color: rgba(201, 161, 74, 0.55);
-          box-shadow: 0 18px 40px rgba(139, 105, 20, 0.22);
+          border-color: rgba(223, 177, 91, 0.65);
+          box-shadow: 0 20px 42px rgba(12, 8, 5, 0.35), 0 0 24px rgba(223, 177, 91, 0.15);
         }
 
         .craft-card-img {
           object-fit: cover;
-          transition: transform 0.7s cubic-bezier(0.25, 1, 0.5, 1);
+          transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
           z-index: 0;
         }
 
         .craft-card:hover .craft-card-img {
-          transform: scale(1.08);
+          transform: scale(1.06);
         }
 
         .craft-card-overlay {
@@ -1034,20 +1035,22 @@ export default function GiftSection() {
           inset: 0;
           background: linear-gradient(
             180deg,
-            rgba(12, 8, 5, 0.25) 0%,
-            rgba(12, 8, 5, 0.5) 45%,
-            rgba(12, 8, 5, 0.94) 100%
+            rgba(12, 8, 5, 0.4) 0%,
+            rgba(12, 8, 5, 0.1) 32%,
+            rgba(12, 8, 5, 0.45) 65%,
+            rgba(12, 8, 5, 0.92) 100%
           );
           z-index: 1;
-          transition: opacity 0.3s ease;
+          transition: background 0.4s ease;
         }
 
         .craft-card:hover .craft-card-overlay {
           background: linear-gradient(
             180deg,
-            rgba(12, 8, 5, 0.15) 0%,
-            rgba(12, 8, 5, 0.4) 40%,
-            rgba(12, 8, 5, 0.9) 100%
+            rgba(12, 8, 5, 0.3) 0%,
+            rgba(12, 8, 5, 0.05) 32%,
+            rgba(12, 8, 5, 0.35) 65%,
+            rgba(12, 8, 5, 0.88) 100%
           );
         }
 
@@ -1060,71 +1063,81 @@ export default function GiftSection() {
           height: 100%;
         }
 
+        .craft-card-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          width: 100%;
+        }
+
+        .craft-card-num {
+          font-family: 'Jost', sans-serif;
+          font-size: 11px;
+          font-weight: 600;
+          color: rgba(223, 177, 91, 0.85);
+          letter-spacing: 0.18em;
+          text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
+        }
+
         .craft-card-badge {
-          align-self: flex-start;
           display: inline-flex;
           align-items: center;
-          gap: 6px;
-          background: rgba(12, 8, 5, 0.68);
+          gap: 5px;
+          background: rgba(14, 10, 6, 0.72);
           backdrop-filter: blur(12px);
           -webkit-backdrop-filter: blur(12px);
-          border: 1px solid rgba(212, 175, 55, 0.35);
+          border: 1px solid rgba(212, 175, 55, 0.38);
           color: #dfb15b;
           font-family: 'Jost', sans-serif;
           font-size: 9.5px;
           font-weight: 600;
-          letter-spacing: 0.14em;
+          letter-spacing: 0.16em;
           text-transform: uppercase;
-          padding: 4px 11px;
-          border-radius: 20px;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+          padding: 4px 12px;
+          border-radius: 9999px;
+          box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+          transition: all 0.3s ease;
         }
 
-        .craft-card-badge-num {
-          color: #dfb15b;
-          font-weight: 700;
+        .craft-card:hover .craft-card-badge {
+          border-color: rgba(223, 177, 91, 0.75);
+          color: #ffd875;
+          box-shadow: 0 4px 16px rgba(223, 177, 91, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.2);
         }
 
-        .craft-card-badge-dot {
-          opacity: 0.35;
-          color: #ffffff;
-        }
-
-        .craft-card-bottom {
+        .craft-card-footer {
           display: flex;
           flex-direction: column;
-          gap: 6px;
+          align-items: flex-start;
+        }
+
+        .craft-card-accent-line {
+          width: 32px;
+          height: 1.5px;
+          background: linear-gradient(90deg, #dfb15b 0%, rgba(223, 177, 91, 0) 100%);
+          margin-bottom: 9px;
+          transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1), background 0.4s ease;
+        }
+
+        .craft-card:hover .craft-card-accent-line {
+          width: 52px;
+          background: linear-gradient(90deg, #ffd875 0%, rgba(255, 216, 117, 0) 100%);
         }
 
         .craft-card-title {
           font-family: 'Cormorant Garamond', serif;
-          font-size: clamp(21px, 1.9vw, 28px);
-          font-weight: 600;
+          font-size: clamp(23px, 1.8vw, 28px);
+          font-weight: 500;
           color: #ffffff;
-          letter-spacing: 0.02em;
+          letter-spacing: 0.03em;
           margin: 0;
           line-height: 1.15;
-          text-shadow: 0 2px 12px rgba(0, 0, 0, 0.85);
+          text-shadow: 0 2px 12px rgba(0, 0, 0, 0.75);
+          transition: color 0.3s ease;
         }
 
-        .craft-card-tag {
-          font-family: 'Jost', sans-serif;
-          font-size: clamp(9.5px, 0.8vw, 11px);
-          font-weight: 600;
-          letter-spacing: 0.2em;
-          text-transform: uppercase;
-          color: #dfb15b;
-          display: inline-flex;
-          align-items: center;
-          gap: 6px;
-        }
-
-        .craft-card-tag-line {
-          width: 12px;
-          height: 1px;
-          background: #dfb15b;
-          opacity: 0.8;
-          display: inline-block;
+        .craft-card:hover .craft-card-title {
+          color: #fcf9f2;
         }
 
         /* ── RESPONSIVE MOBILE VIEW ── */
@@ -1312,7 +1325,7 @@ export default function GiftSection() {
         {/* RIGHT COLUMN: 4 Pillars of Winsor Watch Craftsmanship */}
         <div className="celebrate-right-col">
           {CRAFTSMANSHIP_PILLARS.map((pillar, idx) => (
-            <div key={idx} className="craft-card">
+            <div key={idx} className="craft-card group">
               <Image
                 src={pillar.image}
                 alt={pillar.title}
@@ -1322,17 +1335,13 @@ export default function GiftSection() {
               />
               <div className="craft-card-overlay" />
               <div className="craft-card-content">
-                <span className="craft-card-badge">
-                  <span className="craft-card-badge-num">{pillar.number}</span>
-                  <span className="craft-card-badge-dot">•</span>
-                  <span>WINSOR</span>
-                </span>
-                <div className="craft-card-bottom">
+                <div className="craft-card-header">
+                  <span className="craft-card-num">{pillar.num}</span>
+                  <span className="craft-card-badge">{pillar.badge}</span>
+                </div>
+                <div className="craft-card-footer">
+                  <div className="craft-card-accent-line" />
                   <h3 className="craft-card-title">{pillar.title}</h3>
-                  <span className="craft-card-tag">
-                    <span className="craft-card-tag-line" />
-                    {pillar.tag}
-                  </span>
                 </div>
               </div>
             </div>
