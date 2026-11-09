@@ -121,8 +121,7 @@ export default function ProfilePage() {
 
   // Membership calculation helper
   const getMembershipTier = (count: number) => {
-    if (count === 0) return 'NEW PATRON';
-    if (count === 1) return 'VERIFIED CUSTOMER';
+    if (count < 2) return 'VERIFIED CLIENT';
     if (count >= 2 && count < 8) return 'BRONZE MEMBER';
     if (count >= 8 && count < 18) return 'SILVER MEMBER';
     if (count >= 18 && count < 35) return 'GOLD MEMBER';
@@ -502,89 +501,39 @@ export default function ProfilePage() {
   // Filtered Wishlist Products
   const wishlistedProducts = allProducts.filter(p => wishlistIds.includes(p._id));
 
-  // Clerk Loading State
-  if (!isLoaded) {
-    return (
-      <div className="profile-loading-wrapper">
-        <div className="profile-spinner" />
-      </div>
-    );
-  }
-
-  // Unauthenticated State
-  if (!isSignedIn) {
-    return (
-      <div className="profile-page-container">
-        <div className="access-card">
-          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: '20px' }}>
-            <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-          </svg>
-          <h1 className="access-title">Secure Profile Access</h1>
-          <p className="access-subtitle">
-            To view and manage your custom profile details, shipping addresses, and reward orders, please sign in.
-          </p>
-          <div style={{ marginTop: '28px' }}>
-            <Link href="/login">
-              <button className="gold-action-btn">
-                SIGN IN TO YOUR ACCOUNT
-              </button>
-            </Link>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // Real patron orders mapping (synced with MongoDB database)
-  const displayOrders = orders.slice(0, 5).map(o => ({
-    orderRef: o.orderRef,
-    date: new Date(o.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-    status: (o.status || 'pending').toLowerCase(),
-    statusLabel: (o.status || 'pending').replace('_', ' ').toUpperCase(),
-    productTitle: o.items[0]?.productTitle || 'Winsor Timepiece',
-    productThumbnail: o.items[0]?.productThumbnail || '/winsor_hero_backgroundremoved.webp'
-  }));
-
-  return (
-    <div className="profile-page-container">
-      <style>{`
+  const profileStyles = `
         @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Jost:wght@300;400;500;600;700&display=swap');
 
         .profile-page-container {
-          background-image: linear-gradient(to bottom, rgba(250, 247, 240, 0.94), rgba(250, 247, 240, 0.96)), url('/hero_bg_marble.jpg');
-          background-size: cover;
-          background-position: center;
-          background-attachment: fixed;
+          background-color: #FBFBFC;
           min-height: 100vh;
           padding: 130px 24px 80px;
           font-family: 'Jost', sans-serif;
+          color: #141414;
         }
 
         /* ── Loading ── */
         .profile-loading-wrapper {
           min-height: 80vh;
           display: flex; align-items: center; justify-content: center;
-          background-image: linear-gradient(to bottom, rgba(250, 247, 240, 0.94), rgba(250, 247, 240, 0.96)), url('/hero_bg_marble.jpg');
-          background-size: cover;
+          background-color: #FBFBFC;
         }
         .profile-spinner {
           width: 36px; height: 36px;
-          border: 3px solid rgba(139,105,20,0.15);
-          border-top: 3px solid #8B6914;
+          border: 2px solid rgba(20,20,20,0.1);
+          border-top: 2px solid #141414;
           border-radius: 50%;
           animation: spin 0.8s linear infinite;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* ── Access Card ── */
+        /* ── Access Card (Unauthenticated) ── */
         .access-card {
-          background: rgba(255, 255, 255, 0.95);
-          backdrop-filter: blur(12px);
-          border: 1px solid rgba(139,105,20,0.2);
-          box-shadow: 0 20px 50px rgba(26,18,9,0.08);
-          border-radius: 20px;
-          max-width: 500px;
+          background: #FFFFFF;
+          border: 1px solid rgba(20,20,20,0.08);
+          box-shadow: 0 20px 50px rgba(0,0,0,0.06);
+          border-radius: 16px;
+          max-width: 480px;
           margin: 60px auto;
           padding: 48px 36px;
           text-align: center;
@@ -592,165 +541,152 @@ export default function ProfilePage() {
         }
         .access-title {
           font-family: 'Cormorant Garamond', serif;
-          font-size: 26px; font-weight: 600;
-          color: #1a1209;
-          letter-spacing: 0.1em; text-transform: uppercase;
+          font-size: 28px; font-weight: 500;
+          color: #141414;
+          letter-spacing: 0.04em;
           margin-bottom: 12px;
         }
-        .access-subtitle { font-size: 13.5px; color: rgba(26,18,9,0.6); line-height: 1.65; }
+        .access-subtitle {
+          font-size: 13.5px;
+          color: #666666;
+          line-height: 1.65;
+          margin-bottom: 28px;
+        }
 
         /* ── Portal Wrapper ── */
         .profile-portal-wrapper {
-          max-width: 1160px;
+          max-width: 1180px;
           margin: 0 auto;
           display: flex; flex-direction: column;
           gap: 28px;
         }
 
-        /* ── Futuristic Hero Header Banner ── */
+        /* ── Header Banner (Swiss Luxury Obsidian Card) ── */
         .portal-header-banner {
-          background: linear-gradient(135deg, rgba(26, 18, 9, 0.95) 0%, rgba(40, 28, 15, 0.92) 50%, rgba(20, 14, 7, 0.96) 100%), url('/hero_bg_marble.jpg');
-          background-size: cover;
-          background-position: center;
-          border: 1px solid rgba(212, 175, 55, 0.35);
-          border-radius: 24px;
-          padding: 36px 42px;
+          background: #141414;
+          background-image: radial-gradient(circle at 85% 25%, rgba(255, 255, 255, 0.05) 0%, transparent 60%);
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          border-radius: 18px;
+          padding: 34px 38px;
           display: flex;
           align-items: center;
           gap: 32px;
           position: relative;
           overflow: hidden;
-          box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25), 0 0 30px rgba(139, 105, 20, 0.15);
-          backdrop-filter: blur(16px);
+          box-shadow: 0 16px 40px rgba(0, 0, 0, 0.12);
         }
         .banner-watermark {
           position: absolute; right: -20px; top: 50%;
           transform: translateY(-50%);
-          width: 320px; height: auto;
-          opacity: 0.10; pointer-events: none;
+          width: 280px; height: auto;
+          opacity: 0.06; pointer-events: none;
           mix-blend-mode: luminosity;
         }
         .banner-glow-effect {
-          position: absolute;
-          top: -50%;
-          right: -10%;
-          width: 450px;
-          height: 450px;
-          background: radial-gradient(circle, rgba(212, 175, 55, 0.15) 0%, transparent 70%);
-          pointer-events: none;
+          display: none;
         }
         .avatar-wrapper {
           position: relative;
-          width: 105px; height: 105px; flex-shrink: 0;
+          width: 96px; height: 96px; flex-shrink: 0;
         }
         .avatar-img {
           width: 100%; height: 100%;
           border-radius: 50%;
-          border: 3px solid #d4af37;
-          box-shadow: 0 0 20px rgba(212, 175, 55, 0.4), inset 0 0 10px rgba(0,0,0,0.5);
-          padding: 3px;
+          border: 2px solid rgba(255, 255, 255, 0.2);
+          box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+          padding: 2px;
           object-fit: cover;
-          background: #1a1209;
+          background: #1a1a1a;
         }
         .avatar-fallback {
           width: 100%; height: 100%;
           border-radius: 50%;
-          border: 3px solid #d4af37;
-          box-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
-          background: linear-gradient(135deg, #1a1209 0%, #8b6914 100%);
-          color: #f3e3b8;
+          border: 2px solid rgba(255, 255, 255, 0.2);
+          box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+          background: #222222;
+          color: #FFFFFF;
           display: flex; align-items: center; justify-content: center;
-          font-size: 36px; font-weight: 600;
+          font-size: 32px; font-weight: 500;
           font-family: 'Cormorant Garamond', serif;
         }
         .avatar-edit-btn {
-          position: absolute; bottom: 2px; right: 2px;
+          position: absolute; bottom: 0; right: 0;
           width: 28px; height: 28px;
-          background: #d4af37;
-          border: 2px solid #1a1209;
+          background: #FFFFFF;
+          border: 1px solid rgba(20,20,20,0.15);
           border-radius: 50%;
           display: flex; align-items: center; justify-content: center;
-          color: #1a1209; cursor: pointer;
-          box-shadow: 0 2px 10px rgba(0,0,0,0.4);
-          transition: all 0.25s ease;
+          color: #141414; cursor: pointer;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+          transition: all 0.2s ease;
         }
-        .avatar-edit-btn:hover { transform: scale(1.15); background: #ffffff; color: #8b6914; }
+        .avatar-edit-btn:hover { transform: scale(1.1); background: #F4F4F6; }
 
         .header-info-block { display: flex; flex-direction: column; gap: 8px; z-index: 2; width: 100%; }
         .patron-badge {
           display: inline-flex; align-items: center; gap: 6px;
-          background: rgba(212, 175, 55, 0.12);
-          border: 1px solid rgba(212, 175, 55, 0.4);
-          color: #f3e3b8;
-          font-size: 10px; font-weight: 700; letter-spacing: 0.2em;
-          padding: 5px 14px; border-radius: 30px;
+          background: rgba(255, 255, 255, 0.08);
+          border: 1px solid rgba(255, 255, 255, 0.15);
+          color: #F0F0F0;
+          font-size: 10px; font-weight: 600; letter-spacing: 0.12em;
+          padding: 4px 12px; border-radius: 20px;
           width: fit-content; text-transform: uppercase;
-          box-shadow: 0 0 12px rgba(212, 175, 55, 0.15);
         }
         .patron-badge-dot {
-          width: 6px; height: 6px; border-radius: 50%;
-          background: #d4af37;
-          box-shadow: 0 0 8px #d4af37;
-          animation: pulseGold 2s infinite;
-        }
-        @keyframes pulseGold {
-          0%, 100% { opacity: 1; transform: scale(1); }
-          50% { opacity: 0.5; transform: scale(1.3); }
+          width: 5px; height: 5px; border-radius: 50%;
+          background: #C5A880;
         }
 
         .patron-name {
           font-family: 'Cormorant Garamond', serif;
-          font-size: 32px; font-weight: 600;
-          color: #ffffff; margin: 0; letter-spacing: 0.02em;
-          text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+          font-size: 30px; font-weight: 500;
+          color: #FFFFFF; margin: 0; letter-spacing: 0.02em;
         }
-        .member-since { font-size: 12px; color: rgba(255, 255, 255, 0.55); margin-top: -4px; letter-spacing: 0.04em; }
+        .member-since { font-size: 12px; color: rgba(255, 255, 255, 0.55); margin-top: -2px; letter-spacing: 0.02em; }
 
-        /* ── Futuristic Metrics Grid in Hero ── */
+        /* ── Hero Metrics Grid ── */
         .hero-stats-grid {
           display: grid;
           grid-template-columns: repeat(4, 1fr);
-          gap: 16px;
+          gap: 14px;
           margin-top: 14px;
-          border-top: 1px solid rgba(212, 175, 55, 0.2);
+          border-top: 1px solid rgba(255, 255, 255, 0.1);
           padding-top: 16px;
           width: 100%;
         }
         .hero-stat-card {
-          background: rgba(255, 255, 255, 0.05);
-          border: 1px solid rgba(212, 175, 55, 0.25);
-          border-radius: 14px;
+          background: rgba(255, 255, 255, 0.04);
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          border-radius: 12px;
           padding: 12px 16px;
           display: flex;
           align-items: center;
           gap: 12px;
-          backdrop-filter: blur(10px);
-          transition: all 0.3s ease;
+          transition: all 0.25s ease;
         }
         .hero-stat-card:hover {
-          background: rgba(212, 175, 55, 0.12);
-          border-color: #d4af37;
-          transform: translateY(-2px);
-          box-shadow: 0 6px 20px rgba(212, 175, 55, 0.15);
+          background: rgba(255, 255, 255, 0.07);
+          border-color: rgba(255, 255, 255, 0.18);
+          transform: translateY(-1px);
         }
         .hero-stat-icon-wrapper {
-          width: 36px; height: 36px;
-          border-radius: 10px;
-          background: rgba(212, 175, 55, 0.15);
-          border: 1px solid rgba(212, 175, 55, 0.3);
+          width: 34px; height: 34px;
+          border-radius: 8px;
+          background: rgba(255, 255, 255, 0.08);
+          border: 1px solid rgba(255, 255, 255, 0.1);
           display: flex; align-items: center; justify-content: center;
-          color: #d4af37; flex-shrink: 0;
+          color: #E5E5E5; flex-shrink: 0;
         }
         .hero-stat-val {
           font-family: 'Jost', monospace;
           font-variant-numeric: tabular-nums;
-          font-size: 20px; font-weight: 700;
-          color: #ffffff; line-height: 1;
+          font-size: 18px; font-weight: 600;
+          color: #FFFFFF; line-height: 1;
         }
         .hero-stat-lbl {
-          font-size: 10px; font-weight: 600;
-          color: rgba(255, 255, 255, 0.6);
-          text-transform: uppercase; letter-spacing: 0.1em;
+          font-size: 9.5px; font-weight: 500;
+          color: rgba(255, 255, 255, 0.5);
+          text-transform: uppercase; letter-spacing: 0.08em;
           margin-top: 3px;
         }
 
@@ -758,161 +694,162 @@ export default function ProfilePage() {
         .portal-main-grid {
           display: grid;
           grid-template-columns: 240px 1fr;
-          gap: 28px; align-items: start;
+          gap: 24px; align-items: start;
         }
 
         /* ── Sidebar ── */
         .portal-sidebar { display: flex; flex-direction: column; gap: 20px; }
         .portal-sidebar-desktop { display: flex; flex-direction: column; gap: 20px; }
         .sidebar-card {
-          background: #FAF7F0;
-          border: 1.5px solid rgba(184, 142, 60, 0.22);
-          border-radius: 16px;
-          box-shadow: 0 6px 24px rgba(26, 18, 9, 0.03);
-          overflow: hidden; padding: 10px 0;
+          background: #FFFFFF;
+          border: 1px solid rgba(20, 20, 20, 0.08);
+          border-radius: 14px;
+          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+          overflow: hidden; padding: 8px 0;
         }
         .sidebar-menu-btn {
           display: flex; align-items: center; gap: 11px;
-          width: 100%; padding: 12px 22px;
+          width: 100%; padding: 11px 20px;
           border: none; background: transparent;
           font-family: 'Jost', sans-serif;
           font-size: 13px; font-weight: 500;
-          color: rgba(26,18,9,0.65);
+          color: #555555;
           text-align: left; cursor: pointer;
-          transition: all 0.25s ease;
+          transition: all 0.2s ease;
           border-left: 3px solid transparent;
         }
-        .sidebar-menu-btn:hover { background: rgba(184,142,60,0.08); color: #1a1209; }
+        .sidebar-menu-btn:hover { background: #F8F7F4; color: #141414; }
         .sidebar-menu-btn.active {
-          background: rgba(184,142,60,0.12);
-          border-left-color: #8b6914;
-          color: #8b6914; font-weight: 700;
+          background: #F8F7F4;
+          border-left-color: #141414;
+          color: #141414; font-weight: 600;
         }
         .sidebar-menu-btn svg { flex-shrink: 0; }
 
         /* ── Completion Box ── */
         .completion-box {
-          background: #FAF7F0;
-          border: 1.5px solid rgba(184, 142, 60, 0.22);
-          border-radius: 16px;
-          padding: 24px 20px;
+          background: #FFFFFF;
+          border: 1px solid rgba(20, 20, 20, 0.08);
+          border-radius: 14px;
+          padding: 22px 18px;
           text-align: center;
           display: flex; flex-direction: column; align-items: center; gap: 10px;
-          box-shadow: 0 6px 24px rgba(26, 18, 9, 0.03);
+          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
         }
-        .completion-title { font-size: 12px; font-weight: 700; color: #8b6914; text-transform: uppercase; letter-spacing: 0.08em; margin: 0; }
-        .completion-desc { font-size: 11px; color: rgba(26,18,9,0.55); line-height: 1.55; margin: 0; }
-        .circular-chart { display: block; margin: 4px auto; max-width: 72px; max-height: 72px; }
-        .circle-bg { stroke: rgba(184,142,60,0.15); }
-        .circle { transition: stroke-dasharray 0.4s ease; }
-        .percentage { font-family: 'Jost', sans-serif; }
+        .completion-title { font-size: 11.5px; font-weight: 600; color: #141414; text-transform: uppercase; letter-spacing: 0.08em; margin: 0; }
+        .completion-desc { font-size: 11px; color: #666666; line-height: 1.5; margin: 0; }
+        .circular-chart { display: block; margin: 4px auto; max-width: 68px; max-height: 68px; }
+        .circle-bg { stroke: #EEEEEE; }
+        .circle { transition: stroke-dasharray 0.4s ease; stroke: #141414; }
+        .percentage { font-family: 'Jost', sans-serif; fill: #141414; }
 
         /* ── Content Panel ── */
         .portal-content-panel { display: flex; flex-direction: column; gap: 24px; }
         .content-card {
-          background: #FAF7F0;
-          border: 1.5px solid rgba(184, 142, 60, 0.22);
+          background: #FFFFFF;
+          border: 1px solid rgba(20, 20, 20, 0.08);
           border-radius: 16px;
           padding: 30px 32px;
-          box-shadow: 0 8px 30px rgba(26,18,9,0.03);
+          box-shadow: 0 2px 12px rgba(0, 0, 0, 0.02);
         }
         .card-header-block {
-          border-bottom: 1.5px solid rgba(184, 142, 60, 0.15);
-          padding-bottom: 18px; margin-bottom: 24px;
+          border-bottom: 1px solid rgba(20, 20, 20, 0.07);
+          padding-bottom: 16px; margin-bottom: 22px;
         }
-        .card-title { font-family: 'Cormorant Garamond', serif; font-size: 26px; font-weight: 600; color: #1a1209; margin: 0; }
-        .card-subtitle { font-size: 13px; color: rgba(26,18,9,0.55); margin: 4px 0 0; }
+        .card-title { font-family: 'Cormorant Garamond', serif; font-size: 24px; font-weight: 600; color: #141414; margin: 0; letter-spacing: 0.01em; }
+        .card-subtitle { font-size: 13px; color: #666666; margin: 4px 0 0; }
 
         /* ── Form ── */
-        .profile-custom-form { display: flex; flex-direction: column; gap: 20px; }
-        .profile-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .profile-form-group { display: flex; flex-direction: column; gap: 7px; }
-        .profile-form-label { font-size: 10.5px; font-weight: 700; color: rgba(26,18,9,0.55); letter-spacing: 0.08em; text-transform: uppercase; }
+        .profile-custom-form { display: flex; flex-direction: column; gap: 18px; }
+        .profile-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+        .profile-form-group { display: flex; flex-direction: column; gap: 6px; }
+        .profile-form-label { font-size: 11px; font-weight: 600; color: #333333; letter-spacing: 0.04em; text-transform: uppercase; }
         .input-wrapper-gold { position: relative; display: flex; align-items: center; width: 100%; }
-        .input-icon-left { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); color: #8b6914; display: flex; align-items: center; justify-content: center; pointer-events: none; z-index: 2; line-height: 1; }
-        .input-icon-right { position: absolute; right: 13px; top: 50%; transform: translateY(-50%); color: rgba(26,18,9,0.35); display: flex; align-items: center; justify-content: center; pointer-events: none; z-index: 2; line-height: 1; }
+        .input-icon-left { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); color: #888888; display: flex; align-items: center; justify-content: center; pointer-events: none; z-index: 2; line-height: 1; }
+        .input-icon-right { position: absolute; right: 13px; top: 50%; transform: translateY(-50%); color: #999999; display: flex; align-items: center; justify-content: center; pointer-events: none; z-index: 2; line-height: 1; }
         .profile-form-input {
-          width: 100%; padding: 12px 16px 12px 40px;
-          border: 1.5px solid rgba(184, 142, 60, 0.2);
-          border-radius: 10px;
+          width: 100%; padding: 11px 16px 11px 40px;
+          border: 1px solid rgba(20, 20, 20, 0.12);
+          border-radius: 8px;
           font-family: 'Jost', sans-serif; font-size: 13.5px;
-          color: #1a1209; background: #FAF7F0;
-          outline: none; transition: all 0.25s;
+          color: #141414; background: #FBFBFC;
+          outline: none; transition: all 0.2s ease;
           box-sizing: border-box;
         }
-        .profile-form-input:focus { border-color: #8b6914; background: #ffffff; box-shadow: 0 0 0 3px rgba(139,105,20,0.12); }
-        .profile-form-input:disabled { background: rgba(26,18,9,0.03); border-color: rgba(184,142,60,0.12); color: rgba(26,18,9,0.5); cursor: not-allowed; padding-right: 40px; }
+        .profile-form-input:focus { border-color: #141414; background: #FFFFFF; box-shadow: 0 0 0 3px rgba(20, 20, 20, 0.06); }
+        .profile-form-input:disabled { background: #F4F4F6; border-color: rgba(20, 20, 20, 0.08); color: #777777; cursor: not-allowed; padding-right: 40px; }
         .custom-select {
-          width: 100%; padding: 12px 28px 12px 40px;
-          border: 1.5px solid rgba(184, 142, 60, 0.2);
-          border-radius: 10px;
+          width: 100%; padding: 11px 28px 11px 40px;
+          border: 1px solid rgba(20, 20, 20, 0.12);
+          border-radius: 8px;
           font-family: 'Jost', sans-serif; font-size: 13.5px;
-          color: #1a1209; background: #FAF7F0;
+          color: #141414; background: #FBFBFC;
           outline: none; appearance: none;
-          background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238B6914' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>");
+          background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23555555' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>");
           background-repeat: no-repeat; background-position: right 12px center; background-size: 12px;
-          cursor: pointer; box-sizing: border-box; transition: all 0.25s;
+          cursor: pointer; box-sizing: border-box; transition: all 0.2s ease;
         }
-        .custom-select:focus { border-color: #8b6914; background-color: #ffffff; box-shadow: 0 0 0 3px rgba(139,105,20,0.12); }
+        .custom-select:focus { border-color: #141414; background-color: #FFFFFF; box-shadow: 0 0 0 3px rgba(20, 20, 20, 0.06); }
 
-        /* ── Buttons ── */
+        /* ── Action Buttons ── */
         .gold-action-btn {
-          background: linear-gradient(135deg, #8b6914 0%, #a07c20 100%);
-          border: none; color: #fff;
-          padding: 14px 28px;
-          font-family: 'Jost', sans-serif; font-size: 11px; font-weight: 700;
-          letter-spacing: 0.16em; border-radius: 100px;
-          cursor: pointer; transition: all 0.25s ease;
+          background: #141414;
+          border: 1px solid #141414;
+          color: #FFFFFF;
+          padding: 13px 26px;
+          font-family: 'Jost', sans-serif; font-size: 11px; font-weight: 600;
+          letter-spacing: 0.1em; border-radius: 8px;
+          cursor: pointer; transition: all 0.2s ease;
           width: 100%; text-transform: uppercase;
-          box-shadow: 0 4px 16px rgba(139,105,20,0.28);
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
         }
-        .gold-action-btn:hover { background: linear-gradient(135deg, #1a1209 0%, #2c1f0c 100%); box-shadow: 0 6px 20px rgba(26,18,9,0.2); transform: translateY(-1px); }
-        .gold-action-btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+        .gold-action-btn:hover { background: #2A2A2A; border-color: #2A2A2A; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12); }
+        .gold-action-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
         /* ── Bottom split ── */
         .portal-bottom-split { display: grid; grid-template-columns: 1.2fr 1fr; gap: 24px; }
 
         /* ── Recent Orders ── */
-        .recent-orders-list { display: flex; flex-direction: column; gap: 12px; }
+        .recent-orders-list { display: flex; flex-direction: column; gap: 10px; }
         .recent-order-item {
           display: flex; align-items: center; gap: 14px;
           padding: 12px 14px;
-          border: 1.5px solid rgba(184, 142, 60, 0.18);
-          border-radius: 12px;
-          background: #FAF7F0;
-          transition: all 0.25s ease;
+          border: 1px solid rgba(20, 20, 20, 0.08);
+          border-radius: 10px;
+          background: #FBFBFC;
+          transition: all 0.2s ease;
         }
-        .recent-order-item:hover { border-color: rgba(184,142,60,0.38); background: rgba(184,142,60,0.06); transform: translateY(-1px); }
+        .recent-order-item:hover { border-color: rgba(20, 20, 20, 0.18); background: #FFFFFF; }
         .order-watch-thumb {
           width: 48px; height: 48px;
           border-radius: 8px;
-          background: transparent;
-          border: 1px solid rgba(184,142,60,0.18);
+          background: #FFFFFF;
+          border: 1px solid rgba(20, 20, 20, 0.08);
           display: flex; align-items: center; justify-content: center;
           padding: 4px; flex-shrink: 0;
         }
         .order-watch-thumb img { max-width: 100%; max-height: 100%; object-fit: contain; }
         .recent-order-info { flex: 1; min-width: 0; }
-        .order-item-title { font-size: 12.5px; font-weight: 600; color: #1a1209; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .order-ref-date { font-size: 10.5px; color: rgba(26,18,9,0.45); margin-top: 2px; }
+        .order-item-title { font-size: 13px; font-weight: 600; color: #141414; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .order-ref-date { font-size: 11px; color: #666666; margin-top: 2px; }
 
         /* ── Status Badges ── */
-        .status-badge { font-size: 9px; font-weight: 750; text-transform: uppercase; letter-spacing: 0.06em; padding: 3px 8px; border-radius: 20px; white-space: nowrap; }
-        .status-badge.pending { background: rgba(139,105,20,0.08); color: #8b6914; border: 1px solid rgba(139,105,20,0.25); }
-        .status-badge.processing { background: rgba(239,108,0,0.07); color: #ef6c00; border: 1px solid rgba(239,108,0,0.18); }
-        .status-badge.shipped { background: rgba(21,101,192,0.07); color: #1565c0; border: 1px solid rgba(21,101,192,0.18); }
-        .status-badge.delivered { background: rgba(46,125,50,0.07); color: #2e7d32; border: 1px solid rgba(46,125,50,0.18); }
-        .status-badge.cancelled { background: rgba(198,40,40,0.07); color: #c62828; border: 1px solid rgba(198,40,40,0.18); }
-        .status-badge.cancel_requested { background: rgba(184,142,60,0.1); color: #b88e3c; border: 1px solid rgba(184,142,60,0.3); }
+        .status-badge { font-size: 9.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; padding: 4px 10px; border-radius: 20px; white-space: nowrap; }
+        .status-badge.pending { background: #F5F5F5; color: #616161; border: 1px solid rgba(0,0,0,0.1); }
+        .status-badge.processing { background: #FFF3E0; color: #E65100; border: 1px solid rgba(230,81,0,0.2); }
+        .status-badge.shipped { background: #E3F2FD; color: #1565C0; border: 1px solid rgba(21,101,192,0.2); }
+        .status-badge.delivered { background: #E8F5E9; color: #2E7D32; border: 1px solid rgba(46,125,50,0.2); }
+        .status-badge.cancelled { background: #FFEBEE; color: #C62828; border: 1px solid rgba(198,40,40,0.2); }
+        .status-badge.cancel_requested { background: #FFF8E1; color: #B78103; border: 1px solid rgba(183,129,3,0.25); }
 
-        /* ── Luxury Order Filter Bar ── */
+        /* ── Order Filter Bar ── */
         .order-filter-bar {
           display: flex;
           flex-direction: column;
           gap: 14px;
           margin-bottom: 22px;
-          padding-bottom: 18px;
-          border-bottom: 1px solid rgba(184, 142, 60, 0.18);
+          padding-bottom: 16px;
+          border-bottom: 1px solid rgba(20, 20, 20, 0.07);
         }
         .order-filter-pills {
           display: flex;
@@ -922,36 +859,32 @@ export default function ProfilePage() {
           padding-bottom: 4px;
           scrollbar-width: none;
         }
-        .order-filter-pills::-webkit-scrollbar {
-          display: none;
-        }
+        .order-filter-pills::-webkit-scrollbar { display: none; }
         .order-filter-pill {
           display: inline-flex;
           align-items: center;
-          gap: 7px;
-          padding: 8px 15px;
-          border-radius: 100px;
+          gap: 6px;
+          padding: 7px 14px;
+          border-radius: 20px;
           font-family: 'Jost', sans-serif;
           font-size: 12px;
-          font-weight: 600;
-          letter-spacing: 0.03em;
-          background: #FAF7F0;
-          color: #1a1209;
-          border: 1.5px solid rgba(184, 142, 60, 0.22);
+          font-weight: 500;
+          letter-spacing: 0.02em;
+          background: #FFFFFF;
+          color: #555555;
+          border: 1px solid rgba(20, 20, 20, 0.12);
           cursor: pointer;
           white-space: nowrap;
-          transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+          transition: all 0.2s ease;
         }
         .order-filter-pill:hover {
-          border-color: #8B6914;
-          background: rgba(184, 142, 60, 0.08);
-          color: #8B6914;
+          border-color: #141414;
+          color: #141414;
         }
         .order-filter-pill.active {
-          background: #1a1209;
-          color: #FAF7F0;
-          border-color: #1a1209;
-          box-shadow: 0 4px 14px rgba(26, 18, 9, 0.18);
+          background: #141414;
+          color: #FFFFFF;
+          border-color: #141414;
         }
         .filter-pill-badge {
           display: inline-flex;
@@ -960,86 +893,85 @@ export default function ProfilePage() {
           min-width: 18px;
           height: 18px;
           padding: 0 5px;
-          border-radius: 100px;
+          border-radius: 10px;
           font-size: 10px;
-          font-weight: 700;
-          background: rgba(184, 142, 60, 0.18);
-          color: #8B6914;
-          transition: all 0.25s ease;
+          font-weight: 600;
+          background: rgba(20, 20, 20, 0.08);
+          color: #555555;
+          transition: all 0.2s ease;
         }
         .order-filter-pill.active .filter-pill-badge {
-          background: #8B6914;
-          color: #FAF7F0;
+          background: rgba(255, 255, 255, 0.2);
+          color: #FFFFFF;
         }
         .order-search-box {
           position: relative;
           display: flex;
           align-items: center;
           width: 100%;
-          max-width: 420px;
+          max-width: 380px;
         }
         .order-search-box .search-icon {
           position: absolute;
-          left: 14px;
-          color: rgba(139, 105, 20, 0.7);
+          left: 12px;
+          color: #888888;
           pointer-events: none;
         }
         .order-search-input {
           width: 100%;
-          padding: 9px 36px 9px 38px;
-          border-radius: 100px;
-          border: 1.5px solid rgba(184, 142, 60, 0.25);
-          background: #FFFFFF;
+          padding: 9px 34px 9px 36px;
+          border-radius: 8px;
+          border: 1px solid rgba(20, 20, 20, 0.12);
+          background: #FBFBFC;
           font-family: 'Jost', sans-serif;
           font-size: 12.5px;
-          color: #1a1209;
+          color: #141414;
           outline: none;
-          transition: all 0.25s ease;
+          transition: all 0.2s ease;
         }
         .order-search-input:focus {
-          border-color: #8B6914;
-          box-shadow: 0 0 0 3px rgba(139, 105, 20, 0.12);
+          border-color: #141414;
+          background: #FFFFFF;
+          box-shadow: 0 0 0 3px rgba(20, 20, 20, 0.06);
         }
         .order-search-clear {
           position: absolute;
-          right: 12px;
+          right: 10px;
           background: none;
           border: none;
           font-size: 16px;
-          color: rgba(26, 18, 9, 0.4);
+          color: #888888;
           cursor: pointer;
           padding: 0;
           line-height: 1;
         }
-        .order-search-clear:hover {
-          color: #1a1209;
-        }
+        .order-search-clear:hover { color: #141414; }
 
         /* ── Profile Order Card ── */
         .profile-order-card {
-          border: 1.5px solid rgba(184, 142, 60, 0.22);
+          border: 1px solid rgba(20, 20, 20, 0.08);
           padding: 18px 20px;
-          border-radius: 16px;
-          background: #FAF7F0;
+          border-radius: 14px;
+          background: #FFFFFF;
           display: flex;
           flex-direction: column;
           gap: 14px;
-          box-shadow: 0 4px 18px rgba(26, 18, 9, 0.03);
+          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
           width: 100%;
           box-sizing: border-box;
           overflow: hidden;
-          transition: all 0.25s ease;
+          transition: all 0.2s ease;
         }
         .profile-order-card:hover {
-          border-color: rgba(184, 142, 60, 0.4);
-          box-shadow: 0 8px 24px rgba(184, 142, 60, 0.08);
+          border-color: rgba(20, 20, 20, 0.16);
+          box-shadow: 0 4px 18px rgba(0, 0, 0, 0.05);
         }
 
         .poc-header {
           display: flex;
           flex-direction: column;
           gap: 6px;
-          border-bottom: 1.5px solid rgba(184, 142, 60, 0.15);
+          border-bottom: 1px solid rgba(20, 20, 20, 0.06);
           padding-bottom: 12px;
           width: 100%;
         }
@@ -1051,8 +983,8 @@ export default function ProfilePage() {
           width: 100%;
         }
         .poc-ref {
-          font-weight: 700;
-          color: #1a1209;
+          font-weight: 600;
+          color: #141414;
           font-size: 13.5px;
           font-family: 'Jost', monospace;
           word-break: break-all;
@@ -1062,12 +994,12 @@ export default function ProfilePage() {
           align-items: center;
           gap: 8px;
           font-size: 11.5px;
-          color: rgba(26, 18, 9, 0.55);
+          color: #666666;
           flex-wrap: wrap;
         }
         .poc-items-count {
-          color: #8B6914;
-          font-weight: 600;
+          color: #141414;
+          font-weight: 500;
         }
 
         .poc-items-list {
@@ -1082,7 +1014,7 @@ export default function ProfilePage() {
           gap: 12px;
           width: 100%;
           padding-bottom: 10px;
-          border-bottom: 1px dashed rgba(184, 142, 60, 0.14);
+          border-bottom: 1px solid rgba(20, 20, 20, 0.06);
         }
         .poc-item-row:last-child {
           border-bottom: none;
@@ -1091,8 +1023,8 @@ export default function ProfilePage() {
         .poc-item-thumb {
           width: 52px;
           height: 52px;
-          background: transparent;
-          border: 1px solid rgba(184, 142, 60, 0.18);
+          background: #F9F9FB;
+          border: 1px solid rgba(20, 20, 20, 0.08);
           border-radius: 8px;
           display: flex;
           align-items: center;
@@ -1114,14 +1046,14 @@ export default function ProfilePage() {
         }
         .poc-item-title {
           font-size: 13px;
-          font-weight: 650;
-          color: #1a1209;
+          font-weight: 600;
+          color: #141414;
           line-height: 1.3;
           word-break: break-word;
         }
         .poc-item-meta {
           font-size: 11px;
-          color: rgba(26, 18, 9, 0.55);
+          color: #666666;
           line-height: 1.3;
         }
         .poc-item-price-block {
@@ -1134,8 +1066,8 @@ export default function ProfilePage() {
         }
         .poc-item-price {
           font-size: 12.5px;
-          font-weight: 700;
-          color: #8b6914;
+          font-weight: 600;
+          color: #141414;
         }
 
         .poc-footer {
@@ -1143,19 +1075,19 @@ export default function ProfilePage() {
           justify-content: space-between;
           align-items: center;
           padding-top: 12px;
-          border-top: 1px dashed rgba(184, 142, 60, 0.2);
+          border-top: 1px solid rgba(20, 20, 20, 0.06);
           flex-wrap: wrap;
           gap: 12px;
           width: 100%;
         }
         .poc-total {
           font-size: 12.5px;
-          color: rgba(26, 18, 9, 0.7);
+          color: #666666;
         }
         .poc-total strong {
-          color: #1a1209;
+          color: #141414;
           font-size: 14px;
-          font-weight: 700;
+          font-weight: 600;
         }
         .poc-actions {
           display: flex;
@@ -1168,13 +1100,13 @@ export default function ProfilePage() {
           align-items: center;
           justify-content: center;
           gap: 6px;
-          padding: 8px 14px;
-          border-radius: 100px;
-          background: rgba(184, 142, 60, 0.1);
-          border: 1px solid rgba(184, 142, 60, 0.28);
-          color: #8B6914;
+          padding: 7px 14px;
+          border-radius: 6px;
+          background: #141414;
+          border: 1px solid #141414;
+          color: #FFFFFF;
           font-size: 11px;
-          font-weight: 650;
+          font-weight: 600;
           text-decoration: none;
           text-transform: uppercase;
           letter-spacing: 0.04em;
@@ -1182,20 +1114,20 @@ export default function ProfilePage() {
           white-space: nowrap;
         }
         .poc-btn-track:hover {
-          background: #8B6914;
-          color: #FAF7F0;
+          background: #2A2A2A;
         }
         .poc-btn-details {
           display: inline-flex;
           align-items: center;
           justify-content: center;
           gap: 5px;
-          padding: 8px 14px;
-          border-radius: 100px;
-          background: #1a1209;
-          color: #FAF7F0;
+          padding: 7px 14px;
+          border-radius: 6px;
+          background: #FFFFFF;
+          border: 1px solid rgba(20, 20, 20, 0.15);
+          color: #141414;
           font-size: 11px;
-          font-weight: 650;
+          font-weight: 600;
           text-decoration: none;
           text-transform: uppercase;
           letter-spacing: 0.04em;
@@ -1203,35 +1135,31 @@ export default function ProfilePage() {
           white-space: nowrap;
         }
         .poc-btn-details:hover {
-          background: #8B6914;
+          background: #F4F4F6;
+          border-color: #141414;
         }
 
-        /* ── Benefits ── */
+        /* ── Membership Privileges Card ── */
         .patron-black-card {
-          background: linear-gradient(135deg, #110d07 0%, #1e160c 50%, #110d07 100%);
-          border: 1px solid rgba(196,161,70,0.4);
+          background: #141414;
+          border: 1px solid rgba(255,255,255,0.08);
           border-radius: 12px; padding: 20px;
-          color: #fff; position: relative; overflow: hidden;
+          color: #FFFFFF; position: relative; overflow: hidden;
           margin-bottom: 16px;
-          box-shadow: 0 8px 28px rgba(26,18,9,0.18);
+          box-shadow: 0 8px 24px rgba(0,0,0,0.12);
         }
-        .patron-black-card::before {
-          content: ''; position: absolute; inset: 0;
-          background: radial-gradient(ellipse at top right, rgba(196,161,70,0.12) 0%, transparent 60%);
-          pointer-events: none;
-        }
-        .black-card-title { font-family: 'Cormorant Garamond', serif; font-size: 13px; font-weight: 600; letter-spacing: 0.2em; color: #d4af37; margin: 0 0 4px 0; text-transform: uppercase; }
-        .black-card-desc { font-size: 11px; color: rgba(255,255,255,0.65); margin: 0; font-family: 'Jost', sans-serif; }
-        .black-card-gold-seal { position: absolute; right: -8px; bottom: -10px; font-size: 54px; opacity: 0.12; pointer-events: none; }
-        .benefits-checklist { display: flex; flex-direction: column; gap: 9px; }
-        .benefit-check-item { display: flex; align-items: center; gap: 10px; font-size: 12.5px; color: rgba(26,18,9,0.68); font-weight: 500; }
-        .benefit-check-icon { color: #8b6914; display: flex; align-items: center; flex-shrink: 0; }
+        .black-card-title { font-family: 'Cormorant Garamond', serif; font-size: 14px; font-weight: 600; letter-spacing: 0.15em; color: #C5A880; margin: 0 0 4px 0; text-transform: uppercase; }
+        .black-card-desc { font-size: 11px; color: rgba(255,255,255,0.7); margin: 0; font-family: 'Jost', sans-serif; line-height: 1.5; }
+        .black-card-gold-seal { position: absolute; right: -8px; bottom: -10px; font-size: 54px; opacity: 0.08; pointer-events: none; }
+        .benefits-checklist { display: flex; flex-direction: column; gap: 8px; }
+        .benefit-check-item { display: flex; align-items: center; gap: 10px; font-size: 12.5px; color: #444444; font-weight: 400; }
+        .benefit-check-icon { color: #141414; display: flex; align-items: center; flex-shrink: 0; }
 
         /* ── Dashboard banner ── */
         .dashboard-welcome-banner {
-          background: linear-gradient(135deg, rgba(139,105,20,0.04) 0%, rgba(196,161,70,0.06) 100%);
-          border: 1px solid rgba(139,105,20,0.12);
-          border-radius: 10px; padding: 20px; margin-bottom: 20px;
+          background: #F8F7F4;
+          border: 1px solid rgba(20,20,20,0.06);
+          border-radius: 12px; padding: 22px; margin-bottom: 20px;
         }
 
         /* ═══════════════════════════════════════
@@ -1243,92 +1171,74 @@ export default function ProfilePage() {
         }
 
         /* ═══════════════════════════════════════
-           MOBILE  ≤ 768px
+           MOBILE ≤ 768px
            ═══════════════════════════════════════ */
         .mobile-tab-bar { display: none; }
         .mobile-completion-strip { display: none; }
 
         @media (max-width: 768px) {
-
           /* ── Shell ── */
-          .profile-page-container { padding: 0 0 96px; background-attachment: scroll; }
+          .profile-page-container { padding: 0 0 96px; }
+          .access-card { margin: 100px 16px 40px !important; padding: 36px 20px !important; }
           .profile-portal-wrapper { padding: 0; gap: 0; }
 
-          /* ── Hero Header ── */
+          /* ── Header Banner ── */
           .portal-header-banner {
-            background: linear-gradient(160deg, rgba(26, 18, 9, 0.98) 0%, rgba(40, 28, 15, 0.96) 50%, rgba(20, 14, 7, 0.98) 100%), url('/hero_bg_marble.jpg');
-            background-size: cover;
-            border-radius: 0 0 24px 24px;
+            border-radius: 0 0 20px 20px;
             border-left: none; border-right: none; border-top: none;
             flex-direction: column; align-items: center; text-align: center;
-            padding: 100px 16px 28px;
+            padding: 96px 16px 26px;
             gap: 0; margin-bottom: 0;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            position: relative;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
           }
           .banner-watermark {
             display: block !important;
-            right: -40px; top: 20px;
-            width: 200px; opacity: 0.06;
+            right: -30px; top: 20px;
+            width: 180px; opacity: 0.04;
             transform: none;
           }
 
           /* ── Avatar ── */
           .avatar-wrapper {
-            width: 90px; height: 90px;
-            margin-bottom: 14px;
-            position: relative;
-            z-index: 2;
+            width: 84px; height: 84px;
+            margin-bottom: 12px;
           }
-          .avatar-img {
-            border: 3px solid rgba(212,175,55,0.9);
-            box-shadow: 0 0 0 4px rgba(139,105,20,0.25), 0 8px 24px rgba(0,0,0,0.4);
-          }
-          .avatar-fallback {
-            border: 3px solid rgba(212,175,55,0.9);
-            box-shadow: 0 0 0 4px rgba(139,105,20,0.25), 0 8px 24px rgba(0,0,0,0.4);
+          .avatar-img, .avatar-fallback {
+            border: 2px solid rgba(255,255,255,0.25);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.3);
           }
           .avatar-edit-btn {
-            background: #d4af37;
-            border-color: #1a1209;
-            color: #1a1209;
+            background: #FFFFFF;
+            color: #141414;
           }
 
           /* ── Name & Badge ── */
-          .header-info-block { align-items: center; text-align: center; gap: 8px; position: relative; z-index: 2; }
+          .header-info-block { align-items: center; text-align: center; gap: 6px; }
           .patron-badge {
-            background: rgba(212,175,55,0.15);
-            border-color: rgba(212,175,55,0.4);
-            color: #f3e3b8;
+            background: rgba(255,255,255,0.08);
+            border-color: rgba(255,255,255,0.15);
+            color: #E0E0E0;
             font-size: 8.5px;
           }
-          .patron-name { font-size: 24px; color: #ffffff; letter-spacing: 0.03em; }
-          .member-since { color: rgba(255,255,255,0.55); font-size: 11px; text-align: center; }
+          .patron-name { font-size: 24px; color: #FFFFFF; }
+          .member-since { color: rgba(255,255,255,0.5); font-size: 11px; text-align: center; }
 
-          /* ── Stats: 2×2 luxury tiles ── */
+          /* ── Stats: 2x2 grid for mobile ── */
           .hero-stats-grid {
             display: grid; grid-template-columns: repeat(2, 1fr);
-            gap: 10px; margin-top: 18px; padding-top: 16px;
-            border-top: 1px solid rgba(212,175,55,0.2); width: 100%;
-            position: relative; z-index: 2;
+            gap: 8px; margin-top: 16px; padding-top: 14px;
+            border-top: 1px solid rgba(255,255,255,0.1); width: 100%;
           }
           .hero-stat-card {
-            padding: 10px 12px;
-            gap: 10px;
-            background: rgba(255,255,255,0.06);
-            border-radius: 12px;
+            padding: 9px 11px;
+            gap: 8px;
+            border-radius: 10px;
           }
-          .hero-stat-icon-wrapper {
-            width: 32px; height: 32px;
-          }
-          .hero-stat-val {
-            font-size: 16px;
-          }
-          .hero-stat-lbl {
-            font-size: 8.5px;
-          }
+          .hero-stat-icon-wrapper { width: 28px; height: 28px; }
+          .hero-stat-val { font-size: 15px; }
+          .hero-stat-lbl { font-size: 8px; }
 
-          /* ── Dashboard command stat tiles 2x2 compact grid for mobile ── */
+          /* ── Dashboard stat tiles 2x2 grid ── */
           .dashboard-metrics-grid {
             display: grid !important;
             grid-template-columns: repeat(2, 1fr) !important;
@@ -1337,32 +1247,15 @@ export default function ProfilePage() {
           }
           .metric-tile-card {
             padding: 12px 10px !important;
-            border-radius: 12px !important;
+            border-radius: 10px !important;
           }
-          .metric-tile-label {
-            font-size: 8.5px !important;
-            letter-spacing: 0.04em !important;
-          }
-          .metric-tile-value {
-            font-size: 22px !important;
-            margin-top: 4px !important;
-          }
-          .metric-tile-sub {
-            font-size: 9px !important;
-            margin-top: 4px !important;
-            line-height: 1.25 !important;
-          }
+          .metric-tile-label { font-size: 8.5px !important; }
+          .metric-tile-value { font-size: 22px !important; }
+          .metric-tile-sub { font-size: 9px !important; }
+
           .dashboard-welcome-banner {
             padding: 16px 14px !important;
-            border-radius: 12px !important;
-          }
-          .dashboard-welcome-banner h4 {
-            font-size: 18px !important;
-            margin-bottom: 6px !important;
-          }
-          .dashboard-welcome-banner p {
-            font-size: 12px !important;
-            line-height: 1.5 !important;
+            border-radius: 10px !important;
           }
 
           /* ── Sticky bottom tab bar ── */
@@ -1373,51 +1266,47 @@ export default function ProfilePage() {
             z-index: 200;
             overflow-x: auto; -webkit-overflow-scrolling: touch;
             gap: 0; padding: 0 0 env(safe-area-inset-bottom, 0px);
-            background: rgba(26, 18, 9, 0.96);
-            backdrop-filter: blur(16px);
-            border-top: 1px solid rgba(212,175,55,0.3);
+            background: #FFFFFF;
+            border-top: 1px solid rgba(20,20,20,0.08);
             scrollbar-width: none;
-            box-shadow: 0 -6px 28px rgba(0,0,0,0.35);
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.06);
           }
           .mobile-tab-bar::-webkit-scrollbar { display: none; }
           .mobile-tab-pill {
             display: flex; flex-direction: column;
             align-items: center; justify-content: center; gap: 3px;
             white-space: nowrap; scroll-snap-align: start;
-            padding: 10px 14px 8px;
+            padding: 9px 12px 7px;
             border: none; border-top: 2px solid transparent;
             background: transparent;
             font-family: 'Jost', sans-serif;
-            font-size: 9px; font-weight: 650; letter-spacing: 0.06em;
-            color: rgba(255,255,255,0.4);
-            cursor: pointer; flex-shrink: 0; min-width: 60px;
+            font-size: 9px; font-weight: 500; letter-spacing: 0.04em;
+            color: #666666;
+            cursor: pointer; flex-shrink: 0; min-width: 58px;
             transition: all 0.15s ease; text-transform: uppercase;
           }
-          .mobile-tab-pill svg { opacity: 0.5; transition: opacity 0.15s; }
-          .mobile-tab-pill.active { border-top-color: #d4af37; color: #d4af37; background: rgba(212,175,55,0.06); }
+          .mobile-tab-pill svg { opacity: 0.7; }
+          .mobile-tab-pill.active { border-top-color: #141414; color: #141414; background: #F8F7F4; font-weight: 600; }
           .mobile-tab-pill.active svg { opacity: 1; }
-          .mobile-tab-pill.logout-pill { color: rgba(220,80,80,0.7); }
-          .mobile-tab-pill.logout-pill svg { opacity: 0.7; }
+          .mobile-tab-pill.logout-pill { color: #C62828; }
 
           /* ── Compact completion strip ── */
           .mobile-completion-strip {
             display: flex; align-items: center; gap: 14px;
-            background: #FAF7F0;
-            backdrop-filter: blur(10px);
-            border-bottom: 1.5px solid rgba(184,142,60,0.2);
-            padding: 12px 18px;
+            background: #FFFFFF;
+            border-bottom: 1px solid rgba(20,20,20,0.08);
+            padding: 12px 16px;
           }
           .mcs-ring { flex-shrink: 0; }
           .mcs-text { flex: 1; min-width: 0; }
-          .mcs-title { font-size: 10.5px; font-weight: 700; color: #8b6914; text-transform: uppercase; letter-spacing: 0.07em; margin: 0; }
-          .mcs-desc { font-size: 10px; color: rgba(26,18,9,0.48); margin: 2px 0 0; }
+          .mcs-title { font-size: 10.5px; font-weight: 600; color: #141414; text-transform: uppercase; letter-spacing: 0.05em; margin: 0; }
+          .mcs-desc { font-size: 10px; color: #666666; margin: 2px 0 0; }
           .mcs-btn {
-            background: #8b6914; color: #fff; border: none;
-            padding: 6px 14px; border-radius: 20px;
-            font-family: 'Jost', sans-serif; font-size: 9px; font-weight: 700;
-            letter-spacing: 0.08em; text-transform: uppercase;
+            background: #141414; color: #FFFFFF; border: none;
+            padding: 6px 14px; border-radius: 6px;
+            font-family: 'Jost', sans-serif; font-size: 9px; font-weight: 600;
+            letter-spacing: 0.06em; text-transform: uppercase;
             cursor: pointer; flex-shrink: 0; white-space: nowrap;
-            box-shadow: 0 3px 10px rgba(139,105,20,0.3);
           }
 
           /* ── Content layout ── */
@@ -1430,12 +1319,11 @@ export default function ProfilePage() {
             box-sizing: border-box;
           }
           .content-card {
-            padding: 16px 12px !important;
-            border-radius: 14px;
-            box-shadow: 0 4px 20px rgba(26,18,9,0.05);
-            background: #FAF7F0;
-            border: 1.5px solid rgba(184, 142, 60, 0.22);
-            backdrop-filter: blur(8px);
+            padding: 16px 14px !important;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+            background: #FFFFFF;
+            border: 1px solid rgba(20, 20, 20, 0.08);
             width: 100%;
             box-sizing: border-box;
             overflow: hidden;
@@ -1444,15 +1332,15 @@ export default function ProfilePage() {
           .card-subtitle { font-size: 11.5px; }
 
           /* ── Profile form ── */
-          .profile-custom-form { gap: 15px; }
-          .profile-form-grid { grid-template-columns: 1fr; gap: 13px; }
-          .profile-form-label { font-size: 9.5px; }
-          .profile-form-input { font-size: 13px; padding: 10px 13px 10px 38px; border-radius: 8px; }
-          .custom-select { font-size: 13px; padding: 10px 26px 10px 38px; border-radius: 8px; }
+          .profile-custom-form { gap: 14px; }
+          .profile-form-grid { grid-template-columns: 1fr; gap: 12px; }
+          .profile-form-label { font-size: 10px; }
+          .profile-form-input { font-size: 13px; padding: 10px 12px 10px 36px; border-radius: 6px; }
+          .custom-select { font-size: 13px; padding: 10px 24px 10px 36px; border-radius: 6px; }
 
           /* ── Orders ── */
-          .recent-orders-list { gap: 9px; }
-          .recent-order-item { padding: 10px 12px; border-radius: 10px; }
+          .recent-orders-list { gap: 8px; }
+          .recent-order-item { padding: 10px 12px; border-radius: 8px; }
           .order-watch-thumb { width: 42px; height: 42px; }
           .order-item-title { font-size: 12px; max-width: 145px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
           .order-ref-date { font-size: 10px; max-width: 145px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -1461,14 +1349,12 @@ export default function ProfilePage() {
           /* ── Mobile Profile Order Card Rules ── */
           .profile-order-card {
             padding: 14px 12px !important;
-            border-radius: 12px !important;
+            border-radius: 10px !important;
             gap: 12px !important;
             width: 100% !important;
             box-sizing: border-box !important;
           }
-          .poc-header-top {
-            gap: 8px !important;
-          }
+          .poc-header-top { gap: 8px !important; }
           .poc-ref {
             font-size: 12px !important;
             max-width: calc(100% - 85px) !important;
@@ -1476,16 +1362,9 @@ export default function ProfilePage() {
             text-overflow: ellipsis !important;
             white-space: nowrap !important;
           }
-          .poc-item-thumb {
-            width: 44px !important;
-            height: 44px !important;
-          }
-          .poc-item-title {
-            font-size: 12px !important;
-          }
-          .poc-item-meta {
-            font-size: 10.5px !important;
-          }
+          .poc-item-thumb { width: 44px !important; height: 44px !important; }
+          .poc-item-title { font-size: 12px !important; }
+          .poc-item-meta { font-size: 10.5px !important; }
           .poc-item-price-block {
             display: flex !important;
             flex-direction: row !important;
@@ -1518,9 +1397,9 @@ export default function ProfilePage() {
             font-size: 10px !important;
           }
           .order-filter-bar {
-            margin-bottom: 16px !important;
-            padding-bottom: 12px !important;
-            gap: 10px !important;
+            margin-bottom: 14px !important;
+            padding-bottom: 10px !important;
+            gap: 8px !important;
           }
           .order-filter-pill {
             padding: 6px 12px !important;
@@ -1536,13 +1415,68 @@ export default function ProfilePage() {
           /* ── Hide desktop completion box on mobile ── */
           .completion-box { display: none; }
         }
-      `}</style>
+`;
+
+  // Clerk Loading State
+  if (!isLoaded) {
+    return (
+      <div className="profile-loading-wrapper">
+        <style>{`${profileStyles}`}</style>
+        <div className="profile-spinner" />
+      </div>
+    );
+  }
+
+  // Unauthenticated State
+  if (!isSignedIn) {
+    return (
+      <div className="profile-page-container">
+        <style>{`${profileStyles}`}</style>
+        <div className="access-card">
+          <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#141414" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: '18px' }}>
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+          </svg>
+          <h1 className="access-title">Client Portal</h1>
+          <p className="access-subtitle">
+            Sign in to access your order history, manage personal delivery details, and view your verified timepieces.
+          </p>
+          <div>
+            <Link href="/login">
+              <button className="gold-action-btn">
+                SIGN IN / REGISTER
+              </button>
+            </Link>
+          </div>
+          <div style={{ marginTop: '20px' }}>
+            <Link href="/collections" style={{ fontSize: '11px', color: '#666666', textDecoration: 'none', letterSpacing: '0.04em', textTransform: 'uppercase', fontWeight: 500 }}>
+              ← Return to Boutique
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Real patron orders mapping (synced with MongoDB database)
+  const displayOrders = orders.slice(0, 5).map(o => ({
+    orderRef: o.orderRef,
+    date: new Date(o.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+    status: (o.status || 'pending').toLowerCase(),
+    statusLabel: (o.status || 'pending').replace('_', ' ').toUpperCase(),
+    productTitle: o.items[0]?.productTitle || 'Winsor Timepiece',
+    productThumbnail: o.items[0]?.productThumbnail || '/winsor_hero_backgroundremoved.webp'
+  }));
+
+  return (
+    <div className="profile-page-container">
+      <style>{`${profileStyles}`}</style>
 
 
       <div className="profile-portal-wrapper">
         {/* TOP PATRON HEADER BANNER (FUTURISTIC MARBLE HERO) */}
         <div className="portal-header-banner">
-          <div className="banner-glow-effect" />
+          {/* Glow effect removed for Swiss luxury minimalist aesthetic */}
           <img src="/winsor_hero_backgroundremoved.webp" alt="Winsor Signature Timepiece" className="banner-watermark" />
 
           <div className="avatar-wrapper">
@@ -1561,18 +1495,14 @@ export default function ProfilePage() {
 
           <div className="header-info-block">
             <div className="flex items-center justify-between w-full flex-wrap gap-2">
-              <div className="patron-badge">
-                <span className="patron-badge-dot" />
-                <span>✦ {membershipTier} ✦</span>
-              </div>
-              <span className="font-mono text-[10px] text-[#f3e3b8]/80 tracking-widest uppercase bg-black/40 px-3 py-1 rounded-full border border-[#d4af37]/35 shadow-inner">
-                PATRON ID: #WS-{(user.id || '987654').slice(-6).toUpperCase()}
+              <h1 className="patron-name">{fullName || 'WINSOR CLIENT'}</h1>
+              <span className="font-mono text-[10px] text-white/50 tracking-widest uppercase bg-white/5 px-2.5 py-1 rounded border border-white/10">
+                CLIENT ID: #WS-{(user.id || '987654').slice(-6).toUpperCase()}
               </span>
             </div>
 
-            <h1 className="patron-name">{fullName || 'WINSOR PATRON'}</h1>
             <span className="member-since">
-              Member since {user.createdAt ? new Date(user.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long' }) : new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long' })} • Verified Winsor Watches Client
+              Member since {user.createdAt ? new Date(user.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long' }) : new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long' })} • Verified Winsor Timepieces Client
             </span>
 
             {/* Professional Numbers Hero Stats Grid */}
@@ -1623,10 +1553,10 @@ export default function ProfilePage() {
                   </svg>
                 </div>
                 <div>
-                  <div className="hero-stat-val text-xs text-[#d4af37] font-semibold font-sans tracking-wide uppercase">
-                    {membershipTier.replace(' MEMBER', '').replace(' PATRON', '')}
+                  <div className="hero-stat-val text-xs text-white font-medium font-sans tracking-wide uppercase">
+                    {orders.length >= 2 ? membershipTier.replace(' MEMBER', '') : 'VERIFIED'}
                   </div>
-                  <div className="hero-stat-lbl">VIP PRIVILEGE</div>
+                  <div className="hero-stat-lbl">ACCOUNT STATUS</div>
                 </div>
               </div>
             </div>
@@ -1668,8 +1598,8 @@ export default function ProfilePage() {
                 fill="none" stroke="#eaeaea" strokeWidth="3" />
               <path strokeDasharray={`${completionPercentage}, 100`}
                 d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                fill="none" stroke="#8b6914" strokeWidth="3" strokeLinecap="round" />
-              <text x="18" y="21" fill="#8b6914" fontSize="9" fontWeight="bold" textAnchor="middle" fontFamily="Jost, sans-serif">
+                fill="none" stroke="#141414" strokeWidth="3" strokeLinecap="round" />
+              <text x="18" y="21" fill="#141414" fontSize="9" fontWeight="bold" textAnchor="middle" fontFamily="Jost, sans-serif">
                 {completionPercentage}%
               </text>
             </svg>
@@ -1773,11 +1703,11 @@ export default function ProfilePage() {
                     a 15.9155 15.9155 0 0 1 0 31.831
                     a 15.9155 15.9155 0 0 1 0 -31.831"
                   fill="none"
-                  stroke="#8b6914"
+                  stroke="#141414"
                   strokeWidth="2.5"
                   strokeLinecap="round"
                 />
-                <text x="18" y="20.35" className="percentage" fill="#8b6914" fontSize="8" fontWeight="bold" textAnchor="middle">
+                <text x="18" y="20.35" className="percentage" fill="#141414" fontSize="8" fontWeight="bold" textAnchor="middle">
                   {completionPercentage}%
                 </text>
               </svg>
@@ -1794,7 +1724,7 @@ export default function ProfilePage() {
                   toast.success('Scroll to fill blank details below.');
                 }}
               >
-                COMPLETE NOW
+                COMPLETE DETAILS
               </button>
             </div>
           </div>
@@ -1839,7 +1769,7 @@ export default function ProfilePage() {
                       </div>
 
                       <div className="profile-form-group">
-                        <label className="profile-form-label">Email Address <span style={{ color: '#8b6914', fontSize: '9px', fontWeight: 550 }}>(Synced with Clerk)</span></label>
+                        <label className="profile-form-label">Email Address <span style={{ color: '#666666', fontSize: '9px', fontWeight: 500 }}>(Synced with Clerk)</span></label>
                         <div className="input-wrapper-gold">
                           <span className="input-icon-left">
                             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -1866,10 +1796,7 @@ export default function ProfilePage() {
                     {/* Mobile & Country Row */}
                     <div className="profile-form-grid">
                       <div className="profile-form-group">
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                          <label className="profile-form-label">Mobile Number</label>
-                          <span style={{ fontSize: '10px', color: 'rgba(26,18,9,0.45)' }}>{formData.mobile.length}/9 Digits</span>
-                        </div>
+                        <label className="profile-form-label">Mobile Number</label>
                         <div style={{ display: 'flex', gap: '8px' }}>
                           <div className="input-wrapper-gold" style={{ width: '120px', flexShrink: 0 }}>
                             <span className="input-icon-left" style={{ left: '10px' }}>
@@ -1945,10 +1872,7 @@ export default function ProfilePage() {
 
                     {/* Home Address */}
                     <div className="profile-form-group">
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <label className="profile-form-label">Home Address</label>
-                        <span style={{ fontSize: '10px', color: 'rgba(26,18,9,0.45)' }}>{formData.address.length}/200</span>
-                      </div>
+                      <label className="profile-form-label">Home Address</label>
                       <div className="input-wrapper-gold">
                         <span className="input-icon-left">
                           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -1972,10 +1896,7 @@ export default function ProfilePage() {
                     {/* City & Postal Code Row */}
                     <div className="profile-form-grid">
                       <div className="profile-form-group">
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                          <label className="profile-form-label">City / Town</label>
-                          <span style={{ fontSize: '10px', color: 'rgba(26,18,9,0.45)' }}>{formData.city.length}/100</span>
-                        </div>
+                        <label className="profile-form-label">City / Town</label>
                         <div className="input-wrapper-gold">
                           <span className="input-icon-left">
                             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -1997,10 +1918,7 @@ export default function ProfilePage() {
                       </div>
 
                       <div className="profile-form-group">
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                          <label className="profile-form-label">Postal Code</label>
-                          <span style={{ fontSize: '10px', color: 'rgba(26,18,9,0.45)' }}>{formData.postalCode.length}/10 Numbers</span>
-                        </div>
+                        <label className="profile-form-label">Postal Code</label>
                         <div className="input-wrapper-gold">
                           <span className="input-icon-left">
                             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -2029,12 +1947,12 @@ export default function ProfilePage() {
                       <button type="submit" className="gold-action-btn" disabled={saving}>
                         {saving ? 'Saving Changes...' : 'Save Changes'}
                       </button>
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', marginTop: '12px', color: 'rgba(26,18,9,0.5)', fontSize: '11.5px' }}>
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#8b6914" strokeWidth="2.5" style={{ display: 'inline-block' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', marginTop: '12px', color: '#666666', fontSize: '11.5px' }}>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#141414" strokeWidth="2.2" style={{ display: 'inline-block' }}>
                           <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
                           <polyline points="22 4 12 14.01 9 11.01" />
                         </svg>
-                        <span>Your information is safe and secure with us.</span>
+                        <span>Your information is encrypted and securely stored.</span>
                       </div>
                     </div>
                   </form>
@@ -2047,69 +1965,63 @@ export default function ProfilePage() {
               <div className="content-card">
                 <div className="card-header-block flex items-center justify-between">
                   <div>
-                    <h3 className="card-title">Patron Command Dashboard</h3>
+                    <h3 className="card-title">Client Dashboard</h3>
                     <p className="card-subtitle">Overview of your timepiece acquisitions, wishlist, and rewards.</p>
                   </div>
-                  <span className="font-mono text-[10px] text-[#8b6914] font-bold px-3 py-1 bg-[#8b6914]/10 rounded-full border border-[#8b6914]/30 uppercase tracking-widest">
-                    SYSTEM STATUS: ACTIVE
+                  <span className="font-mono text-[10px] text-[#141414] font-semibold px-2.5 py-1 bg-black/[0.04] rounded border border-black/10 uppercase tracking-widest">
+                    VERIFIED CLIENT
                   </span>
                 </div>
 
-                {/* Futuristic Welcome Banner */}
-                <div className="dashboard-welcome-banner relative overflow-hidden" style={{ background: 'linear-gradient(135deg, rgba(26,18,9,0.04) 0%, rgba(139,105,20,0.08) 100%)', border: '1px solid rgba(139,105,20,0.25)', borderRadius: '14px', padding: '24px' }}>
-                  <div style={{ position: 'absolute', right: '-20px', top: '-20px', opacity: 0.05, pointerEvents: 'none' }}>
-                    <svg width="200" height="200" viewBox="0 0 24 24" fill="none" stroke="#8b6914" strokeWidth="1">
-                      <circle cx="12" cy="12" r="10" />
-                      <path d="M12 6v6l4 2" />
-                    </svg>
-                  </div>
-                  <h4 style={{ margin: '0 0 8px 0', fontFamily: 'Cormorant Garamond, serif', fontSize: '22px', color: '#1a1209', fontWeight: 600 }}>
-                    Welcome to Your Private Curation, {user.firstName || 'Winsor Patron'}
+                {/* Welcome Banner */}
+                <div className="dashboard-welcome-banner relative overflow-hidden">
+                  <h4 style={{ margin: '0 0 8px 0', fontFamily: 'Cormorant Garamond, serif', fontSize: '22px', color: '#141414', fontWeight: 600 }}>
+                    Welcome to Your Winsor Account, {user.firstName || 'Winsor Client'}
                   </h4>
-                  <p style={{ margin: 0, fontSize: '13px', color: 'rgba(26,18,9,0.65)', lineHeight: 1.6, maxWidth: '680px' }}>
-                    As a verified <strong style={{ color: '#8b6914' }}>{membershipTier}</strong>, you receive priority allocations for limited-edition watch releases, complimentary bespoke packaging, and dedicated boutique concierge access.
+                  <p style={{ margin: 0, fontSize: '13px', color: '#555555', lineHeight: 1.6, maxWidth: '680px' }}>
+                    Manage your timepiece orders, track active shipments, and enjoy priority allocations for limited releases, complimentary luxury presentation box packaging, and dedicated customer support.
                   </p>
                 </div>
 
                 {/* 4 Quick Stat Tiles with Tabular Numbers */}
                 <div className="dashboard-metrics-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px', marginTop: '20px' }}>
-                  <div className="metric-tile-card" style={{ background: 'linear-gradient(135deg, #ffffff 0%, #faf7f0 100%)', border: '1px solid rgba(139,105,20,0.18)', padding: '20px', borderRadius: '14px', boxShadow: '0 4px 15px rgba(26,18,9,0.03)' }}>
-                    <div className="metric-tile-label" style={{ fontSize: '10.5px', textTransform: 'uppercase', color: 'rgba(26,18,9,0.5)', fontWeight: 700, letterSpacing: '0.1em' }}>Active Shipments</div>
-                    <div className="metric-tile-value" style={{ fontSize: '32px', fontFamily: 'Jost, monospace', fontVariantNumeric: 'tabular-nums', color: '#1a1209', fontWeight: 700, marginTop: '6px', lineHeight: 1 }}>
+                  <div className="metric-tile-card" style={{ background: '#FFFFFF', border: '1px solid rgba(20,20,20,0.08)', padding: '20px', borderRadius: '12px', boxShadow: '0 2px 10px rgba(0,0,0,0.02)' }}>
+                    <div className="metric-tile-label" style={{ fontSize: '10.5px', textTransform: 'uppercase', color: '#666666', fontWeight: 600, letterSpacing: '0.08em' }}>Active Shipments</div>
+                    <div className="metric-tile-value" style={{ fontSize: '30px', fontFamily: 'Jost, monospace', fontVariantNumeric: 'tabular-nums', color: '#141414', fontWeight: 600, marginTop: '6px', lineHeight: 1 }}>
                       {activeOrdersCount.toString().padStart(2, '0')}
                     </div>
-                    <div className="metric-tile-sub" style={{ fontSize: '10.5px', color: 'rgba(26,18,9,0.45)', marginTop: '8px' }}>
-                      {activeOrdersCount > 0 ? 'In transit via express courier' : 'No active pending dispatches'}
+                    <div className="metric-tile-sub" style={{ fontSize: '11px', color: '#888888', marginTop: '8px' }}>
+                      {activeOrdersCount > 0 ? 'In transit via courier' : 'No active dispatches'}
                     </div>
                   </div>
 
-                  <div className="metric-tile-card" style={{ background: 'linear-gradient(135deg, #ffffff 0%, #faf7f0 100%)', border: '1px solid rgba(139,105,20,0.18)', padding: '20px', borderRadius: '14px', boxShadow: '0 4px 15px rgba(26,18,9,0.03)' }}>
-                    <div className="metric-tile-label" style={{ fontSize: '10.5px', textTransform: 'uppercase', color: 'rgba(26,18,9,0.5)', fontWeight: 700, letterSpacing: '0.1em' }}>Delivered Acquisitions</div>
-                    <div className="metric-tile-value" style={{ fontSize: '32px', fontFamily: 'Jost, monospace', fontVariantNumeric: 'tabular-nums', color: '#8b6914', fontWeight: 700, marginTop: '6px', lineHeight: 1 }}>
+                  <div className="metric-tile-card" style={{ background: '#FFFFFF', border: '1px solid rgba(20,20,20,0.08)', padding: '20px', borderRadius: '12px', boxShadow: '0 2px 10px rgba(0,0,0,0.02)' }}>
+                    <div className="metric-tile-label" style={{ fontSize: '10.5px', textTransform: 'uppercase', color: '#666666', fontWeight: 600, letterSpacing: '0.08em' }}>Delivered Timepieces</div>
+                    <div className="metric-tile-value" style={{ fontSize: '30px', fontFamily: 'Jost, monospace', fontVariantNumeric: 'tabular-nums', color: '#141414', fontWeight: 600, marginTop: '6px', lineHeight: 1 }}>
                       {completedOrdersCount.toString().padStart(2, '0')}
                     </div>
-                    <div className="metric-tile-sub" style={{ fontSize: '10.5px', color: 'rgba(26,18,9,0.45)', marginTop: '8px' }}>
+                    <div className="metric-tile-sub" style={{ fontSize: '11px', color: '#888888', marginTop: '8px' }}>
                       {orders.length} Total orders recorded
                     </div>
                   </div>
 
-                  <div className="metric-tile-card" style={{ background: 'linear-gradient(135deg, #ffffff 0%, #faf7f0 100%)', border: '1px solid rgba(139,105,20,0.18)', padding: '20px', borderRadius: '14px', boxShadow: '0 4px 15px rgba(26,18,9,0.03)' }}>
-                    <div className="metric-tile-label" style={{ fontSize: '10.5px', textTransform: 'uppercase', color: 'rgba(26,18,9,0.5)', fontWeight: 700, letterSpacing: '0.1em' }}>Reward Point Balance</div>
-                    <div className="metric-tile-value" style={{ fontSize: '32px', fontFamily: 'Jost, monospace', fontVariantNumeric: 'tabular-nums', color: '#1a1209', fontWeight: 700, marginTop: '6px', lineHeight: 1 }}>
+                  <div className="metric-tile-card" style={{ background: '#FFFFFF', border: '1px solid rgba(20,20,20,0.08)', padding: '20px', borderRadius: '12px', boxShadow: '0 2px 10px rgba(0,0,0,0.02)' }}>
+                    <div className="metric-tile-label" style={{ fontSize: '10.5px', textTransform: 'uppercase', color: '#666666', fontWeight: 600, letterSpacing: '0.08em' }}>Reward Points</div>
+                    <div className="metric-tile-value" style={{ fontSize: '30px', fontFamily: 'Jost, monospace', fontVariantNumeric: 'tabular-nums', color: '#141414', fontWeight: 600, marginTop: '6px', lineHeight: 1 }}>
                       {(orders.length * 25).toLocaleString()}
                     </div>
-                    <div className="metric-tile-sub" style={{ fontSize: '10.5px', color: '#8b6914', fontWeight: 600, marginTop: '8px' }}>
-                      {orders.length > 0 ? `+25 Points per timepiece order (${orders.length * 25} total)` : '0 Points • 25 Points earned per order'}
+                    <div className="metric-tile-sub" style={{ fontSize: '11px', color: '#666666', fontWeight: 500, marginTop: '8px' }}>
+                      {orders.length > 0 ? `+25 Points per timepiece order` : '0 Points • 25 Points per order'}
                     </div>
                   </div>
 
-                  <div className="metric-tile-card" style={{ background: 'linear-gradient(135deg, #ffffff 0%, #faf7f0 100%)', border: '1px solid rgba(139,105,20,0.18)', padding: '20px', borderRadius: '14px', boxShadow: '0 4px 15px rgba(26,18,9,0.03)' }}>
-                    <div className="metric-tile-label" style={{ fontSize: '10.5px', textTransform: 'uppercase', color: 'rgba(26,18,9,0.5)', fontWeight: 700, letterSpacing: '0.1em' }}>Saved Wishlist</div>
-                    <div className="metric-tile-value" style={{ fontSize: '32px', fontFamily: 'Jost, monospace', fontVariantNumeric: 'tabular-nums', color: '#8b6914', fontWeight: 700, marginTop: '6px', lineHeight: 1 }}>
+                  <div className="metric-tile-card" style={{ background: '#FFFFFF', border: '1px solid rgba(20,20,20,0.08)', padding: '20px', borderRadius: '12px', boxShadow: '0 2px 10px rgba(0,0,0,0.02)' }}>
+                    <div className="metric-tile-label" style={{ fontSize: '10.5px', textTransform: 'uppercase', color: '#666666', fontWeight: 600, letterSpacing: '0.08em' }}>Saved Wishlist</div>
+                    <div className="metric-tile-value" style={{ fontSize: '30px', fontFamily: 'Jost, monospace', fontVariantNumeric: 'tabular-nums', color: '#141414', fontWeight: 600, marginTop: '6px', lineHeight: 1 }}>
                       {wishlistCount.toString().padStart(2, '0')}
                     </div>
-                    <div className="metric-tile-sub" style={{ fontSize: '10.5px', color: 'rgba(26,18,9,0.45)', marginTop: '8px' }}>
-                      Favorite watch designs saved
+                    <div className="metric-tile-sub" style={{ fontSize: '11px', color: '#888888', marginTop: '8px' }}>
+                      Favorite watches saved
                     </div>
                   </div>
                 </div>
@@ -2118,8 +2030,8 @@ export default function ProfilePage() {
                 <div className="portal-bottom-split" style={{ marginTop: '24px' }}>
                   {/* Left: Recent Activity */}
                   <div>
-                    <h4 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '20px', fontWeight: 600, color: '#1a1209', margin: '0 0 14px 0' }}>
-                      Recent Timepiece Activity
+                    <h4 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '20px', fontWeight: 600, color: '#141414', margin: '0 0 14px 0' }}>
+                      Recent Activity
                     </h4>
                     <div className="recent-orders-list">
                       {displayOrders.length > 0 ? (
@@ -2138,15 +2050,15 @@ export default function ProfilePage() {
                           </div>
                         ))
                       ) : (
-                        <div style={{ background: '#faf7f0', border: '1px solid rgba(139,105,20,0.15)', borderRadius: '12px', padding: '24px 16px', textAlign: 'center' }}>
-                          <svg className="w-8 h-8 text-[#8B6914] mx-auto mb-2 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div style={{ background: '#F8F7F4', border: '1px solid rgba(20,20,20,0.08)', borderRadius: '12px', padding: '24px 16px', textAlign: 'center' }}>
+                          <svg className="w-8 h-8 text-[#141414] mx-auto mb-2 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                           </svg>
-                          <p style={{ margin: '0 0 6px 0', fontSize: '13px', fontWeight: 600, color: '#1a1209' }}>No Timepiece Acquisitions Yet</p>
-                          <p style={{ margin: 0, fontSize: '11.5px', color: 'rgba(26,18,9,0.5)', lineHeight: 1.5 }}>
-                            Your order history is empty. Explore our luxury watch catalog to make your first acquisition.
+                          <p style={{ margin: '0 0 6px 0', fontSize: '13px', fontWeight: 600, color: '#141414' }}>No Timepiece Orders Yet</p>
+                          <p style={{ margin: 0, fontSize: '12px', color: '#666666', lineHeight: 1.5 }}>
+                            Your order history is empty. Explore our watch catalog to place your first order.
                           </p>
-                          <Link href="/collections" style={{ display: 'inline-block', marginTop: '12px', background: '#1a1209', color: '#faf7f0', fontSize: '10.5px', fontWeight: 700, letterSpacing: '0.12em', padding: '8px 16px', borderRadius: '8px', textTransform: 'uppercase' }}>
+                          <Link href="/collections" style={{ display: 'inline-block', marginTop: '12px', background: '#141414', color: '#FFFFFF', fontSize: '10.5px', fontWeight: 600, letterSpacing: '0.08em', padding: '8px 16px', borderRadius: '6px', textTransform: 'uppercase', textDecoration: 'none' }}>
                             Explore Collections →
                           </Link>
                         </div>
@@ -2156,40 +2068,40 @@ export default function ProfilePage() {
 
                   {/* Right: Black Card Privileges */}
                   <div>
-                    <h4 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '20px', fontWeight: 600, color: '#1a1209', margin: '0 0 14px 0' }}>
-                      Patron Membership Benefits
+                    <h4 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '20px', fontWeight: 600, color: '#141414', margin: '0 0 14px 0' }}>
+                      Client Privileges
                     </h4>
                     <div className="patron-black-card">
                       <div className="black-card-gold-seal">
-                        <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#d4af37" strokeWidth="1.2" style={{ opacity: 0.25 }}><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" /></svg>
+                        <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth="1.2" style={{ opacity: 0.12 }}><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" /></svg>
                       </div>
-                      <h5 className="black-card-title">✦ {membershipTier} PRIVILEGES ✦</h5>
-                      <p className="black-card-desc">Your exclusive membership status grants tier 1 perks across all global Winsor boutiques.</p>
+                      <h5 className="black-card-title">CLIENT PRIVILEGES</h5>
+                      <p className="black-card-desc">Your verified membership provides access to priority allocations and boutique client care.</p>
                       
                       <div className="benefits-checklist" style={{ marginTop: '16px' }}>
                         <div className="benefit-check-item">
                           <span className="benefit-check-icon">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg>
                           </span>
-                          <span style={{ color: '#ffffff', fontSize: '12px' }}>First right to limited releases & allocations</span>
+                          <span style={{ color: '#E0E0E0', fontSize: '12px' }}>First access to new limited timepiece allocations</span>
                         </div>
                         <div className="benefit-check-item">
                           <span className="benefit-check-icon">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg>
                           </span>
-                          <span style={{ color: '#ffffff', fontSize: '12px' }}>Complimentary lifetime timepiece maintenance</span>
+                          <span style={{ color: '#E0E0E0', fontSize: '12px' }}>Official international warranty & service support</span>
                         </div>
                         <div className="benefit-check-item">
                           <span className="benefit-check-icon">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg>
                           </span>
-                          <span style={{ color: '#ffffff', fontSize: '12px' }}>Bespoke gift engraving & luxury box wrapping</span>
+                          <span style={{ color: '#E0E0E0', fontSize: '12px' }}>Complimentary luxury presentation box packaging</span>
                         </div>
                         <div className="benefit-check-item">
                           <span className="benefit-check-icon">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg>
                           </span>
-                          <span style={{ color: '#ffffff', fontSize: '12px' }}>Direct VIP concierge support 24/7</span>
+                          <span style={{ color: '#E0E0E0', fontSize: '12px' }}>Dedicated client care and support</span>
                         </div>
                       </div>
                     </div>
@@ -2257,29 +2169,29 @@ export default function ProfilePage() {
                 )}
 
                 {orders.length === 0 ? (
-                  <div style={{ textAlign: 'center', padding: '48px 16px', color: 'rgba(26,18,9,0.55)', fontSize: '13px' }}>
+                  <div style={{ textAlign: 'center', padding: '48px 16px', color: '#666666', fontSize: '13px' }}>
                     <div style={{ width: '48px', height: '48px', margin: '0 auto 12px', opacity: 0.4 }}>
-                      <svg viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.2">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="#141414" strokeWidth="1.2">
                         <circle cx="12" cy="12" r="10"/>
                         <polyline points="12 6 12 12 16 14"/>
                       </svg>
                     </div>
-                    <p style={{ margin: '0 0 14px 0', fontSize: '13.5px', color: '#1a1209', fontWeight: 600 }}>No Orders Placed Yet</p>
-                    <p style={{ margin: '0 0 18px 0', fontSize: '12px', color: 'rgba(26,18,9,0.5)' }}>Explore our catalog to make your first acquisition.</p>
-                    <Link href="/collections" style={{ display: 'inline-block', background: '#1a1209', color: '#FAF7F0', padding: '10px 22px', borderRadius: '100px', fontSize: '11px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', textDecoration: 'none' }}>
+                    <p style={{ margin: '0 0 8px 0', fontSize: '14px', color: '#141414', fontWeight: 600 }}>No Orders Placed Yet</p>
+                    <p style={{ margin: '0 0 18px 0', fontSize: '12px', color: '#666666' }}>Explore our catalog to place your first order.</p>
+                    <Link href="/collections" style={{ display: 'inline-block', background: '#141414', color: '#FFFFFF', padding: '10px 22px', borderRadius: '6px', fontSize: '11px', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', textDecoration: 'none' }}>
                       Discover Timepieces
                     </Link>
                   </div>
                 ) : filteredOrders.length === 0 ? (
-                  <div style={{ textAlign: 'center', padding: '44px 20px', background: '#FAF7F0', border: '1.5px dashed rgba(184, 142, 60, 0.3)', borderRadius: '16px' }}>
-                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.3" style={{ margin: '0 auto 10px', opacity: 0.6 }}>
+                  <div style={{ textAlign: 'center', padding: '40px 20px', background: '#F8F7F4', border: '1px dashed rgba(20,20,20,0.12)', borderRadius: '12px' }}>
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#141414" strokeWidth="1.3" style={{ margin: '0 auto 10px', opacity: 0.4 }}>
                       <circle cx="11" cy="11" r="8" />
                       <line x1="21" y1="21" x2="16.65" y2="16.65" />
                     </svg>
-                    <h4 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '20px', fontWeight: 600, color: '#1a1209', margin: '0 0 6px' }}>
+                    <h4 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '20px', fontWeight: 600, color: '#141414', margin: '0 0 6px' }}>
                       No {orderFilter !== 'all' ? `${orderFilter.toUpperCase()} ` : ''}Orders Found
                     </h4>
-                    <p style={{ fontSize: '12.5px', color: 'rgba(26,18,9,0.55)', maxWidth: '420px', margin: '0 auto 16px', lineHeight: 1.5 }}>
+                    <p style={{ fontSize: '12.5px', color: '#666666', maxWidth: '420px', margin: '0 auto 16px', lineHeight: 1.5 }}>
                       {orderSearchQuery
                         ? `No orders matched "${orderSearchQuery}". Clear your search or try another filter.`
                         : `You have no orders currently in "${orderFilter}" status.`}
@@ -2288,7 +2200,7 @@ export default function ProfilePage() {
                       type="button"
                       onClick={() => { setOrderFilter('all'); setOrderSearchQuery(''); }}
                       className="gold-action-btn"
-                      style={{ padding: '8px 22px', fontSize: '11px' }}
+                      style={{ padding: '8px 22px', fontSize: '11px', width: 'auto' }}
                     >
                       VIEW ALL ORDERS ({orders.length})
                     </button>
@@ -2380,22 +2292,22 @@ export default function ProfilePage() {
                                             display: 'inline-flex',
                                             alignItems: 'center',
                                             gap: '4px',
-                                            background: 'rgba(139,105,20,0.08)',
-                                            border: '1px solid rgba(139,105,20,0.28)',
-                                            color: '#8b6914',
+                                            background: '#141414',
+                                            border: '1px solid #141414',
+                                            color: '#FFFFFF',
                                             fontSize: '10px',
-                                            padding: '4px 10px',
-                                            borderRadius: '100px',
+                                            padding: '4px 12px',
+                                            borderRadius: '6px',
                                             cursor: 'pointer',
                                             fontFamily: "'Jost', sans-serif",
-                                            fontWeight: 700,
+                                            fontWeight: 600,
                                             letterSpacing: '0.04em',
                                             whiteSpace: 'nowrap',
                                             textTransform: 'uppercase',
-                                            transition: 'all 0.25s ease',
+                                            transition: 'all 0.2s ease',
                                           }}
                                         >
-                                          <svg width="11" height="11" viewBox="0 0 24 24" fill="#8b6914" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" /></svg>
+                                          <svg width="11" height="11" viewBox="0 0 24 24" fill="#FFFFFF" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" /></svg>
                                           Write Review
                                         </button>
                                       )
@@ -2446,23 +2358,23 @@ export default function ProfilePage() {
                 {wishlistedProducts.length > 0 ? (
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '20px' }}>
                     {wishlistedProducts.map((p, idx) => (
-                      <div key={idx} style={{ border: '1.5px solid rgba(184, 142, 60, 0.22)', borderRadius: '16px', padding: '16px', background: '#FAF7F0', display: 'flex', flexDirection: 'column', gap: '12px', boxShadow: '0 4px 18px rgba(26,18,9,0.03)' }}>
-                        <div style={{ width: '100%', height: '145px', background: 'transparent', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '8px' }}>
+                      <div key={idx} style={{ border: '1px solid rgba(20,20,20,0.08)', borderRadius: '12px', padding: '16px', background: '#FFFFFF', display: 'flex', flexDirection: 'column', gap: '12px', boxShadow: '0 2px 10px rgba(0,0,0,0.02)' }}>
+                        <div style={{ width: '100%', height: '145px', background: '#F9F9FB', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '8px' }}>
                           <img src={getWatchImageUrl(p)} alt={p.title} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', margin: '0 auto' }} />
                         </div>
                         <div style={{ flex: 1 }}>
-                          <h4 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '17px', fontWeight: 600, color: '#1a1209', margin: 0 }}>{p.title}</h4>
-                          <div style={{ fontSize: '11px', color: 'rgba(26,18,9,0.55)', marginTop: '2px' }}>Model: {p.modelNo}</div>
-                          <div style={{ fontSize: '14px', fontWeight: 700, color: '#8b6914', marginTop: '6px' }}>LKR {p.price?.toLocaleString()}</div>
+                          <h4 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '17px', fontWeight: 600, color: '#141414', margin: 0 }}>{p.title}</h4>
+                          <div style={{ fontSize: '11px', color: '#666666', marginTop: '2px' }}>Model: {p.modelNo}</div>
+                          <div style={{ fontSize: '14px', fontWeight: 600, color: '#141414', marginTop: '6px' }}>LKR {p.price?.toLocaleString()}</div>
                         </div>
                         <div style={{ display: 'flex', gap: '8px', marginTop: '4px' }}>
-                          <Link href={`/collections/${p._id}`} style={{ flex: 1, textAlign: 'center', background: '#8b6914', color: '#ffffff', fontSize: '10.5px', padding: '8px 0', borderRadius: '100px', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 700, textDecoration: 'none' }}>
+                          <Link href={`/collections/${p._id}`} style={{ flex: 1, textAlign: 'center', background: '#141414', color: '#ffffff', fontSize: '11px', padding: '8px 0', borderRadius: '6px', textTransform: 'uppercase', letterSpacing: '0.04em', fontWeight: 600, textDecoration: 'none' }}>
                             View Details
                           </Link>
                           <button
                             type="button"
                             onClick={() => handleRemoveFromWishlist(p._id)}
-                            style={{ background: 'rgba(198, 40, 40, 0.05)', border: '1px solid rgba(198, 40, 40, 0.25)', color: '#c62828', fontSize: '10.5px', padding: '8px 12px', borderRadius: '100px', cursor: 'pointer', fontFamily: "'Jost', sans-serif", fontWeight: 700, textTransform: 'uppercase' }}
+                            style={{ background: '#FFFFFF', border: '1px solid rgba(198, 40, 40, 0.2)', color: '#c62828', fontSize: '11px', padding: '8px 12px', borderRadius: '6px', cursor: 'pointer', fontFamily: "'Jost', sans-serif", fontWeight: 600, textTransform: 'uppercase' }}
                           >
                             Remove
                           </button>
@@ -2472,7 +2384,7 @@ export default function ProfilePage() {
                   </div>
                 ) : (
                   <div style={{ textAlign: 'center', padding: '40px 10px', color: 'rgba(26,18,9,0.5)', fontSize: '13px' }}>
-                    No timepieces saved to your wishlist yet. Go to the <Link href="/collections" style={{ color: '#8b6914', textDecoration: 'underline', fontWeight: 500 }}>Collections Page</Link> to save your favorites.
+                    No timepieces saved to your wishlist yet. Explore the <Link href="/collections" style={{ color: '#141414', textDecoration: 'underline', fontWeight: 600 }}>Collections Page</Link> to save your favorites.
                   </div>
                 )}
               </div>
@@ -2485,9 +2397,9 @@ export default function ProfilePage() {
                   <h3 className="card-title">Dispatch Addresses</h3>
                   <p className="card-subtitle">Manage default addresses for courier shipping.</p>
                 </div>
-                <div style={{ background: '#faf7f0', border: '1px solid rgba(139,105,20,0.1)', padding: '16px', borderRadius: '8px' }}>
-                  <strong style={{ display: 'block', fontSize: '13px', color: '#1a1209', marginBottom: '4px' }}>Primary Destination Address</strong>
-                  <span style={{ fontSize: '12.5px', color: 'rgba(26,18,9,0.7)', lineHeight: 1.5 }}>
+                <div style={{ background: '#F8F7F4', border: '1px solid rgba(20,20,20,0.08)', padding: '16px', borderRadius: '8px' }}>
+                  <strong style={{ display: 'block', fontSize: '13px', color: '#141414', marginBottom: '4px' }}>Primary Destination Address</strong>
+                  <span style={{ fontSize: '12.5px', color: '#555555', lineHeight: 1.5 }}>
                     {formData.address ? `${formData.address}, ${formData.city}, ${formData.postalCode}, ${COUNTRIES.find(c => c.code === formData.country)?.name || formData.country}` : 'No address set yet. Use the Profile Details tab to add your destination.'}
                   </span>
                 </div>
@@ -2501,7 +2413,7 @@ export default function ProfilePage() {
                   <h3 className="card-title">Security & Account</h3>
                   <p className="card-subtitle">Manage account security and Clerk connection keys.</p>
                 </div>
-                <p style={{ fontSize: '13px', color: 'rgba(26,18,9,0.7)', lineHeight: 1.6 }}>
+                <p style={{ fontSize: '13px', color: '#555555', lineHeight: 1.6 }}>
                   Winsor Brand utilizes Clerk's state-of-the-art secure single-sign-on (SSO) systems. To modify your security credentials, email authentication codes, or password keys, please open your Clerk portal settings below:
                 </p>
                 <button type="button" className="gold-action-btn" style={{ width: 'fit-content', marginTop: '12px' }} onClick={() => openUserProfile()}>
@@ -2518,13 +2430,13 @@ export default function ProfilePage() {
                   <p className="card-subtitle">Manage dispatch transit notifications and launch updates.</p>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '13px', color: 'rgba(26,18,9,0.5)', cursor: 'pointer' }}>
-                    <input type="checkbox" style={{ accentColor: '#8b6914' }} disabled />
-                    <span>Send SMS updates on courier shipping dispatch (Currently Unavailable)</span>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '13px', color: '#777777', cursor: 'not-allowed' }}>
+                    <input type="checkbox" style={{ accentColor: '#141414' }} disabled />
+                    <span>Send SMS updates on shipping dispatch (Currently Unavailable)</span>
                   </label>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '13px', color: 'rgba(26,18,9,0.5)', cursor: 'pointer' }}>
-                    <input type="checkbox" style={{ accentColor: '#8b6914' }} disabled />
-                    <span>Email receipts and VAT invoice summaries (Currently Unavailable)</span>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '13px', color: '#777777', cursor: 'not-allowed' }}>
+                    <input type="checkbox" style={{ accentColor: '#141414' }} disabled />
+                    <span>Email receipts and order summaries (Currently Unavailable)</span>
                   </label>
                 </div>
               </div>
@@ -2548,15 +2460,15 @@ export default function ProfilePage() {
                   ) : (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                       {pendingReviews.map((item, idx) => (
-                        <div key={idx} style={{ display: 'flex', gap: '16px', border: '1.5px solid rgba(184, 142, 60, 0.2)', borderRadius: '14px', padding: '16px', alignItems: 'center', background: '#FAF7F0' }}>
-                          <div style={{ position: 'relative', width: '64px', height: '64px', borderRadius: '8px', overflow: 'hidden', flexShrink: 0, border: '1px solid rgba(184, 142, 60, 0.18)', background: 'transparent' }}>
+                        <div key={idx} style={{ display: 'flex', gap: '16px', border: '1px solid rgba(20,20,20,0.08)', borderRadius: '12px', padding: '16px', alignItems: 'center', background: '#FFFFFF', boxShadow: '0 2px 8px rgba(0,0,0,0.02)' }}>
+                          <div style={{ position: 'relative', width: '64px', height: '64px', borderRadius: '8px', overflow: 'hidden', flexShrink: 0, border: '1px solid rgba(20,20,20,0.08)', background: '#F9F9FB' }}>
                             <img src={item.productThumbnail} alt={item.productTitle} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
                           </div>
                           <div style={{ flexGrow: 1, minWidth: 0 }}>
-                            <h4 style={{ margin: '0 0 2px 0', fontSize: '14.5px', fontWeight: 650, color: '#1a1209', fontFamily: 'Cormorant Garamond, serif' }}>{item.productTitle}</h4>
-                            <span style={{ fontSize: '11px', color: 'rgba(26,18,9,0.5)', textTransform: 'uppercase' }}>Model: {item.productModelNo}</span>
-                            <div style={{ marginTop: '6px', fontSize: '11.5px', color: '#8B6914', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '5px' }}>
-                              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#8b6914" strokeWidth="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                            <h4 style={{ margin: '0 0 2px 0', fontSize: '14.5px', fontWeight: 600, color: '#141414', fontFamily: 'Cormorant Garamond, serif' }}>{item.productTitle}</h4>
+                            <span style={{ fontSize: '11px', color: '#666666', textTransform: 'uppercase' }}>Model: {item.productModelNo}</span>
+                            <div style={{ marginTop: '6px', fontSize: '11.5px', color: '#555555', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '5px' }}>
+                              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#141414" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
                               <span>{item.daysLeft} days remaining to review</span>
                             </div>
                           </div>
@@ -2566,7 +2478,7 @@ export default function ProfilePage() {
                               setReviewItem(item);
                               setIsReviewModalOpen(true);
                             }}
-                            style={{ background: '#8b6914', color: '#ffffff', border: 'none', padding: '8px 18px', fontSize: '10.5px', fontWeight: 700, letterSpacing: '0.08em', borderRadius: '100px', cursor: 'pointer', textTransform: 'uppercase' }}
+                            style={{ background: '#141414', color: '#ffffff', border: '1px solid #141414', padding: '8px 18px', fontSize: '10.5px', fontWeight: 600, letterSpacing: '0.04em', borderRadius: '6px', cursor: 'pointer', textTransform: 'uppercase' }}
                           >
                             WRITE REVIEW
                           </button>
@@ -2591,15 +2503,15 @@ export default function ProfilePage() {
                   ) : (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                       {myReviews.map((rev, idx) => (
-                        <div key={idx} style={{ border: '1.5px solid rgba(184,142,60,0.22)', borderRadius: '16px', padding: '20px', background: '#FAF7F0', display: 'flex', flexDirection: 'column', gap: '14px', width: '100%', boxSizing: 'border-box' }}>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1.5px solid rgba(184,142,60,0.15)', paddingBottom: '12px', flexWrap: 'wrap', gap: '10px' }}>
+                        <div key={idx} style={{ border: '1px solid rgba(20,20,20,0.08)', borderRadius: '12px', padding: '18px', background: '#FFFFFF', display: 'flex', flexDirection: 'column', gap: '14px', width: '100%', boxSizing: 'border-box', boxShadow: '0 2px 8px rgba(0,0,0,0.02)' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(20,20,20,0.06)', paddingBottom: '12px', flexWrap: 'wrap', gap: '10px' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                              <div style={{ width: '48px', height: '48px', position: 'relative', borderRadius: '8px', overflow: 'hidden', border: '1px solid rgba(184,142,60,0.18)', background: 'transparent', padding: '2px', flexShrink: 0 }}>
+                              <div style={{ width: '48px', height: '48px', position: 'relative', borderRadius: '8px', overflow: 'hidden', border: '1px solid rgba(20,20,20,0.08)', background: '#F9F9FB', padding: '2px', flexShrink: 0 }}>
                                 <img src={rev.productId?.thumbnail?.url || '/winsor_hero_backgroundremoved.webp'} alt={rev.productId?.title || 'Timepiece'} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
                               </div>
                               <div>
-                                <h4 style={{ margin: '0 0 2px 0', fontSize: '15px', fontWeight: 650, color: '#1a1209', fontFamily: 'Cormorant Garamond, serif' }}>{rev.productId?.title || 'Timepiece'}</h4>
-                                <span style={{ fontSize: '11px', color: '#8b6914', fontFamily: 'Jost, monospace', fontWeight: 600 }}>Model: #{rev.productId?.modelNo || 'N/A'}</span>
+                                <h4 style={{ margin: '0 0 2px 0', fontSize: '15px', fontWeight: 600, color: '#141414', fontFamily: 'Cormorant Garamond, serif' }}>{rev.productId?.title || 'Timepiece'}</h4>
+                                <span style={{ fontSize: '11px', color: '#666666', fontFamily: 'Jost, monospace', fontWeight: 500 }}>Model: #{rev.productId?.modelNo || 'N/A'}</span>
                               </div>
                             </div>
 
@@ -2614,9 +2526,9 @@ export default function ProfilePage() {
                               display: 'inline-flex',
                               alignItems: 'center',
                               gap: '5px',
-                              background: rev.status === 'approved' ? 'rgba(46,125,50,0.08)' : rev.status === 'rejected' ? 'rgba(198,40,40,0.08)' : 'rgba(212,175,55,0.12)',
-                              color: rev.status === 'approved' ? '#2e7d32' : rev.status === 'rejected' ? '#c62828' : '#8b6914',
-                              border: rev.status === 'approved' ? '1px solid rgba(46,125,50,0.25)' : rev.status === 'rejected' ? '1px solid rgba(198,40,40,0.25)' : '1px solid rgba(212,175,55,0.3)',
+                              background: rev.status === 'approved' ? '#E8F5E9' : rev.status === 'rejected' ? '#FFEBEE' : '#F5F5F5',
+                              color: rev.status === 'approved' ? '#2E7D32' : rev.status === 'rejected' ? '#C62828' : '#616161',
+                              border: rev.status === 'approved' ? '1px solid rgba(46,125,50,0.2)' : rev.status === 'rejected' ? '1px solid rgba(198,40,40,0.2)' : '1px solid rgba(0,0,0,0.1)',
                             }}>
                               {rev.status === 'pending' ? (
                                 <>
@@ -2642,14 +2554,14 @@ export default function ProfilePage() {
                             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '10px', flexWrap: 'wrap' }}>
                               <div style={{ display: 'flex', gap: '2px' }}>
                                 {Array.from({ length: 5 }).map((_, i) => (
-                                  <svg key={i} width="14" height="14" viewBox="0 0 24 24" fill={i < rev.rating ? '#d4af37' : '#d1c7b7'} stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" /></svg>
+                                  <svg key={i} width="14" height="14" viewBox="0 0 24 24" fill={i < rev.rating ? '#D4AF37' : '#E0E0E0'} stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" /></svg>
                                 ))}
                               </div>
-                              <span style={{ fontSize: '11px', color: 'rgba(26,18,9,0.55)', marginLeft: '6px', fontWeight: 500 }}>
+                              <span style={{ fontSize: '11px', color: '#666666', marginLeft: '6px', fontWeight: 500 }}>
                                 Reviewed on {new Date(rev.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                               </span>
                               {rev.isAnonymous && (
-                                <span style={{ fontSize: '10px', background: 'rgba(26,18,9,0.06)', color: 'rgba(26,18,9,0.6)', padding: '3px 10px', borderRadius: '100px', marginLeft: 'auto', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                                <span style={{ fontSize: '10px', background: '#F0F0F2', color: '#555555', padding: '3px 10px', borderRadius: '100px', marginLeft: 'auto', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
                                   <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
                                   Anonymous Review
                                 </span>
@@ -2658,17 +2570,16 @@ export default function ProfilePage() {
 
                             {/* Long text container with word-break & max-height scroll */}
                             <div style={{
-                              background: '#ffffff',
-                              border: '1px solid rgba(26,18,9,0.06)',
-                              borderRadius: '10px',
-                              padding: '14px 16px',
-                              fontSize: '13.5px',
+                              background: '#F8F7F4',
+                              border: '1px solid rgba(20,20,20,0.06)',
+                              borderRadius: '8px',
+                              padding: '12px 14px',
+                              fontSize: '13px',
                               lineHeight: 1.6,
-                              color: '#1a1209',
+                              color: '#141414',
                               wordBreak: 'break-word',
                               overflowWrap: 'anywhere',
                               whiteSpace: 'pre-wrap',
-                              boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.02)',
                               maxHeight: '280px',
                               overflowY: 'auto',
                             }}>
@@ -2700,14 +2611,14 @@ export default function ProfilePage() {
               <div className="portal-bottom-split">
                 {/* RECENT ORDERS */}
                 <div className="content-card">
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(26,18,9,0.06)', paddingBottom: '12px', marginBottom: '14px' }}>
-                    <h4 style={{ margin: 0, fontFamily: 'Cormorant Garamond, serif', fontSize: '18px', fontWeight: 600, color: '#1a1209' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(20,20,20,0.06)', paddingBottom: '12px', marginBottom: '14px' }}>
+                    <h4 style={{ margin: 0, fontFamily: 'Cormorant Garamond, serif', fontSize: '18px', fontWeight: 600, color: '#141414' }}>
                       Recent Orders
                     </h4>
                     <button
                       type="button"
                       onClick={() => setActiveTab('orders')}
-                      style={{ background: 'none', border: 'none', color: '#8b6914', fontSize: '11px', fontWeight: 600, textDecoration: 'underline', cursor: 'pointer', fontFamily: "'Jost', sans-serif" }}
+                      style={{ background: 'none', border: 'none', color: '#141414', fontSize: '11px', fontWeight: 600, textDecoration: 'underline', cursor: 'pointer', fontFamily: "'Jost', sans-serif" }}
                     >
                       View All
                     </button>
@@ -2733,17 +2644,17 @@ export default function ProfilePage() {
 
                 {/* ACCOUNT BENEFITS */}
                 <div className="content-card">
-                  <div style={{ borderBottom: '1px solid rgba(26,18,9,0.06)', paddingBottom: '12px', marginBottom: '14px' }}>
-                    <h4 style={{ margin: 0, fontFamily: 'Cormorant Garamond, serif', fontSize: '18px', fontWeight: 600, color: '#1a1209' }}>
+                  <div style={{ borderBottom: '1px solid rgba(20,20,20,0.06)', paddingBottom: '12px', marginBottom: '14px' }}>
+                    <h4 style={{ margin: 0, fontFamily: 'Cormorant Garamond, serif', fontSize: '18px', fontWeight: 600, color: '#141414' }}>
                       Account Benefits
                     </h4>
                   </div>
 
                   <div className="patron-black-card">
-                    <h5 className="black-card-title">{membershipTier} BENEFITS</h5>
+                    <h5 className="black-card-title">CLIENT BENEFITS</h5>
                     <p className="black-card-desc">Enjoy exclusive benefits and privileges.</p>
                     <span className="black-card-gold-seal">
-                      <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#d4af37" strokeWidth="1.2" style={{ opacity: 0.25 }}><path d="M2 4l3 12h14l3-12-6 7-4-7-4 7-6-7zm3 14h14v2H5v-2z"/></svg>
+                      <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth="1.2" style={{ opacity: 0.12 }}><path d="M2 4l3 12h14l3-12-6 7-4-7-4 7-6-7zm3 14h14v2H5v-2z"/></svg>
                     </span>
                   </div>
 
@@ -2772,19 +2683,19 @@ export default function ProfilePage() {
         </div>
       </div>
 
-      {/* WRITE REVIEW MODAL (LUXURY OVERLAY) */}
+      {/* WRITE REVIEW MODAL */}
       {isReviewModalOpen && reviewItem && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 1000, background: 'rgba(10, 7, 4, 0.75)', backdropFilter: 'blur(12px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', fontFamily: "'Jost', sans-serif" }}>
-          <div style={{ background: '#ffffff', borderRadius: '20px', maxWidth: '520px', width: '100%', boxShadow: '0 25px 60px rgba(0,0,0,0.35)', maxHeight: '90vh', display: 'flex', flexDirection: 'column', overflow: 'hidden', border: '1px solid rgba(212,175,55,0.3)' }}>
+        <div style={{ position: 'fixed', inset: 0, zIndex: 1000, background: 'rgba(0, 0, 0, 0.65)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', fontFamily: "'Jost', sans-serif" }}>
+          <div style={{ background: '#FFFFFF', borderRadius: '16px', maxWidth: '520px', width: '100%', boxShadow: '0 25px 60px rgba(0,0,0,0.25)', maxHeight: '90vh', display: 'flex', flexDirection: 'column', overflow: 'hidden', border: '1px solid rgba(20,20,20,0.1)' }}>
             
-            {/* Dark Luxury Header */}
-            <div style={{ background: 'linear-gradient(135deg, #1a1209 0%, #2c1f0c 100%)', padding: '20px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', color: '#f3e3b8', borderBottom: '1px solid rgba(212,175,55,0.25)' }}>
+            {/* Header */}
+            <div style={{ background: '#141414', padding: '20px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', color: '#FFFFFF', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
               <div>
-                <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '22px', fontWeight: 600, margin: 0, letterSpacing: '0.04em', color: '#ffffff' }}>
-                  ✦ WRITE TIMEPIECE REVIEW ✦
+                <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '22px', fontWeight: 600, margin: 0, letterSpacing: '0.02em', color: '#FFFFFF' }}>
+                  Write Timepiece Review
                 </h2>
-                <p style={{ margin: '3px 0 0 0', fontSize: '11px', color: 'rgba(243,227,184,0.7)', letterSpacing: '0.05em' }}>
-                  Share your experience with the Winsor watch community
+                <p style={{ margin: '3px 0 0 0', fontSize: '11px', color: 'rgba(255,255,255,0.65)', letterSpacing: '0.02em' }}>
+                  Share your experience with the Winsor community
                 </p>
               </div>
               <button
@@ -2793,7 +2704,7 @@ export default function ProfilePage() {
                   setIsReviewModalOpen(false);
                   setReviewItem(null);
                 }}
-                style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'rgba(212,175,55,0.15)', border: '1px solid rgba(212,175,55,0.3)', color: '#d4af37', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', transition: 'all 0.2s ease', flexShrink: 0 }}
+                style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.15)', color: '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', transition: 'all 0.2s ease', flexShrink: 0 }}
                 title="Close"
               >
                 ✕
@@ -2804,13 +2715,13 @@ export default function ProfilePage() {
             <div style={{ padding: '24px', overflowY: 'auto', flex: 1 }}>
               
               {/* Product Item Brief Card */}
-              <div style={{ background: '#faf7f0', border: '1px solid rgba(139,105,20,0.18)', borderRadius: '12px', padding: '12px 16px', display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '22px' }}>
-                <div style={{ width: '48px', height: '48px', borderRadius: '8px', background: '#ffffff', border: '1px solid rgba(26,18,9,0.08)', padding: '3px', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <div style={{ background: '#F8F7F4', border: '1px solid rgba(20,20,20,0.08)', borderRadius: '10px', padding: '12px 16px', display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '22px' }}>
+                <div style={{ width: '48px', height: '48px', borderRadius: '8px', background: '#FFFFFF', border: '1px solid rgba(20,20,20,0.08)', padding: '3px', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <img src={reviewItem.productThumbnail || '/winsor_hero_backgroundremoved.webp'} alt={reviewItem.productTitle} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
                 </div>
                 <div>
-                  <h4 style={{ margin: 0, fontSize: '13.5px', fontWeight: 650, color: '#1a1209' }}>{reviewItem.productTitle}</h4>
-                  <div style={{ fontSize: '11px', color: '#8b6914', fontFamily: 'Jost, monospace', fontWeight: 600, marginTop: '2px' }}>
+                  <h4 style={{ margin: 0, fontSize: '13.5px', fontWeight: 600, color: '#141414' }}>{reviewItem.productTitle}</h4>
+                  <div style={{ fontSize: '11px', color: '#666666', fontFamily: 'Jost, monospace', fontWeight: 500, marginTop: '2px' }}>
                     Model: #{reviewItem.productModelNo} {reviewItem.colorVariant ? `• Variant: ${reviewItem.colorVariant}` : ''}
                   </div>
                 </div>
@@ -2820,18 +2731,18 @@ export default function ProfilePage() {
                 {/* Rating selection */}
                 <div style={{ marginBottom: '22px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-                    <label style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#1a1209' }}>
+                    <label style={{ fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#141414' }}>
                       Overall Rating *
                     </label>
-                    <span style={{ fontSize: '11px', fontWeight: 600, color: '#8b6914' }}>
-                      {reviewRating === 5 && '5.0 / 5.0 — Exceptional Quality'}
+                    <span style={{ fontSize: '11px', fontWeight: 500, color: '#141414' }}>
+                      {reviewRating === 5 && '5.0 / 5.0 — Exceptional'}
                       {reviewRating === 4 && '4.0 / 5.0 — Very Good'}
                       {reviewRating === 3 && '3.0 / 5.0 — Satisfactory'}
                       {reviewRating === 2 && '2.0 / 5.0 — Below Expectations'}
                       {reviewRating === 1 && '1.0 / 5.0 — Poor Experience'}
                     </span>
                   </div>
-                  <div style={{ display: 'flex', gap: '8px', background: '#faf7f0', padding: '10px 16px', borderRadius: '10px', border: '1px solid rgba(139,105,20,0.15)', width: 'fit-content' }}>
+                  <div style={{ display: 'flex', gap: '8px', background: '#F8F7F4', padding: '10px 16px', borderRadius: '8px', border: '1px solid rgba(20,20,20,0.08)', width: 'fit-content' }}>
                     {[1, 2, 3, 4, 5].map((num) => (
                       <button
                         key={num}
@@ -2841,13 +2752,13 @@ export default function ProfilePage() {
                           background: 'none',
                           border: 'none',
                           cursor: 'pointer',
-                          fontSize: '26px',
-                          color: reviewRating >= num ? '#d4af37' : '#d1c7b7',
+                          fontSize: '24px',
+                          color: reviewRating >= num ? '#D4AF37' : '#D8D8D8',
                           padding: 0,
                           transition: 'transform 0.15s ease',
                           lineHeight: 1,
                         }}
-                        onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.2)')}
+                        onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.15)')}
                         onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
                       >
                         ★
@@ -2858,35 +2769,35 @@ export default function ProfilePage() {
 
                 {/* Feedback Comment */}
                 <div style={{ marginBottom: '22px' }}>
-                  <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '8px', color: '#1a1209' }}>
+                  <label style={{ display: 'block', fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '8px', color: '#141414' }}>
                     Your Detailed Review *
                   </label>
                   <textarea
                     required
                     rows={4}
-                    placeholder="Describe your experience with the timepiece's craftsmanship, movement precision, packaging presentation, and overall timepiece details..."
+                    placeholder="Describe your experience with the craftsmanship, precision, packaging, and overall finish..."
                     value={reviewComment}
                     onChange={(e) => setReviewComment(e.target.value)}
                     style={{
                       width: '100%',
-                      padding: '14px',
-                      borderRadius: '10px',
-                      border: '1px solid rgba(139,105,20,0.25)',
-                      background: '#ffffff',
+                      padding: '12px 14px',
+                      borderRadius: '8px',
+                      border: '1px solid rgba(20,20,20,0.14)',
+                      background: '#FBFBFC',
                       outline: 'none',
                       resize: 'vertical',
                       fontSize: '13px',
-                      color: '#1a1209',
+                      color: '#141414',
                       lineHeight: 1.5,
-                      boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.02)',
+                      boxSizing: 'border-box',
                     }}
                   />
                 </div>
 
                 {/* Styled Photo Attachment Dropzone */}
                 <div style={{ marginBottom: '22px' }}>
-                  <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '8px', color: '#1a1209' }}>
-                    Attach Timepiece Photos (Max 2)
+                  <label style={{ display: 'block', fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '8px', color: '#141414' }}>
+                    Attach Photos (Max 2)
                   </label>
                   
                   <div style={{ position: 'relative' }}>
@@ -2906,19 +2817,19 @@ export default function ProfilePage() {
                         alignItems: 'center',
                         justifyContent: 'center',
                         gap: '10px',
-                        padding: '16px',
-                        borderRadius: '10px',
-                        border: '2px dashed rgba(139,105,20,0.3)',
-                        background: uploadingReviewImg || reviewImages.length >= 2 ? '#f5f2eb' : '#faf7f0',
+                        padding: '14px',
+                        borderRadius: '8px',
+                        border: '1.5px dashed rgba(20,20,20,0.15)',
+                        background: uploadingReviewImg || reviewImages.length >= 2 ? '#F4F4F6' : '#F8F7F4',
                         cursor: uploadingReviewImg || reviewImages.length >= 2 ? 'not-allowed' : 'pointer',
                         transition: 'all 0.2s ease',
                       }}
                     >
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8b6914" strokeWidth="2">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#141414" strokeWidth="2">
                         <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
                         <circle cx="12" cy="13" r="4" />
                       </svg>
-                      <span style={{ fontSize: '12.5px', fontWeight: 600, color: '#1a1209' }}>
+                      <span style={{ fontSize: '12px', fontWeight: 500, color: '#141414' }}>
                         {uploadingReviewImg
                           ? 'Uploading Photo...'
                           : reviewImages.length >= 2
@@ -2927,20 +2838,20 @@ export default function ProfilePage() {
                       </span>
                     </label>
                   </div>
-                  <div style={{ fontSize: '10.5px', color: 'rgba(26,18,9,0.5)', marginTop: '6px' }}>
+                  <div style={{ fontSize: '11px', color: '#777777', marginTop: '6px' }}>
                     Supported formats: PNG, JPG, WEBP. Maximum 2 image attachments.
                   </div>
 
                   {/* Thumbnail previews */}
                   {reviewImages.length > 0 && (
-                    <div style={{ display: 'flex', gap: '12px', marginTop: '12px' }}>
+                    <div style={{ display: 'flex', gap: '10px', marginTop: '12px' }}>
                       {reviewImages.map((url, i) => (
-                        <div key={i} style={{ position: 'relative', width: '64px', height: '64px', borderRadius: '8px', overflow: 'hidden', border: '1px solid rgba(139,105,20,0.3)', boxShadow: '0 3px 10px rgba(0,0,0,0.1)' }}>
+                        <div key={i} style={{ position: 'relative', width: '60px', height: '60px', borderRadius: '8px', overflow: 'hidden', border: '1px solid rgba(20,20,20,0.15)', boxShadow: '0 2px 6px rgba(0,0,0,0.06)' }}>
                           <img src={url} alt="Attached review item" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                           <button
                             type="button"
                             onClick={() => setReviewImages(prev => prev.filter((_, idx) => idx !== i))}
-                            style={{ position: 'absolute', top: 3, right: 3, background: 'rgba(26,18,9,0.85)', border: '1px solid #d4af37', color: '#ffffff', width: '18px', height: '18px', borderRadius: '50%', fontSize: '9px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                            style={{ position: 'absolute', top: 3, right: 3, background: 'rgba(20,20,20,0.8)', border: 'none', color: '#FFFFFF', width: '18px', height: '18px', borderRadius: '50%', fontSize: '9px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                             title="Remove photo"
                           >
                             ✕
@@ -2952,21 +2863,21 @@ export default function ProfilePage() {
                 </div>
 
                 {/* Anonymous Checkbox */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '26px', background: '#faf7f0', padding: '12px 16px', borderRadius: '10px', border: '1px solid rgba(139,105,20,0.15)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '24px', background: '#F8F7F4', padding: '12px 14px', borderRadius: '8px', border: '1px solid rgba(20,20,20,0.08)' }}>
                   <input
                     id="review-anonymous"
                     type="checkbox"
                     checked={reviewAnonymous}
                     onChange={(e) => setReviewAnonymous(e.target.checked)}
-                    style={{ width: '16px', height: '16px', accentColor: '#8b6914', cursor: 'pointer' }}
+                    style={{ width: '16px', height: '16px', accentColor: '#141414', cursor: 'pointer' }}
                   />
-                  <label htmlFor="review-anonymous" style={{ fontSize: '12.5px', color: '#1a1209', fontWeight: 550, cursor: 'pointer', userSelect: 'none' }}>
-                    Publish review anonymously (masks your profile name for privacy)
+                  <label htmlFor="review-anonymous" style={{ fontSize: '12.5px', color: '#141414', fontWeight: 500, cursor: 'pointer', userSelect: 'none' }}>
+                    Publish review anonymously (masks your profile name)
                   </label>
                 </div>
 
                 {/* High Contrast Action Buttons */}
-                <div style={{ display: 'flex', gap: '12px' }}>
+                <div style={{ display: 'flex', gap: '10px' }}>
                   <button
                     type="button"
                     onClick={() => {
@@ -2975,15 +2886,15 @@ export default function ProfilePage() {
                     }}
                     style={{
                       flex: 1,
-                      padding: '14px',
-                      borderRadius: '10px',
-                      border: '1px solid rgba(26,18,9,0.25)',
-                      background: '#f4efe6',
-                      color: '#1a1209',
+                      padding: '12px',
+                      borderRadius: '8px',
+                      border: '1px solid rgba(20,20,20,0.15)',
+                      background: '#FFFFFF',
+                      color: '#141414',
                       cursor: 'pointer',
-                      fontSize: '12px',
-                      fontWeight: 700,
-                      letterSpacing: '0.1em',
+                      fontSize: '11px',
+                      fontWeight: 600,
+                      letterSpacing: '0.06em',
                       textTransform: 'uppercase',
                       transition: 'all 0.2s ease',
                     }}
@@ -2995,17 +2906,17 @@ export default function ProfilePage() {
                     disabled={submittingReview || uploadingReviewImg}
                     style={{
                       flex: 1.5,
-                      padding: '14px',
-                      borderRadius: '10px',
-                      background: 'linear-gradient(135deg, #1a1209 0%, #362510 100%)',
-                      color: '#d4af37',
-                      border: '1px solid #d4af37',
+                      padding: '12px',
+                      borderRadius: '8px',
+                      background: '#141414',
+                      color: '#FFFFFF',
+                      border: '1px solid #141414',
                       cursor: submittingReview || uploadingReviewImg ? 'not-allowed' : 'pointer',
-                      fontSize: '12px',
-                      fontWeight: 700,
-                      letterSpacing: '0.12em',
+                      fontSize: '11px',
+                      fontWeight: 600,
+                      letterSpacing: '0.08em',
                       textTransform: 'uppercase',
-                      boxShadow: '0 4px 15px rgba(26,18,9,0.25)',
+                      boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
                       opacity: submittingReview || uploadingReviewImg ? 0.6 : 1,
                       transition: 'all 0.2s ease',
                     }}

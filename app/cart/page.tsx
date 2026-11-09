@@ -1128,174 +1128,178 @@ export default function CartPage() {
         .bnm-dialog {
           background: #ffffff;
           border: 1px solid rgba(20, 20, 20, 0.1);
-          border-radius: 16px;
+          border-radius: 12px;
           width: 100%; max-width: 480px;
           max-height: 90vh;
           overflow-y: auto;
-          box-shadow: 0 24px 60px rgba(0, 0, 0, 0.2);
-          animation: bnm-fade-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+          box-shadow: 0 24px 64px rgba(0, 0, 0, 0.18);
+          animation: bnm-fade-in 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
           font-family: 'Jost', sans-serif;
           scrollbar-width: thin;
-          scrollbar-color: rgba(184, 142, 60, 0.3) transparent;
+          scrollbar-color: rgba(20, 20, 20, 0.2) transparent;
           position: relative;
         }
         .bnm-dialog::-webkit-scrollbar { width: 5px; }
-        .bnm-dialog::-webkit-scrollbar-thumb { background: rgba(184, 142, 60, 0.3); border-radius: 4px; }
+        .bnm-dialog::-webkit-scrollbar-thumb { background: rgba(20, 20, 20, 0.2); border-radius: 4px; }
 
         .bnm-header {
-          padding: 24px 28px 16px;
+          padding: 22px 26px 16px;
           display: flex; align-items: flex-start; justify-content: space-between;
           position: sticky; top: 0; background: #ffffff; z-index: 5;
+          border-bottom: 1px solid rgba(20, 20, 20, 0.06);
+          margin-bottom: 18px;
         }
 
         .bnm-title {
-          font-size: 22px; font-weight: 700;
-          color: #1a1209; margin: 0; letter-spacing: -0.01em;
+          font-family: 'Cormorant Garamond', Georgia, serif;
+          font-size: 24px; font-weight: 500;
+          color: #141414; margin: 0; letter-spacing: 0.01em; line-height: 1.2;
         }
         .bnm-subtitle {
-          font-size: 12px; color: #7a6e5d; margin: 3px 0 0; font-weight: 400;
+          font-family: 'Jost', sans-serif;
+          font-size: 12.5px; color: #666666; margin: 4px 0 0; font-weight: 400;
         }
 
         .bnm-close {
           width: 32px; height: 32px; border-radius: 50%;
-          border: 1px solid rgba(184, 142, 60, 0.3);
-          background: #ffffff; color: #6e6354; cursor: pointer;
+          border: 1px solid rgba(20, 20, 20, 0.1);
+          background: #F8F7F4; color: #141414; cursor: pointer;
           display: flex; align-items: center; justify-content: center;
           font-size: 16px; flex-shrink: 0; transition: all 0.2s ease;
-          box-shadow: 0 2px 6px rgba(0,0,0,0.04);
         }
-        .bnm-close:hover { background: rgba(184, 142, 60, 0.1); color: #1a1209; border-color: #b88e3c; }
+        .bnm-close:hover { background: #141414; color: #ffffff; border-color: #141414; }
 
-        .bnm-stepper-container { padding: 0 28px 16px; }
+        .bnm-stepper-container { padding: 0 26px 16px; }
         .bnm-stepper-track { display: flex; align-items: center; justify-content: space-between; position: relative; }
-        .bnm-stepper-line { flex: 1; height: 1.5px; background: rgba(184, 142, 60, 0.22); margin: 0 8px; transition: background 0.3s ease; }
-        .bnm-stepper-line.active { background: #b88e3c; height: 2px; }
+        .bnm-stepper-line { flex: 1; height: 1.5px; background: rgba(20, 20, 20, 0.1); margin: 0 8px; transition: background 0.3s ease; }
+        .bnm-stepper-line.active { background: #141414; height: 1.5px; }
 
-        .bnm-step-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(184, 142, 60, 0.3); }
+        .bnm-step-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(20, 20, 20, 0.18); }
         .bnm-step-dot.completed {
-          width: 24px; height: 24px; border-radius: 50%;
-          background: #b88e3c; display: flex; align-items: center; justify-content: center; color: #fff;
+          width: 22px; height: 22px; border-radius: 50%;
+          background: #141414; display: flex; align-items: center; justify-content: center; color: #fff;
         }
         .bnm-step-badge {
-          width: 32px; height: 32px; border-radius: 50%;
-          background: linear-gradient(135deg, #c59b4e 0%, #9e7529 100%);
+          width: 28px; height: 28px; border-radius: 50%;
+          background: #141414;
           display: flex; align-items: center; justify-content: center;
-          color: #ffffff; box-shadow: 0 3px 10px rgba(184, 142, 60, 0.35);
+          color: #ffffff; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.16);
         }
 
-        .bnm-body { padding: 0 28px 24px; }
+        .bnm-body { padding: 0 26px 24px; }
         .bnm-card {
-          background: #ffffff; border: 1px solid rgba(184, 142, 60, 0.2);
-          border-radius: 14px; padding: 16px 18px; margin-bottom: 14px;
-          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02); position: relative;
+          background: #F8F7F4; border: 1px solid rgba(20, 20, 20, 0.08);
+          border-radius: 8px; padding: 16px 18px; margin-bottom: 14px;
+          position: relative;
         }
 
         .bnm-section-label {
-          font-size: 10.5px; font-weight: 700; color: #8e7c66;
-          text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 12px;
+          font-size: 10.5px; font-weight: 600; color: #141414;
+          text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 12px;
         }
 
         .bnm-pay-option {
-          border: 1.5px solid rgba(184, 142, 60, 0.22); border-radius: 14px;
+          border: 1px solid rgba(20, 20, 20, 0.12); border-radius: 8px;
           padding: 16px 18px; cursor: pointer; transition: all 0.2s ease;
           background: #ffffff; display: flex; align-items: flex-start;
           gap: 14px; width: 100%; box-sizing: border-box; margin-bottom: 12px;
           text-align: left; position: relative; overflow: hidden;
         }
         .bnm-pay-option.active {
-          border-color: #b88e3c; border-width: 2px;
-          box-shadow: 0 4px 14px rgba(184, 142, 60, 0.12);
+          border-color: #141414; border-width: 1.5px;
+          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
         }
-        .bnm-pay-option:hover { border-color: rgba(184, 142, 60, 0.6); }
+        .bnm-pay-option:hover { border-color: rgba(20, 20, 20, 0.35); }
 
         .bnm-corner-ribbon {
-          position: absolute; top: 0; right: 0; width: 28px; height: 28px;
-          background: linear-gradient(135deg, #b88e3c, #9e7529);
-          border-bottom-left-radius: 10px; display: flex; align-items: center;
-          justify-content: center; color: #ffffff; box-shadow: 0 2px 6px rgba(184, 142, 60, 0.3);
+          position: absolute; top: 0; right: 0; width: 26px; height: 26px;
+          background: #141414;
+          border-bottom-left-radius: 8px; display: flex; align-items: center;
+          justify-content: center; color: #ffffff;
         }
 
         .bnm-radio {
-          width: 20px; height: 20px; border-radius: 50%;
-          border: 2px solid rgba(184, 142, 60, 0.4); flex-shrink: 0;
+          width: 18px; height: 18px; border-radius: 50%;
+          border: 1.5px solid #141414; flex-shrink: 0;
           display: flex; align-items: center; justify-content: center;
           transition: all 0.2s ease; margin-top: 1px;
         }
-        .bnm-radio.active { border-color: #b88e3c; background: #b88e3c; }
-        .bnm-radio.active::after { content: ''; width: 7px; height: 7px; background: #ffffff; border-radius: 50%; }
+        .bnm-radio.active { border-color: #141414; background: #141414; }
+        .bnm-radio.active::after { content: ''; width: 6px; height: 6px; background: #ffffff; border-radius: 50%; }
 
         .bnm-bank-details {
-          background: #faf7f0; border: 1px solid rgba(184, 142, 60, 0.2);
-          border-radius: 12px; padding: 14px 16px; margin-top: 12px;
+          background: #F8F7F4; border: 1px solid rgba(20, 20, 20, 0.08);
+          border-radius: 8px; padding: 14px 16px; margin-top: 12px;
         }
 
         .bnm-bank-row {
-          display: flex; justify-content: space-between; font-size: 12.5px;
-          line-height: 1.7; color: #1a1209;
+          display: flex; justify-content: space-between; font-size: 12px;
+          line-height: 1.6; color: #141414;
         }
         .bnm-bank-row + .bnm-bank-row {
-          border-top: 1px solid rgba(184, 142, 60, 0.12);
+          border-top: 1px solid rgba(20, 20, 20, 0.06);
           margin-top: 6px; padding-top: 6px;
         }
 
         .bnm-info-box {
-          background: #fffbeb; border: 1px solid rgba(245, 158, 11, 0.3);
-          border-radius: 10px; padding: 12px 14px; margin-top: 12px;
+          background: #F8F7F4; border: 1px solid rgba(20, 20, 20, 0.1);
+          border-radius: 8px; padding: 12px 14px; margin-top: 12px;
           display: flex; gap: 10px; align-items: flex-start;
         }
 
         .bnm-receipt-upload {
-          border: 2px dashed rgba(184, 142, 60, 0.35);
-          border-radius: 12px; padding: 16px; text-align: center;
+          border: 1.5px dashed rgba(20, 20, 20, 0.18);
+          border-radius: 8px; padding: 14px; text-align: center;
           cursor: pointer; transition: all 0.2s ease; position: relative;
           overflow: hidden; margin-top: 12px; background: #ffffff;
         }
-        .bnm-receipt-upload:hover { border-color: #b88e3c; background: rgba(184, 142, 60, 0.03); }
+        .bnm-receipt-upload:hover { border-color: #141414; background: #F8F7F4; }
         .bnm-receipt-upload input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
 
         .bnm-btn-primary {
-          width: 100%; height: 48px;
-          background: linear-gradient(135deg, #c59b4e 0%, #936f26 100%);
-          color: #ffffff; border: none; border-radius: 12px;
-          cursor: pointer; font-family: 'Jost', sans-serif; font-size: 12.5px;
-          font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+          width: 100%; height: 46px; box-sizing: border-box;
+          background: #141414;
+          color: #ffffff; border: 1px solid #141414; border-radius: 6px;
+          cursor: pointer; font-family: 'Jost', sans-serif; font-size: 11.5px;
+          font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase;
           transition: all 0.2s ease; display: flex; align-items: center;
-          justify-content: center; gap: 8px; box-shadow: 0 4px 14px rgba(184, 142, 60, 0.28);
-          margin-top: 4px;
+          justify-content: center; gap: 8px; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+          margin-top: 0;
         }
         .bnm-btn-primary:hover:not(:disabled) {
-          background: linear-gradient(135deg, #d4a755 0%, #a47c2d 100%);
-          box-shadow: 0 6px 18px rgba(184, 142, 60, 0.38); transform: translateY(-1px);
+          background: #2C2C2C; border-color: #2C2C2C;
+          box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15); transform: translateY(-1px);
         }
-        .bnm-btn-primary:disabled { opacity: 0.6; cursor: not-allowed; box-shadow: none; }
+        .bnm-btn-primary:disabled { opacity: 0.5; cursor: not-allowed; box-shadow: none; }
 
         .bnm-btn-outline {
-          width: 100%; height: 46px; background: transparent;
-          border: 1.5px solid rgba(184, 142, 60, 0.45); color: #9e7529;
-          border-radius: 12px; cursor: pointer; font-family: 'Jost', sans-serif;
-          font-size: 12.5px; font-weight: 700; letter-spacing: 0.08em;
+          width: 100%; height: 46px; box-sizing: border-box; background: #FFFFFF;
+          border: 1px solid rgba(20, 20, 20, 0.2); color: #141414;
+          border-radius: 6px; cursor: pointer; font-family: 'Jost', sans-serif;
+          font-size: 11.5px; font-weight: 500; letter-spacing: 0.08em;
           text-transform: uppercase; margin-top: 10px; transition: all 0.2s ease;
+          display: flex; align-items: center; justify-content: center; gap: 8px;
         }
-        .bnm-btn-outline:hover { border-color: #b88e3c; background: rgba(184, 142, 60, 0.06); color: #b88e3c; }
+        .bnm-btn-outline:hover { border-color: #141414; background: #F8F7F4; color: #141414; }
 
         .bnm-checkbox-row {
-          display: flex; align-items: flex-start; gap: 10px; padding: 10px 0 2px;
+          display: flex; align-items: flex-start; gap: 10px; padding: 8px 0 2px;
           cursor: pointer; margin-top: 8px;
         }
         .bnm-checkbox {
-          width: 18px; height: 18px; border: 2px solid rgba(184, 142, 60, 0.4);
+          width: 18px; height: 18px; border: 1.5px solid rgba(20, 20, 20, 0.3);
           border-radius: 4px; flex-shrink: 0; display: flex; align-items: center;
           justify-content: center; transition: all 0.2s ease; margin-top: 1px;
         }
-        .bnm-checkbox.checked { background: #b88e3c; border-color: #b88e3c; }
+        .bnm-checkbox.checked { background: #141414; border-color: #141414; }
 
         .bnm-trust-footer {
           display: flex; align-items: center; justify-content: space-around;
-          margin-top: 20px; padding-top: 16px; border-top: 1px solid rgba(184, 142, 60, 0.18);
+          margin-top: 20px; padding-top: 16px; border-top: 1px solid rgba(20, 20, 20, 0.08);
         }
         .bnm-trust-item {
           display: flex; align-items: center; gap: 6px; font-size: 11.5px;
-          font-weight: 600; color: #6e6354;
+          font-weight: 500; color: #666666;
         }
 
         /* MODALS */
@@ -2083,37 +2087,37 @@ export default function CartPage() {
                   {isProfileComplete ? (
                     <div className="bnm-card">
                       <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                        <div style={{ fontSize: '14px', color: '#1a1209', fontWeight: 700 }}>
-                          {user?.fullName || profile?.name || 'Patron'}
+                        <div style={{ fontSize: '13.5px', color: '#141414', fontWeight: 600 }}>
+                          {user?.fullName || profile?.name || 'Customer'}
                         </div>
                         <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#b88e3c" strokeWidth="2" style={{ flexShrink: 0, marginTop: 3 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" /></svg>
-                          <span style={{ fontSize: '13px', color: '#1a1209', lineHeight: 1.5 }}>
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#141414" strokeWidth="2" style={{ flexShrink: 0, marginTop: 3 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" /></svg>
+                          <span style={{ fontSize: '13px', color: '#141414', lineHeight: 1.5 }}>
                             {profile?.address}, {profile?.city}, {profile?.postalCode}, {profile?.country}
                           </span>
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#b88e3c" strokeWidth="2" style={{ flexShrink: 0 }}><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" /></svg>
-                          <span style={{ fontSize: '13px', color: '#1a1209' }}>{profile?.mobileCode} {profile?.mobile}</span>
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#141414" strokeWidth="2" style={{ flexShrink: 0 }}><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" /></svg>
+                          <span style={{ fontSize: '13px', color: '#141414' }}>{profile?.mobileCode} {profile?.mobile}</span>
                         </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 4, paddingTop: 8, borderTop: '1px solid rgba(184,142,60,0.12)' }}>
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#b88e3c" strokeWidth="2" style={{ flexShrink: 0 }}><path d="M12 20h9" /><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" /></svg>
-                          <span style={{ fontSize: '11.5px', color: '#7a6e5d' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 4, paddingTop: 8, borderTop: '1px solid rgba(20,20,20,0.08)' }}>
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#666666" strokeWidth="2" style={{ flexShrink: 0 }}><path d="M12 20h9" /><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" /></svg>
+                          <span style={{ fontSize: '11.5px', color: '#666666' }}>
                             To change your address, visit{' '}
-                            <Link href="/profile" onClick={() => setShowConfirmModal(false)} style={{ color: '#b88e3c', fontWeight: 700, textDecoration: 'none' }}>Profile settings.</Link>
+                            <Link href="/profile" onClick={() => setShowConfirmModal(false)} style={{ color: '#141414', fontWeight: 600, textDecoration: 'underline' }}>Profile settings.</Link>
                           </span>
                         </div>
                       </div>
                     </div>
                   ) : (
-                    <div style={{ background: 'rgba(198,40,40,0.04)', border: '1px solid rgba(198,40,40,0.2)', borderRadius: 12, padding: '14px 16px', marginBottom: 14 }}>
-                      <div style={{ fontSize: '13px', color: '#c62828', fontWeight: 700, marginBottom: 4 }}>
+                    <div style={{ background: '#FFF5F5', border: '1px solid rgba(220,38,38,0.2)', borderRadius: 8, padding: '14px 16px', marginBottom: 14 }}>
+                      <div style={{ fontSize: '13px', color: '#DC2626', fontWeight: 600, marginBottom: 4 }}>
                         Shipping address incomplete
                       </div>
-                      <div style={{ fontSize: '12px', color: '#7a6e5d', marginBottom: 8 }}>
+                      <div style={{ fontSize: '12px', color: '#666666', marginBottom: 8 }}>
                         Please complete your address in <strong>Profile &rarr; Profile Details</strong> before purchasing.
                       </div>
-                      <Link href="/profile" onClick={() => setShowConfirmModal(false)} style={{ display: 'inline-block', background: '#b88e3c', color: '#fff', padding: '6px 14px', borderRadius: 8, fontSize: '11.5px', fontWeight: 700, textDecoration: 'none' }}>
+                      <Link href="/profile" onClick={() => setShowConfirmModal(false)} style={{ display: 'inline-block', background: '#141414', color: '#fff', padding: '6px 14px', borderRadius: 6, fontSize: '11.5px', fontWeight: 500, textDecoration: 'none' }}>
                         Complete Profile &rarr;
                       </Link>
                     </div>
@@ -2127,26 +2131,26 @@ export default function CartPage() {
                         const key = `${item.productId}-${item.colorVariant || ''}`;
                         const gift = giftDetails[key];
                         return (
-                          <div key={idx} style={{ display: 'flex', gap: 12, alignItems: 'center', borderBottom: idx < selectedItemsList.length - 1 ? '1px dashed rgba(184,142,60,0.15)' : 'none', paddingBottom: idx < selectedItemsList.length - 1 ? '10px' : '0' }}>
+                          <div key={idx} style={{ display: 'flex', gap: 12, alignItems: 'center', borderBottom: idx < selectedItemsList.length - 1 ? '1px dashed rgba(20,20,20,0.1)' : 'none', paddingBottom: idx < selectedItemsList.length - 1 ? '10px' : '0' }}>
                             <img
                               src={getItemImage(item)}
                               alt={item.product?.title || 'Watch'}
-                              style={{ width: 54, height: 54, objectFit: 'contain', borderRadius: 10, background: '#faf7f0', flexShrink: 0, border: '1px solid rgba(184,142,60,0.15)' }}
+                              style={{ width: 54, height: 54, objectFit: 'contain', borderRadius: 8, background: '#ffffff', flexShrink: 0, border: '1px solid rgba(20,20,20,0.08)' }}
                             />
                             <div style={{ flex: 1, minWidth: 0 }}>
-                              <div style={{ fontSize: '14px', fontWeight: 700, color: '#1a1209', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                              <div style={{ fontSize: '14px', fontWeight: 600, color: '#141414', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                                 {item.product?.title}
                               </div>
-                              <div style={{ fontSize: '11.5px', color: '#7a6e5d', marginTop: 2 }}>
+                              <div style={{ fontSize: '11.5px', color: '#666666', marginTop: 2 }}>
                                 {item.colorVariant && `${item.colorVariant} · `}Qty {item.quantity}
                               </div>
                               {gift?.isGift && (
-                                <div style={{ fontSize: '10.5px', color: '#b88e3c', marginTop: 2, fontWeight: 600 }}>
+                                <div style={{ fontSize: '10.5px', color: '#141414', marginTop: 2, fontWeight: 500 }}>
                                   🎁 Gifting Configured
                                 </div>
                               )}
                             </div>
-                            <div style={{ fontSize: '15px', fontWeight: 800, color: '#b88e3c', fontFamily: 'monospace', flexShrink: 0 }}>
+                            <div style={{ fontSize: '14px', fontWeight: 600, color: '#141414', flexShrink: 0 }}>
                               {convertPrice((item.product?.price || 0) * item.quantity)}
                             </div>
                           </div>
@@ -2158,57 +2162,62 @@ export default function CartPage() {
                   {/* ORDER TOTAL CARD */}
                   <div className="bnm-card" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                      <div style={{ width: 38, height: 38, borderRadius: 10, background: 'rgba(184,142,60,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#b88e3c' }}>
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="4" y="2" width="16" height="20" rx="2" ry="2" /><line x1="8" y1="6" x2="16" y2="6" /><line x1="8" y1="10" x2="16" y2="10" /><line x1="8" y1="14" x2="12" y2="14" /></svg>
+                      <div style={{ width: 38, height: 38, borderRadius: 8, background: 'rgba(20,20,20,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#141414' }}>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="4" y="2" width="16" height="20" rx="2" ry="2" /><line x1="8" y1="6" x2="16" y2="6" /><line x1="8" y1="10" x2="16" y2="10" /><line x1="8" y1="14" x2="12" y2="14" /></svg>
                       </div>
                       <div>
-                        <div style={{ fontSize: '12px', fontWeight: 800, color: '#1a1209', letterSpacing: '0.06em', textTransform: 'uppercase' }}>Order Total</div>
-                        <div style={{ fontSize: '11px', color: '#7a6e5d' }}>Inclusive of all taxes</div>
+                        <div style={{ fontSize: '11.5px', fontWeight: 600, color: '#141414', letterSpacing: '0.06em', textTransform: 'uppercase' }}>Order Total</div>
+                        <div style={{ fontSize: '11px', color: '#666666' }}>Inclusive of all taxes</div>
                       </div>
                     </div>
                     <div style={{ textAlign: 'right' }}>
                       {appliedCoupon ? (
                         <>
-                          <div style={{ fontSize: '11px', color: '#7a6e5d', textDecoration: 'line-through' }}>{convertPrice(selectedSubtotal)}</div>
-                          <div style={{ fontSize: '19px', fontWeight: 800, color: '#b88e3c' }}>
+                          <div style={{ fontSize: '11px', color: '#666666', textDecoration: 'line-through' }}>{convertPrice(selectedSubtotal)}</div>
+                          <div style={{ fontSize: '18px', fontWeight: 600, color: '#141414' }}>
                             {convertPrice(Math.max(0, selectedSubtotal - Math.round((selectedSubtotal * appliedCoupon.discountPercent) / 100)))}
                           </div>
                         </>
                       ) : (
-                        <div style={{ fontSize: '19px', fontWeight: 800, color: '#b88e3c' }}>
+                        <div style={{ fontSize: '18px', fontWeight: 600, color: '#141414' }}>
                           {convertPrice(selectedSubtotal)}
                         </div>
                       )}
                     </div>
                   </div>
 
-                  <button
-                    className="bnm-btn-primary"
-                    onClick={() => {
-                      if (!isProfileComplete) {
-                        toast.error('Please complete your shipping profile address before proceeding.');
-                        return;
-                      }
-                      setConfirmStep('payment');
-                    }}
-                    disabled={!isProfileComplete}
-                  >
-                    Continue to Payment &#8594;
-                  </button>
-                  <button className="bnm-btn-outline" onClick={() => setShowConfirmModal(false)}>Cancel</button>
+                  <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginTop: 16 }}>
+                    <button className="bnm-btn-outline" onClick={() => setShowConfirmModal(false)} style={{ width: 110, flexShrink: 0, marginTop: 0 }}>
+                      Cancel
+                    </button>
+                    <button
+                      className="bnm-btn-primary"
+                      onClick={() => {
+                        if (!isProfileComplete) {
+                          toast.error('Please complete your shipping profile address before proceeding.');
+                          return;
+                        }
+                        setConfirmStep('payment');
+                      }}
+                      disabled={!isProfileComplete}
+                      style={{ flex: 1 }}
+                    >
+                      Continue to Payment &#8594;
+                    </button>
+                  </div>
 
                   {/* Trust Badges Footer */}
                   <div className="bnm-trust-footer">
                     <div className="bnm-trust-item">
-                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#b88e3c" strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /><polyline points="9 12 11 14 15 10" /></svg>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#141414" strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /><polyline points="9 12 11 14 15 10" /></svg>
                       <span>100% Authentic</span>
                     </div>
                     <div className="bnm-trust-item">
-                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#b88e3c" strokeWidth="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#141414" strokeWidth="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
                       <span>Secure Payment</span>
                     </div>
                     <div className="bnm-trust-item">
-                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#b88e3c" strokeWidth="2"><polyline points="1 4 1 10 7 10" /><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" /></svg>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#141414" strokeWidth="2"><polyline points="1 4 1 10 7 10" /><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" /></svg>
                       <span>Easy Returns</span>
                     </div>
                   </div>
@@ -2220,8 +2229,8 @@ export default function CartPage() {
                 <>
                   {/* Total Bar */}
                   <div className="bnm-card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '14px 18px' }}>
-                    <span style={{ fontSize: '11.5px', color: '#7a6e5d', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Order Total</span>
-                    <span style={{ fontSize: '20px', fontWeight: 800, color: '#b88e3c' }}>
+                    <span style={{ fontSize: '11.5px', color: '#666666', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Order Total</span>
+                    <span style={{ fontSize: '18px', fontWeight: 600, color: '#141414' }}>
                       {appliedCoupon
                         ? convertPrice(Math.max(0, selectedSubtotal - Math.round((selectedSubtotal * appliedCoupon.discountPercent) / 100)))
                         : convertPrice(selectedSubtotal)}
@@ -2238,15 +2247,15 @@ export default function CartPage() {
                     <div className={`bnm-radio ${paymentMethod === 'card' ? 'active' : ''}`} />
                     <div style={{ flex: 1 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#b88e3c" strokeWidth="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2" /><line x1="1" y1="10" x2="23" y2="10" /></svg>
-                        <span style={{ fontWeight: 700, fontSize: '14px', color: '#1a1209' }}>Pay via PayHere</span>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#141414" strokeWidth="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2" /><line x1="1" y1="10" x2="23" y2="10" /></svg>
+                        <span style={{ fontWeight: 600, fontSize: '13.5px', color: '#141414' }}>Pay via PayHere</span>
                       </div>
-                      <div style={{ fontSize: '11px', color: '#7a6e5d', marginTop: 3 }}>
+                      <div style={{ fontSize: '11.5px', color: '#666666', marginTop: 3 }}>
                         Visa · Mastercard · Amex · eWallet · Bank · USSD
                       </div>
-                      <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap', marginTop: 8 }}>
+                      <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 8 }}>
                         {['VISA', 'mastercard', 'AMEX', 'eWallets', 'BANK', 'USSD'].map((b) => (
-                          <span key={b} style={{ fontSize: '8.5px', fontWeight: 800, color: '#4a3f31', background: '#f5f0e6', border: '1px solid rgba(184,142,60,0.25)', borderRadius: 3, padding: '1px 5px', textTransform: 'uppercase' }}>
+                          <span key={b} style={{ fontSize: '9px', fontWeight: 600, color: '#141414', background: '#F8F7F4', border: '1px solid rgba(20,20,20,0.1)', borderRadius: 4, padding: '2px 6px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                             {b}
                           </span>
                         ))}
@@ -2267,10 +2276,10 @@ export default function CartPage() {
                     <div className={`bnm-radio ${paymentMethod === 'bank_transfer' ? 'active' : ''}`} />
                     <div style={{ flex: 1 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#b88e3c" strokeWidth="2"><line x1="3" y1="21" x2="21" y2="21" /><line x1="6" y1="18" x2="6" y2="11" /><line x1="10" y1="18" x2="10" y2="11" /><line x1="14" y1="18" x2="14" y2="11" /><line x1="18" y1="18" x2="18" y2="11" /><polygon points="12 3 2 10 22 10 12 3" /></svg>
-                        <span style={{ fontWeight: 700, fontSize: '14px', color: '#1a1209' }}>Direct Bank Transfer</span>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#141414" strokeWidth="2"><line x1="3" y1="21" x2="21" y2="21" /><line x1="6" y1="18" x2="6" y2="11" /><line x1="10" y1="18" x2="10" y2="11" /><line x1="14" y1="18" x2="14" y2="11" /><line x1="18" y1="18" x2="18" y2="11" /><polygon points="12 3 2 10 22 10 12 3" /></svg>
+                        <span style={{ fontWeight: 600, fontSize: '13.5px', color: '#141414' }}>Direct Bank Transfer</span>
                       </div>
-                      <div style={{ fontSize: '11.5px', color: '#7a6e5d', marginTop: 3 }}>
+                      <div style={{ fontSize: '11.5px', color: '#666666', marginTop: 3 }}>
                         Transfer and upload receipt – verified within 24 hrs
                       </div>
                     </div>
@@ -2279,13 +2288,13 @@ export default function CartPage() {
                   {paymentMethod === 'bank_transfer' && (
                     <>
                       <div className="bnm-bank-details">
-                        <div style={{ fontSize: '9.5px', fontWeight: 700, color: '#8e7c66', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 8 }}>Bank Transfer Details</div>
-                        <div className="bnm-bank-row"><span style={{ color: '#7a6e5d', fontSize: '11.5px' }}>Bank</span><span style={{ fontWeight: 700 }}>NATIONS TRUST BANK</span></div>
-                        <div className="bnm-bank-row"><span style={{ color: '#7a6e5d', fontSize: '11.5px' }}>Account No.</span><span style={{ fontWeight: 700, fontFamily: 'monospace' }}>100460045365</span></div>
-                        <div className="bnm-bank-row"><span style={{ color: '#7a6e5d', fontSize: '11.5px' }}>Branch</span><span style={{ fontWeight: 700 }}>Bankshall Street (PETTAH)</span></div>
+                        <div style={{ fontSize: '10px', fontWeight: 600, color: '#666666', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>Bank Transfer Details</div>
+                        <div className="bnm-bank-row"><span style={{ color: '#666666', fontSize: '12px' }}>Bank</span><span style={{ fontWeight: 600 }}>NATIONS TRUST BANK</span></div>
+                        <div className="bnm-bank-row"><span style={{ color: '#666666', fontSize: '12px' }}>Account No.</span><span style={{ fontWeight: 600, fontFamily: 'monospace' }}>100460045365</span></div>
+                        <div className="bnm-bank-row"><span style={{ color: '#666666', fontSize: '12px' }}>Branch</span><span style={{ fontWeight: 600 }}>Bankshall Street (PETTAH)</span></div>
                         <div className="bnm-bank-row">
-                          <span style={{ color: '#7a6e5d', fontSize: '11.5px' }}>Amount</span>
-                          <span style={{ fontWeight: 800, color: '#b88e3c' }}>
+                          <span style={{ color: '#666666', fontSize: '12px' }}>Amount</span>
+                          <span style={{ fontWeight: 700, color: '#141414' }}>
                             {appliedCoupon
                               ? convertPrice(Math.max(0, selectedSubtotal - Math.round((selectedSubtotal * appliedCoupon.discountPercent) / 100)))
                               : convertPrice(selectedSubtotal)}
@@ -2294,8 +2303,8 @@ export default function CartPage() {
                       </div>
 
                       <div className="bnm-info-box">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#d97706" strokeWidth="2" style={{ flexShrink: 0, marginTop: 1 }}><circle cx="12" cy="12" r="10" /><line x1="12" y1="16" x2="12" y2="12" /><line x1="12" y1="8" x2="12.01" y2="8" /></svg>
-                        <span style={{ fontSize: '11.5px', color: '#92400e', lineHeight: 1.5 }}>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#141414" strokeWidth="2" style={{ flexShrink: 0, marginTop: 1 }}><circle cx="12" cy="12" r="10" /><line x1="12" y1="16" x2="12" y2="12" /><line x1="12" y1="8" x2="12.01" y2="8" /></svg>
+                        <span style={{ fontSize: '12px', color: '#444444', lineHeight: 1.5 }}>
                           Please upload your payment receipt after completing the transfer. Your order will be verified within 24 hours.
                         </span>
                       </div>
@@ -2304,14 +2313,14 @@ export default function CartPage() {
                         <input type="file" accept=".jpg,.jpeg,.png,.webp,.pdf" onChange={handleBankReceiptSelect} />
                         {bankReceiptName ? (
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2e7d32" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg>
-                            <span style={{ fontSize: '13px', color: '#2e7d32', fontWeight: 600 }}>{bankReceiptName}</span>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#141414" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg>
+                            <span style={{ fontSize: '13px', color: '#141414', fontWeight: 600 }}>{bankReceiptName}</span>
                           </div>
                         ) : (
                           <>
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#b88e3c" strokeWidth="1.5" style={{ margin: '0 auto 6px', display: 'block' }}><polyline points="16 16 12 12 8 16" /><line x1="12" y1="12" x2="12" y2="21" /><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3" /></svg>
-                            <div style={{ fontSize: '12.5px', color: '#1a1209', fontWeight: 600 }}>Click to upload transfer receipt</div>
-                            <div style={{ fontSize: '10.5px', color: '#7a6e5d', marginTop: 3 }}>PDF, JPG, PNG, WEBP · Max 10 MB</div>
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#141414" strokeWidth="1.5" style={{ margin: '0 auto 6px', display: 'block' }}><polyline points="16 16 12 12 8 16" /><line x1="12" y1="12" x2="12" y2="21" /><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3" /></svg>
+                            <div style={{ fontSize: '12.5px', color: '#141414', fontWeight: 600 }}>Click to upload transfer receipt</div>
+                            <div style={{ fontSize: '11px', color: '#666666', marginTop: 3 }}>PDF, JPG, PNG, WEBP · Max 10 MB</div>
                           </>
                         )}
                       </div>
@@ -2320,40 +2329,45 @@ export default function CartPage() {
                         <div className={`bnm-checkbox ${bankTransferConfirmed ? 'checked' : ''}`}>
                           {bankTransferConfirmed && <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3"><polyline points="20 6 9 17 4 12" /></svg>}
                         </div>
-                        <span style={{ fontSize: '12.5px', color: '#1a1209', lineHeight: 1.5 }}>
+                        <span style={{ fontSize: '12.5px', color: '#141414', lineHeight: 1.5 }}>
                           I confirm I have transferred <strong>{appliedCoupon ? convertPrice(Math.max(0, selectedSubtotal - Math.round(selectedSubtotal * appliedCoupon.discountPercent / 100))) : convertPrice(selectedSubtotal)}</strong> to the account above.
                         </span>
                       </div>
                     </>
                   )}
 
-                  <button
-                    className="bnm-btn-primary"
-                    onClick={handlePlaceOrder}
-                    disabled={paymentProcessing || bankReceiptUploading || (paymentMethod === 'bank_transfer' && (!bankTransferConfirmed || !bankReceipt))}
-                  >
-                    {(paymentProcessing || bankReceiptUploading) ? (
-                      <>
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ animation: 'bnm-spin 1s linear infinite' }}><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" /></svg>
-                        {bankReceiptUploading ? 'Uploading Receipt...' : 'Processing...'}
-                      </>
-                    ) : (
-                      <>Confirm &amp; Place Order &#8594;</>
-                    )}
-                  </button>
-                  <button className="bnm-btn-outline" onClick={() => setConfirmStep('details')}>Back</button>
+                  <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginTop: 16 }}>
+                    <button className="bnm-btn-outline" onClick={() => setConfirmStep('details')} style={{ width: 110, flexShrink: 0, marginTop: 0 }}>
+                      ← Back
+                    </button>
+                    <button
+                      className="bnm-btn-primary"
+                      onClick={handlePlaceOrder}
+                      disabled={paymentProcessing || bankReceiptUploading || (paymentMethod === 'bank_transfer' && (!bankTransferConfirmed || !bankReceipt))}
+                      style={{ flex: 1 }}
+                    >
+                      {(paymentProcessing || bankReceiptUploading) ? (
+                        <>
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ animation: 'bnm-spin 1s linear infinite' }}><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" /></svg>
+                          {bankReceiptUploading ? 'Uploading Receipt...' : 'Processing...'}
+                        </>
+                      ) : (
+                        <>Place Order &#8594;</>
+                      )}
+                    </button>
+                  </div>
 
                   <div className="bnm-trust-footer">
                     <div className="bnm-trust-item">
-                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#b88e3c" strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /><polyline points="9 12 11 14 15 10" /></svg>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#141414" strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /><polyline points="9 12 11 14 15 10" /></svg>
                       <span>100% Authentic</span>
                     </div>
                     <div className="bnm-trust-item">
-                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#b88e3c" strokeWidth="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#141414" strokeWidth="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
                       <span>Secure Payment</span>
                     </div>
                     <div className="bnm-trust-item">
-                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#b88e3c" strokeWidth="2"><polyline points="1 4 1 10 7 10" /><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" /></svg>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#141414" strokeWidth="2"><polyline points="1 4 1 10 7 10" /><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" /></svg>
                       <span>Easy Returns</span>
                     </div>
                   </div>
@@ -2626,8 +2640,8 @@ export default function CartPage() {
                                                 style={{
                                                   width: '100%',
                                                   maxWidth: '320px',
-                                                  background: '#FAF7F0',
-                                                  border: '1.5px solid #8B6914',
+                                                  background: '#ffffff',
+                                                  border: '1px solid rgba(20,20,20,0.12)',
                                                   borderRadius: '12px',
                                                   padding: '16px',
                                                   boxShadow: '0 15px 35px rgba(26,18,9,0.3)',
@@ -2697,8 +2711,8 @@ export default function CartPage() {
                                                 left: '50%',
                                                 transform: 'translateX(-50%)',
                                                 width: '280px',
-                                                background: '#FAF7F0',
-                                                border: '1.5px solid #8B6914',
+                                                background: '#ffffff',
+                                                border: '1px solid rgba(20,20,20,0.12)',
                                                 borderRadius: '10px',
                                                 padding: '12px',
                                                 boxShadow: '0 10px 25px rgba(26,18,9,0.18)',
@@ -2866,22 +2880,23 @@ export default function CartPage() {
                                 onKeyDown={e => e.key === 'Enter' && handleApplyCoupon()}
                                 style={{
                                   flex: 1, padding: '9px 12px',
-                                  border: '1.5px solid rgba(26,18,9,0.12)', borderRadius: 8,
+                                  border: '1px solid rgba(20,20,20,0.15)', borderRadius: 6,
                                   fontFamily: "'Jost', sans-serif", fontSize: 13,
-                                  fontWeight: 700, letterSpacing: '0.12em', color: '#1a1209',
-                                  background: '#FAF7F0', outline: 'none',
+                                  fontWeight: 600, letterSpacing: '0.08em', color: '#141414',
+                                  background: '#ffffff', outline: 'none',
                                 }}
                               />
                               <button
                                 onClick={handleApplyCoupon}
                                 disabled={couponValidating || !couponInput.trim()}
                                 style={{
-                                  padding: '9px 14px',
-                                  background: couponValidating ? 'rgba(139,105,20,0.4)' : '#8B6914',
-                                  color: '#ffffff', border: 'none', borderRadius: 8,
+                                  padding: '9px 16px',
+                                  background: couponValidating ? 'rgba(20,20,20,0.4)' : '#141414',
+                                  color: '#ffffff', border: 'none', borderRadius: 6,
                                   fontFamily: "'Jost', sans-serif", fontSize: 11.5,
-                                  fontWeight: 700, cursor: couponValidating ? 'not-allowed' : 'pointer',
-                                  letterSpacing: '0.06em', whiteSpace: 'nowrap',
+                                  fontWeight: 500, cursor: couponValidating ? 'not-allowed' : 'pointer',
+                                  letterSpacing: '0.08em', whiteSpace: 'nowrap',
+                                  textTransform: 'uppercase',
                                   transition: 'all 0.2s ease',
                                 }}
                               >
@@ -2914,25 +2929,7 @@ export default function CartPage() {
                         )}
                       </div>
                     )}
-                    {/* GATE 1: GUEST BANNER */}
-                    {!isSignedIn && (
-                      <div className="guard-banner banner-warning">
-                        <div className="banner-title">
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
-                          <span>Sign In Required</span>
-                        </div>
-                        <p className="banner-text">
-                          You can add timepieces to your bag as a guest. To complete checkout and secure transit, please sign in.
-                        </p>
-                        <SignInButton mode="modal" forceRedirectUrl="/cart">
-                          <button className="checkout-action-btn" style={{ fontSize: '11px', padding: '9px 12px', borderRadius: '20px' }}>
-                            Sign In to Account
-                          </button>
-                        </SignInButton>
-                      </div>
-                    )}
-
-                    {/* GATE 2: INCOMPLETE PROFILE DETAILS */}
+                    {/* GATE 2: INCOMPLETE PROFILE DETAILS (Signed-in only) */}
                     {isSignedIn && !profileLoading && !isProfileComplete && (
                       <div className="guard-banner banner-warning">
                         <div className="banner-title">
@@ -2951,17 +2948,15 @@ export default function CartPage() {
                     {/* CHECKOUT PROMPT CTA */}
                     <button
                       onClick={handleCheckoutClick}
-                      disabled={selectedItemsList.length === 0 || !isSignedIn || !isProfileComplete}
+                      disabled={selectedItemsList.length === 0 || (isSignedIn && !isProfileComplete)}
                       className="checkout-action-btn"
                     >
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
                       {selectedItemsList.length === 0
                         ? 'Select Timepieces'
-                        : !isSignedIn
-                          ? 'Sign In to Purchase'
-                          : !isProfileComplete
-                            ? 'Complete Shipping Info'
-                            : 'Proceed to Checkout'}
+                        : (isSignedIn && !isProfileComplete)
+                          ? 'Complete Shipping Info'
+                          : 'Proceed to Checkout'}
                     </button>
 
                     {/* Secure Checkout details */}
