@@ -55,27 +55,27 @@ const OCCASION_BACKGROUNDS: Record<string, string> = {
 // ── Winsor Watch Craftsmanship Highlights ─────────────────────────────────
 const CRAFTSMANSHIP_PILLARS = [
   {
-    title: 'Sapphire Crystal Glass',
-    badge: 'SCRATCH RESISTANT',
-    description: 'Durable scratch-resistant crystal offering lasting clarity and dial protection.',
-    image: '/craftsmanship/sapphire_crystal.webp',
+    number: '01',
+    title: 'Sapphire Glass',
+    tag: 'Scratch Resistant',
+    image: '/craftsmanship/sapphire_crystal1.webp',
   },
   {
-    title: 'Precision Machine',
-    badge: 'AUTOMATIC & QUARTZ',
-    description: 'Equipped with reliable Japanese movements ensuring accurate and dependable timekeeping.',
+    number: '02',
+    title: 'Automatic & Quartz',
+    tag: 'Precision Movements',
     image: '/craftsmanship/precision_movement.webp',
   },
   {
+    number: '03',
     title: 'Water Resistant',
-    badge: 'DAILY RESISTANCE',
-    description: 'Engineered to withstand daily splashes, rain, and everyday routines with ease.',
+    tag: 'Daily Resistance',
     image: '/craftsmanship/water_resistant.webp',
   },
   {
-    title: 'Premium Craft',
-    badge: 'PREMIUM QUALITY',
-    description: 'Crafted with durable stainless steel and elegant finishes built for lasting comfort.',
+    number: '04',
+    title: 'Premium Quality',
+    tag: 'Maison Craftsmanship',
     image: '/craftsmanship/premium_craft.webp',
   },
 ];
@@ -1064,40 +1064,67 @@ export default function GiftSection() {
           align-self: flex-start;
           display: inline-flex;
           align-items: center;
-          gap: 5px;
-          background: rgba(14, 10, 6, 0.78);
-          backdrop-filter: blur(10px);
-          -webkit-backdrop-filter: blur(10px);
-          border: 1px solid rgba(201, 161, 74, 0.4);
+          gap: 6px;
+          background: rgba(12, 8, 5, 0.68);
+          backdrop-filter: blur(12px);
+          -webkit-backdrop-filter: blur(12px);
+          border: 1px solid rgba(212, 175, 55, 0.35);
           color: #dfb15b;
           font-family: 'Jost', sans-serif;
           font-size: 9.5px;
           font-weight: 600;
-          letter-spacing: 0.12em;
+          letter-spacing: 0.14em;
           text-transform: uppercase;
-          padding: 4px 10px;
+          padding: 4px 11px;
           border-radius: 20px;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+        }
+
+        .craft-card-badge-num {
+          color: #dfb15b;
+          font-weight: 700;
+        }
+
+        .craft-card-badge-dot {
+          opacity: 0.35;
+          color: #ffffff;
+        }
+
+        .craft-card-bottom {
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
         }
 
         .craft-card-title {
           font-family: 'Cormorant Garamond', serif;
-          font-size: clamp(19px, 1.7vw, 24px);
+          font-size: clamp(21px, 1.9vw, 28px);
           font-weight: 600;
           color: #ffffff;
           letter-spacing: 0.02em;
-          margin: 0 0 6px 0;
+          margin: 0;
           line-height: 1.15;
-          text-shadow: 0 2px 10px rgba(0, 0, 0, 0.6);
+          text-shadow: 0 2px 12px rgba(0, 0, 0, 0.85);
         }
 
-        .craft-card-desc {
+        .craft-card-tag {
           font-family: 'Jost', sans-serif;
-          font-size: clamp(11.5px, 0.9vw, 13px);
-          color: rgba(255, 255, 255, 0.82);
-          line-height: 1.45;
-          margin: 0;
-          letter-spacing: 0.02em;
-          text-shadow: 0 1px 6px rgba(0, 0, 0, 0.5);
+          font-size: clamp(9.5px, 0.8vw, 11px);
+          font-weight: 600;
+          letter-spacing: 0.2em;
+          text-transform: uppercase;
+          color: #dfb15b;
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+        }
+
+        .craft-card-tag-line {
+          width: 12px;
+          height: 1px;
+          background: #dfb15b;
+          opacity: 0.8;
+          display: inline-block;
         }
 
         /* ── RESPONSIVE MOBILE VIEW ── */
@@ -1273,8 +1300,8 @@ export default function GiftSection() {
               {loadingProds
                 ? `Curating ${activeCat?.label || 'Gift'} Timepieces…`
                 : products.length === 0 && activeCat
-                ? `Selections for ${activeCat.label} — Coming Soon`
-                : `Featured ${activeCat?.label || 'Gift'} Selections (${products.length})`}
+                  ? `Selections for ${activeCat.label} — Coming Soon`
+                  : `Featured ${activeCat?.label || 'Gift'} Selections (${products.length})`}
             </span>
             <Link href="/gifts" className="celebrate-left-link">
               Explore Gifts ›
@@ -1295,10 +1322,17 @@ export default function GiftSection() {
               />
               <div className="craft-card-overlay" />
               <div className="craft-card-content">
-                <span className="craft-card-badge">{pillar.badge}</span>
-                <div>
+                <span className="craft-card-badge">
+                  <span className="craft-card-badge-num">{pillar.number}</span>
+                  <span className="craft-card-badge-dot">•</span>
+                  <span>WINSOR</span>
+                </span>
+                <div className="craft-card-bottom">
                   <h3 className="craft-card-title">{pillar.title}</h3>
-                  <p className="craft-card-desc">{pillar.description}</p>
+                  <span className="craft-card-tag">
+                    <span className="craft-card-tag-line" />
+                    {pillar.tag}
+                  </span>
                 </div>
               </div>
             </div>
