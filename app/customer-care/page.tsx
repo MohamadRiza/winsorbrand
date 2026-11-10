@@ -240,13 +240,18 @@ export default function CustomerCarePage() {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=Jost:wght@300;400;500;600;700&display=swap');
 
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+
         /* ── LUXURY HERO HEADER ── */
         .care-hero-section {
           position: relative;
           min-height: 480px;
           background-image: 
-            linear-gradient(180deg, rgba(10, 8, 5, 0.82) 0%, rgba(10, 8, 5, 0.72) 50%, rgba(10, 8, 5, 0.95) 100%),
-            radial-gradient(circle at 50% 30%, rgba(223, 177, 91, 0.18) 0%, transparent 65%),
+            linear-gradient(180deg, rgba(24, 18, 12, 0.78) 0%, rgba(20, 15, 10, 0.68) 50%, rgba(22, 17, 11, 0.94) 100%),
+            radial-gradient(ellipse at 50% 35%, rgba(223, 177, 91, 0.18) 0%, transparent 65%),
             url('/contact.png');
           background-size: cover;
           background-position: center 35%;
@@ -264,19 +269,20 @@ export default function CustomerCarePage() {
         .hero-badge-pill {
           display: inline-flex;
           align-items: center;
-          gap: 8px;
-          padding: 8px 20px;
-          background: rgba(139, 105, 20, 0.22);
-          border: 1px solid rgba(223, 177, 91, 0.45);
+          gap: 10px;
+          padding: 8px 22px;
+          background: rgba(139, 105, 20, 0.28);
+          border: 1.5px solid rgba(223, 177, 91, 0.5);
           border-radius: 30px;
-          font-size: 10px;
+          font-size: 10.5px;
           letter-spacing: 0.26em;
           text-transform: uppercase;
           font-weight: 600;
           color: #dfb15b;
-          margin-bottom: 20px;
-          backdrop-filter: blur(8px);
-          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+          margin-bottom: 22px;
+          backdrop-filter: blur(10px);
+          -webkit-backdrop-filter: blur(10px);
+          box-shadow: 0 4px 18px rgba(0, 0, 0, 0.25);
         }
 
         .care-hero-title {
@@ -295,7 +301,7 @@ export default function CustomerCarePage() {
           font-size: clamp(13px, 1.2vw, 15px);
           font-weight: 300;
           letter-spacing: 0.04em;
-          color: rgba(250, 247, 240, 0.85);
+          color: rgba(250, 247, 240, 0.9);
           max-width: 680px;
           line-height: 1.65;
           margin: 0 0 28px;
@@ -313,14 +319,16 @@ export default function CustomerCarePage() {
           display: inline-flex;
           align-items: center;
           gap: 8px;
-          background: rgba(255, 255, 255, 0.08);
-          border: 1px solid rgba(255, 255, 255, 0.16);
-          padding: 8px 16px;
+          background: rgba(255, 255, 255, 0.1);
+          border: 1px solid rgba(223, 177, 91, 0.35);
+          padding: 8px 18px;
           border-radius: 20px;
-          font-size: 11px;
-          color: rgba(255, 255, 255, 0.9);
+          font-size: 11.5px;
+          color: rgba(255, 255, 255, 0.95);
           letter-spacing: 0.03em;
-          backdrop-filter: blur(6px);
+          backdrop-filter: blur(8px);
+          -webkit-backdrop-filter: blur(8px);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         }
 
         /* ── ATTACHED BENEFITS BAR ── */
@@ -342,11 +350,11 @@ export default function CustomerCarePage() {
         }
         .hero-attached-benefits-bar {
           position: relative;
-          background: rgba(255, 255, 255, 0.75);
-          border-radius: 14px;
-          border: 1.5px solid rgba(139, 105, 20, 0.22);
-          box-shadow: 0 16px 40px rgba(26, 18, 9, 0.06), 0 4px 12px rgba(139, 105, 20, 0.04);
-          padding: 20px 32px;
+          background: rgba(255, 255, 255, 0.88);
+          border-radius: 16px;
+          border: 1.5px solid rgba(139, 105, 20, 0.24);
+          box-shadow: 0 16px 40px rgba(139, 105, 20, 0.08), 0 4px 14px rgba(0, 0, 0, 0.03);
+          padding: 22px 34px;
           backdrop-filter: blur(16px);
           -webkit-backdrop-filter: blur(16px);
           overflow: hidden;
@@ -355,10 +363,10 @@ export default function CustomerCarePage() {
           display: flex;
           align-items: center;
           gap: 14px;
-          color: #1a1209;
+          color: #141414;
         }
         .hero-attached-benefit-item svg {
-          color: #8b6914;
+          color: #8B6914;
           flex-shrink: 0;
         }
         .hero-attached-benefit-item h4 {
@@ -366,12 +374,12 @@ export default function CustomerCarePage() {
           font-weight: 600;
           margin: 0;
           letter-spacing: 0.01em;
-          color: #1a1209;
+          color: #141414;
           white-space: nowrap;
         }
         .hero-attached-benefit-item span {
           font-size: 10.5px;
-          color: rgba(26, 18, 9, 0.5);
+          color: rgba(20, 20, 20, 0.55);
           margin: 0;
           display: block;
           white-space: nowrap;
@@ -445,9 +453,9 @@ export default function CustomerCarePage() {
         /* ── PAGE BODY CONTAINER ── */
         .care-content-container {
           background-color: #faf7f0;
-          padding: 20px 4% 80px;
+          padding: 24px 4% 80px;
           font-family: 'Jost', sans-serif;
-          color: #1a1209;
+          color: #141414;
         }
 
         .care-wrapper {
@@ -459,72 +467,73 @@ export default function CustomerCarePage() {
         .quick-contact-grid {
           display: grid;
           grid-template-columns: repeat(3, 1fr);
-          gap: 20px;
+          gap: 22px;
           margin-bottom: 44px;
         }
 
         .quick-contact-card {
-          background: rgba(255, 255, 255, 0.72);
+          background: rgba(255, 255, 255, 0.85);
           backdrop-filter: blur(14px);
           -webkit-backdrop-filter: blur(14px);
-          border: 1px solid rgba(139, 105, 20, 0.18);
-          border-radius: 14px;
-          padding: 22px 24px;
+          border: 1.5px solid rgba(139, 105, 20, 0.2);
+          border-radius: 16px;
+          padding: 24px 26px;
           display: flex;
           align-items: center;
           gap: 18px;
-          box-shadow: 0 10px 30px rgba(26, 18, 9, 0.04), 0 2px 8px rgba(139, 105, 20, 0.03);
-          transition: all 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+          box-shadow: 0 10px 30px rgba(139, 105, 20, 0.05), 0 2px 8px rgba(0, 0, 0, 0.02);
+          transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
           text-decoration: none;
         }
 
         .quick-contact-card:hover {
-          transform: translateY(-5px);
-          background: rgba(255, 255, 255, 0.92);
-          box-shadow: 0 18px 42px rgba(139, 105, 20, 0.15), 0 4px 14px rgba(26, 18, 9, 0.06);
-          border-color: #8b6914;
+          transform: translateY(-4px);
+          background: #ffffff;
+          box-shadow: 0 18px 42px rgba(139, 105, 20, 0.16), 0 4px 14px rgba(0, 0, 0, 0.04);
+          border-color: #8B6914;
         }
 
         .quick-icon-circle {
-          width: 48px;
-          height: 48px;
+          width: 50px;
+          height: 50px;
           border-radius: 50%;
-          background: linear-gradient(135deg, rgba(139,105,20,0.12) 0%, rgba(223,177,91,0.2) 100%);
-          border: 1px solid rgba(139,105,20,0.3);
-          color: #8b6914;
+          background: linear-gradient(135deg, rgba(139,105,20,0.14) 0%, rgba(223,177,91,0.24) 100%);
+          border: 1.5px solid rgba(139,105,20,0.32);
+          color: #8B6914;
           display: flex;
           align-items: center;
           justify-content: center;
           flex-shrink: 0;
-          transition: transform 0.3s ease;
+          transition: all 0.3s ease;
         }
 
         .quick-contact-card:hover .quick-icon-circle {
           transform: scale(1.08);
-          background: #8b6914;
+          background: linear-gradient(135deg, #9C7A3C 0%, #8B6914 100%);
           color: #ffffff;
+          border-color: #70530E;
         }
 
         .quick-card-tag {
           font-size: 10px;
           font-weight: 700;
-          letter-spacing: 0.14em;
+          letter-spacing: 0.16em;
           text-transform: uppercase;
-          color: #8b6914;
-          margin-bottom: 3px;
+          color: #8B6914;
+          margin-bottom: 4px;
         }
 
         .quick-card-title {
-          font-size: 14px;
+          font-size: 14.5px;
           font-weight: 600;
-          color: #1a1209;
-          margin-bottom: 2px;
+          color: #141414;
+          margin-bottom: 3px;
           word-break: break-word;
         }
 
         .quick-card-sub {
-          font-size: 11.5px;
-          color: rgba(26, 18, 9, 0.5);
+          font-size: 12px;
+          color: rgba(20, 20, 20, 0.55);
           display: flex;
           align-items: center;
           gap: 6px;
@@ -540,41 +549,52 @@ export default function CustomerCarePage() {
 
         /* ── LEFT COLUMN - BOUTIQUE DETAILS ── */
         .care-details-card {
-          background: rgba(255, 255, 255, 0.78);
+          background: rgba(255, 255, 255, 0.85);
           backdrop-filter: blur(16px);
           -webkit-backdrop-filter: blur(16px);
-          border: 1px solid rgba(139, 105, 20, 0.18);
-          border-top: 3.5px solid #8b6914;
-          border-radius: 14px;
-          padding: 36px;
-          box-shadow: 0 16px 44px rgba(26, 18, 9, 0.05), 0 2px 10px rgba(139, 105, 20, 0.03);
+          border: 1.5px solid rgba(139, 105, 20, 0.2);
+          border-radius: 16px;
+          position: relative;
+          overflow: hidden;
+          padding: 38px;
+          box-shadow: 0 16px 44px rgba(139, 105, 20, 0.06), 0 2px 10px rgba(0, 0, 0, 0.02);
+        }
+
+        .care-details-card::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          height: 4px;
+          background: linear-gradient(90deg, #9C7A3C 0%, #DFB15B 50%, #8B6914 100%);
         }
 
         .details-header-tag {
           font-size: 10px;
           font-weight: 700;
-          letter-spacing: 0.2em;
-          color: #8b6914;
+          letter-spacing: 0.22em;
+          color: #8B6914;
           text-transform: uppercase;
-          margin-bottom: 6px;
+          margin-bottom: 8px;
         }
 
         .details-title {
           font-family: 'Cormorant Garamond', serif;
-          font-size: 28px;
+          font-size: 30px;
           font-weight: 500;
           margin: 0 0 14px;
-          color: #1a1209;
+          color: #141414;
           letter-spacing: 0.02em;
         }
 
         .details-paragraph {
           font-size: 13.5px;
-          line-height: 1.65;
-          color: rgba(26, 18, 9, 0.62);
+          line-height: 1.7;
+          color: rgba(20, 20, 20, 0.65);
           margin-bottom: 28px;
           padding-bottom: 20px;
-          border-bottom: 1px solid rgba(26, 18, 9, 0.08);
+          border-bottom: 1px solid rgba(139, 105, 20, 0.12);
         }
 
         .contact-info-block {
@@ -590,11 +610,11 @@ export default function CustomerCarePage() {
         }
 
         .info-icon {
-          width: 40px;
-          height: 40px;
-          border-radius: 10px;
-          background: rgba(139, 105, 20, 0.08);
-          border: 1px solid rgba(139, 105, 20, 0.2);
+          width: 42px;
+          height: 42px;
+          border-radius: 12px;
+          background: linear-gradient(135deg, rgba(139, 105, 20, 0.08) 0%, rgba(223, 177, 91, 0.16) 100%);
+          border: 1px solid rgba(139, 105, 20, 0.25);
           color: #8B6914;
           display: flex;
           align-items: center;
@@ -604,25 +624,26 @@ export default function CustomerCarePage() {
         }
 
         .contact-info-row:hover .info-icon {
-          background: #8b6914;
+          background: linear-gradient(135deg, #9C7A3C 0%, #8B6914 100%);
           color: #ffffff;
           transform: translateY(-2px);
+          box-shadow: 0 4px 14px rgba(139, 105, 20, 0.25);
         }
 
         .info-label {
-          font-size: 10px;
+          font-size: 10.5px;
           font-weight: 700;
           text-transform: uppercase;
-          letter-spacing: 0.12em;
+          letter-spacing: 0.14em;
           color: #8B6914;
-          margin-bottom: 3px;
+          margin-bottom: 4px;
         }
 
         .info-value {
           font-size: 13.5px;
-          color: #1a1209;
+          color: #141414;
           font-weight: 500;
-          line-height: 1.5;
+          line-height: 1.55;
         }
 
         .contact-link {
@@ -632,54 +653,66 @@ export default function CustomerCarePage() {
           transition: all 0.2s ease;
         }
         .contact-link:hover {
-          color: #1a1209;
+          color: #5d460d;
           text-decoration: underline;
         }
 
         .headquarters-box {
-          border-top: 1px dashed rgba(139, 105, 20, 0.25);
-          padding-top: 24px;
-          margin-top: 10px;
-          background: rgba(250, 247, 240, 0.5);
-          border-radius: 8px;
-          padding: 18px;
+          border-top: 1.5px dashed rgba(139, 105, 20, 0.3);
+          padding-top: 22px;
+          margin-top: 14px;
+          background: rgba(250, 247, 240, 0.7);
+          border: 1px solid rgba(139, 105, 20, 0.18);
+          border-radius: 12px;
+          padding: 18px 20px;
         }
 
         /* ── RIGHT COLUMN - SUPPORT FORM ── */
         .care-form-card {
-          background: rgba(255, 255, 255, 0.78);
+          background: rgba(255, 255, 255, 0.85);
           backdrop-filter: blur(16px);
           -webkit-backdrop-filter: blur(16px);
-          border: 1px solid rgba(139, 105, 20, 0.18);
-          border-top: 3.5px solid #1a1209;
-          border-radius: 14px;
+          border: 1.5px solid rgba(139, 105, 20, 0.2);
+          border-radius: 16px;
+          position: relative;
+          overflow: hidden;
           padding: 40px;
-          box-shadow: 0 16px 44px rgba(26, 18, 9, 0.05), 0 2px 10px rgba(139, 105, 20, 0.03);
+          box-shadow: 0 16px 44px rgba(139, 105, 20, 0.06), 0 2px 10px rgba(0, 0, 0, 0.02);
+        }
+
+        .care-form-card::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          height: 4px;
+          background: linear-gradient(90deg, #8B6914 0%, #DFB15B 50%, #9C7A3C 100%);
         }
 
         .form-header-tag {
           font-size: 10px;
           font-weight: 700;
-          letter-spacing: 0.2em;
-          color: #8b6914;
+          letter-spacing: 0.22em;
+          color: #8B6914;
           text-transform: uppercase;
-          margin-bottom: 6px;
+          margin-bottom: 8px;
         }
 
         .form-title {
           font-family: 'Cormorant Garamond', serif;
-          font-size: 28px;
+          font-size: 30px;
           font-weight: 500;
           margin: 0 0 8px;
-          color: #1a1209;
+          color: #141414;
           letter-spacing: 0.02em;
         }
 
         .form-desc {
-          font-size: 13px;
-          color: rgba(26, 18, 9, 0.55);
+          font-size: 13.5px;
+          color: rgba(20, 20, 20, 0.6);
           margin-bottom: 28px;
-          line-height: 1.5;
+          line-height: 1.55;
         }
 
         .form-row-grid {
@@ -699,26 +732,26 @@ export default function CustomerCarePage() {
           font-size: 11px;
           font-weight: 600;
           text-transform: uppercase;
-          letter-spacing: 0.08em;
-          color: rgba(26, 18, 9, 0.6);
+          letter-spacing: 0.1em;
+          color: #8B6914;
           margin-bottom: 8px;
           display: flex;
           align-items: center;
-          gap: 6px;
+          gap: 7px;
         }
 
         .input-field {
           width: 100%;
           box-sizing: border-box;
-          height: 46px;
-          border: 1.5px solid rgba(26, 18, 9, 0.12);
+          height: 48px;
+          border: 1.5px solid rgba(139, 105, 20, 0.22);
           border-radius: 8px;
-          padding: 0 14px;
+          padding: 0 16px;
           font-family: 'Jost', sans-serif;
-          font-size: 13.5px;
-          color: #1a1209;
+          font-size: 14px;
+          color: #141414;
           outline: none;
-          background-color: rgba(250, 247, 240, 0.65);
+          background-color: #FAF8F5;
           backdrop-filter: blur(8px);
           -webkit-backdrop-filter: blur(8px);
           box-shadow: inset 0 1px 3px rgba(26, 18, 9, 0.02);
@@ -727,28 +760,28 @@ export default function CustomerCarePage() {
 
         .input-field:focus {
           border-color: #8B6914;
-          box-shadow: 0 0 0 3.5px rgba(139, 105, 20, 0.14), 0 6px 16px rgba(139, 105, 20, 0.08);
-          background-color: rgba(255, 255, 255, 0.95);
+          box-shadow: 0 0 0 3.5px rgba(223, 177, 91, 0.2), 0 4px 12px rgba(139, 105, 20, 0.08);
+          background-color: #ffffff;
         }
 
         .input-field:disabled {
-          background-color: rgba(26, 18, 9, 0.03);
-          color: rgba(26, 18, 9, 0.5);
-          border-color: rgba(26, 18, 9, 0.08);
+          background-color: rgba(26, 18, 9, 0.04);
+          color: rgba(20, 20, 20, 0.5);
+          border-color: rgba(139, 105, 20, 0.15);
           cursor: not-allowed;
         }
 
         .textarea-field {
           width: 100%;
           box-sizing: border-box;
-          border: 1.5px solid rgba(26, 18, 9, 0.12);
+          border: 1.5px solid rgba(139, 105, 20, 0.22);
           border-radius: 8px;
-          padding: 14px;
+          padding: 14px 16px;
           font-family: 'Jost', sans-serif;
-          font-size: 13.5px;
-          color: #1a1209;
+          font-size: 14px;
+          color: #141414;
           outline: none;
-          background-color: rgba(250, 247, 240, 0.65);
+          background-color: #FAF8F5;
           backdrop-filter: blur(8px);
           -webkit-backdrop-filter: blur(8px);
           box-shadow: inset 0 1px 3px rgba(26, 18, 9, 0.02);
@@ -759,13 +792,13 @@ export default function CustomerCarePage() {
 
         .textarea-field:focus {
           border-color: #8B6914;
-          box-shadow: 0 0 0 3.5px rgba(139, 105, 20, 0.14), 0 6px 16px rgba(139, 105, 20, 0.08);
-          background-color: rgba(255, 255, 255, 0.95);
+          box-shadow: 0 0 0 3.5px rgba(223, 177, 91, 0.2), 0 4px 12px rgba(139, 105, 20, 0.08);
+          background-color: #ffffff;
         }
 
         .char-counter {
           font-size: 11px;
-          color: rgba(26, 18, 9, 0.4);
+          color: rgba(20, 20, 20, 0.45);
           text-align: right;
           margin-top: 6px;
           font-weight: 500;
@@ -774,8 +807,8 @@ export default function CustomerCarePage() {
         .lock-icon-container {
           position: absolute;
           right: 14px;
-          top: 36px;
-          color: #8b6914;
+          top: 38px;
+          color: #8B6914;
           display: flex;
           align-items: center;
         }
@@ -784,78 +817,147 @@ export default function CustomerCarePage() {
           margin-bottom: 24px;
           display: flex;
           justify-content: flex-start;
-          padding: 8px;
-          background: rgba(250, 247, 240, 0.6);
+          padding: 10px;
+          background: rgba(250, 247, 240, 0.7);
           border-radius: 8px;
-          border: 1px solid rgba(26, 18, 9, 0.06);
+          border: 1px solid rgba(139, 105, 20, 0.18);
         }
 
         .submit-btn {
-          background: linear-gradient(135deg, #1a1209 0%, #2b2016 100%);
-          color: #faf7f0;
-          border: none;
-          border-radius: 6px;
+          background: linear-gradient(135deg, #9C7A3C 0%, #8B6914 50%, #70530E 100%);
+          color: #ffffff;
+          border: 1px solid rgba(223, 177, 91, 0.4);
+          border-radius: 8px;
           padding: 16px 36px;
           font-family: 'Jost', sans-serif;
-          font-size: 12.5px;
+          font-size: 13px;
           font-weight: 600;
           letter-spacing: 0.16em;
           text-transform: uppercase;
           cursor: pointer;
-          transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+          transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
           display: inline-flex;
           align-items: center;
           gap: 10px;
           width: 100%;
           justify-content: center;
-          box-shadow: 0 6px 20px rgba(26, 18, 9, 0.15);
+          box-shadow: 0 8px 24px rgba(139, 105, 20, 0.28);
         }
 
         .submit-btn:hover:not(:disabled) {
-          background: #8B6914;
-          box-shadow: 0 8px 24px rgba(139, 105, 20, 0.3);
+          background: linear-gradient(135deg, #AA8644 0%, #9C7A3C 50%, #7E5F12 100%);
+          box-shadow: 0 12px 28px rgba(139, 105, 20, 0.38);
           transform: translateY(-2px);
         }
 
         .submit-btn:disabled {
-          background: rgba(26, 18, 9, 0.15);
-          color: rgba(26, 18, 9, 0.4);
+          background: linear-gradient(135deg, rgba(156, 122, 60, 0.48) 0%, rgba(139, 105, 20, 0.4) 100%);
+          color: rgba(255, 255, 255, 0.88);
+          border: 1px solid rgba(139, 105, 20, 0.25);
           cursor: not-allowed;
           box-shadow: none;
+          transform: none;
         }
 
-        /* ── GOOGLE MAPS SECTION ── */
+        /* ── FLAGSHIP BOUTIQUE & SHOWROOM MAP SECTION ── */
         .map-section {
           margin-top: 64px;
-          border-top: 1px solid rgba(26, 18, 9, 0.08);
+          border-top: 1.5px solid rgba(139, 105, 20, 0.18);
           padding-top: 48px;
+        }
+
+        .map-badge-pill {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          padding: 6px 18px;
+          background: rgba(139, 105, 20, 0.12);
+          border: 1px solid rgba(139, 105, 20, 0.3);
+          border-radius: 24px;
+          font-size: 10px;
+          letter-spacing: 0.22em;
+          text-transform: uppercase;
+          font-weight: 700;
+          color: #8B6914;
+          margin-bottom: 12px;
         }
 
         .map-title {
           font-family: 'Cormorant Garamond', serif;
-          font-size: 32px;
+          font-size: 34px;
           font-weight: 500;
           text-align: center;
-          margin: 0 0 6px;
-          color: #1a1209;
+          margin: 0 0 8px;
+          color: #141414;
+          letter-spacing: 0.02em;
         }
 
         .map-subtitle {
-          font-size: 13.5px;
-          color: rgba(26, 18, 9, 0.55);
+          font-size: 14px;
+          color: rgba(20, 20, 20, 0.6);
           text-align: center;
           margin: 0 0 28px;
+          max-width: 650px;
+          margin-left: auto;
+          margin-right: auto;
+        }
+
+        .map-info-strip {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 18px;
+          margin-bottom: 24px;
+        }
+
+        .map-info-card {
+          background: rgba(255, 255, 255, 0.85);
+          border: 1.5px solid rgba(139, 105, 20, 0.2);
+          border-radius: 14px;
+          padding: 18px 20px;
+          display: flex;
+          align-items: flex-start;
+          gap: 14px;
+          box-shadow: 0 4px 14px rgba(139, 105, 20, 0.04);
+        }
+
+        .map-info-icon {
+          width: 38px;
+          height: 38px;
+          border-radius: 10px;
+          background: linear-gradient(135deg, rgba(139, 105, 20, 0.1) 0%, rgba(223, 177, 91, 0.2) 100%);
+          border: 1px solid rgba(139, 105, 20, 0.25);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+          color: #8B6914;
+        }
+
+        .map-info-label {
+          font-size: 10.5px;
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 0.14em;
+          color: #8B6914;
+          margin-bottom: 4px;
+        }
+
+        .map-info-text {
+          font-size: 13px;
+          color: #141414;
+          font-weight: 500;
+          line-height: 1.45;
         }
 
         .map-container {
           position: relative;
           width: 100%;
-          height: 460px;
-          border-radius: 14px;
+          height: 480px;
+          border-radius: 16px;
           overflow: hidden;
-          border: 1.5px solid rgba(139, 105, 20, 0.2);
-          box-shadow: 0 18px 48px rgba(26, 18, 9, 0.08), 0 4px 12px rgba(139, 105, 20, 0.04);
-          margin-bottom: 24px;
+          border: 1.5px solid rgba(139, 105, 20, 0.28);
+          box-shadow: 0 20px 48px rgba(139, 105, 20, 0.08), 0 4px 16px rgba(0, 0, 0, 0.03);
+          margin-bottom: 28px;
         }
 
         .map-iframe {
@@ -871,44 +973,69 @@ export default function CustomerCarePage() {
           flex-wrap: wrap;
         }
 
-        .map-link-btn {
+        .map-btn-primary {
           display: inline-flex;
           align-items: center;
           gap: 10px;
-          background: rgba(255, 255, 255, 0.85);
-          backdrop-filter: blur(12px);
-          -webkit-backdrop-filter: blur(12px);
-          color: #8B6914;
-          border: 1.5px solid rgba(139, 105, 20, 0.35);
-          border-radius: 6px;
-          padding: 12px 28px;
+          background: linear-gradient(135deg, #9C7A3C 0%, #8B6914 100%);
+          color: #ffffff;
+          border: 1px solid #70530E;
+          border-radius: 8px;
+          padding: 13px 30px;
           font-size: 12px;
           font-weight: 600;
           text-decoration: none;
-          letter-spacing: 0.1em;
+          letter-spacing: 0.12em;
           text-transform: uppercase;
-          transition: all 0.3s ease;
-          box-shadow: 0 6px 20px rgba(26, 18, 9, 0.04), 0 2px 6px rgba(139, 105, 20, 0.03);
+          transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+          box-shadow: 0 6px 20px rgba(139, 105, 20, 0.28);
         }
 
-        .map-link-btn:hover {
-          background-color: #8B6914;
+        .map-btn-primary:hover {
+          background: linear-gradient(135deg, #AA8644 0%, #9C7A3C 100%);
+          box-shadow: 0 10px 26px rgba(139, 105, 20, 0.38);
+          transform: translateY(-2px);
           color: #ffffff;
-          border-color: #8b6914;
-          box-shadow: 0 6px 20px rgba(139,105,20,0.25);
+        }
+
+        .map-btn-secondary {
+          display: inline-flex;
+          align-items: center;
+          gap: 10px;
+          background: #ffffff;
+          backdrop-filter: blur(12px);
+          -webkit-backdrop-filter: blur(12px);
+          color: #8B6914;
+          border: 1.5px solid rgba(139, 105, 20, 0.38);
+          border-radius: 8px;
+          padding: 13px 30px;
+          font-size: 12px;
+          font-weight: 600;
+          text-decoration: none;
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
+          transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+          box-shadow: 0 6px 20px rgba(139, 105, 20, 0.05);
+        }
+
+        .map-btn-secondary:hover {
+          background-color: #FAF8F5;
+          color: #70530E;
+          border-color: #8B6914;
+          box-shadow: 0 8px 24px rgba(139, 105, 20, 0.18);
           transform: translateY(-2px);
         }
 
         /* SUCCESS SCREEN */
         .success-card {
-          background: rgba(255, 255, 255, 0.85);
+          background: rgba(255, 255, 255, 0.88);
           backdrop-filter: blur(16px);
           -webkit-backdrop-filter: blur(16px);
           border: 1.5px solid rgba(139, 105, 20, 0.3);
-          border-radius: 14px;
+          border-radius: 16px;
           padding: 60px 40px;
           text-align: center;
-          box-shadow: 0 16px 44px rgba(26, 18, 9, 0.06);
+          box-shadow: 0 18px 48px rgba(139, 105, 20, 0.08);
           max-width: 680px;
           margin: 0 auto;
         }
@@ -917,26 +1044,26 @@ export default function CustomerCarePage() {
           width: 64px;
           height: 64px;
           border-radius: 50%;
-          background: rgba(46, 125, 50, 0.1);
-          color: #2e7d32;
+          background: rgba(139, 105, 20, 0.12);
+          color: #8B6914;
           display: flex;
           align-items: center;
           justify-content: center;
           margin: 0 auto 24px;
-          border: 1px solid rgba(46, 125, 50, 0.25);
+          border: 1.5px solid rgba(139, 105, 20, 0.35);
         }
 
         .success-title {
           font-family: 'Cormorant Garamond', serif;
           font-size: 34px;
-          color: #1a1209;
+          color: #141414;
           margin: 0 0 12px;
           font-weight: 500;
         }
 
         .success-text {
           font-size: 14.5px;
-          color: rgba(26, 18, 9, 0.65);
+          color: rgba(20, 20, 20, 0.65);
           line-height: 1.65;
           margin: 0 0 32px;
         }
@@ -950,6 +1077,10 @@ export default function CustomerCarePage() {
           .care-grid {
             grid-template-columns: 1fr;
             gap: 32px;
+          }
+          .map-info-strip {
+            grid-template-columns: 1fr;
+            gap: 12px;
           }
           .hero-attached-benefits-bar {
             display: flex;
@@ -966,14 +1097,14 @@ export default function CustomerCarePage() {
             flex: 0 0 auto;
           }
           .map-container {
-            height: 360px;
+            height: 380px;
           }
         }
 
         @media (max-width: 640px) {
           .care-hero-section {
             min-height: 380px;
-            padding-top: 100px;
+            padding: 100px 18px 48px;
             background-attachment: scroll;
           }
           .form-row-grid {
@@ -981,10 +1112,18 @@ export default function CustomerCarePage() {
             gap: 0;
           }
           .care-form-card, .care-details-card {
-            padding: 24px;
+            padding: 24px 20px;
           }
           .map-container {
             height: 300px;
+          }
+          .map-action-row {
+            flex-direction: column;
+            width: 100%;
+          }
+          .map-btn-primary, .map-btn-secondary {
+            width: 100%;
+            justify-content: center;
           }
         }
       `}</style>
@@ -1162,7 +1301,7 @@ export default function CustomerCarePage() {
               <div>
                 <div className="quick-card-tag">Official Concierge Emails</div>
                 <div className="quick-card-title" style={{ fontSize: '13px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                  <a href="mailto:support@winsorbrand.com" style={{ color: '#8b6914', textDecoration: 'underline', fontWeight: 600 }}>support@winsorbrand.com</a>
+                  <a href="mailto:support@winsorbrand.com" style={{ color: '#8B6914', textDecoration: 'underline', fontWeight: 600 }}>support@winsorbrand.com</a>
                   <a href="mailto:winsorwatches@gmail.com" style={{ color: 'inherit', textDecoration: 'underline' }}>winsorwatches@gmail.com</a>
                 </div>
                 <div className="quick-card-sub" style={{ marginTop: '4px' }}>
@@ -1251,7 +1390,7 @@ export default function CustomerCarePage() {
 
                   <div className="headquarters-box">
                     <div className="info-label" style={{ marginBottom: '8px' }}>Wholesale & Retailer Purchases</div>
-                    <p style={{ margin: 0, fontSize: '13px', color: 'rgba(26,18,9,0.68)', lineHeight: 1.6 }}>
+                    <p style={{ margin: 0, fontSize: '13px', color: 'rgba(20,20,20,0.7)', lineHeight: 1.6 }}>
                       To register for wholesale or to purchase timepieces for your shop, contact our Head Office directly:<br />
                       <span style={{ display: 'block', marginTop: '6px' }}>
                         <strong>Phone:</strong> <a href="tel:0770716212" className="contact-link">077 071 6212</a> / <a href="tel:0778778555" className="contact-link">077 877 8555</a>
@@ -1434,8 +1573,12 @@ export default function CustomerCarePage() {
                     >
                       {loading ? (
                         <>
-                          <div className="shimmer-circle" style={{ width: '14px', height: '14px', borderRadius: '50%', border: '2px solid rgba(255,255,255,0.2)', borderTopColor: '#fff', animation: 'spin 1s linear infinite' }} />
+                          <div className="shimmer-circle" style={{ width: '15px', height: '15px', borderRadius: '50%', border: '2px solid rgba(255,255,255,0.3)', borderTopColor: '#ffffff', animation: 'spin 1s linear infinite' }} />
                           Submitting Inquiry...
+                        </>
+                      ) : !turnstileToken ? (
+                        <>
+                          Complete Security Verification Above <span>→</span>
                         </>
                       ) : (
                         <>
@@ -1451,13 +1594,53 @@ export default function CustomerCarePage() {
 
               {/* GOOGLE MAPS SECTION */}
               <div className="map-section">
-                <h2 className="map-title">Flagship Boutique Location</h2>
-                <p className="map-subtitle">Experience Winsor timepieces in person at our Colombo Pettah showroom.</p>
+                <div style={{ textAlign: 'center' }}>
+                  <div className="map-badge-pill">
+                    ★ OFFICIAL BOUTIQUE SHOWROOM ★
+                  </div>
+                </div>
+                <h2 className="map-title">Flagship Boutique & Showroom</h2>
+                <p className="map-subtitle">Experience Winsor timepieces, master horology consultation, and after-sales care in person at our flagship showroom.</p>
+
+                {/* Boutique Key Information Cards */}
+                <div className="map-info-strip">
+                  <div className="map-info-card">
+                    <div className="map-info-icon">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" /></svg>
+                    </div>
+                    <div>
+                      <div className="map-info-label">Colombo Flagship Showroom</div>
+                      <div className="map-info-text">Happy Time (Pvt) Ltd, 49A Keyzer Street, Colombo 11 (Pettah)</div>
+                    </div>
+                  </div>
+
+                  <div className="map-info-card">
+                    <div className="map-info-icon">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>
+                    </div>
+                    <div>
+                      <div className="map-info-label">Operating Hours</div>
+                      <div className="map-info-text">Mon – Sat: 9:30 AM – 7:30 PM (Sunday Closed)</div>
+                    </div>
+                  </div>
+
+                  <div className="map-info-card">
+                    <div className="map-info-icon">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" /></svg>
+                    </div>
+                    <div>
+                      <div className="map-info-label">Showroom Direct Line</div>
+                      <div className="map-info-text">
+                        <a href="tel:0770716212" className="contact-link">077 071 6212</a> / <a href="tel:0778778555" className="contact-link">077 877 8555</a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
 
                 <div className="map-container">
                   <iframe
                     className="map-iframe"
-                    src="https://maps.google.com/maps?q=Happy%20Time%20(Pvt)%20Ltd%20-%20Colombo%2011&t=&z=16&ie=UTF8&iwloc=&output=embed"
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3960.6726214532677!2d79.8485117!3d6.9368997!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3ae259261ada6aad%3A0x64dff49a1c0ccff2!2sHappy%20Time%20(Pvt)%20Ltd%20-%20Colombo%2011!5e0!3m2!1sen!2slk!4v1700000000000!5m2!1sen!2slk"
                     allowFullScreen={true}
                     loading="lazy"
                     referrerPolicy="no-referrer-when-downgrade"
@@ -1466,10 +1649,20 @@ export default function CustomerCarePage() {
 
                 <div className="map-action-row">
                   <a
+                    href="tel:0770716212"
+                    className="map-btn-primary"
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+                    </svg>
+                    Call Colombo Showroom
+                  </a>
+
+                  <a
                     href="https://www.google.com/maps/place/Happy+Time+(Pvt)+Ltd+-+Colombo+11/@6.9368997,79.8485117,17z/data=!3m1!4b1!4m6!3m5!1s0x3ae259261ada6aad:0x64dff49a1c0ccff2!8m2!3d6.9368997!4d79.8510866!16s%2Fg%2F11qp2yyysl?hl=en-US&entry=ttu&g_ep=EgoyMDI2MDYwMS4wIKXMDSoASAFQAw%3D%3D"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="map-link-btn"
+                    className="map-btn-secondary"
                   >
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z" />
@@ -1479,14 +1672,13 @@ export default function CustomerCarePage() {
                   </a>
 
                   <a
-                    href="tel:+94112345678"
-                    className="map-link-btn"
-                    style={{ background: '#1a1209', color: '#ffffff', borderColor: '#1a1209' }}
+                    href="tel:0779779666"
+                    className="map-btn-secondary"
                   >
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+                      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" />
                     </svg>
-                    Call Showroom Desk
+                    Call Kandy KCC Showroom
                   </a>
                 </div>
               </div>
