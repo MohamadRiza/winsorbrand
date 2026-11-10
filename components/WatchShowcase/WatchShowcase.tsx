@@ -172,7 +172,25 @@ const WatchShowcase = () => {
             <div className="pt-1 sm:pt-3">
               <Link
                 href="/our-story"
-                className="inline-block border border-[#141414] text-[#141414] hover:bg-[#141414] hover:text-white px-3.5 sm:px-5 py-1.5 sm:py-2 text-[9px] sm:text-[10px] lg:text-[11px] font-medium tracking-[0.15em] uppercase transition-all duration-300"
+                className="inline-block rounded-[4px] border border-[#141414] text-[#141414] px-4 sm:px-5 py-1.5 sm:py-2 text-[9.5px] sm:text-[10.5px] lg:text-[11px] font-semibold tracking-[0.16em] uppercase"
+                style={{
+                  textDecoration: 'none',
+                  transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'linear-gradient(135deg, #9C7A3C 0%, #8B6914 100%)';
+                  e.currentTarget.style.borderColor = '#8B6914';
+                  e.currentTarget.style.color = '#FFFFFF';
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.boxShadow = '0 6px 18px rgba(139, 105, 20, 0.32)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'transparent';
+                  e.currentTarget.style.borderColor = '#141414';
+                  e.currentTarget.style.color = '#141414';
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = 'none';
+                }}
               >
                 OUR STORY
               </Link>
@@ -233,7 +251,25 @@ const WatchShowcase = () => {
               <div className="pt-1 sm:pt-3">
                 <Link
                   href="/limited-edition"
-                  className="inline-block border border-[#141414] text-[#141414] hover:bg-[#141414] hover:text-white px-3.5 sm:px-5 py-1.5 sm:py-2 text-[9px] sm:text-[10px] lg:text-[11px] font-medium tracking-[0.15em] uppercase transition-all duration-300"
+                  className="inline-block rounded-[4px] border border-[#141414] text-[#141414] px-4 sm:px-5 py-1.5 sm:py-2 text-[9.5px] sm:text-[10.5px] lg:text-[11px] font-semibold tracking-[0.16em] uppercase"
+                  style={{
+                    textDecoration: 'none',
+                    transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = 'linear-gradient(135deg, #9C7A3C 0%, #8B6914 100%)';
+                    e.currentTarget.style.borderColor = '#8B6914';
+                    e.currentTarget.style.color = '#FFFFFF';
+                    e.currentTarget.style.boxShadow = '0 6px 18px rgba(139, 105, 20, 0.32)';
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = 'transparent';
+                    e.currentTarget.style.borderColor = '#141414';
+                    e.currentTarget.style.color = '#141414';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = 'none';
+                  }}
                 >
                   VIEW SERIES
                 </Link>

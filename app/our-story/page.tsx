@@ -277,33 +277,33 @@ export default function OurStoryPage() {
       </section>
 
       {/* ── 5. INTERACTIVE BRAND FILM ── */}
-      <section className="py-14 sm:py-20 bg-[#120d08] text-white px-4 sm:px-6 lg:px-8">
+      <section className="py-14 sm:py-20 bg-gradient-to-b from-[#FAF8F5] via-[#F3EDE5] to-[#FAF8F5] text-[#141414] border-y border-[#8B6914]/20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-8 sm:mb-10">
             <div className="flex items-center justify-center gap-2.5 mb-3">
-              <span className="w-6 sm:w-10 h-[1px] bg-[#dfb15b]/50" />
-              <span className="font-['Jost'] text-[9.5px] sm:text-[10.5px] tracking-[0.28em] uppercase font-semibold text-[#dfb15b]">
+              <span className="w-6 sm:w-10 h-[1px] bg-[#8B6914]/40" />
+              <span className="font-['Jost'] text-[9.5px] sm:text-[10.5px] tracking-[0.28em] uppercase font-semibold text-[#8B6914]">
                 WINSOR CRAFTSMANSHIP
               </span>
-              <span className="w-6 sm:w-10 h-[1px] bg-[#dfb15b]/50" />
+              <span className="w-6 sm:w-10 h-[1px] bg-[#8B6914]/40" />
             </div>
 
-            <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl font-normal tracking-tight text-white mb-2">
+            <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl font-normal tracking-tight text-[#141414] mb-2">
               The Architecture of Precision
             </h2>
 
-            <p className="font-serif italic text-xs sm:text-sm md:text-base text-white/70 max-w-md mx-auto">
+            <p className="font-serif italic text-xs sm:text-sm md:text-base text-[#555555] max-w-md mx-auto">
               Witness the deconstructed art of automatic timepiece movements, skeletonized dials, and high-frequency regulation.
             </p>
           </div>
 
-          {/* Client-Side Video Player */}
-          <div className="max-w-4xl mx-auto">
+          {/* Client-Side Video Player with Gold Bezel Frame */}
+          <div className="max-w-4xl mx-auto rounded-2xl overflow-hidden border border-[#8B6914]/30 shadow-[0_20px_50px_rgba(139,105,20,0.12)]">
             <VideoPlayer src="/winsor_video.webm" />
           </div>
 
           <div className="text-center mt-6">
-            <p className="font-['Jost'] text-[10.5px] text-white/50 tracking-wider uppercase">
+            <p className="font-['Jost'] text-[10.5px] text-[#777777] tracking-wider uppercase">
               Official Winsor Calibre Automatic Movement • Hand-Assembled Quality Control
             </p>
           </div>
@@ -350,7 +350,7 @@ export default function OurStoryPage() {
       </section>
 
       {/* ── 7. OFFICIAL INDUSTRY AWARDS & RECOGNITION ── */}
-      <section className="py-14 sm:py-20 bg-[#f4efe4] border-y border-[#8B6914]/20 px-4 sm:px-6 lg:px-8">
+      <section className="py-14 sm:py-20 bg-gradient-to-b from-[#FAF8F5] via-[#F5EFEB] to-[#FAF8F5] border-y border-[#8B6914]/20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-10 sm:mb-14">
             <SectionLabel>Honors & Accolades</SectionLabel>
@@ -424,13 +424,13 @@ export default function OurStoryPage() {
             <div className="flex flex-wrap gap-3">
               <Link
                 href="/retailers"
-                className="px-6 py-2.5 bg-[#141414] hover:bg-[#8B6914] text-white text-[11px] tracking-[0.18em] uppercase font-semibold rounded-[4px] transition-all duration-300"
+                className="px-6 py-2.5 bg-gradient-to-r from-[#9C7A3C] via-[#8B6914] to-[#9C7A3C] hover:from-[#B58F49] hover:to-[#8B6914] text-white text-[11px] tracking-[0.18em] uppercase font-semibold rounded-[4px] shadow-md hover:shadow-[0_4px_16px_rgba(139,105,20,0.3)] transition-all duration-300 hover:-translate-y-0.5"
               >
                 Find Retailers
               </Link>
               <Link
                 href="/customer-care"
-                className="px-6 py-2.5 bg-white hover:bg-[#141414] text-[#141414] hover:text-white border border-black/[0.14] text-[11px] tracking-[0.18em] uppercase font-semibold rounded-[4px] transition-all duration-300"
+                className="px-6 py-2.5 bg-white hover:bg-[#FAF8F5] text-[#8B6914] hover:text-[#141414] border border-[#8B6914]/40 hover:border-[#8B6914] text-[11px] tracking-[0.18em] uppercase font-semibold rounded-[4px] transition-all duration-300 shadow-sm hover:shadow-[0_4px_16px_rgba(139,105,20,0.15)] hover:-translate-y-0.5"
               >
                 Dealer Inquiries
               </Link>

@@ -1353,19 +1353,40 @@ export default function GiftSection() {
         <Link
           href="/gifts"
           style={{
-            display: 'inline-block',
-            padding: '12px 28px',
-            border: '1px solid #1a1a1a',
-            color: '#1a1a1a',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '8px',
+            padding: '13px 32px',
+            border: '1px solid #141414',
+            background: 'transparent',
+            color: '#141414',
+            borderRadius: '4px',
             textDecoration: 'none',
             fontFamily: "'Jost', sans-serif",
-            fontSize: 13,
-            letterSpacing: '0.15em',
+            fontSize: '12px',
+            fontWeight: 600,
+            letterSpacing: '0.16em',
             textTransform: 'uppercase',
-            transition: 'all 0.3s ease',
+            transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+            boxShadow: '0 2px 6px rgba(0, 0, 0, 0.04)',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = 'linear-gradient(135deg, #9C7A3C 0%, #8B6914 100%)';
+            e.currentTarget.style.borderColor = '#8B6914';
+            e.currentTarget.style.color = '#FFFFFF';
+            e.currentTarget.style.transform = 'translateY(-2px)';
+            e.currentTarget.style.boxShadow = '0 8px 24px rgba(139, 105, 20, 0.32)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = 'transparent';
+            e.currentTarget.style.borderColor = '#141414';
+            e.currentTarget.style.color = '#141414';
+            e.currentTarget.style.transform = 'translateY(0)';
+            e.currentTarget.style.boxShadow = '0 2px 6px rgba(0, 0, 0, 0.04)';
           }}
         >
-          View All Gift Collections →
+          <span>View All Gift Collections</span>
+          <span style={{ fontSize: '13px', transition: 'transform 0.3s ease' }}>→</span>
         </Link>
       </div>
     </section>

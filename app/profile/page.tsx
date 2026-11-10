@@ -79,7 +79,7 @@ export default function ProfilePage() {
   const { openUserProfile, signOut } = useClerk();
 
   // Tab State
-  const [activeTab, setActiveTab] = useState<'profile-details' | 'dashboard' | 'orders' | 'wishlist' | 'addresses' | 'security' | 'notifications' | 'reviews'>('profile-details');
+  const [activeTab, setActiveTab] = useState<'profile-details' | 'dashboard' | 'orders' | 'wishlist' | 'addresses' | 'security' | 'notifications' | 'reviews'>('dashboard');
 
   // Reviews States
   const [pendingReviews, setPendingReviews] = useState<any[]>([]);
@@ -561,50 +561,64 @@ export default function ProfilePage() {
           gap: 28px;
         }
 
-        /* ── Header Banner (Swiss Luxury Obsidian Card) ── */
+        /* ── Header Banner (Swiss Luxury Warm Pearl & Gold Card) ── */
         .portal-header-banner {
-          background: #141414;
-          background-image: radial-gradient(circle at 85% 25%, rgba(255, 255, 255, 0.05) 0%, transparent 60%);
-          border: 1px solid rgba(255, 255, 255, 0.08);
+          background: linear-gradient(135deg, #FFFFFF 0%, #FAF8F5 45%, #F4EFEB 100%);
+          border: 1px solid rgba(197, 168, 128, 0.35);
           border-radius: 18px;
-          padding: 34px 38px;
+          padding: 32px 36px;
           display: flex;
           align-items: center;
-          gap: 32px;
+          justify-content: space-between;
+          gap: 28px;
           position: relative;
           overflow: hidden;
-          box-shadow: 0 16px 40px rgba(0, 0, 0, 0.12);
+          box-shadow: 0 10px 30px rgba(20, 20, 20, 0.04), 0 2px 6px rgba(0, 0, 0, 0.02);
         }
         .banner-watermark {
-          position: absolute; right: -20px; top: 50%;
+          position: absolute; right: 230px; top: 50%;
           transform: translateY(-50%);
-          width: 280px; height: auto;
-          opacity: 0.06; pointer-events: none;
-          mix-blend-mode: luminosity;
+          width: 260px; height: auto;
+          opacity: 0.035; pointer-events: none;
         }
         .banner-glow-effect {
           display: none;
         }
+
+        .header-banner-left {
+          flex: 1;
+          min-width: 0;
+          display: flex;
+          flex-direction: column;
+          gap: 16px;
+          z-index: 2;
+        }
+        .header-banner-profile-row {
+          display: flex;
+          align-items: center;
+          gap: 22px;
+        }
+
         .avatar-wrapper {
           position: relative;
-          width: 96px; height: 96px; flex-shrink: 0;
+          width: 90px; height: 90px; flex-shrink: 0;
         }
         .avatar-img {
           width: 100%; height: 100%;
           border-radius: 50%;
-          border: 2px solid rgba(255, 255, 255, 0.2);
-          box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+          border: 3px solid #FFFFFF;
+          box-shadow: 0 4px 16px rgba(0,0,0,0.08), 0 0 0 1.5px rgba(197, 168, 128, 0.45);
           padding: 2px;
           object-fit: cover;
-          background: #1a1a1a;
+          background: #FAF8F5;
         }
         .avatar-fallback {
           width: 100%; height: 100%;
           border-radius: 50%;
-          border: 2px solid rgba(255, 255, 255, 0.2);
-          box-shadow: 0 4px 16px rgba(0,0,0,0.3);
-          background: #222222;
-          color: #FFFFFF;
+          border: 3px solid #FFFFFF;
+          box-shadow: 0 4px 16px rgba(0,0,0,0.08), 0 0 0 1.5px rgba(197, 168, 128, 0.45);
+          background: linear-gradient(135deg, #222222 0%, #141414 100%);
+          color: #FAF8F5;
           display: flex; align-items: center; justify-content: center;
           font-size: 32px; font-weight: 500;
           font-family: 'Cormorant Garamond', serif;
@@ -612,80 +626,134 @@ export default function ProfilePage() {
         .avatar-edit-btn {
           position: absolute; bottom: 0; right: 0;
           width: 28px; height: 28px;
-          background: #FFFFFF;
-          border: 1px solid rgba(20,20,20,0.15);
+          background: #8C6D3B;
+          border: 2px solid #FFFFFF;
           border-radius: 50%;
           display: flex; align-items: center; justify-content: center;
-          color: #141414; cursor: pointer;
-          box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+          color: #FFFFFF; cursor: pointer;
+          box-shadow: 0 2px 8px rgba(140, 109, 59, 0.28);
           transition: all 0.2s ease;
         }
-        .avatar-edit-btn:hover { transform: scale(1.1); background: #F4F4F6; }
+        .avatar-edit-btn:hover { transform: scale(1.1); background: #7A5E30; }
 
-        .header-info-block { display: flex; flex-direction: column; gap: 8px; z-index: 2; width: 100%; }
-        .patron-badge {
-          display: inline-flex; align-items: center; gap: 6px;
-          background: rgba(255, 255, 255, 0.08);
-          border: 1px solid rgba(255, 255, 255, 0.15);
-          color: #F0F0F0;
-          font-size: 10px; font-weight: 600; letter-spacing: 0.12em;
-          padding: 4px 12px; border-radius: 20px;
-          width: fit-content; text-transform: uppercase;
-        }
-        .patron-badge-dot {
-          width: 5px; height: 5px; border-radius: 50%;
-          background: #C5A880;
-        }
-
+        .header-info-block { display: flex; flex-direction: column; gap: 4px; width: 100%; }
         .patron-name {
           font-family: 'Cormorant Garamond', serif;
-          font-size: 30px; font-weight: 500;
-          color: #FFFFFF; margin: 0; letter-spacing: 0.02em;
+          font-size: 32px; font-weight: 600;
+          color: #141414; margin: 0; letter-spacing: 0.02em;
         }
-        .member-since { font-size: 12px; color: rgba(255, 255, 255, 0.55); margin-top: -2px; letter-spacing: 0.02em; }
+        .member-since { font-size: 12.5px; color: #666666; margin-top: 1px; letter-spacing: 0.01em; }
+        .client-id-pill {
+          font-family: 'Jost', monospace;
+          font-size: 10px;
+          font-weight: 600;
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
+          background: #FAF6EE;
+          color: #8C6D3B;
+          padding: 3px 10px;
+          border-radius: 20px;
+          border: 1px solid #E5D7BE;
+          box-shadow: 0 1px 3px rgba(140, 109, 59, 0.06);
+        }
+
+        /* ── Header Banner Timepiece Showcase ── */
+        .header-banner-showcase {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          width: 220px;
+          flex-shrink: 0;
+          position: relative;
+          padding: 12px 14px;
+          border-radius: 14px;
+          background: rgba(255, 255, 255, 0.7);
+          border: 1px solid rgba(197, 168, 128, 0.3);
+          box-shadow: 0 4px 16px rgba(20, 20, 20, 0.03);
+          backdrop-filter: blur(8px);
+          z-index: 2;
+        }
+        .banner-watch-glow {
+          position: absolute;
+          width: 140px; height: 140px;
+          border-radius: 50%;
+          background: radial-gradient(circle, rgba(197, 168, 128, 0.22) 0%, transparent 70%);
+          pointer-events: none;
+        }
+        .banner-watch-img {
+          width: 125px;
+          height: auto;
+          object-fit: contain;
+          filter: drop-shadow(0 14px 18px rgba(20, 20, 20, 0.16));
+          transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+          z-index: 2;
+        }
+        .header-banner-showcase:hover .banner-watch-img {
+          transform: translateY(-4px) scale(1.05);
+        }
+        .banner-watch-tag {
+          font-family: 'Jost', sans-serif;
+          font-size: 9.5px;
+          font-weight: 700;
+          letter-spacing: 0.14em;
+          text-transform: uppercase;
+          color: #141414;
+          margin-top: 8px;
+          z-index: 2;
+        }
+        .banner-watch-sub {
+          font-size: 9px;
+          color: #8C6D3B;
+          letter-spacing: 0.04em;
+          margin-top: 1px;
+          z-index: 2;
+        }
 
         /* ── Hero Metrics Grid ── */
         .hero-stats-grid {
           display: grid;
           grid-template-columns: repeat(4, 1fr);
-          gap: 14px;
-          margin-top: 14px;
-          border-top: 1px solid rgba(255, 255, 255, 0.1);
+          gap: 12px;
+          margin-top: 4px;
+          border-top: 1px solid rgba(197, 168, 128, 0.25);
           padding-top: 16px;
           width: 100%;
         }
         .hero-stat-card {
-          background: rgba(255, 255, 255, 0.04);
-          border: 1px solid rgba(255, 255, 255, 0.08);
+          background: #FFFFFF;
+          border: 1px solid rgba(197, 168, 128, 0.28);
           border-radius: 12px;
-          padding: 12px 16px;
+          padding: 11px 14px;
           display: flex;
           align-items: center;
           gap: 12px;
+          box-shadow: 0 2px 8px rgba(20, 20, 20, 0.02);
           transition: all 0.25s ease;
         }
         .hero-stat-card:hover {
-          background: rgba(255, 255, 255, 0.07);
-          border-color: rgba(255, 255, 255, 0.18);
-          transform: translateY(-1px);
+          background: #FFFFFF;
+          border-color: #8C6D3B;
+          transform: translateY(-2px);
+          box-shadow: 0 6px 18px rgba(140, 109, 59, 0.12);
         }
         .hero-stat-icon-wrapper {
           width: 34px; height: 34px;
           border-radius: 8px;
-          background: rgba(255, 255, 255, 0.08);
-          border: 1px solid rgba(255, 255, 255, 0.1);
+          background: #FAF8F5;
+          border: 1px solid rgba(197, 168, 128, 0.3);
           display: flex; align-items: center; justify-content: center;
-          color: #E5E5E5; flex-shrink: 0;
+          color: #8C6D3B; flex-shrink: 0;
         }
         .hero-stat-val {
           font-family: 'Jost', monospace;
           font-variant-numeric: tabular-nums;
-          font-size: 18px; font-weight: 600;
-          color: #FFFFFF; line-height: 1;
+          font-size: 19px; font-weight: 700;
+          color: #141414; line-height: 1;
         }
         .hero-stat-lbl {
-          font-size: 9.5px; font-weight: 500;
-          color: rgba(255, 255, 255, 0.5);
+          font-size: 9px; font-weight: 600;
+          color: #777777;
           text-transform: uppercase; letter-spacing: 0.08em;
           margin-top: 3px;
         }
@@ -791,19 +859,29 @@ export default function ProfilePage() {
         }
         .custom-select:focus { border-color: #141414; background-color: #FFFFFF; box-shadow: 0 0 0 3px rgba(20, 20, 20, 0.06); }
 
-        /* ── Action Buttons ── */
+        /* ── Action Buttons (Signature Warm Antique Gold) ── */
         .gold-action-btn {
-          background: #141414;
-          border: 1px solid #141414;
+          background: #8C6D3B;
+          background: linear-gradient(135deg, #9C7A3C 0%, #8C6D3B 100%);
+          border: 1px solid #8C6D3B;
           color: #FFFFFF;
           padding: 13px 26px;
           font-family: 'Jost', sans-serif; font-size: 11px; font-weight: 600;
           letter-spacing: 0.1em; border-radius: 8px;
-          cursor: pointer; transition: all 0.2s ease;
+          cursor: pointer; transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
           width: 100%; text-transform: uppercase;
-          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+          box-shadow: 0 4px 14px rgba(140, 109, 59, 0.25);
         }
-        .gold-action-btn:hover { background: #2A2A2A; border-color: #2A2A2A; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12); }
+        .gold-action-btn:hover {
+          background: linear-gradient(135deg, #A88646 0%, #967640 100%);
+          border-color: #967640;
+          box-shadow: 0 6px 20px rgba(140, 109, 59, 0.32);
+          transform: translateY(-1px);
+        }
+        .gold-action-btn:active {
+          transform: translateY(0);
+          box-shadow: 0 2px 8px rgba(140, 109, 59, 0.2);
+        }
         .gold-action-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
         /* ── Bottom split ── */
@@ -1102,8 +1180,9 @@ export default function ProfilePage() {
           gap: 6px;
           padding: 7px 14px;
           border-radius: 6px;
-          background: #141414;
-          border: 1px solid #141414;
+          background: #8C6D3B;
+          background: linear-gradient(135deg, #9C7A3C 0%, #8C6D3B 100%);
+          border: 1px solid #8C6D3B;
           color: #FFFFFF;
           font-size: 11px;
           font-weight: 600;
@@ -1112,9 +1191,14 @@ export default function ProfilePage() {
           letter-spacing: 0.04em;
           transition: all 0.2s ease;
           white-space: nowrap;
+          box-shadow: 0 2px 8px rgba(140, 109, 59, 0.22);
         }
         .poc-btn-track:hover {
-          background: #2A2A2A;
+          background: linear-gradient(135deg, #A88646 0%, #967640 100%);
+          border-color: #967640;
+          color: #FFFFFF;
+          transform: translateY(-1px);
+          box-shadow: 0 4px 14px rgba(140, 109, 59, 0.32);
         }
         .poc-btn-details {
           display: inline-flex;
@@ -1141,19 +1225,27 @@ export default function ProfilePage() {
 
         /* ── Membership Privileges Card ── */
         .patron-black-card {
-          background: #141414;
-          border: 1px solid rgba(255,255,255,0.08);
-          border-radius: 12px; padding: 20px;
-          color: #FFFFFF; position: relative; overflow: hidden;
+          background: linear-gradient(135deg, #FAF8F5 0%, #FFFFFF 50%, #F5F1E8 100%);
+          border: 1px solid rgba(197, 168, 128, 0.35);
+          border-radius: 14px; padding: 22px;
+          color: #141414; position: relative; overflow: hidden;
           margin-bottom: 16px;
-          box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+          box-shadow: 0 4px 18px rgba(20,20,20,0.03);
         }
-        .black-card-title { font-family: 'Cormorant Garamond', serif; font-size: 14px; font-weight: 600; letter-spacing: 0.15em; color: #C5A880; margin: 0 0 4px 0; text-transform: uppercase; }
-        .black-card-desc { font-size: 11px; color: rgba(255,255,255,0.7); margin: 0; font-family: 'Jost', sans-serif; line-height: 1.5; }
+        .black-card-title { font-family: 'Cormorant Garamond', serif; font-size: 15px; font-weight: 600; letter-spacing: 0.12em; color: #8C6D3B; margin: 0 0 4px 0; text-transform: uppercase; }
+        .black-card-desc { font-size: 11.5px; color: #666666; margin: 0; font-family: 'Jost', sans-serif; line-height: 1.55; }
         .black-card-gold-seal { position: absolute; right: -8px; bottom: -10px; font-size: 54px; opacity: 0.08; pointer-events: none; }
-        .benefits-checklist { display: flex; flex-direction: column; gap: 8px; }
-        .benefit-check-item { display: flex; align-items: center; gap: 10px; font-size: 12.5px; color: #444444; font-weight: 400; }
-        .benefit-check-icon { color: #141414; display: flex; align-items: center; flex-shrink: 0; }
+        .benefits-checklist { display: flex; flex-direction: column; gap: 9px; }
+        .benefit-check-item { display: flex; align-items: center; gap: 10px; font-size: 12.5px; color: #333333; font-weight: 500; }
+        .benefit-check-icon {
+          width: 20px; height: 20px;
+          border-radius: 50%;
+          background: #FAF6EE;
+          border: 1px solid #E5D7BE;
+          color: #8C6D3B;
+          display: flex; align-items: center; justify-content: center;
+          flex-shrink: 0;
+        }
 
         /* ── Dashboard banner ── */
         .dashboard-welcome-banner {
@@ -1188,55 +1280,58 @@ export default function ProfilePage() {
             border-left: none; border-right: none; border-top: none;
             flex-direction: column; align-items: center; text-align: center;
             padding: 96px 16px 26px;
-            gap: 0; margin-bottom: 0;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+            gap: 16px; margin-bottom: 0;
+            box-shadow: 0 6px 20px rgba(20,20,20,0.05);
+            background: linear-gradient(180deg, #FFFFFF 0%, #FAF8F5 55%, #F4EFEB 100%);
           }
           .banner-watermark {
-            display: block !important;
-            right: -30px; top: 20px;
-            width: 180px; opacity: 0.04;
-            transform: none;
+            display: none !important;
+          }
+
+          .header-banner-showcase {
+            display: none !important;
+          }
+          .header-banner-profile-row {
+            flex-direction: column;
+            text-align: center;
+            gap: 12px;
           }
 
           /* ── Avatar ── */
           .avatar-wrapper {
             width: 84px; height: 84px;
-            margin-bottom: 12px;
+            margin-bottom: 4px;
           }
           .avatar-img, .avatar-fallback {
-            border: 2px solid rgba(255,255,255,0.25);
-            box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+            border: 3px solid #FFFFFF;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08), 0 0 0 1.5px rgba(197, 168, 128, 0.45);
           }
           .avatar-edit-btn {
-            background: #FFFFFF;
-            color: #141414;
+            background: #8C6D3B;
+            color: #FFFFFF;
           }
 
           /* ── Name & Badge ── */
           .header-info-block { align-items: center; text-align: center; gap: 6px; }
-          .patron-badge {
-            background: rgba(255,255,255,0.08);
-            border-color: rgba(255,255,255,0.15);
-            color: #E0E0E0;
-            font-size: 8.5px;
-          }
-          .patron-name { font-size: 24px; color: #FFFFFF; }
-          .member-since { color: rgba(255,255,255,0.5); font-size: 11px; text-align: center; }
+          .patron-name { font-size: 24px; color: #141414; }
+          .member-since { color: #666666; font-size: 11.5px; text-align: center; }
 
           /* ── Stats: 2x2 grid for mobile ── */
           .hero-stats-grid {
             display: grid; grid-template-columns: repeat(2, 1fr);
-            gap: 8px; margin-top: 16px; padding-top: 14px;
-            border-top: 1px solid rgba(255,255,255,0.1); width: 100%;
+            gap: 8px; margin-top: 14px; padding-top: 14px;
+            border-top: 1px solid rgba(197, 168, 128, 0.25); width: 100%;
           }
           .hero-stat-card {
             padding: 9px 11px;
             gap: 8px;
             border-radius: 10px;
+            background: #FFFFFF;
+            border: 1px solid rgba(197, 168, 128, 0.28);
           }
-          .hero-stat-icon-wrapper { width: 28px; height: 28px; }
-          .hero-stat-val { font-size: 15px; }
-          .hero-stat-lbl { font-size: 8px; }
+          .hero-stat-icon-wrapper { width: 28px; height: 28px; background: #FAF8F5; border: 1px solid rgba(197, 168, 128, 0.3); color: #8C6D3B; }
+          .hero-stat-val { font-size: 15px; color: #141414; }
+          .hero-stat-lbl { font-size: 8px; color: #777777; }
 
           /* ── Dashboard stat tiles 2x2 grid ── */
           .dashboard-metrics-grid {
@@ -1302,11 +1397,14 @@ export default function ProfilePage() {
           .mcs-title { font-size: 10.5px; font-weight: 600; color: #141414; text-transform: uppercase; letter-spacing: 0.05em; margin: 0; }
           .mcs-desc { font-size: 10px; color: #666666; margin: 2px 0 0; }
           .mcs-btn {
-            background: #141414; color: #FFFFFF; border: none;
+            background: #8C6D3B;
+            background: linear-gradient(135deg, #9C7A3C 0%, #8C6D3B 100%);
+            color: #FFFFFF; border: none;
             padding: 6px 14px; border-radius: 6px;
             font-family: 'Jost', sans-serif; font-size: 9px; font-weight: 600;
             letter-spacing: 0.06em; text-transform: uppercase;
             cursor: pointer; flex-shrink: 0; white-space: nowrap;
+            box-shadow: 0 2px 8px rgba(140, 109, 59, 0.25);
           }
 
           /* ── Content layout ── */
@@ -1433,10 +1531,10 @@ export default function ProfilePage() {
       <div className="profile-page-container">
         <style>{`${profileStyles}`}</style>
         <div className="access-card">
-          <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#141414" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: '18px' }}>
-            <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-          </svg>
+          <div style={{ width: '84px', height: '84px', margin: '0 auto 16px', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ position: 'absolute', width: '76px', height: '76px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(197, 168, 128, 0.2) 0%, transparent 70%)' }} />
+            <img src="/winsor_hero_backgroundremoved.webp" alt="Winsor Timepiece" style={{ width: '72px', height: 'auto', objectFit: 'contain', filter: 'drop-shadow(0 8px 14px rgba(0,0,0,0.15))', zIndex: 2 }} />
+          </div>
           <h1 className="access-title">Client Portal</h1>
           <p className="access-subtitle">
             Sign in to access your order history, manage personal delivery details, and view your verified timepieces.
@@ -1474,36 +1572,40 @@ export default function ProfilePage() {
 
 
       <div className="profile-portal-wrapper">
-        {/* TOP PATRON HEADER BANNER (FUTURISTIC MARBLE HERO) */}
+        {/* TOP CLIENT HEADER BANNER (SWISS LUXURY LIGHT THEME WITH TIMEPIECE SHOWCASE) */}
         <div className="portal-header-banner">
-          {/* Glow effect removed for Swiss luxury minimalist aesthetic */}
-          <img src="/winsor_hero_backgroundremoved.webp" alt="Winsor Signature Timepiece" className="banner-watermark" />
+          <img src="/winsor_hero_backgroundremoved.webp" alt="Winsor Watermark" className="banner-watermark" />
 
-          <div className="avatar-wrapper">
-            {user.imageUrl ? (
-              <img src={user.imageUrl} alt="Profile" className="avatar-img" />
-            ) : (
-              <div className="avatar-fallback">{user.firstName?.charAt(0) || 'U'}</div>
-            )}
-            <div className="avatar-edit-btn" onClick={() => openUserProfile()} title="Edit Profile Details">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <path d="M12 20h9" />
-                <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
-              </svg>
+          {/* Left Column: Profile Row & Stats */}
+          <div className="header-banner-left">
+            <div className="header-banner-profile-row">
+              <div className="avatar-wrapper">
+                {user.imageUrl ? (
+                  <img src={user.imageUrl} alt="Profile" className="avatar-img" />
+                ) : (
+                  <div className="avatar-fallback">{user.firstName?.charAt(0) || 'U'}</div>
+                )}
+                <div className="avatar-edit-btn" onClick={() => openUserProfile()} title="Edit Profile Details">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <path d="M12 20h9" />
+                    <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+                  </svg>
+                </div>
+              </div>
+
+              <div className="header-info-block">
+                <div className="flex items-center justify-between w-full flex-wrap gap-2">
+                  <h1 className="patron-name">{fullName || 'WINSOR CLIENT'}</h1>
+                  <span className="client-id-pill">
+                    CLIENT ID: #WS-{(user.id || '987654').slice(-6).toUpperCase()}
+                  </span>
+                </div>
+
+                <span className="member-since">
+                  Member since {user.createdAt ? new Date(user.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long' }) : new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long' })} • Verified Winsor Timepieces Client
+                </span>
+              </div>
             </div>
-          </div>
-
-          <div className="header-info-block">
-            <div className="flex items-center justify-between w-full flex-wrap gap-2">
-              <h1 className="patron-name">{fullName || 'WINSOR CLIENT'}</h1>
-              <span className="font-mono text-[10px] text-white/50 tracking-widest uppercase bg-white/5 px-2.5 py-1 rounded border border-white/10">
-                CLIENT ID: #WS-{(user.id || '987654').slice(-6).toUpperCase()}
-              </span>
-            </div>
-
-            <span className="member-since">
-              Member since {user.createdAt ? new Date(user.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long' }) : new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long' })} • Verified Winsor Timepieces Client
-            </span>
 
             {/* Professional Numbers Hero Stats Grid */}
             <div className="hero-stats-grid">
@@ -1553,13 +1655,21 @@ export default function ProfilePage() {
                   </svg>
                 </div>
                 <div>
-                  <div className="hero-stat-val text-xs text-white font-medium font-sans tracking-wide uppercase">
+                  <div className="hero-stat-val text-xs text-[#141414] font-semibold font-sans tracking-wide uppercase">
                     {orders.length >= 2 ? membershipTier.replace(' MEMBER', '') : 'VERIFIED'}
                   </div>
                   <div className="hero-stat-lbl">ACCOUNT STATUS</div>
                 </div>
               </div>
             </div>
+          </div>
+
+          {/* Right Column: Timepiece Showcase Widget (Desktop/Tablet) */}
+          <div className="header-banner-showcase">
+            <div className="banner-watch-glow" />
+            <img src="/winsor_hero_backgroundremoved.webp" alt="Winsor Flagship Watch" className="banner-watch-img" />
+            <div className="banner-watch-tag">FLAGSHIP CALIBRE</div>
+            <div className="banner-watch-sub">Japanese Precision Movement</div>
           </div>
         </div>
 
@@ -2026,7 +2136,7 @@ export default function ProfilePage() {
                   </div>
                 </div>
 
-                {/* Bottom Split: Recent Acquisitions & Black Card Privileges */}
+                {/* Bottom Split: Recent Acquisitions & Client Privileges */}
                 <div className="portal-bottom-split" style={{ marginTop: '24px' }}>
                   {/* Left: Recent Activity */}
                   <div>
@@ -2050,15 +2160,16 @@ export default function ProfilePage() {
                           </div>
                         ))
                       ) : (
-                        <div style={{ background: '#F8F7F4', border: '1px solid rgba(20,20,20,0.08)', borderRadius: '12px', padding: '24px 16px', textAlign: 'center' }}>
-                          <svg className="w-8 h-8 text-[#141414] mx-auto mb-2 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                          </svg>
-                          <p style={{ margin: '0 0 6px 0', fontSize: '13px', fontWeight: 600, color: '#141414' }}>No Timepiece Orders Yet</p>
-                          <p style={{ margin: 0, fontSize: '12px', color: '#666666', lineHeight: 1.5 }}>
-                            Your order history is empty. Explore our watch catalog to place your first order.
+                        <div style={{ background: '#F8F7F4', border: '1px solid rgba(197, 168, 128, 0.25)', borderRadius: '14px', padding: '28px 18px', textAlign: 'center' }}>
+                          <div style={{ width: '90px', height: '90px', margin: '0 auto 12px', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <div style={{ position: 'absolute', width: '80px', height: '80px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(197, 168, 128, 0.2) 0%, transparent 70%)' }} />
+                            <img src="/winsor_hero_backgroundremoved.webp" alt="Winsor Timepiece" style={{ width: '74px', height: 'auto', objectFit: 'contain', filter: 'drop-shadow(0 6px 12px rgba(0,0,0,0.12))', zIndex: 2 }} />
+                          </div>
+                          <p style={{ margin: '0 0 4px 0', fontSize: '15px', fontWeight: 600, color: '#141414', fontFamily: 'Cormorant Garamond, serif' }}>Your Watch Collection Begins Here</p>
+                          <p style={{ margin: 0, fontSize: '12px', color: '#666666', lineHeight: 1.5, maxWidth: '360px', marginLeft: 'auto', marginRight: 'auto' }}>
+                            Your order history is empty. Explore our handcrafted gents, ladies, and sports collections to make your first acquisition.
                           </p>
-                          <Link href="/collections" style={{ display: 'inline-block', marginTop: '12px', background: '#141414', color: '#FFFFFF', fontSize: '10.5px', fontWeight: 600, letterSpacing: '0.08em', padding: '8px 16px', borderRadius: '6px', textTransform: 'uppercase', textDecoration: 'none' }}>
+                          <Link href="/collections" style={{ display: 'inline-block', marginTop: '14px', background: '#8C6D3B', color: '#FFFFFF', fontSize: '10.5px', fontWeight: 600, letterSpacing: '0.08em', padding: '9px 18px', borderRadius: '6px', textTransform: 'uppercase', textDecoration: 'none', boxShadow: '0 3px 10px rgba(140, 109, 59, 0.25)' }}>
                             Explore Collections →
                           </Link>
                         </div>
@@ -2081,27 +2192,27 @@ export default function ProfilePage() {
                       <div className="benefits-checklist" style={{ marginTop: '16px' }}>
                         <div className="benefit-check-item">
                           <span className="benefit-check-icon">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg>
                           </span>
-                          <span style={{ color: '#E0E0E0', fontSize: '12px' }}>First access to new limited timepiece allocations</span>
+                          <span style={{ color: '#333333', fontSize: '12px' }}>First access to new limited timepiece allocations</span>
                         </div>
                         <div className="benefit-check-item">
                           <span className="benefit-check-icon">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg>
                           </span>
-                          <span style={{ color: '#E0E0E0', fontSize: '12px' }}>Official international warranty & service support</span>
+                          <span style={{ color: '#333333', fontSize: '12px' }}>Official international warranty & service support</span>
                         </div>
                         <div className="benefit-check-item">
                           <span className="benefit-check-icon">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg>
                           </span>
-                          <span style={{ color: '#E0E0E0', fontSize: '12px' }}>Complimentary luxury presentation box packaging</span>
+                          <span style={{ color: '#333333', fontSize: '12px' }}>Complimentary luxury presentation box packaging</span>
                         </div>
                         <div className="benefit-check-item">
                           <span className="benefit-check-icon">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg>
                           </span>
-                          <span style={{ color: '#E0E0E0', fontSize: '12px' }}>Dedicated client care and support</span>
+                          <span style={{ color: '#333333', fontSize: '12px' }}>Dedicated client care and support</span>
                         </div>
                       </div>
                     </div>
@@ -2178,7 +2289,7 @@ export default function ProfilePage() {
                     </div>
                     <p style={{ margin: '0 0 8px 0', fontSize: '14px', color: '#141414', fontWeight: 600 }}>No Orders Placed Yet</p>
                     <p style={{ margin: '0 0 18px 0', fontSize: '12px', color: '#666666' }}>Explore our catalog to place your first order.</p>
-                    <Link href="/collections" style={{ display: 'inline-block', background: '#141414', color: '#FFFFFF', padding: '10px 22px', borderRadius: '6px', fontSize: '11px', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', textDecoration: 'none' }}>
+                    <Link href="/collections" style={{ display: 'inline-block', background: '#8C6D3B', color: '#FFFFFF', padding: '10px 22px', borderRadius: '6px', fontSize: '11px', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', textDecoration: 'none', boxShadow: '0 3px 10px rgba(140, 109, 59, 0.25)' }}>
                       Discover Timepieces
                     </Link>
                   </div>
@@ -2292,8 +2403,8 @@ export default function ProfilePage() {
                                             display: 'inline-flex',
                                             alignItems: 'center',
                                             gap: '4px',
-                                            background: '#141414',
-                                            border: '1px solid #141414',
+                                            background: '#8C6D3B',
+                                            border: '1px solid #8C6D3B',
                                             color: '#FFFFFF',
                                             fontSize: '10px',
                                             padding: '4px 12px',
@@ -2304,6 +2415,7 @@ export default function ProfilePage() {
                                             letterSpacing: '0.04em',
                                             whiteSpace: 'nowrap',
                                             textTransform: 'uppercase',
+                                            boxShadow: '0 2px 8px rgba(140, 109, 59, 0.2)',
                                             transition: 'all 0.2s ease',
                                           }}
                                         >
@@ -2368,7 +2480,7 @@ export default function ProfilePage() {
                           <div style={{ fontSize: '14px', fontWeight: 600, color: '#141414', marginTop: '6px' }}>LKR {p.price?.toLocaleString()}</div>
                         </div>
                         <div style={{ display: 'flex', gap: '8px', marginTop: '4px' }}>
-                          <Link href={`/collections/${p._id}`} style={{ flex: 1, textAlign: 'center', background: '#141414', color: '#ffffff', fontSize: '11px', padding: '8px 0', borderRadius: '6px', textTransform: 'uppercase', letterSpacing: '0.04em', fontWeight: 600, textDecoration: 'none' }}>
+                          <Link href={`/collections/${p._id}`} style={{ flex: 1, textAlign: 'center', background: '#8C6D3B', color: '#ffffff', fontSize: '11px', padding: '8px 0', borderRadius: '6px', textTransform: 'uppercase', letterSpacing: '0.04em', fontWeight: 600, textDecoration: 'none', boxShadow: '0 2px 8px rgba(140, 109, 59, 0.2)' }}>
                             View Details
                           </Link>
                           <button
@@ -2478,7 +2590,7 @@ export default function ProfilePage() {
                               setReviewItem(item);
                               setIsReviewModalOpen(true);
                             }}
-                            style={{ background: '#141414', color: '#ffffff', border: '1px solid #141414', padding: '8px 18px', fontSize: '10.5px', fontWeight: 600, letterSpacing: '0.04em', borderRadius: '6px', cursor: 'pointer', textTransform: 'uppercase' }}
+                            style={{ background: '#8C6D3B', color: '#ffffff', border: '1px solid #8C6D3B', padding: '8px 18px', fontSize: '10.5px', fontWeight: 600, letterSpacing: '0.04em', borderRadius: '6px', cursor: 'pointer', textTransform: 'uppercase', boxShadow: '0 2px 8px rgba(140, 109, 59, 0.2)' }}
                           >
                             WRITE REVIEW
                           </button>
@@ -2689,12 +2801,12 @@ export default function ProfilePage() {
           <div style={{ background: '#FFFFFF', borderRadius: '16px', maxWidth: '520px', width: '100%', boxShadow: '0 25px 60px rgba(0,0,0,0.25)', maxHeight: '90vh', display: 'flex', flexDirection: 'column', overflow: 'hidden', border: '1px solid rgba(20,20,20,0.1)' }}>
             
             {/* Header */}
-            <div style={{ background: '#141414', padding: '20px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', color: '#FFFFFF', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+            <div style={{ background: 'linear-gradient(135deg, #FAF8F5 0%, #FFFFFF 100%)', padding: '20px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', color: '#141414', borderBottom: '1px solid rgba(197, 168, 128, 0.3)' }}>
               <div>
-                <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '22px', fontWeight: 600, margin: 0, letterSpacing: '0.02em', color: '#FFFFFF' }}>
+                <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '22px', fontWeight: 600, margin: 0, letterSpacing: '0.02em', color: '#141414' }}>
                   Write Timepiece Review
                 </h2>
-                <p style={{ margin: '3px 0 0 0', fontSize: '11px', color: 'rgba(255,255,255,0.65)', letterSpacing: '0.02em' }}>
+                <p style={{ margin: '3px 0 0 0', fontSize: '11px', color: '#666666', letterSpacing: '0.02em' }}>
                   Share your experience with the Winsor community
                 </p>
               </div>
@@ -2704,7 +2816,7 @@ export default function ProfilePage() {
                   setIsReviewModalOpen(false);
                   setReviewItem(null);
                 }}
-                style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.15)', color: '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', transition: 'all 0.2s ease', flexShrink: 0 }}
+                style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#FAF8F5', border: '1px solid rgba(20,20,20,0.12)', color: '#141414', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', transition: 'all 0.2s ease', flexShrink: 0 }}
                 title="Close"
               >
                 ✕
@@ -2908,15 +3020,15 @@ export default function ProfilePage() {
                       flex: 1.5,
                       padding: '12px',
                       borderRadius: '8px',
-                      background: '#141414',
+                      background: 'linear-gradient(135deg, #9C7A3C 0%, #8C6D3B 100%)',
                       color: '#FFFFFF',
-                      border: '1px solid #141414',
+                      border: '1px solid #8C6D3B',
                       cursor: submittingReview || uploadingReviewImg ? 'not-allowed' : 'pointer',
                       fontSize: '11px',
                       fontWeight: 600,
                       letterSpacing: '0.08em',
                       textTransform: 'uppercase',
-                      boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                      boxShadow: '0 4px 14px rgba(140, 109, 59, 0.25)',
                       opacity: submittingReview || uploadingReviewImg ? 0.6 : 1,
                       transition: 'all 0.2s ease',
                     }}

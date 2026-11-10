@@ -43,7 +43,7 @@ function GenderSection({
   const [isVideoLoaded, setIsVideoLoaded] = useState(false);
   const [shouldPlayVideo, setShouldPlayVideo] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const sectionRef = useRef<HTMLDivElement>(null);
+  const sectionRef = useRef<HTMLAnchorElement>(null);
   const hoverTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
@@ -114,9 +114,10 @@ function GenderSection({
   const targetHref = href || (gender === 'men' ? '/mens' : gender === 'women' ? '/womens' : gender === 'gifts' ? '/gifts' : `/collections/${gender}`);
 
   return (
-    <div
+    <Link
+      href={targetHref}
       ref={sectionRef}
-      className="gender-section group"
+      className="gender-section group block"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       style={{
@@ -126,6 +127,8 @@ function GenderSection({
         overflow: 'hidden',
         cursor: 'pointer',
         borderRadius: '10px',
+        textDecoration: 'none',
+        display: 'block',
       }}
     >
       {/* Zoomable Media Container Wrapper */}
@@ -266,58 +269,37 @@ function GenderSection({
           </p>
         )}
 
-        {buttonType === 'link' ? (
-          <Link
-            href={targetHref}
+        <div style={{ marginTop: '2px' }}>
+          <span
             style={{
               fontFamily: "'Jost', sans-serif",
-              fontSize: isMobile ? '8.5px' : '11px',
-              fontWeight: 500,
+              fontSize: isMobile ? '8px' : '10.5px',
+              fontWeight: 600,
               color: '#ffffff',
-              textDecoration: 'none',
               textTransform: 'uppercase',
-              letterSpacing: '0.15em',
+              letterSpacing: '0.18em',
+              border: `1px solid ${isHovered ? '#9C7A3C' : '#8B6914'}`,
+              borderRadius: '4px',
+              padding: isMobile ? '6px 14px' : '11px 24px',
               display: 'inline-flex',
               alignItems: 'center',
               gap: '6px',
-              transition: 'opacity 0.3s ease',
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.opacity = '0.8')}
-            onMouseLeave={(e) => (e.currentTarget.style.opacity = '1')}
-          >
-            {buttonText}
-          </Link>
-        ) : (
-          <Link
-            href={targetHref}
-            style={{
-              fontFamily: "'Jost', sans-serif",
-              fontSize: isMobile ? '7.5px' : '10px',
-              fontWeight: 500,
-              color: '#ffffff',
-              textDecoration: 'none',
-              textTransform: 'uppercase',
-              letterSpacing: '0.18em',
-              border: '1px solid #8B6914',
-              padding: isMobile ? '6px 14px' : '11px 24px',
-              display: 'inline-block',
               transition: 'all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-              background: 'transparent',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = '#8B6914';
-              e.currentTarget.style.borderColor = '#8B6914';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = 'transparent';
-              e.currentTarget.style.borderColor = '#8B6914';
+              background: isHovered
+                ? 'linear-gradient(135deg, #9C7A3C 0%, #8B6914 100%)'
+                : 'rgba(20, 20, 20, 0.42)',
+              backdropFilter: 'blur(4px)',
+              boxShadow: isHovered
+                ? '0 6px 20px rgba(139, 105, 20, 0.4)'
+                : '0 2px 8px rgba(0, 0, 0, 0.25)',
+              transform: isHovered ? 'translateY(-2px)' : 'translateY(0)',
             }}
           >
             {buttonText}
-          </Link>
-        )}
+          </span>
+        </div>
       </div>
-    </div>
+    </Link>
   );
 }
 
@@ -446,7 +428,7 @@ export default function GenderCollectionSection() {
             description="Give more than time. Give a memory."
             image={giftData.image}
             buttonText="Explore Gift Sets →"
-            buttonType="link"
+            buttonType="outline"
             objectPosition={isMobile ? 'center 26%' : 'center 32%'}
             sizes="100vw"
             quality={95}

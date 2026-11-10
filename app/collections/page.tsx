@@ -66,6 +66,23 @@ export default function CollectionsPage() {
   // Hero Carousel State
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isMuted, setIsMuted] = useState(true);
+  const [isFilmModalOpen, setIsFilmModalOpen] = useState(false);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setIsFilmModalOpen(false);
+    };
+    if (isFilmModalOpen) {
+      window.addEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = '';
+    };
+  }, [isFilmModalOpen]);
 
   const nextSlide = () => {
     setCurrentSlide(prev => (prev + 1) % 3);
@@ -421,41 +438,62 @@ export default function CollectionsPage() {
           align-items: center;
         }
         .hero-btn-primary {
-          background: #ffffff;
-          color: #141414;
-          border: none;
-          padding: 14px 30px;
+          background: linear-gradient(135deg, #9C7A3C 0%, #8B6914 100%);
+          color: #ffffff;
+          border: 1px solid #8B6914;
+          padding: 14px 32px;
           font-size: 11px;
           letter-spacing: 0.16em;
           text-transform: uppercase;
-          font-weight: 500;
+          font-weight: 600;
           cursor: pointer;
-          transition: all 0.25s ease;
-          border-radius: 2px;
+          transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+          border-radius: 4px;
+          box-shadow: 0 4px 16px rgba(139, 105, 20, 0.28);
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
         }
         .hero-btn-primary:hover {
-          background: #8b6914;
-          color: #fff;
+          background: linear-gradient(135deg, #B58F49 0%, #9C7A3C 100%);
+          border-color: #B58F49;
+          color: #ffffff;
+          transform: translateY(-2px);
+          box-shadow: 0 8px 24px rgba(160, 124, 39, 0.45);
         }
         .hero-btn-secondary {
-          background: transparent;
-          color: #fff;
-          border: 1px solid rgba(255,255,255,0.28);
+          background: rgba(20, 20, 20, 0.5);
+          backdrop-filter: blur(8px);
+          -webkit-backdrop-filter: blur(8px);
+          color: #ffffff;
+          border: 1px solid rgba(255, 255, 255, 0.35);
           padding: 14px 30px;
           font-size: 11px;
           letter-spacing: 0.16em;
           text-transform: uppercase;
-          font-weight: 500;
+          font-weight: 600;
           cursor: pointer;
-          transition: all 0.25s ease;
-          display: flex;
+          transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+          display: inline-flex;
           align-items: center;
-          gap: 8px;
-          border-radius: 2px;
+          gap: 9px;
+          border-radius: 4px;
+        }
+        .hero-btn-secondary .play-icon {
+          color: #dfb15b;
+          font-size: 10px;
+          transition: transform 0.3s ease, color 0.3s ease;
         }
         .hero-btn-secondary:hover {
-          border-color: #fff;
-          background: rgba(255,255,255,0.06);
+          border-color: #8B6914;
+          background: rgba(139, 105, 20, 0.22);
+          color: #ffffff;
+          transform: translateY(-2px);
+          box-shadow: 0 6px 20px rgba(139, 105, 20, 0.3);
+        }
+        .hero-btn-secondary:hover .play-icon {
+          color: #ffffff;
+          transform: scale(1.18);
         }
         .hero-banner-image-container {
           position: absolute;
@@ -543,13 +581,17 @@ export default function CollectionsPage() {
           cursor: pointer;
           transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), border-color 0.3s, box-shadow 0.3s;
           border: 2px solid transparent;
+          display: block;
+          text-decoration: none;
         }
         .gender-header-card.active {
           border-color: #8b6914;
-          box-shadow: 0 8px 24px rgba(139, 105, 20, 0.18);
+          box-shadow: 0 8px 24px rgba(139, 105, 20, 0.22);
         }
         .gender-header-card:hover {
           transform: translateY(-4px);
+          border-color: #8b6914;
+          box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18), 0 4px 16px rgba(139, 105, 20, 0.25);
         }
         .gender-card-img-wrapper {
           position: absolute;
@@ -580,6 +622,7 @@ export default function CollectionsPage() {
           left: 24px;
           color: #fff;
           z-index: 2;
+          text-decoration: none;
         }
         .gender-header-content h2 {
           font-family: 'Cormorant Garamond', serif;
@@ -587,12 +630,14 @@ export default function CollectionsPage() {
           font-weight: 400;
           margin-bottom: 2px;
           letter-spacing: 0.04em;
+          color: #ffffff;
         }
         .gender-header-content span {
           font-size: 11px;
           opacity: 0.75;
           letter-spacing: 0.04em;
           font-weight: 300;
+          color: #ffffff;
         }
         .gender-header-arrow {
           position: absolute;
@@ -605,8 +650,8 @@ export default function CollectionsPage() {
         }
         .gender-header-card:hover .gender-header-arrow {
           opacity: 1;
-          transform: scale(1.1);
-          color: #8b6914;
+          transform: scale(1.15) translateX(2px);
+          color: #dfb15b;
         }
 
         /* ── ATTACHED BENEFITS BAR (MATCHING IMG2 LUXURY ATTACHED DESIGN) ── */
@@ -1089,16 +1134,17 @@ export default function CollectionsPage() {
           grid-template-columns: 1fr 1fr;
           border-radius: 12px;
           overflow: hidden;
-          border: 1px solid rgba(20, 20, 20, 0.08);
-          background: #F8F7F4;
+          border: 1px solid rgba(139, 105, 20, 0.2);
+          background: linear-gradient(145deg, #FFFFFF 0%, #FAF8F5 45%, #F4EFEB 100%);
           margin: 40px auto 30px;
           max-width: 1350px;
           width: 100%;
-          box-shadow: 0 12px 36px -12px rgba(0, 0, 0, 0.05);
-          transition: transform 0.35s ease, box-shadow 0.35s ease;
+          box-shadow: 0 16px 48px -12px rgba(20, 20, 20, 0.08), 0 4px 16px rgba(139, 105, 20, 0.06);
+          transition: transform 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease;
         }
         .newsletter-banner:hover {
-          box-shadow: 0 16px 42px -12px rgba(0, 0, 0, 0.08);
+          border-color: rgba(139, 105, 20, 0.35);
+          box-shadow: 0 24px 56px -12px rgba(20, 20, 20, 0.12), 0 6px 20px rgba(139, 105, 20, 0.1);
         }
         .newsletter-image-block {
           height: 100%;
@@ -1118,28 +1164,30 @@ export default function CollectionsPage() {
         .newsletter-image-overlay {
           position: absolute;
           inset: 0;
-          background: linear-gradient(to right, rgba(20, 20, 20, 0.1), rgba(20, 20, 20, 0.45));
+          background: linear-gradient(to right, rgba(20, 20, 20, 0.15) 0%, rgba(20, 20, 20, 0.4) 60%, rgba(20, 20, 20, 0.6) 100%);
         }
         .newsletter-image-badge {
           position: absolute;
           bottom: 24px;
           left: 24px;
-          background: rgba(20, 20, 20, 0.88);
-          backdrop-filter: blur(8px);
-          border: 1px solid rgba(255, 255, 255, 0.18);
+          background: rgba(18, 18, 18, 0.88);
+          backdrop-filter: blur(10px);
+          -webkit-backdrop-filter: blur(10px);
+          border: 1px solid rgba(212, 167, 83, 0.35);
           padding: 8px 16px;
-          border-radius: 4px;
+          border-radius: 6px;
           display: flex;
           align-items: center;
           gap: 8px;
-          color: #ffffff;
-          box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+          color: #DFB15B;
+          box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
         }
         .badge-gold-dot {
           width: 6px;
           height: 6px;
           border-radius: 50%;
-          background: #8B6914;
+          background: #dfb15b;
+          box-shadow: 0 0 8px rgba(223, 177, 91, 0.6);
         }
 
         .newsletter-form-block {
@@ -1148,7 +1196,7 @@ export default function CollectionsPage() {
           flex-direction: column;
           justify-content: center;
           position: relative;
-          background: #F8F7F4;
+          background: transparent;
         }
         .newsletter-tag-container {
           display: flex;
@@ -1159,7 +1207,10 @@ export default function CollectionsPage() {
         .gold-line {
           height: 1px;
           width: 24px;
-          background: #8B6914;
+          background: linear-gradient(90deg, transparent, #8B6914);
+        }
+        .gold-line:last-child {
+          background: linear-gradient(90deg, #8B6914, transparent);
         }
         .newsletter-tag {
           font-size: 10.5px;
@@ -1169,8 +1220,8 @@ export default function CollectionsPage() {
           text-transform: uppercase;
         }
         .newsletter-title {
-          font-family: 'Cormorant Garamond', serif;
-          font-size: 34px;
+          font-family: 'Cormorant Garamond', Georgia, serif;
+          font-size: 35px;
           font-weight: 500;
           color: #141414;
           margin: 0 0 10px;
@@ -1179,48 +1230,62 @@ export default function CollectionsPage() {
         }
         .newsletter-desc {
           font-size: 13.5px;
-          color: rgba(20, 20, 20, 0.65);
-          line-height: 1.6;
+          color: #555555;
+          line-height: 1.65;
           margin: 0 0 24px;
         }
 
         .newsletter-perks-grid {
           display: grid;
           grid-template-columns: 1fr 1fr;
-          gap: 12px;
+          gap: 14px;
           margin-bottom: 24px;
         }
         .perk-item {
           display: flex;
           align-items: center;
-          gap: 10px;
-          background: #ffffff;
-          border: 1px solid rgba(20, 20, 20, 0.08);
-          padding: 10px 14px;
+          gap: 12px;
+          background: rgba(255, 255, 255, 0.95);
+          border: 1px solid rgba(139, 105, 20, 0.16);
+          padding: 12px 16px;
           border-radius: 8px;
+          box-shadow: 0 2px 8px rgba(139, 105, 20, 0.04);
+          transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .perk-item:hover {
+          transform: translateY(-2px);
+          border-color: rgba(139, 105, 20, 0.45);
+          box-shadow: 0 8px 20px rgba(139, 105, 20, 0.12);
+          background: #ffffff;
         }
         .perk-icon {
-          width: 32px;
-          height: 32px;
-          border-radius: 6px;
-          background: rgba(139, 105, 20, 0.08);
+          width: 36px;
+          height: 36px;
+          border-radius: 50%;
+          background: linear-gradient(135deg, rgba(236, 196, 120, 0.22) 0%, rgba(139, 105, 20, 0.12) 100%);
+          border: 1px solid rgba(139, 105, 20, 0.25);
           display: flex;
           align-items: center;
           justify-content: center;
           flex-shrink: 0;
+          transition: transform 0.3s ease;
+        }
+        .perk-item:hover .perk-icon {
+          transform: scale(1.08);
         }
         .perk-title {
           font-size: 11px;
           font-weight: 600;
           color: #141414;
           text-transform: uppercase;
-          letter-spacing: 0.05em;
+          letter-spacing: 0.07em;
+          margin: 0 0 2px;
         }
         .perk-desc {
           font-size: 10.5px;
-          color: rgba(20, 20, 20, 0.55);
+          color: #666666;
           margin: 0;
-          line-height: 1.2;
+          line-height: 1.25;
         }
 
         .newsletter-form {
@@ -1235,54 +1300,72 @@ export default function CollectionsPage() {
         }
         .input-icon {
           position: absolute;
-          left: 14px;
+          left: 15px;
           top: 50%;
           transform: translateY(-50%);
-          width: 16px;
-          height: 16px;
-          color: rgba(20, 20, 20, 0.4);
+          width: 17px;
+          height: 17px;
+          color: #8B6914;
           pointer-events: none;
         }
         .input-wrapper input {
           width: 100%;
           background: #ffffff;
-          border: 1px solid rgba(20, 20, 20, 0.14);
-          padding: 14px 16px 14px 42px;
+          border: 1px solid rgba(139, 105, 20, 0.25);
+          padding: 14px 16px 14px 44px;
           font-size: 13px;
           font-family: inherit;
           border-radius: 6px;
           color: #141414;
           transition: all 0.25s ease;
+          box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.02), 0 2px 6px rgba(139, 105, 20, 0.04);
         }
         .input-wrapper input:focus {
           outline: none;
-          border-color: #141414;
+          border-color: #8B6914;
+          box-shadow: 0 0 0 3px rgba(139, 105, 20, 0.14);
           background: #ffffff;
         }
         .newsletter-submit-btn {
-          background: #141414;
+          background: linear-gradient(135deg, #9C7A3C 0%, #8B6914 100%);
           color: #ffffff;
-          border: 1px solid #141414;
-          padding: 14px 24px;
+          border: 1px solid #8B6914;
+          padding: 14px 26px;
           font-size: 11px;
-          letter-spacing: 0.15em;
+          letter-spacing: 0.16em;
           text-transform: uppercase;
-          font-weight: 500;
+          font-weight: 600;
+          font-family: 'Jost', sans-serif;
           cursor: pointer;
-          transition: all 0.25s ease;
+          transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
           border-radius: 6px;
           display: flex;
           align-items: center;
           gap: 8px;
           white-space: nowrap;
+          box-shadow: 0 4px 16px rgba(139, 105, 20, 0.28);
         }
         .newsletter-submit-btn:hover {
-          background: #8B6914;
-          border-color: #8B6914;
+          background: linear-gradient(135deg, #B58F49 0%, #9C7A3C 100%);
+          border-color: #B58F49;
           color: #ffffff;
+          transform: translateY(-2px);
+          box-shadow: 0 8px 24px rgba(160, 124, 39, 0.42);
+        }
+        .newsletter-submit-btn:hover svg {
+          transform: translateX(3px);
+        }
+        .newsletter-submit-btn svg {
+          transition: transform 0.25s ease;
         }
 
         .newsletter-footer-note {
+          display: flex;
+          align-items: center;
+          gap: 7px;
+          font-size: 11px;
+          color: #666666;
+        }
           display: flex;
           align-items: center;
           gap: 6px;
@@ -1602,8 +1685,16 @@ export default function CollectionsPage() {
               onCycleComplete={nextSlide}
             />
             <div className="hero-banner-actions">
-              <button className="hero-btn-primary" onClick={() => { setSelectedSection('all'); setSelectedGender('all'); scrollToProducts(); }}>EXPLORE COLLECTION</button>
-              <button className="hero-btn-secondary">
+              <button
+                className="hero-btn-primary"
+                onClick={() => { setSelectedSection('all'); setSelectedGender('all'); scrollToProducts(); }}
+              >
+                EXPLORE COLLECTION
+              </button>
+              <button
+                className="hero-btn-secondary"
+                onClick={() => setIsFilmModalOpen(true)}
+              >
                 <span className="play-icon">▶</span> WATCH FILM
               </button>
             </div>
@@ -1677,6 +1768,86 @@ export default function CollectionsPage() {
               />
             </div>
           </div>
+          {/* Brand Film Lightbox Modal */}
+          {isFilmModalOpen && (
+            <div
+              style={{
+                position: 'fixed',
+                inset: 0,
+                zIndex: 9999,
+                backgroundColor: 'rgba(5, 5, 5, 0.92)',
+                backdropFilter: 'blur(16px)',
+                WebkitBackdropFilter: 'blur(16px)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '20px',
+              }}
+              onClick={() => setIsFilmModalOpen(false)}
+            >
+              <div
+                style={{
+                  position: 'relative',
+                  width: '100%',
+                  maxWidth: '960px',
+                  backgroundColor: '#0c0c0c',
+                  borderRadius: '12px',
+                  overflow: 'hidden',
+                  border: '1px solid rgba(139, 105, 20, 0.35)',
+                  boxShadow: '0 24px 60px rgba(0, 0, 0, 0.85), 0 0 40px rgba(139, 105, 20, 0.25)',
+                }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                {/* Modal Header */}
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    padding: '16px 24px',
+                    borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+                    backgroundColor: '#121212',
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#8B6914', display: 'inline-block' }} />
+                    <span style={{ fontFamily: "'Jost', sans-serif", fontSize: '11px', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#DFB15B', fontWeight: 600 }}>
+                      WINSOR HOROLOGY CINEMATIC FILM
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => setIsFilmModalOpen(false)}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      color: '#aaaaaa',
+                      fontSize: '24px',
+                      lineHeight: 1,
+                      cursor: 'pointer',
+                      padding: '4px',
+                      transition: 'color 0.2s',
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.color = '#ffffff'}
+                    onMouseLeave={(e) => e.currentTarget.style.color = '#aaaaaa'}
+                    aria-label="Close modal"
+                  >
+                    ×
+                  </button>
+                </div>
+
+                {/* Video Player */}
+                <div style={{ position: 'relative', width: '100%', aspectRatio: '16 / 9', backgroundColor: '#000000' }}>
+                  <video
+                    src="/watch_smoke_vid.webm"
+                    controls
+                    autoPlay
+                    playsInline
+                    style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                  />
+                </div>
+              </div>
+            </div>
+          )}
         </section>
 
         {/* ── ATTACHED BENEFITS BAR (DIRECTLY ATTACHED TO HERO BANNER - IMG2 REPLICATE) ── */}
@@ -1775,14 +1946,10 @@ export default function CollectionsPage() {
         <div className="collections-inner-body">
           {/* GENDER & COLLECTION FILTER HEADER CARDS (4 Columns) */}
           <div className="gender-header-row">
-            {/* Card 1: Gents */}
-            <div
-              className={`gender-header-card ${selectedGender === 'gents' && selectedSection === 'all' ? 'active' : ''}`}
-              onClick={() => {
-                setSelectedSection('all');
-                setSelectedGender(selectedGender === 'gents' ? 'all' : 'gents');
-                scrollToProducts();
-              }}
+            {/* Card 1: Gents -> Redirects directly to /mens */}
+            <Link
+              href="/mens"
+              className="gender-header-card"
             >
               <div className="gender-card-img-wrapper">
                 <Image
@@ -1804,16 +1971,12 @@ export default function CollectionsPage() {
               <div className="gender-header-arrow">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="12" cy="12" r="10" /><path d="M8 12h8M12 8l4 4-4 4" /></svg>
               </div>
-            </div>
+            </Link>
 
-            {/* Card 2: Ladies */}
-            <div
-              className={`gender-header-card ${selectedGender === 'ladies' && selectedSection === 'all' ? 'active' : ''}`}
-              onClick={() => {
-                setSelectedSection('all');
-                setSelectedGender(selectedGender === 'ladies' ? 'all' : 'ladies');
-                scrollToProducts();
-              }}
+            {/* Card 2: Ladies -> Redirects directly to /womens */}
+            <Link
+              href="/womens"
+              className="gender-header-card"
             >
               <div className="gender-card-img-wrapper">
                 <Image
@@ -1835,7 +1998,7 @@ export default function CollectionsPage() {
               <div className="gender-header-arrow">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="12" cy="12" r="10" /><path d="M8 12h8M12 8l4 4-4 4" /></svg>
               </div>
-            </div>
+            </Link>
 
             {/* Card 3: Gifts -> Redirects directly to /gifts */}
             <Link
@@ -1864,14 +2027,10 @@ export default function CollectionsPage() {
               </div>
             </Link>
 
-            {/* Card 4: Limited Edition */}
-            <div
-              className={`gender-header-card ${selectedSection === 'limited' ? 'active' : ''}`}
-              onClick={() => {
-                setSelectedGender('all');
-                setSelectedSection(selectedSection === 'limited' ? 'all' : 'limited');
-                scrollToProducts();
-              }}
+            {/* Card 4: Limited Edition -> Redirects directly to /limited-edition */}
+            <Link
+              href="/limited-edition"
+              className="gender-header-card"
             >
               <div className="gender-card-img-wrapper">
                 <Image
@@ -1893,7 +2052,7 @@ export default function CollectionsPage() {
               <div className="gender-header-arrow">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="12" cy="12" r="10" /><path d="M8 12h8M12 8l4 4-4 4" /></svg>
               </div>
-            </div>
+            </Link>
           </div>
 
 

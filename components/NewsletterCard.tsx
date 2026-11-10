@@ -100,17 +100,18 @@ export default function NewsletterCard({
           grid-template-columns: 1fr 1fr;
           border-radius: 12px;
           overflow: hidden;
-          border: 1px solid rgba(20, 20, 20, 0.08);
-          background: #F8F7F4;
+          border: 1px solid rgba(139, 105, 20, 0.2);
+          background: linear-gradient(145deg, #FFFFFF 0%, #FAF8F5 45%, #F4EFEB 100%);
           max-width: 1320px;
           width: 100%;
           margin: 0 auto;
-          box-shadow: 0 12px 32px -12px rgba(20, 20, 20, 0.06);
-          transition: transform 0.3s ease, box-shadow 0.3s ease;
+          box-shadow: 0 16px 48px -12px rgba(20, 20, 20, 0.08), 0 4px 16px rgba(139, 105, 20, 0.06);
+          transition: transform 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease;
         }
 
         .newsletter-card-container:hover {
-          box-shadow: 0 16px 40px -12px rgba(20, 20, 20, 0.1);
+          border-color: rgba(139, 105, 20, 0.35);
+          box-shadow: 0 24px 56px -12px rgba(20, 20, 20, 0.12), 0 6px 20px rgba(139, 105, 20, 0.1);
         }
 
         .newsletter-img-block {
@@ -134,29 +135,32 @@ export default function NewsletterCard({
         .newsletter-img-overlay {
           position: absolute;
           inset: 0;
-          background: linear-gradient(to right, rgba(20, 20, 20, 0.15), rgba(20, 20, 20, 0.45));
+          background: linear-gradient(to right, rgba(20, 20, 20, 0.15) 0%, rgba(20, 20, 20, 0.4) 60%, rgba(20, 20, 20, 0.6) 100%);
         }
 
         .newsletter-img-badge {
           position: absolute;
           bottom: 24px;
           left: 24px;
-          background: rgba(20, 20, 20, 0.88);
-          backdrop-filter: blur(8px);
-          border: 1px solid rgba(255, 255, 255, 0.18);
-          padding: 7px 14px;
+          background: rgba(18, 18, 18, 0.88);
+          backdrop-filter: blur(10px);
+          -webkit-backdrop-filter: blur(10px);
+          border: 1px solid rgba(212, 167, 83, 0.35);
+          padding: 8px 16px;
           border-radius: 6px;
           display: flex;
           align-items: center;
           gap: 8px;
-          color: #ffffff;
+          color: #DFB15B;
+          box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
         }
 
         .newsletter-badge-dot {
           width: 6px;
           height: 6px;
           border-radius: 50%;
-          background: #8b6914;
+          background: #dfb15b;
+          box-shadow: 0 0 8px rgba(223, 177, 91, 0.6);
         }
 
         .newsletter-form-block {
@@ -165,7 +169,7 @@ export default function NewsletterCard({
           flex-direction: column;
           justify-content: center;
           position: relative;
-          background: #F8F7F4;
+          background: transparent;
         }
 
         .newsletter-tag-container {
@@ -178,60 +182,78 @@ export default function NewsletterCard({
         .newsletter-gold-line {
           height: 1px;
           width: 24px;
-          background: #8b6914;
+          background: linear-gradient(90deg, transparent, #8B6914);
+        }
+        .newsletter-gold-line:last-of-type {
+          background: linear-gradient(90deg, #8B6914, transparent);
         }
 
         .newsletter-tag-text {
           font-size: 10.5px;
           color: #8b6914;
-          letter-spacing: 0.22em;
+          letter-spacing: 0.25em;
           font-weight: 600;
           text-transform: uppercase;
         }
 
         .newsletter-main-title {
           font-family: 'Cormorant Garamond', Georgia, serif;
-          font-size: 32px;
+          font-size: 35px;
           font-weight: 500;
           color: #141414;
           margin: 0 0 10px;
-          letter-spacing: 0.01em;
+          letter-spacing: -0.01em;
           line-height: 1.15;
         }
 
         .newsletter-main-desc {
-          font-size: 13px;
+          font-size: 13.5px;
           color: #555555;
-          line-height: 1.6;
+          line-height: 1.65;
           margin: 0 0 24px;
         }
 
         .newsletter-perks-grid {
           display: grid;
           grid-template-columns: 1fr 1fr;
-          gap: 12px;
+          gap: 14px;
           margin-bottom: 24px;
         }
 
         .newsletter-perk-item {
           display: flex;
           align-items: center;
-          gap: 10px;
-          background: #ffffff;
-          border: 1px solid rgba(20, 20, 20, 0.08);
-          padding: 10px 14px;
+          gap: 12px;
+          background: rgba(255, 255, 255, 0.95);
+          border: 1px solid rgba(139, 105, 20, 0.16);
+          padding: 12px 16px;
           border-radius: 8px;
+          box-shadow: 0 2px 8px rgba(139, 105, 20, 0.04);
+          transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .newsletter-perk-item:hover {
+          transform: translateY(-2px);
+          border-color: rgba(139, 105, 20, 0.45);
+          box-shadow: 0 8px 20px rgba(139, 105, 20, 0.12);
+          background: #ffffff;
         }
 
         .newsletter-perk-icon {
-          width: 32px;
-          height: 32px;
-          border-radius: 6px;
-          background: #F8F7F4;
+          width: 36px;
+          height: 36px;
+          border-radius: 50%;
+          background: linear-gradient(135deg, rgba(236, 196, 120, 0.22) 0%, rgba(139, 105, 20, 0.12) 100%);
+          border: 1px solid rgba(139, 105, 20, 0.25);
           display: flex;
           align-items: center;
           justify-content: center;
           flex-shrink: 0;
+          transition: transform 0.3s ease;
+        }
+
+        .newsletter-perk-item:hover .newsletter-perk-icon {
+          transform: scale(1.08);
         }
 
         .newsletter-perk-title {
@@ -239,21 +261,22 @@ export default function NewsletterCard({
           font-weight: 600;
           color: #141414;
           text-transform: uppercase;
-          letter-spacing: 0.05em;
+          letter-spacing: 0.07em;
+          margin: 0 0 2px;
         }
 
         .newsletter-perk-desc {
-          font-size: 10px;
+          font-size: 10.5px;
           color: #666666;
           margin: 0;
-          line-height: 1.2;
+          line-height: 1.25;
         }
 
         .newsletter-form-row {
           display: flex;
           flex-direction: row;
           gap: 10px;
-          margin-bottom: 12px;
+          margin-bottom: 14px;
         }
 
         .newsletter-input-wrapper {
@@ -263,57 +286,78 @@ export default function NewsletterCard({
 
         .newsletter-input-icon {
           position: absolute;
-          left: 14px;
+          left: 15px;
           top: 50%;
           transform: translateY(-50%);
-          width: 16px;
-          height: 16px;
-          color: rgba(20, 20, 20, 0.4);
+          width: 17px;
+          height: 17px;
+          color: #8B6914;
           pointer-events: none;
         }
 
         .newsletter-input-field {
           width: 100%;
           background: #ffffff;
-          border: 1px solid rgba(20, 20, 20, 0.14);
-          padding: 13px 16px 13px 42px;
+          border: 1px solid rgba(139, 105, 20, 0.25);
+          padding: 14px 16px 14px 44px;
           font-size: 13px;
           font-family: inherit;
           border-radius: 6px;
           color: #141414;
           transition: all 0.25s ease;
+          box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.02), 0 2px 6px rgba(139, 105, 20, 0.04);
         }
 
         .newsletter-input-field:focus {
           outline: none;
-          border-color: #141414;
+          border-color: #8B6914;
+          box-shadow: 0 0 0 3px rgba(139, 105, 20, 0.14);
+          background: #ffffff;
         }
 
         .newsletter-submit-btn {
-          background: #141414;
+          background: linear-gradient(135deg, #9C7A3C 0%, #8B6914 100%);
           color: #ffffff;
-          border: 1px solid #141414;
-          padding: 13px 22px;
+          border: 1px solid #8B6914;
+          padding: 14px 26px;
           font-size: 11px;
-          letter-spacing: 0.15em;
+          letter-spacing: 0.16em;
           text-transform: uppercase;
           font-weight: 600;
+          font-family: 'Jost', sans-serif;
           cursor: pointer;
-          transition: all 0.25s ease;
+          transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
           border-radius: 6px;
           display: flex;
           align-items: center;
           gap: 8px;
           white-space: nowrap;
+          box-shadow: 0 4px 16px rgba(139, 105, 20, 0.28);
         }
 
         .newsletter-submit-btn:hover {
-          background: #8b6914;
-          border-color: #8b6914;
+          background: linear-gradient(135deg, #B58F49 0%, #9C7A3C 100%);
+          border-color: #B58F49;
           color: #ffffff;
+          transform: translateY(-2px);
+          box-shadow: 0 8px 24px rgba(160, 124, 39, 0.42);
+        }
+
+        .newsletter-submit-btn:hover svg {
+          transform: translateX(3px);
+        }
+
+        .newsletter-submit-btn svg {
+          transition: transform 0.25s ease;
         }
 
         .newsletter-footer-note {
+          display: flex;
+          align-items: center;
+          gap: 7px;
+          font-size: 11px;
+          color: #666666;
+        }
           display: flex;
           align-items: center;
           gap: 6px;

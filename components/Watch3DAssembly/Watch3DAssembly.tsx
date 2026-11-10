@@ -282,24 +282,43 @@ export default function Watch3DAssembly() {
                     href={slide.link}
                     className="inline-block transition-all duration-300 font-medium tracking-[0.16em]"
                     style={{
-                      backgroundColor: isDarkSlide ? '#dfb15b' : '#141414',
-                      border: `1px solid ${isDarkSlide ? '#dfb15b' : '#141414'}`,
-                      color: isDarkSlide ? '#050302' : '#ffffff',
-                      padding: isMobile ? '6px 14px' : '13px 32px',
-                      fontSize: isMobile ? '8px' : '11px',
-                      borderRadius: '2px',
+                      background: isDarkSlide
+                        ? 'linear-gradient(135deg, #E5BA6A 0%, #D4A753 100%)'
+                        : 'linear-gradient(135deg, #9C7A3C 0%, #8B6914 100%)',
+                      border: `1px solid ${isDarkSlide ? '#D4A753' : '#8B6914'}`,
+                      color: isDarkSlide ? '#0A0704' : '#ffffff',
+                      padding: isMobile ? '7px 18px' : '13px 32px',
+                      fontSize: isMobile ? '8.5px' : '11px',
+                      borderRadius: '4px',
                       textDecoration: 'none',
                       fontFamily: "'Jost', sans-serif",
+                      boxShadow: isDarkSlide
+                        ? '0 4px 16px rgba(212, 167, 83, 0.28)'
+                        : '0 4px 16px rgba(139, 105, 20, 0.25)',
                     }}
                     onMouseOver={(e) => {
-                      e.currentTarget.style.backgroundColor = '#8b6914';
-                      e.currentTarget.style.borderColor = '#8b6914';
-                      e.currentTarget.style.color = '#ffffff';
+                      if (isDarkSlide) {
+                        e.currentTarget.style.background = 'linear-gradient(135deg, #ECC478 0%, #DFB460 100%)';
+                        e.currentTarget.style.borderColor = '#ECC478';
+                        e.currentTarget.style.boxShadow = '0 6px 22px rgba(223, 177, 91, 0.42)';
+                      } else {
+                        e.currentTarget.style.background = 'linear-gradient(135deg, #7A5C10 0%, #684E0D 100%)';
+                        e.currentTarget.style.borderColor = '#684E0D';
+                        e.currentTarget.style.boxShadow = '0 6px 22px rgba(139, 105, 20, 0.38)';
+                      }
+                      e.currentTarget.style.transform = 'translateY(-2px)';
                     }}
                     onMouseOut={(e) => {
-                      e.currentTarget.style.backgroundColor = isDarkSlide ? '#dfb15b' : '#141414';
-                      e.currentTarget.style.borderColor = isDarkSlide ? '#dfb15b' : '#141414';
-                      e.currentTarget.style.color = isDarkSlide ? '#050302' : '#ffffff';
+                      if (isDarkSlide) {
+                        e.currentTarget.style.background = 'linear-gradient(135deg, #E5BA6A 0%, #D4A753 100%)';
+                        e.currentTarget.style.borderColor = '#D4A753';
+                        e.currentTarget.style.boxShadow = '0 4px 16px rgba(212, 167, 83, 0.28)';
+                      } else {
+                        e.currentTarget.style.background = 'linear-gradient(135deg, #9C7A3C 0%, #8B6914 100%)';
+                        e.currentTarget.style.borderColor = '#8B6914';
+                        e.currentTarget.style.boxShadow = '0 4px 16px rgba(139, 105, 20, 0.25)';
+                      }
+                      e.currentTarget.style.transform = 'translateY(0)';
                     }}
                   >
                     {slide.cta}
