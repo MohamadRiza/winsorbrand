@@ -644,40 +644,91 @@ export default function CartPage() {
         @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=Jost:wght@300;400;500;600&display=swap');
 
         .cart-container {
-          background-color: #F8F7F4;
+          background-color: #FFFFFF;
           min-height: 100vh;
-          padding: 140px 4% 100px;
+          padding: 142px 4% 96px;
           font-family: 'Jost', sans-serif;
           color: #141414;
         }
 
         .cart-wrapper {
-          max-width: 1280px;
+          max-width: 1260px;
           margin: 0 auto;
         }
 
         /* HEADER BLOCK */
         .cart-header-section {
-          margin-bottom: 32px;
+          display: flex;
+          align-items: flex-end;
+          justify-content: space-between;
+          flex-wrap: wrap;
+          gap: 16px;
+          padding-bottom: 24px;
+          margin-bottom: 36px;
+          border-bottom: 1px solid rgba(20, 20, 20, 0.08);
+        }
+
+        .cart-eyebrow {
+          display: inline-flex;
+          align-items: center;
+          gap: 10px;
+          font-family: 'Jost', sans-serif;
+          font-size: 10.5px;
+          font-weight: 600;
+          letter-spacing: 0.22em;
+          text-transform: uppercase;
+          color: #8B6914;
+          margin-bottom: 8px;
+        }
+
+        .cart-eyebrow::before {
+          content: '';
+          width: 24px;
+          height: 1px;
+          background: #8B6914;
+          display: inline-block;
         }
         
         .cart-title {
           font-family: 'Cormorant Garamond', serif;
-          font-size: clamp(32px, 4.5vw, 44px);
+          font-size: clamp(34px, 4.2vw, 46px);
           font-weight: 400;
-          letter-spacing: 0.06em;
-          text-transform: uppercase;
+          letter-spacing: 0.03em;
           color: #141414;
           margin: 0 0 6px;
-          line-height: 1.15;
+          line-height: 1.1;
         }
 
         .cart-subtitle {
           font-family: 'Jost', sans-serif;
           font-size: 13.5px;
-          color: rgba(20, 20, 20, 0.55);
+          color: rgba(20, 20, 20, 0.58);
           letter-spacing: 0.02em;
           margin: 0;
+        }
+
+        .cart-continue-link {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          font-family: 'Jost', sans-serif;
+          font-size: 11px;
+          font-weight: 600;
+          letter-spacing: 0.14em;
+          text-transform: uppercase;
+          color: #8B6914;
+          text-decoration: none;
+          padding: 8px 14px;
+          border: 1px solid rgba(139, 105, 20, 0.28);
+          border-radius: 6px;
+          background: #FFFFFF;
+          transition: all 0.25s ease;
+        }
+
+        .cart-continue-link:hover {
+          background: rgba(139, 105, 20, 0.06);
+          border-color: #8B6914;
+          transform: translateX(2px);
         }
 
         /* LAYOUT GRID */
@@ -690,94 +741,55 @@ export default function CartPage() {
 
         /* LEFT BLOCK - ITEMS CONTAINER */
         .cart-items-panel {
-          background: #ffffff;
-          border-radius: 12px;
+          background: #FFFFFF;
+          border-radius: 14px;
           border: 1px solid rgba(20, 20, 20, 0.08);
-          box-shadow: 0 6px 24px rgba(0, 0, 0, 0.02);
+          border-top: 2.5px solid #8B6914;
+          box-shadow: 0 10px 32px rgba(20, 16, 10, 0.035);
           overflow: visible;
-        }
-
-        .store-header {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          padding: 18px 28px;
-          border-bottom: 1px solid rgba(20, 20, 20, 0.06);
-          background-color: #F8F7F4;
-          border-top-left-radius: 11px;
-          border-top-right-radius: 11px;
-        }
-
-        .store-info {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-        }
-
-        .store-badge {
-          background: #141414;
-          color: #ffffff;
-          font-size: 9px;
-          font-weight: 600;
-          letter-spacing: 0.12em;
-          text-transform: uppercase;
-          padding: 4px 10px;
-          border-radius: 2px;
-        }
-
-        .store-name {
-          font-size: 13.5px;
-          font-weight: 600;
-          letter-spacing: 0.02em;
-          color: #141414;
-        }
-
-        .store-shipping-notice {
-          font-size: 11.5px;
-          color: #2e7d32;
-          display: flex;
-          align-items: center;
-          gap: 6px;
-          font-weight: 600;
         }
 
         /* SELECT ALL CONTROL ROW */
         .select-all-row {
           display: flex;
           align-items: center;
+          justify-content: space-between;
           gap: 14px;
           padding: 16px 28px;
-          background-color: #ffffff;
+          background-color: #FCFBF9;
+          border-top-left-radius: 11px;
+          border-top-right-radius: 11px;
           border-bottom: 1px solid rgba(20, 20, 20, 0.06);
-          font-size: 13px;
-          color: rgba(20, 20, 20, 0.65);
-          font-weight: 600;
+          font-size: 12.5px;
+          color: rgba(20, 20, 20, 0.7);
+          font-weight: 500;
+          letter-spacing: 0.02em;
         }
 
         /* PREMIUM CHECKBOX SYSTEM */
         .custom-checkbox {
           width: 20px;
           height: 20px;
-          border: 1.5px solid rgba(20, 20, 20, 0.25);
-          border-radius: 4px;
+          border: 1.5px solid rgba(139, 105, 20, 0.35);
+          border-radius: 5px;
           cursor: pointer;
           display: flex;
           align-items: center;
           justify-content: center;
           padding: 0;
-          background: #ffffff;
-          transition: all 0.25s ease;
+          background: #FFFFFF;
+          transition: all 0.22s ease;
           flex-shrink: 0;
         }
 
         .custom-checkbox:hover {
-          border-color: #141414;
-          background: rgba(20, 20, 20, 0.02);
+          border-color: #8B6914;
+          background: rgba(139, 105, 20, 0.05);
         }
 
         .custom-checkbox.checked {
-          background-color: #141414;
-          border-color: #141414;
+          background-color: #8B6914;
+          border-color: #8B6914;
         }
 
         /* ITEM CARD ROW */
@@ -788,32 +800,35 @@ export default function CartPage() {
           gap: 24px;
           padding: 28px;
           border-bottom: 1px solid rgba(20, 20, 20, 0.06);
-          background-color: #ffffff;
-          transition: all 0.3s ease;
+          background-color: #FFFFFF;
+          transition: background-color 0.25s ease;
         }
 
         .cart-item-card:last-child {
           border-bottom: none;
+          border-bottom-left-radius: 14px;
+          border-bottom-right-radius: 14px;
         }
 
         .cart-item-card:hover {
-          background-color: #FAFAFA;
+          background-color: #FDFCF9;
         }
 
         .cart-item-img-container {
           width: 120px;
           height: 120px;
           position: relative;
-          border-radius: 8px;
-          border: 1px solid rgba(20, 20, 20, 0.08);
+          border-radius: 10px;
+          border: 1px solid rgba(139, 105, 20, 0.14);
           overflow: hidden;
-          background-color: #F6F5F2;
+          background-color: #FAF8F4;
           flex-shrink: 0;
           transition: all 0.3s ease;
         }
 
         .cart-item-img-container:hover {
           transform: scale(1.03);
+          border-color: rgba(139, 105, 20, 0.35);
           box-shadow: 0 8px 20px rgba(139, 105, 20, 0.1);
         }
 
@@ -821,20 +836,22 @@ export default function CartPage() {
           display: flex;
           flex-direction: column;
           gap: 6px;
+          min-width: 0;
         }
 
         .item-title {
           font-family: 'Cormorant Garamond', serif;
           font-size: 22px;
           font-weight: 500;
-          color: #1a1209;
+          color: #141414;
           margin: 0;
           line-height: 1.25;
           transition: color 0.2s;
+          overflow-wrap: anywhere;
         }
         
         .item-title:hover {
-          color: #8b6914;
+          color: #8B6914;
         }
 
         .item-meta-row {
@@ -843,19 +860,19 @@ export default function CartPage() {
           align-items: center;
           gap: 12px;
           font-size: 11.5px;
-          color: rgba(26, 18, 9, 0.55);
+          color: rgba(20, 20, 20, 0.58);
           margin-top: 2px;
         }
 
         .meta-divider {
           width: 1px;
           height: 12px;
-          background-color: rgba(26, 18, 9, 0.12);
+          background-color: rgba(20, 20, 20, 0.14);
         }
 
         .item-variant-tag {
           font-size: 11.5px;
-          color: #8b6914;
+          color: #8B6914;
           font-weight: 600;
           text-transform: uppercase;
           letter-spacing: 0.05em;
@@ -863,8 +880,12 @@ export default function CartPage() {
 
         .item-stock-status {
           font-size: 11.5px;
-          color: #2e7d32;
+          color: #15803d;
           font-weight: 600;
+        }
+
+        .item-stock-status.sold-out {
+          color: #b91c1c;
         }
 
         /* ACTIONS PANEL (Qty + Remove) */
@@ -872,16 +893,16 @@ export default function CartPage() {
           display: flex;
           align-items: center;
           gap: 20px;
-          margin-top: 16px;
+          margin-top: 14px;
         }
 
         .qty-controller {
           display: flex;
           align-items: center;
-          border: 1px solid rgba(20, 20, 20, 0.12);
+          border: 1px solid rgba(20, 20, 20, 0.14);
           border-radius: 6px;
           overflow: hidden;
-          background: #F8F7F4;
+          background: #FFFFFF;
         }
 
         .qty-btn {
@@ -891,20 +912,21 @@ export default function CartPage() {
           background: none;
           cursor: pointer;
           font-size: 14px;
-          color: #1a1209;
+          color: #141414;
           display: flex;
           align-items: center;
           justify-content: center;
-          transition: background 0.15s;
+          transition: background 0.15s, color 0.15s;
           font-weight: 600;
         }
 
         .qty-btn:hover:not(:disabled) {
-          background: rgba(139, 105, 20, 0.06);
+          background: rgba(139, 105, 20, 0.08);
+          color: #8B6914;
         }
 
         .qty-btn:disabled {
-          color: rgba(26, 18, 9, 0.2);
+          color: rgba(20, 20, 20, 0.2);
           cursor: not-allowed;
         }
 
@@ -913,15 +935,16 @@ export default function CartPage() {
           text-align: center;
           font-size: 13px;
           font-weight: 600;
-          color: #1a1209;
+          color: #141414;
+          font-variant-numeric: tabular-nums;
         }
 
         .text-action-btn {
           background: none;
           border: none;
-          color: rgba(26, 18, 9, 0.4);
+          color: rgba(20, 20, 20, 0.45);
           cursor: pointer;
-          font-size: 12px;
+          font-size: 11.5px;
           font-weight: 600;
           transition: all 0.2s;
           display: inline-flex;
@@ -929,15 +952,15 @@ export default function CartPage() {
           gap: 6px;
           padding: 6px 0;
           text-transform: uppercase;
-          letter-spacing: 0.05em;
+          letter-spacing: 0.06em;
         }
 
         .text-action-btn:hover {
-          color: #8b6914;
+          color: #8B6914;
         }
         
         .text-action-btn.delete:hover {
-          color: #c62828;
+          color: #b91c1c;
         }
 
         /* PRICING ALIGNMENT */
@@ -950,34 +973,37 @@ export default function CartPage() {
         }
 
         .item-price-total {
-          font-size: 19px;
+          font-size: 18.5px;
           font-weight: 600;
-          color: #8b6914;
+          color: #8B6914;
           letter-spacing: 0.01em;
+          font-variant-numeric: tabular-nums;
         }
 
         .item-price-unit {
           font-size: 11.5px;
-          color: rgba(26, 18, 9, 0.4);
+          color: rgba(20, 20, 20, 0.45);
+          font-variant-numeric: tabular-nums;
         }
 
         /* RIGHT BLOCK - SUMMARY SIDEBAR */
         .cart-summary-panel {
-          background: #ffffff;
+          background: #FFFFFF;
           border: 1px solid rgba(20, 20, 20, 0.08);
-          border-radius: 12px;
+          border-top: 2.5px solid #8B6914;
+          border-radius: 14px;
           padding: 32px 28px;
           position: sticky;
           top: 120px;
-          box-shadow: 0 6px 24px rgba(0, 0, 0, 0.02);
+          box-shadow: 0 12px 36px rgba(20, 16, 10, 0.04);
         }
 
         .summary-title {
           font-family: 'Cormorant Garamond', serif;
-          font-size: 24px;
+          font-size: 25px;
           font-weight: 500;
           letter-spacing: 0.02em;
-          margin: 0 0 24px;
+          margin: 0 0 22px;
           color: #141414;
           border-bottom: 1px solid rgba(20, 20, 20, 0.08);
           padding-bottom: 14px;
@@ -987,72 +1013,76 @@ export default function CartPage() {
           display: flex;
           justify-content: space-between;
           font-size: 13.5px;
-          color: rgba(20, 20, 20, 0.65);
+          color: rgba(20, 20, 20, 0.68);
           margin-bottom: 14px;
+          font-variant-numeric: tabular-nums;
         }
 
         .summary-row.total-row {
           border-top: 1px solid rgba(20, 20, 20, 0.08);
-          padding-top: 20px;
-          margin-top: 20px;
+          padding-top: 18px;
+          margin-top: 18px;
           font-size: 19px;
           font-weight: 600;
           color: #141414;
-          margin-bottom: 28px;
+          margin-bottom: 24px;
         }
 
         .shipping-detail-txt {
-          color: #2e7d32;
-          font-weight: 700;
+          color: #15803d;
+          font-weight: 600;
         }
 
         .checkout-action-btn {
           width: 100%;
-          background-color: #141414;
-          color: #ffffff;
-          border: 1px solid #141414;
+          background: linear-gradient(135deg, #9C7A3C 0%, #8B6914 100%);
+          color: #FFFFFF;
+          border: 1px solid #8B6914;
           border-radius: 6px;
-          padding: 16px;
+          padding: 15px 20px;
           font-family: 'Jost', sans-serif;
-          font-size: 12px;
-          font-weight: 500;
-          letter-spacing: 0.14em;
+          font-size: 11.5px;
+          font-weight: 600;
+          letter-spacing: 0.16em;
           text-transform: uppercase;
           cursor: pointer;
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
           text-align: center;
           display: flex;
           align-items: center;
           justify-content: center;
           gap: 10px;
+          box-shadow: 0 6px 20px rgba(139, 105, 20, 0.22);
         }
 
         .checkout-action-btn:hover:not(:disabled) {
-          background-color: #8b6914;
-          border-color: #8b6914;
+          background: linear-gradient(135deg, #7A5C10 0%, #684E0D 100%);
+          border-color: #684E0D;
+          box-shadow: 0 8px 24px rgba(139, 105, 20, 0.34);
+          transform: translateY(-1px);
         }
 
         .checkout-action-btn:disabled {
-          background-color: rgba(26, 18, 9, 0.08);
-          border-color: rgba(26, 18, 9, 0.02);
-          color: rgba(26, 18, 9, 0.3);
+          background: rgba(139, 105, 20, 0.14);
+          border-color: transparent;
+          color: rgba(20, 20, 20, 0.35);
           cursor: not-allowed;
           box-shadow: none;
         }
 
         /* GUARD BANNER BLOCKS INSIDE SIDEBAR */
         .guard-banner {
-          border-radius: 8px;
+          border-radius: 10px;
           padding: 16px;
-          margin-bottom: 24px;
+          margin-bottom: 20px;
           font-size: 12px;
           line-height: 1.5;
           border: 1px solid transparent;
         }
 
         .banner-warning {
-          background-color: rgba(139, 105, 20, 0.04);
-          border-color: rgba(139, 105, 20, 0.15);
+          background-color: #FCFBF8;
+          border-color: rgba(139, 105, 20, 0.22);
           color: #8b6914;
         }
 
@@ -1062,30 +1092,30 @@ export default function CartPage() {
           display: flex;
           align-items: center;
           gap: 8px;
-          font-size: 12.5px;
+          font-size: 12px;
           text-transform: uppercase;
-          letter-spacing: 0.05em;
+          letter-spacing: 0.06em;
         }
 
         .banner-text {
           margin: 0 0 14px;
-          color: rgba(26, 18, 9, 0.7);
+          color: rgba(20, 20, 20, 0.72);
         }
 
         /* SECURITY BADGES */
         .security-badges {
-          margin-top: 28px;
-          border-top: 1.5px solid rgba(139, 105, 20, 0.1);
+          margin-top: 24px;
+          border-top: 1px solid rgba(20, 20, 20, 0.08);
           padding-top: 20px;
           text-align: center;
         }
 
         .security-badge-title {
-          font-size: 11px;
+          font-size: 10.5px;
           font-weight: 600;
-          color: rgba(26, 18, 9, 0.4);
+          color: rgba(20, 20, 20, 0.45);
           text-transform: uppercase;
-          letter-spacing: 0.1em;
+          letter-spacing: 0.12em;
           margin-bottom: 14px;
           display: flex;
           align-items: center;
@@ -1126,26 +1156,27 @@ export default function CartPage() {
         }
 
         .bnm-dialog {
-          background: #ffffff;
-          border: 1px solid rgba(20, 20, 20, 0.1);
-          border-radius: 12px;
-          width: 100%; max-width: 480px;
+          background: #FFFFFF;
+          border: 1px solid rgba(20, 20, 20, 0.08);
+          border-top: 2.5px solid #8B6914;
+          border-radius: 14px;
+          width: 100%; max-width: 490px;
           max-height: 90vh;
           overflow-y: auto;
-          box-shadow: 0 24px 64px rgba(0, 0, 0, 0.18);
+          box-shadow: 0 24px 64px rgba(20, 16, 10, 0.16);
           animation: bnm-fade-in 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
           font-family: 'Jost', sans-serif;
           scrollbar-width: thin;
-          scrollbar-color: rgba(20, 20, 20, 0.2) transparent;
+          scrollbar-color: rgba(139, 105, 20, 0.25) transparent;
           position: relative;
         }
         .bnm-dialog::-webkit-scrollbar { width: 5px; }
-        .bnm-dialog::-webkit-scrollbar-thumb { background: rgba(20, 20, 20, 0.2); border-radius: 4px; }
+        .bnm-dialog::-webkit-scrollbar-thumb { background: rgba(139, 105, 20, 0.25); border-radius: 4px; }
 
         .bnm-header {
           padding: 22px 26px 16px;
           display: flex; align-items: flex-start; justify-content: space-between;
-          position: sticky; top: 0; background: #ffffff; z-index: 5;
+          position: sticky; top: 0; background: #FFFFFF; z-index: 5;
           border-bottom: 1px solid rgba(20, 20, 20, 0.06);
           margin-bottom: 18px;
         }
@@ -1162,74 +1193,75 @@ export default function CartPage() {
 
         .bnm-close {
           width: 32px; height: 32px; border-radius: 50%;
-          border: 1px solid rgba(20, 20, 20, 0.1);
-          background: #F8F7F4; color: #141414; cursor: pointer;
+          border: 1px solid rgba(20, 20, 20, 0.12);
+          background: #FCFBF9; color: #141414; cursor: pointer;
           display: flex; align-items: center; justify-content: center;
           font-size: 16px; flex-shrink: 0; transition: all 0.2s ease;
         }
-        .bnm-close:hover { background: #141414; color: #ffffff; border-color: #141414; }
+        .bnm-close:hover { background: #8B6914; color: #FFFFFF; border-color: #8B6914; }
 
         .bnm-stepper-container { padding: 0 26px 16px; }
         .bnm-stepper-track { display: flex; align-items: center; justify-content: space-between; position: relative; }
         .bnm-stepper-line { flex: 1; height: 1.5px; background: rgba(20, 20, 20, 0.1); margin: 0 8px; transition: background 0.3s ease; }
-        .bnm-stepper-line.active { background: #141414; height: 1.5px; }
+        .bnm-stepper-line.active { background: #8B6914; height: 1.5px; }
 
-        .bnm-step-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(20, 20, 20, 0.18); }
+        .bnm-step-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(20, 20, 20, 0.16); }
         .bnm-step-dot.completed {
           width: 22px; height: 22px; border-radius: 50%;
-          background: #141414; display: flex; align-items: center; justify-content: center; color: #fff;
+          background: #8B6914; display: flex; align-items: center; justify-content: center; color: #fff;
         }
         .bnm-step-badge {
           width: 28px; height: 28px; border-radius: 50%;
-          background: #141414;
+          background: linear-gradient(135deg, #9C7A3C 0%, #8B6914 100%);
           display: flex; align-items: center; justify-content: center;
-          color: #ffffff; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.16);
+          color: #FFFFFF; box-shadow: 0 2px 10px rgba(139, 105, 20, 0.25);
         }
 
         .bnm-body { padding: 0 26px 24px; }
         .bnm-card {
-          background: #F8F7F4; border: 1px solid rgba(20, 20, 20, 0.08);
-          border-radius: 8px; padding: 16px 18px; margin-bottom: 14px;
+          background: #FCFBF8; border: 1px solid rgba(139, 105, 20, 0.14);
+          border-radius: 10px; padding: 16px 18px; margin-bottom: 14px;
           position: relative;
         }
 
         .bnm-section-label {
-          font-size: 10.5px; font-weight: 600; color: #141414;
-          text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 12px;
+          font-size: 10.5px; font-weight: 600; color: #8B6914;
+          text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 10px;
         }
 
         .bnm-pay-option {
-          border: 1px solid rgba(20, 20, 20, 0.12); border-radius: 8px;
+          border: 1px solid rgba(20, 20, 20, 0.12); border-radius: 10px;
           padding: 16px 18px; cursor: pointer; transition: all 0.2s ease;
-          background: #ffffff; display: flex; align-items: flex-start;
+          background: #FFFFFF; display: flex; align-items: flex-start;
           gap: 14px; width: 100%; box-sizing: border-box; margin-bottom: 12px;
           text-align: left; position: relative; overflow: hidden;
         }
         .bnm-pay-option.active {
-          border-color: #141414; border-width: 1.5px;
-          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+          border-color: #8B6914; border-width: 1.5px;
+          background: #FDFCF9;
+          box-shadow: 0 4px 16px rgba(139, 105, 20, 0.08);
         }
-        .bnm-pay-option:hover { border-color: rgba(20, 20, 20, 0.35); }
+        .bnm-pay-option:hover { border-color: rgba(139, 105, 20, 0.45); }
 
         .bnm-corner-ribbon {
           position: absolute; top: 0; right: 0; width: 26px; height: 26px;
-          background: #141414;
+          background: #8B6914;
           border-bottom-left-radius: 8px; display: flex; align-items: center;
-          justify-content: center; color: #ffffff;
+          justify-content: center; color: #FFFFFF;
         }
 
         .bnm-radio {
           width: 18px; height: 18px; border-radius: 50%;
-          border: 1.5px solid #141414; flex-shrink: 0;
+          border: 1.5px solid rgba(139, 105, 20, 0.45); flex-shrink: 0;
           display: flex; align-items: center; justify-content: center;
           transition: all 0.2s ease; margin-top: 1px;
         }
-        .bnm-radio.active { border-color: #141414; background: #141414; }
-        .bnm-radio.active::after { content: ''; width: 6px; height: 6px; background: #ffffff; border-radius: 50%; }
+        .bnm-radio.active { border-color: #8B6914; background: #8B6914; }
+        .bnm-radio.active::after { content: ''; width: 6px; height: 6px; background: #FFFFFF; border-radius: 50%; }
 
         .bnm-bank-details {
-          background: #F8F7F4; border: 1px solid rgba(20, 20, 20, 0.08);
-          border-radius: 8px; padding: 14px 16px; margin-top: 12px;
+          background: #FCFBF8; border: 1px solid rgba(139, 105, 20, 0.16);
+          border-radius: 10px; padding: 14px 16px; margin-top: 12px;
         }
 
         .bnm-bank-row {
@@ -1242,56 +1274,56 @@ export default function CartPage() {
         }
 
         .bnm-info-box {
-          background: #F8F7F4; border: 1px solid rgba(20, 20, 20, 0.1);
+          background: rgba(139, 105, 20, 0.05); border: 1px solid rgba(139, 105, 20, 0.18);
           border-radius: 8px; padding: 12px 14px; margin-top: 12px;
           display: flex; gap: 10px; align-items: flex-start;
         }
 
         .bnm-receipt-upload {
-          border: 1.5px dashed rgba(20, 20, 20, 0.18);
+          border: 1.5px dashed rgba(139, 105, 20, 0.35);
           border-radius: 8px; padding: 14px; text-align: center;
           cursor: pointer; transition: all 0.2s ease; position: relative;
-          overflow: hidden; margin-top: 12px; background: #ffffff;
+          overflow: hidden; margin-top: 12px; background: #FFFFFF;
         }
-        .bnm-receipt-upload:hover { border-color: #141414; background: #F8F7F4; }
+        .bnm-receipt-upload:hover { border-color: #8B6914; background: #FCFBF8; }
         .bnm-receipt-upload input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
 
         .bnm-btn-primary {
           width: 100%; height: 46px; box-sizing: border-box;
-          background: #141414;
-          color: #ffffff; border: 1px solid #141414; border-radius: 6px;
+          background: linear-gradient(135deg, #9C7A3C 0%, #8B6914 100%);
+          color: #FFFFFF; border: 1px solid #8B6914; border-radius: 6px;
           cursor: pointer; font-family: 'Jost', sans-serif; font-size: 11.5px;
-          font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase;
+          font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase;
           transition: all 0.2s ease; display: flex; align-items: center;
-          justify-content: center; gap: 8px; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+          justify-content: center; gap: 8px; box-shadow: 0 4px 16px rgba(139, 105, 20, 0.22);
           margin-top: 0;
         }
         .bnm-btn-primary:hover:not(:disabled) {
-          background: #2C2C2C; border-color: #2C2C2C;
-          box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15); transform: translateY(-1px);
+          background: linear-gradient(135deg, #7A5C10 0%, #684E0D 100%); border-color: #684E0D;
+          box-shadow: 0 6px 20px rgba(139, 105, 20, 0.32); transform: translateY(-1px);
         }
-        .bnm-btn-primary:disabled { opacity: 0.5; cursor: not-allowed; box-shadow: none; }
+        .bnm-btn-primary:disabled { opacity: 0.45; cursor: not-allowed; box-shadow: none; }
 
         .bnm-btn-outline {
           width: 100%; height: 46px; box-sizing: border-box; background: #FFFFFF;
-          border: 1px solid rgba(20, 20, 20, 0.2); color: #141414;
+          border: 1px solid rgba(20, 20, 20, 0.18); color: #141414;
           border-radius: 6px; cursor: pointer; font-family: 'Jost', sans-serif;
           font-size: 11.5px; font-weight: 500; letter-spacing: 0.08em;
           text-transform: uppercase; margin-top: 10px; transition: all 0.2s ease;
           display: flex; align-items: center; justify-content: center; gap: 8px;
         }
-        .bnm-btn-outline:hover { border-color: #141414; background: #F8F7F4; color: #141414; }
+        .bnm-btn-outline:hover { border-color: #8B6914; background: #FCFBF9; color: #8B6914; }
 
         .bnm-checkbox-row {
           display: flex; align-items: flex-start; gap: 10px; padding: 8px 0 2px;
           cursor: pointer; margin-top: 8px;
         }
         .bnm-checkbox {
-          width: 18px; height: 18px; border: 1.5px solid rgba(20, 20, 20, 0.3);
+          width: 18px; height: 18px; border: 1.5px solid rgba(139, 105, 20, 0.4);
           border-radius: 4px; flex-shrink: 0; display: flex; align-items: center;
           justify-content: center; transition: all 0.2s ease; margin-top: 1px;
         }
-        .bnm-checkbox.checked { background: #141414; border-color: #141414; }
+        .bnm-checkbox.checked { background: #8B6914; border-color: #8B6914; }
 
         .bnm-trust-footer {
           display: flex; align-items: center; justify-content: space-around;
@@ -1409,46 +1441,47 @@ export default function CartPage() {
 
         .modal-btn.confirm {
           border: none;
-          background-color: #8b6914;
+          background: linear-gradient(135deg, #9C7A3C 0%, #8B6914 100%);
           color: #ffffff;
-          box-shadow: 0 4px 12px rgba(139,105,20,0.25);
+          box-shadow: 0 4px 14px rgba(139,105,20,0.22);
         }
 
         .modal-btn.confirm:hover {
-          background-color: #1a1209;
-          box-shadow: 0 4px 12px rgba(26,18,9,0.25);
+          background: linear-gradient(135deg, #7A5C10 0%, #684E0D 100%);
+          box-shadow: 0 6px 18px rgba(139,105,20,0.32);
         }
 
         /* SUCCESS STATE SCREEN */
         .success-screen {
           max-width: 620px;
-          margin: 60px auto 0;
+          margin: 40px auto 0;
           text-align: center;
-          background: #ffffff;
-          border: 1px solid rgba(139, 105, 20, 0.15);
-          border-radius: 16px;
+          background: #FFFFFF;
+          border: 1px solid rgba(20, 20, 20, 0.08);
+          border-top: 2.5px solid #8B6914;
+          border-radius: 14px;
           padding: 56px 40px;
-          box-shadow: 0 15px 40px rgba(0, 0, 0, 0.03);
+          box-shadow: 0 14px 40px rgba(20, 16, 10, 0.04);
         }
 
         .success-tick {
           width: 64px;
           height: 64px;
           border-radius: 50%;
-          background: rgba(46, 125, 50, 0.08);
-          color: #2e7d32;
+          background: rgba(21, 128, 61, 0.08);
+          color: #15803d;
           display: flex;
           align-items: center;
           justify-content: center;
           margin: 0 auto 24px;
-          border: 1px solid rgba(46, 125, 50, 0.15);
+          border: 1px solid rgba(21, 128, 61, 0.2);
         }
 
         .ref-box {
-          background: rgba(139, 105, 20, 0.03);
-          border: 1px solid rgba(139, 105, 20, 0.15);
+          background: #FCFBF8;
+          border: 1px solid rgba(139, 105, 20, 0.2);
           padding: 16px 24px;
-          border-radius: 8px;
+          border-radius: 10px;
           margin-bottom: 32px;
           display: inline-block;
         }
@@ -1456,29 +1489,94 @@ export default function CartPage() {
         /* EMPTY STATE VIEW */
         .empty-cart-view {
           text-align: center;
-          padding: 96px 24px;
-          background: #ffffff;
-          border-radius: 16px;
-          border: 1px solid rgba(139, 105, 20, 0.12);
-          box-shadow: 0 10px 30px rgba(0,0,0,0.015);
-          max-width: 600px;
-          margin: 40px auto 0;
+          padding: 64px 40px 48px;
+          background: #FFFFFF;
+          border-radius: 14px;
+          border: 1px solid rgba(20, 20, 20, 0.08);
+          border-top: 2.5px solid #8B6914;
+          box-shadow: 0 14px 42px rgba(20, 16, 10, 0.04);
+          max-width: 660px;
+          margin: 24px auto 0;
         }
 
-        .empty-cart-icon {
-          color: rgba(139, 105, 20, 0.2);
-          margin-bottom: 20px;
+        .empty-cart-medallion {
+          width: 78px;
+          height: 78px;
+          border-radius: 50%;
+          background: rgba(139, 105, 20, 0.06);
+          border: 1px solid rgba(139, 105, 20, 0.2);
+          color: #8B6914;
+          margin: 0 auto 22px;
           display: flex;
           justify-content: center;
           align-items: center;
         }
+
+        .empty-cart-eyebrow {
+          font-size: 10px;
+          font-weight: 600;
+          letter-spacing: 0.22em;
+          text-transform: uppercase;
+          color: #8B6914;
+          margin: 0 0 10px;
+        }
         
         .empty-cart-title {
           font-family: 'Cormorant Garamond', serif;
-          font-size: 26px;
-          color: #1a1209;
+          font-size: clamp(26px, 3vw, 32px);
+          color: #141414;
           margin: 0 0 10px;
           font-weight: 500;
+          line-height: 1.2;
+        }
+
+        .empty-collections-bar {
+          margin-top: 36px;
+          padding-top: 24px;
+          border-top: 1px solid rgba(20, 20, 20, 0.06);
+          display: flex;
+          flex-wrap: wrap;
+          align-items: center;
+          justify-content: center;
+          gap: 10px;
+        }
+
+        .empty-collection-pill {
+          font-size: 11px;
+          font-weight: 500;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
+          color: rgba(20, 20, 20, 0.72);
+          background: #FCFBF9;
+          border: 1px solid rgba(20, 20, 20, 0.09);
+          padding: 7px 14px;
+          border-radius: 999px;
+          text-decoration: none;
+          transition: all 0.2s ease;
+        }
+
+        .empty-collection-pill:hover {
+          color: #8B6914;
+          border-color: rgba(139, 105, 20, 0.4);
+          background: rgba(139, 105, 20, 0.05);
+        }
+
+        .empty-assurances-strip {
+          max-width: 660px;
+          margin: 22px auto 0;
+          display: flex;
+          flex-wrap: wrap;
+          align-items: center;
+          justify-content: center;
+          gap: 18px 28px;
+          font-size: 11.5px;
+          color: rgba(20, 20, 20, 0.55);
+        }
+
+        .empty-assurance-item {
+          display: inline-flex;
+          align-items: center;
+          gap: 7px;
         }
 
         /* ════════════════════════════════════════════════════
@@ -1508,142 +1606,139 @@ export default function CartPage() {
         /* ── Large Mobile ≤ 768px ── */
         @media (max-width: 768px) {
           .cart-container {
-            padding: 100px 14px 80px;
+            padding: 100px 14px 72px;
             overflow-x: hidden;
           }
 
-          /* Store header: stack on small screens */
-          .store-header {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 8px;
-            padding: 14px 16px;
-          }
-
-          .store-name {
-            font-size: 12.5px;
-          }
-
-          .store-shipping-notice {
-            font-size: 11px;
-          }
-
           .select-all-row {
-            padding: 12px 16px;
+            padding: 13px 16px;
             font-size: 12px;
           }
 
           /* Summary panel padding */
           .cart-summary-panel {
-            padding: 22px 18px;
+            padding: 24px 18px;
           }
 
           .summary-title {
-            font-size: 20px;
+            font-size: 22px;
           }
         }
 
         /* ── Phone ≤ 640px — Main card restructure ── */
         @media (max-width: 640px) {
           .cart-container {
-            padding: 92px 12px 80px;
+            padding: 96px 12px 64px;
+          }
+
+          .cart-header-section {
+            margin-bottom: 24px;
+            padding-bottom: 18px;
           }
 
           .cart-title {
-            font-size: 28px;
+            font-size: 30px;
+          }
+
+          .cart-continue-link {
+            width: 100%;
+            justify-content: center;
           }
 
           /* ─────────────────────────────────────────────────
-             CART ITEM CARD: 3-column named-area grid
-             [check] [img / price]  [info (title→actions)]
+             CART ITEM CARD: clean mobile layout
+             Row 1: [check] [img] [info]
+             Row 2:         [price spanning img + info]
              ───────────────────────────────────────────────── */
           .cart-item-card {
             display: grid;
-            grid-template-columns: 26px 82px 1fr;
+            grid-template-columns: 24px 86px 1fr;
             grid-template-rows: auto auto;
             grid-template-areas:
               "check img   info"
-              "check price info";
-            gap: 10px 12px;
-            padding: 14px;
+              ".     price price";
+            gap: 12px 12px;
+            padding: 16px 14px;
             align-items: start;
           }
 
-          /* Checkbox: col 1, span both rows */
+          /* Checkbox: col 1, row 1 */
           .cart-item-card > button:first-child {
             grid-area: check;
-            grid-row: 1 / 3;
             margin-top: 3px;
             align-self: start;
           }
 
-          /* Image: col 2, row 1 only */
+          /* Image: col 2, row 1 */
           .cart-item-img-container {
             grid-area: img;
-            width: 82px !important;
-            height: 82px !important;
+            width: 86px !important;
+            height: 86px !important;
           }
 
-          /* Price: col 2, row 2 — sits below the image */
+          /* Price: spans cols 2-3 on a clean bottom bar */
           .item-price-column {
             grid-area: price;
             min-width: unset !important;
-            text-align: left;
-            flex-direction: column;
-            gap: 1px;
-            align-self: start;
+            width: 100%;
+            text-align: right;
+            flex-direction: row-reverse;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 8px;
+            padding-top: 10px;
+            border-top: 1px solid rgba(20, 20, 20, 0.06);
           }
 
           .item-price-total {
-            font-size: 14px;
+            font-size: 16px;
           }
 
           .item-price-unit {
-            font-size: 10px;
+            font-size: 11px;
           }
 
-          /* Info: col 3, span both rows */
+          /* Info: col 3, row 1 */
           .cart-item-info {
             grid-area: info;
-            grid-row: 1 / 3;
-            min-width: 0; /* prevent overflow inside grid cell */
+            min-width: 0;
           }
 
-          /* Title wraps cleanly */
           .item-title {
-            font-size: 16px;
-            line-height: 1.3;
+            font-size: 17px;
+            line-height: 1.28;
             word-break: break-word;
-            overflow-wrap: break-word;
+            overflow-wrap: anywhere;
           }
 
-          /* Meta row wraps */
           .item-meta-row {
             flex-wrap: wrap;
             gap: 6px;
             font-size: 11px;
           }
 
-          /* Actions panel: qty + delete */
           .item-actions-panel {
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 12px;
             margin-top: 10px;
           }
 
-          /* Qty buttons slightly smaller */
           .qty-btn {
             width: 28px;
             height: 28px;
           }
 
           .qty-val {
-            width: 28px;
+            width: 30px;
           }
 
-          /* Delete button smaller text */
           .text-action-btn {
             font-size: 11px;
+          }
+
+          .empty-cart-view {
+            padding: 44px 20px 36px;
+            margin: 12px 0 0;
           }
         }
 
@@ -2117,7 +2212,7 @@ export default function CartPage() {
                       <div style={{ fontSize: '12px', color: '#666666', marginBottom: 8 }}>
                         Please complete your address in <strong>Profile &rarr; Profile Details</strong> before purchasing.
                       </div>
-                      <Link href="/profile" onClick={() => setShowConfirmModal(false)} style={{ display: 'inline-block', background: '#141414', color: '#fff', padding: '6px 14px', borderRadius: 6, fontSize: '11.5px', fontWeight: 500, textDecoration: 'none' }}>
+                      <Link href="/profile" onClick={() => setShowConfirmModal(false)} style={{ display: 'inline-block', background: 'linear-gradient(135deg, #9C7A3C 0%, #8B6914 100%)', color: '#fff', padding: '7px 15px', borderRadius: 6, fontSize: '11.5px', fontWeight: 600, letterSpacing: '0.06em', textDecoration: 'none' }}>
                         Complete Profile &rarr;
                       </Link>
                     </div>
@@ -2145,8 +2240,9 @@ export default function CartPage() {
                                 {item.colorVariant && `${item.colorVariant} · `}Qty {item.quantity}
                               </div>
                               {gift?.isGift && (
-                                <div style={{ fontSize: '10.5px', color: '#141414', marginTop: 2, fontWeight: 500 }}>
-                                  🎁 Gifting Configured
+                                <div style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: '10.5px', color: '#8B6914', marginTop: 3, fontWeight: 600 }}>
+                                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M20 12v10H4V12" /><path d="M2 7h20v5H2z" /><path d="M12 22V7" /></svg>
+                                  <span>Gifting Configured</span>
                                 </div>
                               )}
                             </div>
@@ -2209,15 +2305,15 @@ export default function CartPage() {
                   {/* Trust Badges Footer */}
                   <div className="bnm-trust-footer">
                     <div className="bnm-trust-item">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#141414" strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /><polyline points="9 12 11 14 15 10" /></svg>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /><polyline points="9 12 11 14 15 10" /></svg>
                       <span>100% Authentic</span>
                     </div>
                     <div className="bnm-trust-item">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#141414" strokeWidth="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
                       <span>Secure Payment</span>
                     </div>
                     <div className="bnm-trust-item">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#141414" strokeWidth="2"><polyline points="1 4 1 10 7 10" /><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" /></svg>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="2"><polyline points="1 4 1 10 7 10" /><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" /></svg>
                       <span>Easy Returns</span>
                     </div>
                   </div>
@@ -2359,15 +2455,15 @@ export default function CartPage() {
 
                   <div className="bnm-trust-footer">
                     <div className="bnm-trust-item">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#141414" strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /><polyline points="9 12 11 14 15 10" /></svg>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /><polyline points="9 12 11 14 15 10" /></svg>
                       <span>100% Authentic</span>
                     </div>
                     <div className="bnm-trust-item">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#141414" strokeWidth="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
                       <span>Secure Payment</span>
                     </div>
                     <div className="bnm-trust-item">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#141414" strokeWidth="2"><polyline points="1 4 1 10 7 10" /><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" /></svg>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="2"><polyline points="1 4 1 10 7 10" /><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" /></svg>
                       <span>Easy Returns</span>
                     </div>
                   </div>
@@ -2414,32 +2510,70 @@ export default function CartPage() {
             <>
               {/* PAGE HEADER */}
               <div className="cart-header-section">
-                <h1 className="cart-title">Shopping Bag</h1>
-                <p className="cart-subtitle">
-                  {cartItems.length === 0
-                    ? 'Your shopping bag is empty.'
-                    : `You have ${cartItems.length} timepiece${cartItems.length > 1 ? 's' : ''} in your bag.`}
-                </p>
+                <div>
+                  <div className="cart-eyebrow">Winsor Client Atelier</div>
+                  <h1 className="cart-title">Shopping Bag</h1>
+                  <p className="cart-subtitle">
+                    {cartItems.length === 0
+                      ? 'Your personal selection awaits inside the Winsor boutique.'
+                      : `You have ${cartItems.length} curated timepiece${cartItems.length > 1 ? 's' : ''} ready for dispatch.`}
+                  </p>
+                </div>
+                {cartItems.length > 0 && (
+                  <Link href="/collections" className="cart-continue-link">
+                    <span>Continue Exploring</span>
+                    <span aria-hidden="true">&#8594;</span>
+                  </Link>
+                )}
               </div>
 
               {cartItems.length === 0 ? (
                 /* EMPTY BAG VIEW */
-                <div className="empty-cart-view">
-                  <div className="empty-cart-icon">
-                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
-                      <line x1="3" y1="6" x2="21" y2="6" />
-                      <path d="M16 10a4 4 0 0 1-8 0" />
-                    </svg>
+                <>
+                  <div className="empty-cart-view">
+                    <div className="empty-cart-medallion">
+                      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+                        <line x1="3" y1="6" x2="21" y2="6" />
+                        <path d="M16 10a4 4 0 0 1-8 0" />
+                      </svg>
+                    </div>
+                    <p className="empty-cart-eyebrow">Personal Selection</p>
+                    <h2 className="empty-cart-title">Your shopping bag is currently empty.</h2>
+                    <p style={{ color: 'rgba(20,20,20,0.58)', fontSize: '14px', lineHeight: 1.65, maxWidth: '440px', margin: '0 auto 28px' }}>
+                      Discover handcrafted Swiss-inspired silhouettes and Japanese precision movements curated for discerning collectors.
+                    </p>
+                    <Link href="/collections" className="checkout-action-btn" style={{ width: 'auto', display: 'inline-flex', padding: '14px 36px', textDecoration: 'none' }}>
+                      <span>Discover Timepieces</span>
+                      <span aria-hidden="true">&#8594;</span>
+                    </Link>
+
+                    <div className="empty-collections-bar">
+                      <span style={{ width: '100%', fontSize: '10.5px', fontWeight: 600, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'rgba(20,20,20,0.4)', marginBottom: '4px' }}>
+                        Browse Signature Collections
+                      </span>
+                      <Link href="/mens" className="empty-collection-pill">Gents</Link>
+                      <Link href="/womens" className="empty-collection-pill">Ladies</Link>
+                      <Link href="/gifts" className="empty-collection-pill">Gifts</Link>
+                      <Link href="/limited-edition" className="empty-collection-pill">Limited Edition</Link>
+                    </div>
                   </div>
-                  <h2 className="empty-cart-title">Your shopping bag is empty.</h2>
-                  <p style={{ color: 'rgba(26,18,9,0.45)', fontSize: '13.5px', margin: '0 0 28px' }}>
-                    Indulge in our collection of handcrafted, high-precision luxury timepieces.
-                  </p>
-                  <Link href="/collections" className="checkout-action-btn" style={{ width: 'auto', display: 'inline-flex', padding: '12px 36px', textDecoration: 'none' }}>
-                    Discover Timepieces
-                  </Link>
-                </div>
+
+                  <div className="empty-assurances-strip">
+                    <div className="empty-assurance-item">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.8"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /><polyline points="9 12 11 14 15 10" /></svg>
+                      <span>2-Year International Warranty</span>
+                    </div>
+                    <div className="empty-assurance-item">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.8"><rect x="1" y="3" width="15" height="13" /><polygon points="16 8 20 8 23 11 23 16 16 16 16 8" /><circle cx="5.5" cy="18.5" r="2.5" /><circle cx="18.5" cy="18.5" r="2.5" /></svg>
+                      <span>Free Insured Sri Lanka Delivery</span>
+                    </div>
+                    <div className="empty-assurance-item">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.8"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
+                      <span>100% Encrypted Checkout</span>
+                    </div>
+                  </div>
+                </>
               ) : (
                 /* CART LAYOUT GRID */
                 <div className="cart-grid">
@@ -2448,34 +2582,26 @@ export default function CartPage() {
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
                     <div className="cart-items-panel">
 
-                      {/* Store / Boutique Grouping Header */}
-                      <div className="store-header">
-                        <div className="store-info">
-                          <span className="store-badge">Official Store</span>
-                          <span className="store-name">Winsor Brand Official Boutique</span>
-                        </div>
-                        <div className="store-shipping-notice">
-                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                            <circle cx="12" cy="12" r="10" /><path d="m9 12 2 2 4-4" />
-                          </svg>
-                          <span>Free Island-Wide Shipping in Sri Lanka</span>
-                        </div>
-                      </div>
-
                       {/* Checkbox Select All Controls */}
-                      <div className="select-all-row">
-                        <button
-                          onClick={toggleSelectAll}
-                          className={`custom-checkbox ${allSelected ? 'checked' : ''}`}
-                          aria-label="Select all items"
-                        >
-                          {allSelected && (
-                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
-                              <polyline points="20 6 9 17 4 12" />
-                            </svg>
-                          )}
-                        </button>
-                        <span>Select All Items ({cartItems.length})</span>
+                      <div className="select-all-row" onClick={toggleSelectAll} style={{ cursor: 'pointer' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                          <button
+                            type="button"
+                            onClick={(e) => { e.stopPropagation(); toggleSelectAll(); }}
+                            className={`custom-checkbox ${allSelected ? 'checked' : ''}`}
+                            aria-label="Select all items"
+                          >
+                            {allSelected && (
+                              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
+                                <polyline points="20 6 9 17 4 12" />
+                              </svg>
+                            )}
+                          </button>
+                          <span>Select All Timepieces ({cartItems.length})</span>
+                        </div>
+                        <span style={{ fontSize: '11px', color: '#8B6914', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+                          {selectedItemsList.length} of {cartItems.length} Selected
+                        </span>
                       </div>
 
                       {/* Cart Items List */}
@@ -2536,7 +2662,7 @@ export default function CartPage() {
                                   </>
                                 )}
                                 <div className="meta-divider" />
-                                <span className="item-stock-status">
+                                <span className={`item-stock-status ${isProductSoldOut ? 'sold-out' : ''}`}>
                                   {isProductSoldOut ? 'Sold Out' : 'In Stock'}
                                 </span>
                               </div>
@@ -2864,11 +2990,11 @@ export default function CartPage() {
 
                     {/* ── COUPON CODE SECTION ── */}
                     {isSignedIn && (
-                      <div style={{ marginTop: 16, padding: '14px', background: 'rgba(139,105,20,0.03)', border: '1.5px dashed rgba(139,105,20,0.2)', borderRadius: 10 }}>
+                      <div style={{ marginTop: 12, marginBottom: 22, padding: '14px 16px', background: '#FCFBF8', border: '1px solid rgba(139,105,20,0.2)', borderRadius: 10 }}>
                         {!appliedCoupon ? (
                           <>
-                            <p style={{ margin: '0 0 10px', fontSize: 12, fontWeight: 600, color: 'rgba(26,18,9,0.65)', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
-                              Have a Coupon Code?
+                            <p style={{ margin: '0 0 10px', fontSize: 11, fontWeight: 600, color: '#8B6914', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+                              Privilege / Coupon Code
                             </p>
                             <div style={{ display: 'flex', gap: 8 }}>
                               <input
@@ -2880,7 +3006,7 @@ export default function CartPage() {
                                 onKeyDown={e => e.key === 'Enter' && handleApplyCoupon()}
                                 style={{
                                   flex: 1, padding: '9px 12px',
-                                  border: '1px solid rgba(20,20,20,0.15)', borderRadius: 6,
+                                  border: '1px solid rgba(20,20,20,0.14)', borderRadius: 6,
                                   fontFamily: "'Jost', sans-serif", fontSize: 13,
                                   fontWeight: 600, letterSpacing: '0.08em', color: '#141414',
                                   background: '#ffffff', outline: 'none',
@@ -2890,12 +3016,13 @@ export default function CartPage() {
                                 onClick={handleApplyCoupon}
                                 disabled={couponValidating || !couponInput.trim()}
                                 style={{
-                                  padding: '9px 16px',
-                                  background: couponValidating ? 'rgba(20,20,20,0.4)' : '#141414',
-                                  color: '#ffffff', border: 'none', borderRadius: 6,
-                                  fontFamily: "'Jost', sans-serif", fontSize: 11.5,
-                                  fontWeight: 500, cursor: couponValidating ? 'not-allowed' : 'pointer',
-                                  letterSpacing: '0.08em', whiteSpace: 'nowrap',
+                                  padding: '9px 18px',
+                                  background: (couponValidating || !couponInput.trim()) ? 'rgba(139,105,20,0.16)' : 'linear-gradient(135deg, #9C7A3C 0%, #8B6914 100%)',
+                                  color: (couponValidating || !couponInput.trim()) ? 'rgba(20,20,20,0.4)' : '#ffffff',
+                                  border: 'none', borderRadius: 6,
+                                  fontFamily: "'Jost', sans-serif", fontSize: 11,
+                                  fontWeight: 600, cursor: (couponValidating || !couponInput.trim()) ? 'not-allowed' : 'pointer',
+                                  letterSpacing: '0.1em', whiteSpace: 'nowrap',
                                   textTransform: 'uppercase',
                                   transition: 'all 0.2s ease',
                                 }}
@@ -2910,7 +3037,7 @@ export default function CartPage() {
                               <p style={{ margin: 0, fontSize: 12, fontWeight: 700, color: '#15803d', letterSpacing: '0.08em' }}>
                                 ✓ {appliedCoupon.code} Applied
                               </p>
-                              <p style={{ margin: '2px 0 0', fontSize: 11, color: 'rgba(26,18,9,0.5)' }}>
+                              <p style={{ margin: '2px 0 0', fontSize: 11, color: 'rgba(20,20,20,0.55)' }}>
                                 {appliedCoupon.discountPercent}% discount active
                               </p>
                             </div>
@@ -2939,7 +3066,7 @@ export default function CartPage() {
                         <p className="banner-text">
                           To dispatch high-value timepieces securely, we require a verified delivery address and contact number.
                         </p>
-                        <Link href="/profile" className="checkout-action-btn" style={{ fontSize: '11px', padding: '9px 12px', borderRadius: '20px', textDecoration: 'none' }}>
+                        <Link href="/profile" className="checkout-action-btn" style={{ fontSize: '11px', padding: '10px 14px', borderRadius: '6px', textDecoration: 'none' }}>
                           Complete Shipping Info
                         </Link>
                       </div>
@@ -2991,17 +3118,17 @@ export default function CartPage() {
                     </div>
 
                     {/* Legal Policy Links Notice */}
-                    <div style={{ marginTop: '16px', paddingTop: '14px', borderTop: '1px solid rgba(139,105,20,0.12)', fontSize: '11px', color: 'rgba(26,18,9,0.55)', textAlign: 'center', lineHeight: '1.6' }}>
-                      By purchasing, you agree to Winsor's{' '}
-                      <Link href="/terms" target="_blank" style={{ color: '#8B6914', textDecoration: 'underline', fontWeight: 600 }}>
+                    <div style={{ marginTop: '16px', paddingTop: '14px', borderTop: '1px solid rgba(20,20,20,0.06)', fontSize: '11px', color: 'rgba(20,20,20,0.55)', textAlign: 'center', lineHeight: '1.6' }}>
+                      By purchasing, you agree to Winsor&apos;s{' '}
+                      <Link href="/terms" target="_blank" style={{ color: '#8B6914', textDecoration: 'underline', fontWeight: 500 }}>
                         Terms &amp; Conditions
                       </Link>
                       ,{' '}
-                      <Link href="/privacy" target="_blank" style={{ color: '#8B6914', textDecoration: 'underline', fontWeight: 600 }}>
+                      <Link href="/privacy" target="_blank" style={{ color: '#8B6914', textDecoration: 'underline', fontWeight: 500 }}>
                         Privacy Policy
                       </Link>
                       , and{' '}
-                      <Link href="/warranty" target="_blank" style={{ color: '#8B6914', textDecoration: 'underline', fontWeight: 600 }}>
+                      <Link href="/warranty" target="_blank" style={{ color: '#8B6914', textDecoration: 'underline', fontWeight: 500 }}>
                         Warranty Policy
                       </Link>
                       .

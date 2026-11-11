@@ -215,10 +215,10 @@ export default function CustomerOrdersPage() {
 
   if (!isLoaded || loading) {
     return (
-      <div style={{ minHeight: '80vh', background: '#faf7f0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Jost', sans-serif" }}>
+      <div style={{ minHeight: '85vh', background: '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Jost', sans-serif", paddingTop: '110px' }}>
         <div style={{ textAlign: 'center' }}>
-          <div className="orders-shimmer" style={{ width: '48px', height: '48px', borderRadius: '50%', border: '3px solid rgba(139,105,20,0.1)', borderTopColor: '#8B6914', animation: 'orders-spin 1s linear infinite', margin: '0 auto 16px' }} />
-          <p style={{ color: 'rgba(26,18,9,0.5)', fontSize: '13px', letterSpacing: '0.05em' }}>Loading your orders...</p>
+          <div style={{ width: '44px', height: '44px', borderRadius: '50%', border: '1.5px solid rgba(139,105,20,0.14)', borderTopColor: '#8B6914', animation: 'orders-spin 0.9s linear infinite', margin: '0 auto 18px' }} />
+          <p style={{ color: 'rgba(20,20,20,0.52)', fontSize: '11.5px', fontWeight: 500, letterSpacing: '0.16em', textTransform: 'uppercase', margin: 0 }}>Loading your orders...</p>
         </div>
         <style>{`
           @keyframes orders-spin {
@@ -231,20 +231,54 @@ export default function CustomerOrdersPage() {
 
   if (!isSignedIn) {
     return (
-      <div style={{ minHeight: '80vh', background: '#faf7f0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Jost', sans-serif", padding: '120px 24px 80px' }}>
-        <div style={{ maxWidth: '450px', width: '100%', background: '#FAF7F0', border: '1.5px solid rgba(184, 142, 60, 0.25)', borderRadius: '16px', padding: '40px 30px', boxShadow: '0 8px 30px rgba(26,18,9,0.04)', textAlign: 'center' }}>
-          <div style={{ color: '#8B6914', marginBottom: '20px' }}>
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      <div style={{ minHeight: '86vh', background: '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Jost', sans-serif", padding: '148px 24px 96px' }}>
+        <div style={{ maxWidth: '480px', width: '100%', background: '#FFFFFF', border: '1px solid rgba(20, 20, 20, 0.08)', borderTop: '2.5px solid #8B6914', borderRadius: '14px', padding: '48px 38px 40px', boxShadow: '0 14px 40px rgba(20,16,10,0.04)', textAlign: 'center' }}>
+          <div style={{ width: '64px', height: '64px', borderRadius: '50%', background: '#FAF8F4', border: '1px solid rgba(139, 105, 20, 0.22)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#8B6914', margin: '0 auto 22px' }}>
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
           </div>
-          <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '28px', color: '#1a1209', margin: '0 0 12px', fontWeight: 500 }}>Sign In Required</h2>
-          <p style={{ color: 'rgba(26,18,9,0.55)', fontSize: '14px', lineHeight: 1.5, margin: '0 0 28px' }}>
+          <div style={{ fontSize: '10.5px', fontWeight: 600, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#8B6914', marginBottom: '10px' }}>
+            Winsor Client Atelier
+          </div>
+          <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '34px', color: '#141414', margin: '0 0 12px', fontWeight: 500, letterSpacing: '-0.01em' }}>Sign In Required</h2>
+          <p style={{ color: 'rgba(20,20,20,0.58)', fontSize: '14.5px', lineHeight: 1.65, maxWidth: '340px', margin: '0 auto 30px' }}>
             Please sign in to view your timepiece orders and check their dispatch status.
           </p>
           <SignInButton mode="modal">
-            <button style={{ width: '100%', background: '#1a1209', color: '#faf7f0', border: 'none', borderRadius: '30px', padding: '14px', fontSize: '13px', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', cursor: 'pointer', transition: 'all 0.25s' }} onMouseEnter={e => e.currentTarget.style.background='#8B6914'} onMouseLeave={e => e.currentTarget.style.background='#1a1209'}>
+            <button
+              style={{
+                width: '100%',
+                background: 'linear-gradient(135deg, #9C7A3C 0%, #8B6914 100%)',
+                color: '#FFFFFF',
+                border: 'none',
+                borderRadius: '4px',
+                padding: '15px 24px',
+                fontSize: '12px',
+                fontWeight: 600,
+                letterSpacing: '0.16em',
+                textTransform: 'uppercase',
+                cursor: 'pointer',
+                transition: 'all 0.25s ease',
+                boxShadow: '0 6px 20px rgba(139, 105, 20, 0.18)',
+              }}
+              onMouseEnter={e => {
+                e.currentTarget.style.background = 'linear-gradient(135deg, #7A5C10 0%, #684E0D 100%)';
+                e.currentTarget.style.boxShadow = '0 8px 24px rgba(139, 105, 20, 0.28)';
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.background = 'linear-gradient(135deg, #9C7A3C 0%, #8B6914 100%)';
+                e.currentTarget.style.boxShadow = '0 6px 20px rgba(139, 105, 20, 0.18)';
+              }}
+            >
               Sign In to Account
             </button>
           </SignInButton>
+
+          <div style={{ marginTop: '26px', paddingTop: '20px', borderTop: '1px solid rgba(20, 20, 20, 0.06)', fontSize: '13px', color: 'rgba(20, 20, 20, 0.52)' }}>
+            Checking a dispatch without an account?{' '}
+            <Link href="/orders/track" style={{ color: '#8B6914', fontWeight: 600, textDecoration: 'none', letterSpacing: '0.02em' }}>
+              Track by Reference →
+            </Link>
+          </div>
         </div>
       </div>
     );
@@ -253,18 +287,18 @@ export default function CustomerOrdersPage() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Jost:wght@300;400;500;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Jost:wght@300;400;500;600;700&display=swap');
 
         .orders-container {
-          background-color: #FAF7F0;
+          background-color: #FFFFFF;
           min-height: 100vh;
-          padding: 120px 24px 80px;
+          padding: 142px 4% 96px;
           font-family: 'Jost', sans-serif;
-          color: #1a1209;
+          color: #141414;
         }
 
         .orders-wrapper {
-          max-width: 920px;
+          max-width: 1080px;
           margin: 0 auto;
         }
 
@@ -273,44 +307,71 @@ export default function CustomerOrdersPage() {
           display: flex;
           justify-content: space-between;
           align-items: flex-end;
-          border-bottom: 1.5px solid rgba(184, 142, 60, 0.18);
-          padding-bottom: 22px;
+          gap: 20px;
+          border-bottom: 1px solid rgba(20, 20, 20, 0.08);
+          padding-bottom: 26px;
+        }
+
+        .orders-eyebrow {
+          display: inline-flex;
+          align-items: center;
+          gap: 10px;
+          font-size: 10.5px;
+          font-weight: 600;
+          letter-spacing: 0.22em;
+          text-transform: uppercase;
+          color: #8B6914;
+          margin-bottom: 10px;
+        }
+
+        .orders-eyebrow-rule {
+          width: 24px;
+          height: 1px;
+          background-color: #8B6914;
+          display: inline-block;
         }
 
         .orders-title {
           font-family: 'Cormorant Garamond', serif;
-          font-size: 38px;
+          font-size: 42px;
           font-weight: 500;
-          color: #1a1209;
-          margin: 0 0 6px;
-          letter-spacing: 0.02em;
+          color: #141414;
+          margin: 0 0 8px;
+          letter-spacing: -0.015em;
+          line-height: 1.08;
         }
 
         .orders-subtitle {
-          font-size: 13.5px;
-          color: rgba(26, 18, 9, 0.55);
+          font-size: 14px;
+          color: rgba(20, 20, 20, 0.56);
           margin: 0;
+          line-height: 1.5;
         }
 
         .profile-link {
           color: #8B6914;
           text-decoration: none;
-          font-size: 13px;
+          font-size: 11.5px;
           font-weight: 600;
+          letter-spacing: 0.14em;
+          text-transform: uppercase;
           display: inline-flex;
           align-items: center;
-          gap: 7px;
-          padding: 8px 16px;
-          border-radius: 100px;
-          background: rgba(184, 142, 60, 0.08);
-          border: 1px solid rgba(184, 142, 60, 0.22);
+          gap: 8px;
+          padding: 11px 20px;
+          border-radius: 4px;
+          background: #FFFFFF;
+          border: 1px solid rgba(139, 105, 20, 0.34);
           transition: all 0.25s ease;
+          white-space: nowrap;
         }
 
         .profile-link:hover {
-          background: #8B6914;
-          color: #FAF7F0;
-          box-shadow: 0 4px 14px rgba(139, 105, 20, 0.25);
+          background: #FAF8F4;
+          border-color: #8B6914;
+          color: #684E0D;
+          box-shadow: 0 6px 18px rgba(139, 105, 20, 0.1);
+          transform: translateY(-1px);
         }
 
         /* ── Luxury Order Filter Bar ── */
@@ -320,9 +381,9 @@ export default function CustomerOrdersPage() {
           align-items: center;
           flex-wrap: wrap;
           gap: 16px;
-          margin-bottom: 28px;
-          padding-bottom: 20px;
-          border-bottom: 1.5px solid rgba(184, 142, 60, 0.18);
+          margin-bottom: 30px;
+          padding-bottom: 22px;
+          border-bottom: 1px solid rgba(20, 20, 20, 0.08);
         }
         .orders-filter-pills {
           display: flex;
@@ -339,30 +400,31 @@ export default function CustomerOrdersPage() {
         .orders-filter-pill {
           display: inline-flex;
           align-items: center;
-          gap: 7px;
-          padding: 8px 16px;
-          border-radius: 100px;
+          gap: 8px;
+          padding: 8px 15px;
+          border-radius: 4px;
           font-family: 'Jost', sans-serif;
-          font-size: 12.5px;
+          font-size: 11.5px;
           font-weight: 600;
-          letter-spacing: 0.03em;
-          background: #FAF7F0;
-          color: #1a1209;
-          border: 1.5px solid rgba(184, 142, 60, 0.22);
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          background: #FFFFFF;
+          color: rgba(20, 20, 20, 0.72);
+          border: 1px solid rgba(20, 20, 20, 0.12);
           cursor: pointer;
           white-space: nowrap;
           transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .orders-filter-pill:hover {
-          border-color: #8B6914;
-          background: rgba(184, 142, 60, 0.08);
+          border-color: rgba(139, 105, 20, 0.48);
+          background: #FAF8F4;
           color: #8B6914;
         }
         .orders-filter-pill.active {
-          background: #1a1209;
-          color: #FAF7F0;
-          border-color: #1a1209;
-          box-shadow: 0 4px 14px rgba(26, 18, 9, 0.18);
+          background: linear-gradient(135deg, #9C7A3C 0%, #8B6914 100%);
+          color: #FFFFFF;
+          border-color: #8B6914;
+          box-shadow: 0 4px 14px rgba(139, 105, 20, 0.22);
         }
         .orders-pill-badge {
           display: inline-flex;
@@ -371,16 +433,19 @@ export default function CustomerOrdersPage() {
           min-width: 18px;
           height: 18px;
           padding: 0 5px;
-          border-radius: 100px;
+          border-radius: 3px;
           font-size: 10px;
           font-weight: 700;
-          background: rgba(184, 142, 60, 0.18);
+          font-variant-numeric: tabular-nums;
+          background: #FAF8F4;
           color: #8B6914;
+          border: 1px solid rgba(139, 105, 20, 0.18);
           transition: all 0.25s ease;
         }
         .orders-filter-pill.active .orders-pill-badge {
-          background: #8B6914;
-          color: #FAF7F0;
+          background: rgba(255, 255, 255, 0.22);
+          color: #FFFFFF;
+          border-color: transparent;
         }
         .orders-search-box {
           position: relative;
@@ -392,24 +457,27 @@ export default function CustomerOrdersPage() {
         .orders-search-box .search-icon {
           position: absolute;
           left: 14px;
-          color: rgba(139, 105, 20, 0.7);
+          color: rgba(139, 105, 20, 0.75);
           pointer-events: none;
         }
         .orders-search-input {
           width: 100%;
-          padding: 9px 36px 9px 38px;
-          border-radius: 100px;
-          border: 1.5px solid rgba(184, 142, 60, 0.25);
+          padding: 10px 36px 10px 38px;
+          border-radius: 4px;
+          border: 1px solid rgba(20, 20, 20, 0.12);
           background: #FFFFFF;
           font-family: 'Jost', sans-serif;
-          font-size: 12.5px;
-          color: #1a1209;
+          font-size: 13px;
+          color: #141414;
           outline: none;
           transition: all 0.25s ease;
         }
+        .orders-search-input::placeholder {
+          color: rgba(20, 20, 20, 0.38);
+        }
         .orders-search-input:focus {
           border-color: #8B6914;
-          box-shadow: 0 0 0 3px rgba(139, 105, 20, 0.12);
+          box-shadow: 0 0 0 3px rgba(139, 105, 20, 0.1);
         }
         .orders-search-clear {
           position: absolute;
@@ -417,34 +485,36 @@ export default function CustomerOrdersPage() {
           background: none;
           border: none;
           font-size: 16px;
-          color: rgba(26, 18, 9, 0.4);
+          color: rgba(20, 20, 20, 0.4);
           cursor: pointer;
           padding: 0;
           line-height: 1;
         }
         .orders-search-clear:hover {
-          color: #1a1209;
+          color: #141414;
         }
 
         /* ORDER CARD */
         .order-card {
-          background: #FAF7F0;
-          border: 1.5px solid rgba(184, 142, 60, 0.22);
-          border-radius: 16px;
-          box-shadow: 0 8px 30px rgba(26, 18, 9, 0.03);
-          margin-bottom: 32px;
+          background: #FFFFFF;
+          border: 1px solid rgba(20, 20, 20, 0.08);
+          border-top: 2.5px solid #8B6914;
+          border-radius: 14px;
+          box-shadow: 0 12px 36px rgba(20, 16, 10, 0.035);
+          margin-bottom: 28px;
           overflow: hidden;
-          transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+          transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .order-card:hover {
-          border-color: rgba(184, 142, 60, 0.4);
-          box-shadow: 0 12px 36px rgba(184, 142, 60, 0.12);
+          border-color: rgba(139, 105, 20, 0.26);
+          border-top-color: #8B6914;
+          box-shadow: 0 16px 44px rgba(20, 16, 10, 0.06);
         }
 
         .order-card-header {
-          background-color: rgba(184, 142, 60, 0.06);
-          border-bottom: 1.5px solid rgba(184, 142, 60, 0.15);
+          background-color: #FCFBF9;
+          border-bottom: 1px solid rgba(20, 20, 20, 0.07);
           padding: 20px 28px;
           display: flex;
           justify-content: space-between;
@@ -455,7 +525,7 @@ export default function CustomerOrdersPage() {
 
         .order-meta {
           display: flex;
-          gap: 28px;
+          gap: 32px;
           flex-wrap: wrap;
         }
 
@@ -466,46 +536,46 @@ export default function CustomerOrdersPage() {
         }
 
         .order-meta-label {
-          font-size: 10.5px;
-          color: rgba(26, 18, 9, 0.5);
+          font-size: 10px;
+          color: rgba(20, 20, 20, 0.48);
           text-transform: uppercase;
-          letter-spacing: 0.1em;
-          font-weight: 700;
+          letter-spacing: 0.14em;
+          font-weight: 600;
         }
 
         .order-meta-value {
           font-size: 13.5px;
-          color: #1a1209;
+          color: #141414;
           font-weight: 600;
         }
 
         .order-status-badge {
-          font-size: 11px;
+          font-size: 10.5px;
           font-weight: 700;
-          letter-spacing: 0.08em;
+          letter-spacing: 0.12em;
           text-transform: uppercase;
-          padding: 6px 16px;
-          border-radius: 100px;
-          border: 1.5px solid transparent;
+          padding: 6px 14px;
+          border-radius: 4px;
+          border: 1px solid transparent;
           display: inline-flex;
           align-items: center;
           gap: 6px;
-          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
         }
 
         /* ORDER BODY */
         .order-card-body {
           padding: 24px 28px;
+          background: #FFFFFF;
         }
 
         /* ORDER ITEMS */
         .order-item-row {
           display: grid;
-          grid-template-columns: 84px 1fr auto;
+          grid-template-columns: 88px 1fr auto;
           align-items: center;
           gap: 20px;
           padding: 18px 0;
-          border-bottom: 1px dashed rgba(184, 142, 60, 0.18);
+          border-bottom: 1px solid rgba(20, 20, 20, 0.06);
         }
 
         .order-item-row:first-child {
@@ -518,12 +588,13 @@ export default function CustomerOrdersPage() {
         }
 
         .order-item-img {
-          width: 84px;
-          height: 84px;
+          width: 88px;
+          height: 88px;
           position: relative;
           border-radius: 10px;
-          border: 1px solid rgba(184, 142, 60, 0.18);
-          background-color: transparent;
+          border: 1px solid rgba(139, 105, 20, 0.14);
+          background-color: #FAF8F4;
+          padding: 6px;
           overflow: hidden;
           flex-shrink: 0;
         }
@@ -536,18 +607,20 @@ export default function CustomerOrdersPage() {
 
         .order-item-title {
           font-family: 'Cormorant Garamond', serif;
-          font-size: 20px;
+          font-size: 21px;
           font-weight: 600;
-          color: #1a1209;
+          color: #141414;
           margin: 0;
+          line-height: 1.2;
         }
 
         .order-item-meta {
           font-size: 12px;
-          color: rgba(26, 18, 9, 0.55);
+          color: rgba(20, 20, 20, 0.56);
           display: flex;
           align-items: center;
           gap: 10px;
+          flex-wrap: wrap;
         }
 
         .order-item-price-calc {
@@ -555,19 +628,22 @@ export default function CustomerOrdersPage() {
           font-weight: 600;
           color: #8B6914;
           margin-top: 2px;
+          font-variant-numeric: tabular-nums;
         }
 
         .order-item-total {
-          font-size: 17px;
-          font-weight: 700;
-          color: #1a1209;
+          font-size: 16.5px;
+          font-weight: 600;
+          color: #141414;
           text-align: right;
+          font-variant-numeric: tabular-nums;
+          white-space: nowrap;
         }
 
         /* SHIPPING COLLAPSIBLE / DETAIL BLOCK */
         .order-shipping-section {
-          background-color: rgba(184, 142, 60, 0.04);
-          border-top: 1.5px solid rgba(184, 142, 60, 0.12);
+          background-color: #FCFBF9;
+          border-top: 1px solid rgba(20, 20, 20, 0.07);
           padding: 20px 28px;
           display: flex;
           justify-content: space-between;
@@ -578,33 +654,44 @@ export default function CustomerOrdersPage() {
 
         .shipping-info-block {
           font-size: 13px;
-          color: rgba(26, 18, 9, 0.7);
+          color: rgba(20, 20, 20, 0.72);
           line-height: 1.55;
         }
 
         .shipping-info-title {
-          font-size: 10.5px;
-          font-weight: 700;
+          font-size: 10px;
+          font-weight: 600;
           color: #8B6914;
           text-transform: uppercase;
-          letter-spacing: 0.1em;
+          letter-spacing: 0.14em;
           margin-bottom: 5px;
           display: flex;
           align-items: center;
           gap: 6px;
         }
 
+        .order-customer-actions {
+          padding: 18px 28px;
+          border-top: 1px solid rgba(20, 20, 20, 0.07);
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          flex-wrap: wrap;
+          gap: 12px;
+          background: #FFFFFF;
+        }
+
         .orders-cancel-btn {
-          background: rgba(198, 40, 40, 0.04);
-          border: 1.5px solid rgba(198, 40, 40, 0.35);
-          color: #c62828;
-          padding: 9px 22px;
+          background: #FFFFFF;
+          border: 1px solid rgba(198, 40, 40, 0.35);
+          color: #b71c1c;
+          padding: 10px 20px;
           font-family: 'Jost', sans-serif;
           font-size: 11px;
-          font-weight: 700;
-          letter-spacing: 0.1em;
+          font-weight: 600;
+          letter-spacing: 0.12em;
           text-transform: uppercase;
-          border-radius: 100px;
+          border-radius: 4px;
           cursor: pointer;
           transition: all 0.25s ease;
         }
@@ -613,52 +700,32 @@ export default function CustomerOrdersPage() {
           background: #c62828;
           color: #ffffff;
           border-color: #c62828;
-          box-shadow: 0 4px 14px rgba(198, 40, 40, 0.25);
+          box-shadow: 0 4px 14px rgba(198, 40, 40, 0.22);
         }
 
         .order-track-action-btn {
           display: inline-flex;
           align-items: center;
-          gap: 7px;
-          background: #1a1209;
-          color: #FAF7F0;
-          border: 1px solid #1a1209;
-          padding: 9px 20px;
-          border-radius: 100px;
+          gap: 8px;
+          background: linear-gradient(135deg, #9C7A3C 0%, #8B6914 100%);
+          color: #FFFFFF;
+          border: none;
+          padding: 11px 22px;
+          border-radius: 4px;
           font-family: 'Jost', sans-serif;
           font-size: 11.5px;
           font-weight: 600;
-          letter-spacing: 0.08em;
+          letter-spacing: 0.14em;
           text-transform: uppercase;
           text-decoration: none;
           transition: all 0.25s ease;
-          box-shadow: 0 2px 8px rgba(26, 18, 9, 0.12);
+          box-shadow: 0 4px 14px rgba(139, 105, 20, 0.18);
         }
         .order-track-action-btn:hover {
-          background: #8B6914;
-          border-color: #8B6914;
-          color: #FAF7F0;
-          box-shadow: 0 4px 14px rgba(139, 105, 20, 0.3);
+          background: linear-gradient(135deg, #7A5C10 0%, #684E0D 100%);
+          color: #FFFFFF;
+          box-shadow: 0 6px 20px rgba(139, 105, 20, 0.28);
           transform: translateY(-1px);
-        }
-
-        /* RESPONSIVE BREAKPOINTS */
-        @media (max-width: 640px) {
-          .orders-container { padding: 90px 16px 60px; }
-          .orders-header { flex-direction: column; align-items: flex-start; gap: 12px; }
-          .order-card-header { padding: 16px 20px; flex-direction: column; align-items: flex-start; }
-          .order-meta { gap: 14px 20px; }
-          .order-card-body { padding: 18px 20px; }
-          .order-item-row { grid-template-columns: 68px 1fr; gap: 14px; }
-          .order-item-total { grid-column: 1 / -1; text-align: right; border-top: 1px dashed rgba(184,142,60,0.15); padding-top: 8px; }
-          .order-shipping-section { flex-direction: column; align-items: flex-start; gap: 16px; padding: 18px 20px; }
-          .text-right-mobile-left { text-align: left !important; }
-          .orders-filter-container { flex-direction: column; align-items: stretch; gap: 12px; }
-          .orders-search-box { max-width: 100%; }
-          .orders-filter-pill { padding: 6px 12px; font-size: 11.5px; }
-          .order-customer-actions { flex-direction: column; align-items: stretch !important; gap: 12px; }
-          .order-track-action-btn { justify-content: center; width: 100%; box-sizing: border-box; }
-          .orders-cancel-btn { width: 100%; text-align: center; }
         }
 
         /* MODALS */
@@ -666,8 +733,8 @@ export default function CustomerOrdersPage() {
           position: fixed;
           inset: 0;
           z-index: 100;
-          background-color: rgba(10, 6, 2, 0.65);
-          backdrop-filter: blur(6px);
+          background-color: rgba(16, 14, 10, 0.56);
+          backdrop-filter: blur(8px);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -675,41 +742,42 @@ export default function CustomerOrdersPage() {
         }
 
         .modal-box {
-          background-color: #FAF7F0;
-          border-radius: 16px;
+          background-color: #FFFFFF;
+          border-radius: 14px;
           width: 100%;
           max-width: 520px;
-          padding: 32px;
-          box-shadow: 0 24px 60px rgba(26, 18, 9, 0.2);
+          padding: 36px 32px;
+          box-shadow: 0 24px 64px rgba(16, 14, 10, 0.18);
           position: relative;
-          border: 1.5px solid rgba(184, 142, 60, 0.3);
+          border: 1px solid rgba(20, 20, 20, 0.08);
+          border-top: 2.5px solid #8B6914;
         }
 
         .modal-title {
           font-family: 'Cormorant Garamond', serif;
-          font-size: 26px;
+          font-size: 28px;
           font-weight: 600;
-          color: #1a1209;
+          color: #141414;
           margin: 0 0 8px;
           text-align: center;
         }
 
         .modal-subtitle {
           font-size: 13px;
-          color: rgba(26, 18, 9, 0.45);
+          color: rgba(20, 20, 20, 0.55);
           text-align: center;
           margin: 0 0 24px;
-          line-height: 1.4;
+          line-height: 1.5;
         }
 
         .modal-block {
-          border: 1px solid rgba(26, 18, 9, 0.08);
-          background-color: rgba(26, 18, 9, 0.01);
-          border-radius: 6px;
-          padding: 16px;
+          border: 1px solid rgba(20, 20, 20, 0.07);
+          background-color: #FCFBF9;
+          border-radius: 8px;
+          padding: 18px;
           margin-bottom: 18px;
           font-size: 12.5px;
-          line-height: 1.5;
+          line-height: 1.55;
         }
 
         .modal-block-header {
@@ -717,8 +785,8 @@ export default function CustomerOrdersPage() {
           font-weight: 600;
           color: #8B6914;
           text-transform: uppercase;
-          letter-spacing: 0.08em;
-          margin-bottom: 6px;
+          letter-spacing: 0.12em;
+          margin-bottom: 8px;
         }
 
         .modal-actions {
@@ -729,35 +797,39 @@ export default function CustomerOrdersPage() {
 
         .modal-btn {
           flex: 1;
-          padding: 12px;
+          padding: 13px 20px;
           font-family: 'Jost', sans-serif;
-          font-size: 12.5px;
+          font-size: 12px;
           font-weight: 600;
+          letter-spacing: 0.14em;
           text-transform: uppercase;
-          border-radius: 20px;
+          border-radius: 4px;
           cursor: pointer;
-          transition: all 0.2s;
+          transition: all 0.25s ease;
           text-align: center;
         }
 
         .modal-btn.cancel {
-          border: 1px solid rgba(26, 18, 9, 0.15);
-          background: #ffffff;
-          color: #1a1209;
+          border: 1px solid rgba(20, 20, 20, 0.15);
+          background: #FFFFFF;
+          color: #141414;
         }
 
         .modal-btn.cancel:hover:not(:disabled) {
-          background-color: rgba(26, 18, 9, 0.04);
+          background-color: #FAF8F4;
+          border-color: rgba(139, 105, 20, 0.35);
         }
 
         .modal-btn.confirm {
           border: none;
-          background-color: #8B6914;
-          color: #ffffff;
+          background: linear-gradient(135deg, #c62828 0%, #a51d1d 100%);
+          color: #FFFFFF;
+          box-shadow: 0 4px 14px rgba(198, 40, 40, 0.2);
         }
 
         .modal-btn.confirm:hover:not(:disabled) {
-          background-color: #1a1209;
+          background: linear-gradient(135deg, #a51d1d 0%, #871616 100%);
+          box-shadow: 0 6px 18px rgba(198, 40, 40, 0.28);
         }
         
         .modal-btn:disabled {
@@ -772,47 +844,90 @@ export default function CustomerOrdersPage() {
           align-items: center;
           justify-content: center;
           text-align: center;
-          background: #ffffff;
-          border-radius: 8px;
-          border: 1px solid rgba(26, 18, 9, 0.08);
-          padding: 80px 24px;
-          box-shadow: 0 4px 24px rgba(0, 0, 0, 0.01);
+          background: #FFFFFF;
+          border-radius: 14px;
+          border: 1px solid rgba(20, 20, 20, 0.08);
+          border-top: 2.5px solid #8B6914;
+          padding: 72px 28px;
+          box-shadow: 0 12px 36px rgba(20, 16, 10, 0.035);
         }
 
-        .empty-orders-icon {
+        .empty-orders-medallion {
+          width: 68px;
+          height: 68px;
+          border-radius: 50%;
+          background: #FAF8F4;
+          border: 1px solid rgba(139, 105, 20, 0.22);
           display: flex;
           align-items: center;
           justify-content: center;
-          color: rgba(26, 18, 9, 0.15);
-          margin: 0 auto 20px auto;
-          width: 100%;
-        }
-
-        .empty-orders-icon svg {
-          display: block;
-          margin: 0 auto;
+          color: #8B6914;
+          margin: 0 auto 22px;
         }
 
         .empty-orders-btn {
           display: inline-flex;
-          background-color: #1a1209;
-          color: #faf7f0;
+          align-items: center;
+          justify-content: center;
+          background: linear-gradient(135deg, #9C7A3C 0%, #8B6914 100%);
+          color: #FFFFFF;
           border: none;
-          border-radius: 30px;
-          padding: 12px 36px;
+          border-radius: 4px;
+          padding: 14px 36px;
           font-family: 'Jost', sans-serif;
-          font-size: 13px;
+          font-size: 12px;
           font-weight: 600;
-          letter-spacing: 0.08em;
+          letter-spacing: 0.16em;
           text-transform: uppercase;
           cursor: pointer;
           text-decoration: none;
-          transition: all 0.25s;
+          transition: all 0.25s ease;
+          box-shadow: 0 6px 20px rgba(139, 105, 20, 0.18);
         }
 
         .empty-orders-btn:hover {
-          background-color: #8B6914;
-          box-shadow: 0 4px 14px rgba(139,105,20,0.25);
+          background: linear-gradient(135deg, #7A5C10 0%, #684E0D 100%);
+          box-shadow: 0 8px 24px rgba(139, 105, 20, 0.28);
+          transform: translateY(-1px);
+        }
+
+        .empty-collections-row {
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: center;
+          gap: 10px;
+          margin-top: 28px;
+          padding-top: 24px;
+          border-top: 1px solid rgba(20, 20, 20, 0.06);
+          width: 100%;
+          max-width: 480px;
+        }
+
+        .empty-collection-pill {
+          font-size: 11px;
+          font-weight: 600;
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
+          color: rgba(20, 20, 20, 0.65);
+          background: #FCFBF9;
+          border: 1px solid rgba(20, 20, 20, 0.08);
+          border-radius: 4px;
+          padding: 7px 14px;
+          text-decoration: none;
+          transition: all 0.2s ease;
+        }
+
+        .empty-collection-pill:hover {
+          color: #8B6914;
+          border-color: rgba(139, 105, 20, 0.35);
+          background: #FAF8F4;
+        }
+
+        /* RESPONSIVE BREAKPOINTS (ordered largest -> smallest) */
+        @media (max-width: 1024px) {
+          .orders-container {
+            padding: 120px 20px 80px;
+          }
         }
 
         @media (max-width: 768px) {
@@ -822,42 +937,96 @@ export default function CustomerOrdersPage() {
             gap: 16px;
           }
 
+          .orders-filter-container {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 14px;
+          }
+
+          .orders-search-box {
+            max-width: 100%;
+          }
+
           .order-card-header {
-            padding: 16px;
+            padding: 18px 20px;
           }
 
           .order-meta {
-            gap: 16px;
+            gap: 16px 24px;
           }
 
           .order-card-body {
-            padding: 16px;
+            padding: 18px 20px;
           }
 
           .order-item-row {
-            grid-template-columns: 64px 1fr;
+            grid-template-columns: 68px 1fr;
             gap: 14px;
-            padding: 14px 0;
+            padding: 16px 0;
           }
 
           .order-item-img {
-            width: 64px;
-            height: 64px;
+            width: 68px;
+            height: 68px;
           }
 
           .order-item-total {
             grid-column: 2;
             text-align: left;
             margin-top: 6px;
-            border-top: 1px dashed rgba(26,18,9,0.06);
-            padding-top: 6px;
+            border-top: 1px solid rgba(20, 20, 20, 0.06);
+            padding-top: 8px;
           }
 
           .order-shipping-section {
-            padding: 14px 16px;
+            padding: 18px 20px;
             flex-direction: column;
             align-items: flex-start;
-            gap: 14px;
+            gap: 16px;
+          }
+
+          .text-right-mobile-left,
+          .text-right-mobile-left .shipping-info-title {
+            text-align: left !important;
+            justify-content: flex-start !important;
+          }
+        }
+
+        @media (max-width: 640px) {
+          .orders-container {
+            padding: 96px 14px 64px;
+          }
+
+          .orders-title {
+            font-size: 34px;
+          }
+
+          .orders-filter-pill {
+            padding: 7px 12px;
+            font-size: 11px;
+          }
+
+          .order-customer-actions {
+            flex-direction: column;
+            align-items: stretch;
+            padding: 16px 20px;
+            gap: 10px;
+          }
+
+          .order-track-action-btn,
+          .orders-cancel-btn {
+            justify-content: center;
+            width: 100%;
+            box-sizing: border-box;
+            text-align: center;
+          }
+
+          .empty-orders-view {
+            padding: 52px 20px;
+          }
+
+          .modal-box {
+            padding: 28px 20px;
           }
         }
       `}</style>
@@ -866,9 +1035,9 @@ export default function CustomerOrdersPage() {
       {showCancelModal && selectedOrderForCancel && (
         <div className="modal-overlay" onClick={() => setShowCancelModal(false)}>
           <div className="modal-box" onClick={e => e.stopPropagation()} style={{ maxWidth: '550px' }}>
-            <h3 className="modal-title" style={{ color: '#c62828' }}>Cancel Order Request</h3>
+            <h3 className="modal-title" style={{ color: '#b71c1c' }}>Cancel Order Request</h3>
             <p className="modal-subtitle">
-              Order Ref: <strong style={{ color: '#1a1209', fontFamily: 'monospace' }}>{selectedOrderForCancel.orderRef}</strong>
+              Order Ref: <strong style={{ color: '#141414', fontFamily: 'monospace' }}>{selectedOrderForCancel.orderRef}</strong>
             </p>
 
             <div className="modal-block">
@@ -879,12 +1048,12 @@ export default function CustomerOrdersPage() {
                 style={{
                   width: '100%',
                   padding: '10px 12px',
-                  borderRadius: '6px',
-                  border: '1px solid rgba(26, 18, 9, 0.15)',
+                  borderRadius: '4px',
+                  border: '1px solid rgba(20, 20, 20, 0.14)',
                   background: '#ffffff',
                   fontFamily: "'Jost', sans-serif",
                   fontSize: '13.5px',
-                  color: '#1a1209',
+                  color: '#141414',
                   marginBottom: '12px',
                   outline: 'none',
                 }}
@@ -906,12 +1075,12 @@ export default function CustomerOrdersPage() {
                   style={{
                     width: '100%',
                     padding: '10px 12px',
-                    borderRadius: '6px',
-                    border: '1px solid rgba(26, 18, 9, 0.15)',
+                    borderRadius: '4px',
+                    border: '1px solid rgba(20, 20, 20, 0.14)',
                     background: '#ffffff',
                     fontFamily: "'Jost', sans-serif",
                     fontSize: '13px',
-                    color: '#1a1209',
+                    color: '#141414',
                     outline: 'none',
                     resize: 'none',
                   }}
@@ -919,12 +1088,12 @@ export default function CustomerOrdersPage() {
               )}
             </div>
 
-            <div className="modal-block" style={{ fontSize: '12px', color: 'rgba(26, 18, 9, 0.7)' }}>
-              <div className="modal-block-header" style={{ color: '#c62828' }}>Cancellation Terms & Conditions</div>
+            <div className="modal-block" style={{ fontSize: '12px', color: 'rgba(20, 20, 20, 0.72)' }}>
+              <div className="modal-block-header" style={{ color: '#b71c1c' }}>Cancellation Terms & Conditions</div>
               <ul style={{ margin: 0, paddingLeft: '20px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
                 <li>Cancellation requests are subject to approval by the store administrator.</li>
                 <li>If the order has already been shipped or processed, the request might be rejected.</li>
-                <li>Once approved by the admin, a full refund will be processed back to your original payment source within **24 hours**.</li>
+                <li>Once approved by the admin, a full refund will be processed back to your original payment source within <strong>24 hours</strong>.</li>
                 <li>Reserved timepiece variant stock quantities will be restored automatically upon approval.</li>
               </ul>
             </div>
@@ -942,7 +1111,7 @@ export default function CustomerOrdersPage() {
                   cursor: 'pointer',
                 }}
               />
-              <label htmlFor="agree-terms" style={{ fontSize: '13px', color: '#1a1209', cursor: 'pointer', fontWeight: 500 }}>
+              <label htmlFor="agree-terms" style={{ fontSize: '13px', color: '#141414', cursor: 'pointer', fontWeight: 500 }}>
                 I agree to the cancellation terms and conditions
               </label>
             </div>
@@ -959,10 +1128,6 @@ export default function CustomerOrdersPage() {
                 className="modal-btn confirm" 
                 onClick={handleConfirmCancel}
                 disabled={submittingCancel || !agreedToTerms || (cancelReason === 'Other' && !customCancelReason.trim())}
-                style={{
-                  backgroundColor: '#c62828',
-                  color: '#ffffff',
-                }}
               >
                 {submittingCancel ? 'Submitting...' : 'Confirm Request'}
               </button>
@@ -976,6 +1141,10 @@ export default function CustomerOrdersPage() {
           
           <div className="orders-header">
             <div>
+              <div className="orders-eyebrow">
+                <span className="orders-eyebrow-rule" />
+                <span>Winsor Client Atelier</span>
+              </div>
               <h1 className="orders-title">Timepiece Orders</h1>
               <p className="orders-subtitle">Track your handcrafted timepiece dispatch and delivery status.</p>
             </div>
@@ -1043,31 +1212,45 @@ export default function CustomerOrdersPage() {
 
           {orders.length === 0 ? (
             <div className="empty-orders-view">
-              <div className="empty-orders-icon" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', marginBottom: '20px' }}>
-                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'block', margin: '0 auto' }}>
-                  <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+              <div className="empty-orders-medallion">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.35" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="9" />
+                  <polyline points="12 7 12 12 15.5 14" />
                 </svg>
               </div>
-              <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '26px', color: '#1a1209', margin: '0 0 10px', fontWeight: 500 }}>No Orders Found</h2>
-              <p style={{ color: 'rgba(26,18,9,0.45)', fontSize: '13.5px', margin: '0 0 28px' }}>
-                You have not placed any timepiece orders yet. Browse our boutique collections.
+              <div style={{ fontSize: '10.5px', fontWeight: 600, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#8B6914', marginBottom: '8px' }}>
+                Order Ledger
+              </div>
+              <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '30px', color: '#141414', margin: '0 0 10px', fontWeight: 500 }}>No Orders Found</h2>
+              <p style={{ color: 'rgba(20,20,20,0.56)', fontSize: '14px', margin: '0 auto 28px', maxWidth: '380px', lineHeight: 1.6 }}>
+                You have not placed any timepiece orders yet. Explore our latest wristpieces crafted for everyday elegance.
               </p>
               <Link href="/collections" className="empty-orders-btn">
                 Discover Timepieces
               </Link>
+              <div className="empty-collections-row">
+                <Link href="/collections?category=Gents" className="empty-collection-pill">Gents</Link>
+                <Link href="/collections?category=Ladies" className="empty-collection-pill">Ladies</Link>
+                <Link href="/collections?category=Sports" className="empty-collection-pill">Sports</Link>
+                <Link href="/collections?category=Limited" className="empty-collection-pill">Limited</Link>
+                <Link href="/orders/track" className="empty-collection-pill">Track by Reference</Link>
+              </div>
             </div>
           ) : filteredOrders.length === 0 ? (
             <div className="empty-orders-view">
-              <div className="empty-orders-icon" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', marginBottom: '20px' }}>
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'block', margin: '0 auto' }}>
+              <div className="empty-orders-medallion">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                   <circle cx="11" cy="11" r="8" />
                   <line x1="21" y1="21" x2="16.65" y2="16.65" />
                 </svg>
               </div>
-              <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '24px', color: '#1a1209', margin: '0 0 8px', fontWeight: 500 }}>
+              <div style={{ fontSize: '10.5px', fontWeight: 600, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#8B6914', marginBottom: '8px' }}>
+                Filter Results
+              </div>
+              <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '28px', color: '#141414', margin: '0 0 8px', fontWeight: 500 }}>
                 No {orderFilter !== 'all' ? `${orderFilter.toUpperCase()} ` : ''}Orders Found
               </h2>
-              <p style={{ color: 'rgba(26,18,9,0.5)', fontSize: '13.5px', margin: '0 0 24px', maxWidth: '420px', marginLeft: 'auto', marginRight: 'auto', lineHeight: 1.5 }}>
+              <p style={{ color: 'rgba(20,20,20,0.56)', fontSize: '14px', margin: '0 auto 26px', maxWidth: '420px', lineHeight: 1.6 }}>
                 {searchQuery
                   ? `No timepiece orders matched "${searchQuery}". Clear your search query or choose another filter.`
                   : `You currently have no orders in "${orderFilter}" status.`}
@@ -1146,7 +1329,7 @@ export default function CustomerOrdersPage() {
                               style={{ objectFit: 'contain' }}
                             />
                           ) : (
-                            <div style={{ width: '100%', height: '100%', background: 'rgba(26,18,9,0.04)' }} />
+                            <div style={{ width: '100%', height: '100%', background: '#FAF8F4' }} />
                           )}
                         </div>
                         
@@ -1156,7 +1339,7 @@ export default function CustomerOrdersPage() {
                             <span>Model: {item.productModelNo}</span>
                             {item.colorVariant && (
                               <>
-                                <span style={{ width: '4px', height: '4px', borderRadius: '50%', background: 'rgba(26,18,9,0.2)' }} />
+                                <span style={{ width: '4px', height: '4px', borderRadius: '50%', background: 'rgba(20,20,20,0.2)' }} />
                                 <span style={{ color: '#8B6914', fontWeight: 600 }}>Edition: {item.colorVariant}</span>
                               </>
                             )}
@@ -1180,7 +1363,7 @@ export default function CustomerOrdersPage() {
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
                         Secured Dispatch Address
                       </div>
-                      <div style={{ color: '#1a1209', fontWeight: 500 }}>
+                      <div style={{ color: '#141414', fontWeight: 500 }}>
                         {formatAddress(order.shippingAddress)}
                       </div>
                     </div>
@@ -1190,14 +1373,14 @@ export default function CustomerOrdersPage() {
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
                         Dispatch Phone Contact
                       </div>
-                      <div style={{ color: '#1a1209', fontWeight: 600, fontFamily: 'monospace' }}>
+                      <div style={{ color: '#141414', fontWeight: 600, fontFamily: 'monospace' }}>
                         {order.shippingAddress?.mobileCode || '+94'} {order.shippingAddress?.mobile || ''}
                       </div>
                     </div>
                   </div>
 
                   {/* CUSTOMER ACTIONS ROW */}
-                  <div className="order-customer-actions" style={{ padding: '16px 24px', borderTop: '1px solid rgba(184, 142, 60, 0.12)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px', background: 'rgba(184, 142, 60, 0.02)' }}>
+                  <div className="order-customer-actions">
                     <Link
                       href={`/orders/track?ref=${encodeURIComponent(order.orderRef)}${order.shippingAddress?.mobile ? `&mobile=${encodeURIComponent(order.shippingAddress.mobile)}` : ''}`}
                       className="order-track-action-btn"
@@ -1218,10 +1401,10 @@ export default function CustomerOrdersPage() {
 
                       {order.status === 'cancel_requested' && (
                         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                          <span style={{ fontSize: '12px', color: 'rgba(26, 18, 9, 0.55)', fontStyle: 'italic' }}>
+                          <span style={{ fontSize: '12px', color: 'rgba(20, 20, 20, 0.56)', fontStyle: 'italic' }}>
                             Reason: {order.cancelReason || 'Not provided'}
                           </span>
-                          <span style={{ fontSize: '11px', color: '#8B6914', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                          <span style={{ fontSize: '11px', color: '#8B6914', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                             Awaiting Admin Approval
                           </span>
                         </div>

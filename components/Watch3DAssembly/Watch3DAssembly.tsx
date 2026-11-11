@@ -21,6 +21,7 @@ export default function Watch3DAssembly() {
     link: string;
     image?: string;
     isVideo?: boolean;
+    bgImage?: string;
   }
 
   const slides: SlideData[] = [
@@ -32,7 +33,8 @@ export default function Watch3DAssembly() {
       description: "Timeless design. Precision engineering. Made for generations.",
       cta: "EXPLORE COLLECTION",
       link: "#collections",
-      image: "/winsor_hero_backgroundremoved.webp"
+      image: "/winsor_hero_backgroundremoved.webp",
+      bgImage: "/hero_silk_pearl.jpg"
     },
     {
       preTitle: "THE HERITAGE SERIES",
@@ -42,7 +44,8 @@ export default function Watch3DAssembly() {
       description: "Engineered for durability, accuracy, and modern performance.",
       cta: "VIEW HERITAGE",
       link: "#collections",
-      image: "/winsor_hero_backgroundremoved_sport.webp"
+      image: "/winsor_hero_backgroundremoved_sport.webp",
+      bgImage: "/hero_silk_greige.jpg"
     },
     {
       preTitle: "THE MASTER COLLECTION",
@@ -109,9 +112,9 @@ export default function Watch3DAssembly() {
       className="relative w-full overflow-clip"
       style={{
         height: isMobile ? '380px' : '100vh',
-        backgroundColor: isDarkSlide ? '#050302' : '#F8F7F4',
+        backgroundColor: isDarkSlide ? '#050302' : '#FFFFFF',
         transition: 'background-color 0.8s cubic-bezier(0.25, 1, 0.5, 1)',
-        borderBottom: `1px solid ${isDarkSlide ? 'rgba(201, 161, 74, 0.2)' : 'rgba(20, 20, 20, 0.08)'}`
+        borderBottom: `1px solid ${isDarkSlide ? 'rgba(201, 161, 74, 0.2)' : 'transparent'}`
       }}
     >
       {/* BACKGROUND GRAPHICS */}
@@ -143,7 +146,7 @@ export default function Watch3DAssembly() {
         />
       )}
 
-      {/* Slide 1 & 2 Studio & Subtle Architectural Backdrop (Light Mode Backdrop) */}
+      {/* Slide 1 & 2 Luxury Fabric Backdrops (Light Mode Backdrop) */}
       <div
         className="absolute inset-0 pointer-events-none overflow-hidden"
         style={{
@@ -153,37 +156,84 @@ export default function Watch3DAssembly() {
           zIndex: 1
         }}
       >
-        {/* Subtle Architectural Marble Texture */}
-        <Image
-          src="/hero_bg_marble.jpg"
-          alt="Winsor Studio Backdrop"
-          fill
-          priority
-          sizes="100vw"
-          className="object-cover object-center"
-          style={{ opacity: 0.35, filter: 'saturate(0.35) brightness(1.06)' }}
-        />
-
-        {/* Soft Studio Light Veil */}
+        {/* Slide 0: Ivory & Champagne Silk Fabric Backdrop for Classic Diver */}
         <div
-          className="absolute inset-0"
+          className="absolute inset-0 transition-opacity duration-1000 ease-in-out"
+          style={{
+            opacity: activeSlide === 0 ? 1 : 0,
+            visibility: activeSlide === 0 ? 'visible' : 'hidden',
+          }}
+        >
+          <Image
+            src="/hero_silk_pearl.jpg"
+            alt="Winsor Classic Luxury Silk Backdrop"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover object-right md:object-center"
+            style={{
+              filter: 'none',
+            }}
+          />
+        </div>
+
+        {/* Slide 1: Sculptural Silver Platinum Liquid Silk & Technical Fabric Backdrop for Sport Watch */}
+        <div
+          className="absolute inset-0 transition-opacity duration-1000 ease-in-out"
+          style={{
+            opacity: activeSlide === 1 ? 1 : 0,
+            visibility: activeSlide === 1 ? 'visible' : 'hidden',
+          }}
+        >
+          <Image
+            src="/hero_silk_greige.jpg"
+            alt="Winsor Sport Platinum Silk Backdrop"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover object-right md:object-center"
+            style={{
+              filter: 'none',
+            }}
+          />
+        </div>
+
+        {/* Soft warm studio glow behind the watch */}
+        <div
+          className="absolute inset-0 pointer-events-none"
           style={{
             background: isMobile
-              ? 'radial-gradient(circle at 75% 45%, rgba(255,255,255,0.92) 0%, rgba(248,247,244,0.65) 100%)'
-              : 'radial-gradient(circle at 68% 50%, rgba(255,255,255,0.92) 0%, rgba(248,247,244,0.6) 100%)'
+              ? 'radial-gradient(ellipse 60% 55% at 78% 48%, rgba(255,252,246,0.75) 0%, rgba(255,252,246,0) 70%)'
+              : 'radial-gradient(ellipse 34% 48% at 70% 50%, rgba(255,252,246,0.8) 0%, rgba(255,252,246,0) 72%)',
+          }}
+        />
+
+        {/* Seamless fade into the white page: top (under navbar) and bottom (into collection cards) */}
+        <div
+          className="absolute inset-x-0 top-0 pointer-events-none"
+          style={{
+            height: isMobile ? '70px' : '140px',
+            background: 'linear-gradient(to bottom, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0) 100%)',
+          }}
+        />
+        <div
+          className="absolute inset-x-0 bottom-0 pointer-events-none"
+          style={{
+            height: isMobile ? '110px' : '34%',
+            background: 'linear-gradient(to top, #FFFFFF 0%, rgba(255,255,255,0.85) 28%, rgba(255,255,255,0) 100%)',
           }}
         />
 
         {/* Restrained Architectural Dial Circles */}
         <svg
-          className="absolute inset-0 w-full h-full"
+          className="absolute inset-0 w-full h-full pointer-events-none"
           viewBox="0 0 1440 900"
           preserveAspectRatio="xMidYMid slice"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
         >
-          <circle cx="1050" cy="430" r="260" stroke="rgba(20, 20, 20, 0.045)" strokeWidth="1" />
-          <circle cx="1050" cy="430" r="360" stroke="rgba(20, 20, 20, 0.03)" strokeWidth="1" />
+          <circle cx="1050" cy="430" r="260" stroke="rgba(20, 20, 20, 0.035)" strokeWidth="1" />
+          <circle cx="1050" cy="430" r="360" stroke="rgba(20, 20, 20, 0.02)" strokeWidth="1" />
         </svg>
       </div>
 

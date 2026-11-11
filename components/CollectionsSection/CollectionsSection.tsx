@@ -86,20 +86,22 @@ function SkeletonCard() {
   return (
     <div style={{
       minWidth: '220px',
-      maxWidth: '220px',
+      maxWidth: '290px',
+      width: '290px',
       flexShrink: 0,
       display: 'flex',
       flexDirection: 'column',
       gap: '16px',
-      background: '#faf7f0',
-      padding: '24px 16px',
-      border: '1px solid rgba(26, 18, 9, 0.06)',
+      background: '#FFFFFF',
+      borderRadius: '10px',
+      padding: '20px',
+      border: '1px solid rgba(20, 20, 20, 0.08)',
       boxSizing: 'border-box',
     }}>
-      <div style={{ aspectRatio: '4/5', background: 'rgba(26,18,9,0.04)', borderRadius: '0', animation: 'wn-pulse 1.5s ease-in-out infinite' }} />
-      <div style={{ height: '14px', width: '60%', background: 'rgba(26,18,9,0.04)', animation: 'wn-pulse 1.5s ease-in-out infinite' }} />
-      <div style={{ height: '12px', width: '80%', background: 'rgba(26,18,9,0.04)', animation: 'wn-pulse 1.5s ease-in-out infinite' }} />
-      <div style={{ height: '14px', width: '30%', background: 'rgba(26,18,9,0.04)', animation: 'wn-pulse 1.5s ease-in-out infinite' }} />
+      <div style={{ aspectRatio: '4/4.2', background: 'rgba(20,20,20,0.04)', borderRadius: '6px', animation: 'wn-pulse 1.5s ease-in-out infinite' }} />
+      <div style={{ height: '13px', width: '62%', background: 'rgba(20,20,20,0.045)', borderRadius: '3px', animation: 'wn-pulse 1.5s ease-in-out infinite' }} />
+      <div style={{ height: '11px', width: '82%', background: 'rgba(20,20,20,0.035)', borderRadius: '3px', animation: 'wn-pulse 1.5s ease-in-out infinite' }} />
+      <div style={{ height: '14px', width: '34%', background: 'rgba(139,105,20,0.08)', borderRadius: '3px', animation: 'wn-pulse 1.5s ease-in-out infinite' }} />
     </div>
   );
 }
@@ -123,33 +125,35 @@ function CardImage({ src, alt, cardHovered, priority, isMobile }: { src: string,
     }
   }, [src, img1, img2, showImg2]);
 
-  const padSize = isMobile ? '12px' : '20px';
+  const padSize = isMobile ? '14px' : '22px';
 
   return (
-    <div style={{ position: 'absolute', inset: 0 }}>
+    <div style={{ position: 'absolute', inset: 0, background: '#FFFFFF' }}>
       {/* Image Layer 1 */}
       <div
         style={{
           position: 'absolute',
           inset: 0,
           opacity: showImg2 ? 0 : 1,
-          transition: 'opacity 0.6s ease-in-out',
+          transition: 'opacity 0.55s ease-in-out',
           zIndex: showImg2 ? 1 : 2,
+          padding: padSize,
         }}
       >
-        <Image
-          src={img1}
-          alt={alt}
-          fill
-          sizes="(max-width: 768px) 220px, 290px"
-          style={{
-            objectFit: 'contain',
-            transform: cardHovered ? 'scale(1.05)' : 'scale(1)',
-            transition: 'transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-            padding: padSize,
-          }}
-          priority={priority}
-        />
+        <div style={{ position: 'relative', width: '100%', height: '100%', borderRadius: '6px', overflow: 'hidden' }}>
+          <Image
+            src={img1}
+            alt={alt}
+            fill
+            sizes="(max-width: 768px) 220px, 290px"
+            style={{
+              objectFit: 'contain',
+              transform: cardHovered ? 'scale(1.05)' : 'scale(1)',
+              transition: 'transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+            }}
+            priority={priority}
+          />
+        </div>
       </div>
       {/* Image Layer 2 */}
       <div
@@ -157,23 +161,25 @@ function CardImage({ src, alt, cardHovered, priority, isMobile }: { src: string,
           position: 'absolute',
           inset: 0,
           opacity: showImg2 ? 1 : 0,
-          transition: 'opacity 0.6s ease-in-out',
+          transition: 'opacity 0.55s ease-in-out',
           zIndex: showImg2 ? 2 : 1,
+          padding: padSize,
         }}
       >
-        <Image
-          src={img2 || src}
-          alt={alt}
-          fill
-          sizes="(max-width: 768px) 220px, 290px"
-          style={{
-            objectFit: 'contain',
-            transform: cardHovered ? 'scale(1.05)' : 'scale(1)',
-            transition: 'transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-            padding: padSize,
-          }}
-          priority={false}
-        />
+        <div style={{ position: 'relative', width: '100%', height: '100%', borderRadius: '6px', overflow: 'hidden' }}>
+          <Image
+            src={img2 || src}
+            alt={alt}
+            fill
+            sizes="(max-width: 768px) 220px, 290px"
+            style={{
+              objectFit: 'contain',
+              transform: cardHovered ? 'scale(1.05)' : 'scale(1)',
+              transition: 'transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+            }}
+            priority={false}
+          />
+        </div>
       </div>
     </div>
   );
@@ -321,39 +327,58 @@ function WatchCard({ product, index }: { product: WatchProduct; index: number })
 
   const formattedSpecs = useMemo(() => formatWatchSpecs(product), [product]);
 
-  const cardWidth = isMobile ? '220px' : '290px';
+  const cardWidth = isMobile ? '224px' : '290px';
 
   return (
     <div
       style={{
+        position: 'relative',
         display: 'flex',
         flexDirection: 'column',
         width: cardWidth,
         minWidth: cardWidth,
         maxWidth: cardWidth,
         flexShrink: 0,
-        borderRadius: '8px',
+        borderRadius: '10px',
         overflow: 'hidden',
-        animationDelay: `${index * 80}ms`,
-        background: '#ffffff',
+        animationDelay: `${Math.min(index * 45, 180)}ms`,
+        background: '#FFFFFF',
         transition: 'transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.35s ease, border-color 0.35s ease',
         transform: (!isMobile && cardHovered) ? 'translateY(-4px)' : 'none',
-        boxShadow: (!isMobile && cardHovered) ? '0 14px 30px rgba(0, 0, 0, 0.06)' : '0 2px 8px rgba(0, 0, 0, 0.02)',
+        boxShadow: (!isMobile && cardHovered)
+          ? '0 18px 40px rgba(20, 16, 10, 0.08)'
+          : '0 4px 16px rgba(20, 16, 10, 0.025)',
         border: '1px solid',
-        borderColor: (!isMobile && cardHovered) ? 'rgba(20, 20, 20, 0.22)' : 'rgba(20, 20, 20, 0.08)',
+        borderColor: (!isMobile && cardHovered) ? 'rgba(139, 105, 20, 0.42)' : 'rgba(20, 20, 20, 0.08)',
         boxSizing: 'border-box',
       }}
       className="wn-card-fade"
       onMouseEnter={() => setCardHovered(true)}
       onMouseLeave={() => setCardHovered(false)}
     >
-      {/* Upper Image Container */}
+      {/* Subtle Top Signature Gold Hairline Accent on Hover */}
+      <div style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        height: '2px',
+        background: 'linear-gradient(90deg, #9C7A3C 0%, #8B6914 100%)',
+        opacity: (!isMobile && cardHovered) ? 1 : 0,
+        transition: 'opacity 0.3s ease',
+        zIndex: 5,
+        pointerEvents: 'none',
+      }} />
+
+      {/* Upper Image Stage (Pure White Seamless Showcase) */}
       <div
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
         style={{
           position: 'relative',
           width: '100%',
-          height: isMobile ? '200px' : '270px',
-          background: '#F6F5F2',
+          height: isMobile ? '210px' : '276px',
+          background: '#FFFFFF',
           overflow: 'hidden',
           display: 'flex',
           alignItems: 'center',
@@ -383,18 +408,18 @@ function WatchCard({ product, index }: { product: WatchProduct; index: number })
             width: '32px',
             height: '32px',
             borderRadius: '50%',
-            background: isFav ? '#141414' : 'rgba(255,255,255,0.92)',
-            border: '1px solid rgba(20,20,20,0.08)',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+            background: isFav ? '#8B6914' : 'rgba(255, 255, 255, 0.96)',
+            border: isFav ? '1px solid #8B6914' : '1px solid rgba(20, 20, 20, 0.09)',
+            boxShadow: isFav ? '0 4px 12px rgba(139, 105, 20, 0.25)' : '0 2px 8px rgba(0, 0, 0, 0.04)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             cursor: 'pointer',
             zIndex: 4,
-            color: isFav ? '#ffffff' : '#141414',
+            color: isFav ? '#FFFFFF' : '#141414',
             transition: 'all 0.25s ease',
           }}
-          className="wn-wishlist-btn"
+          className={`wn-wishlist-btn${isFav ? ' is-fav' : ''}`}
           aria-label="Toggle Wishlist"
         >
           <svg width="13" height="13" viewBox="0 0 24 24" fill={isFav ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.8">
@@ -408,16 +433,17 @@ function WatchCard({ product, index }: { product: WatchProduct; index: number })
             position: 'absolute',
             top: '12px',
             left: '12px',
-            background: '#141414',
-            color: '#ffffff',
+            background: 'linear-gradient(135deg, #9C7A3C 0%, #8B6914 100%)',
+            color: '#FFFFFF',
             fontFamily: "'Jost', sans-serif",
             fontSize: '9px',
             fontWeight: 600,
-            letterSpacing: '0.12em',
-            padding: '4px 9px',
+            letterSpacing: '0.14em',
+            padding: '4px 10px',
             textTransform: 'uppercase',
             zIndex: 2,
-            borderRadius: '2px',
+            borderRadius: '3px',
+            boxShadow: '0 2px 8px rgba(139, 105, 20, 0.2)',
           }}>
             {product.stickerText}
           </div>
@@ -431,9 +457,9 @@ function WatchCard({ product, index }: { product: WatchProduct; index: number })
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-            padding: '0 12px',
+            padding: '0 10px',
             opacity: cardHovered ? 1 : 0,
-            transition: 'opacity 0.3s ease',
+            transition: 'opacity 0.25s ease',
             zIndex: 3,
             pointerEvents: 'none',
           }}>
@@ -444,9 +470,12 @@ function WatchCard({ product, index }: { product: WatchProduct; index: number })
                 prevImage();
               }}
               style={miniArrowStyle}
+              className="wn-mini-arrow"
               aria-label="Previous watch view"
             >
-              ‹
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="15 18 9 12 15 6" />
+              </svg>
             </button>
             <button
               onClick={(e) => {
@@ -455,90 +484,104 @@ function WatchCard({ product, index }: { product: WatchProduct; index: number })
                 nextImage();
               }}
               style={miniArrowStyle}
+              className="wn-mini-arrow"
               aria-label="Next watch view"
             >
-              ›
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="9 18 15 12 9 6" />
+              </svg>
             </button>
+          </div>
+        )}
+
+        {/* Thumbnails Swatch Bar (Desktop ONLY, floats cleanly inside white stage bottom without layout shift) */}
+        {allImages.length > 1 && !isMobile && (
+          <div style={{
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            display: 'flex',
+            gap: '6px',
+            padding: '8px 14px',
+            justifyContent: 'center',
+            overflowX: 'auto',
+            opacity: cardHovered ? 1 : 0,
+            transform: cardHovered ? 'translateY(0)' : 'translateY(6px)',
+            transition: 'all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+            background: 'rgba(255, 255, 255, 0.94)',
+            backdropFilter: 'blur(8px)',
+            WebkitBackdropFilter: 'blur(8px)',
+            borderTop: '1px solid rgba(20, 20, 20, 0.06)',
+            zIndex: 4,
+            pointerEvents: cardHovered ? 'auto' : 'none',
+          }}>
+            {allImages.slice(0, 5).map((imgUrl, i) => {
+              const isActive = i === imgIndex;
+              return (
+                <button
+                  key={i}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setImgIndex(i);
+                  }}
+                  style={{
+                    width: '32px',
+                    height: '32px',
+                    flexShrink: 0,
+                    border: isActive ? '1.5px solid #8B6914' : '1px solid rgba(20, 20, 20, 0.1)',
+                    borderRadius: '4px',
+                    background: '#FFFFFF',
+                    padding: '2px',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    transition: 'border-color 0.2s ease',
+                  }}
+                >
+                  <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+                    <Image
+                      src={imgUrl}
+                      alt={`${product.title} view ${i + 1}`}
+                      fill
+                      sizes="32px"
+                      style={{ objectFit: 'contain' }}
+                    />
+                  </div>
+                </button>
+              );
+            })}
           </div>
         )}
       </div>
 
-      {/* Thumbnails Row (Desktop ONLY, visible on hover to avoid layout clutter) */}
-      {allImages.length > 1 && !isMobile && (
-        <div style={{
-          display: 'flex',
-          gap: '6px',
-          padding: cardHovered ? '8px 16px' : '0px 16px',
-          justifyContent: 'flex-start',
-          overflowX: 'auto',
-          opacity: cardHovered ? 1 : 0,
-          maxHeight: cardHovered ? '48px' : '0px',
-          transition: 'all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-          overflowY: 'hidden',
-          background: '#F6F5F2',
-          borderTop: cardHovered ? '1px solid rgba(20, 20, 20, 0.05)' : 'none',
-        }}>
-          {allImages.slice(0, 5).map((imgUrl, i) => {
-            const isActive = i === imgIndex;
-            return (
-              <button
-                key={i}
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  setImgIndex(i);
-                }}
-                style={{
-                  width: '32px',
-                  height: '32px',
-                  border: isActive ? '1px solid #141414' : '1px solid rgba(20, 20, 20, 0.1)',
-                  borderRadius: '4px',
-                  background: '#ffffff',
-                  padding: '2px',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  transition: 'border-color 0.2s',
-                }}
-              >
-                <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-                  <Image
-                    src={imgUrl}
-                    alt={`${product.title} view ${i + 1}`}
-                    fill
-                    sizes="32px"
-                    style={{ objectFit: 'contain' }}
-                  />
-                </div>
-              </button>
-            );
-          })}
-        </div>
-      )}
-
       {/* Bottom Content Area */}
       <Link href={`/collections/${product._id}`} style={{ textDecoration: 'none' }}>
         <div style={{
-          padding: isMobile ? '14px 14px 18px' : '18px 20px 22px',
+          padding: isMobile ? '14px 15px 18px' : '18px 22px 22px',
           display: 'flex',
           flexDirection: 'column',
           textAlign: 'left',
           boxSizing: 'border-box',
-          background: '#ffffff',
-          borderTop: '1px solid rgba(20, 20, 20, 0.05)',
+          background: '#FFFFFF',
+          borderTop: '1px solid rgba(20, 20, 20, 0.06)',
         }}>
           {/* Watch Title */}
           <h3 style={{
             fontFamily: "'Jost', sans-serif",
-            fontSize: '13px',
+            fontSize: isMobile ? '12.5px' : '13px',
             fontWeight: 600,
             color: cardHovered ? '#8B6914' : '#141414',
-            letterSpacing: '0.06em',
+            letterSpacing: '0.07em',
             textTransform: 'uppercase',
             lineHeight: '1.4',
             margin: '0 0 6px 0',
             minHeight: '36px',
+            display: '-webkit-box',
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical',
             overflow: 'hidden',
             transition: 'color 0.25s ease',
           }}>
@@ -551,29 +594,34 @@ function WatchCard({ product, index }: { product: WatchProduct; index: number })
             fontSize: '11.5px',
             fontWeight: 400,
             letterSpacing: '0.02em',
-            color: 'rgba(20, 20, 20, 0.55)',
+            color: 'rgba(20, 20, 20, 0.54)',
             margin: '0 0 12px 0',
-            lineHeight: 1.4,
-            minHeight: '32px',
+            lineHeight: 1.45,
+            minHeight: '33px',
+            display: '-webkit-box',
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical',
             overflow: 'hidden',
           }}>
             {formattedSpecs}
           </p>
 
           {/* Pricing & Rating Row */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: '10px', borderTop: '1px solid rgba(20, 20, 20, 0.05)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: '12px', borderTop: '1px solid rgba(20, 20, 20, 0.06)' }}>
             <p style={{
               fontFamily: "'Jost', sans-serif",
               fontSize: '14.5px',
               fontWeight: 600,
               color: '#141414',
               margin: 0,
+              fontVariantNumeric: 'tabular-nums',
+              letterSpacing: '0.01em',
             }}>
               {convertPrice(product.price).replace('.00', '')}
             </p>
 
-            {/* Rating Stars - Only displayed if real reviews exist */}
-            {ratingStats.count > 0 && (
+            {/* Rating Stars - Only displayed if real reviews exist; else subtle view cue */}
+            {ratingStats.count > 0 ? (
               <div style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
                 <div style={{ display: 'flex', gap: '1px' }}>
                   {Array.from({ length: 5 }).map((_, i) => (
@@ -598,6 +646,17 @@ function WatchCard({ product, index }: { product: WatchProduct; index: number })
                   ({ratingStats.count})
                 </span>
               </div>
+            ) : (
+              <span style={{
+                fontSize: '10px',
+                fontWeight: 600,
+                letterSpacing: '0.12em',
+                textTransform: 'uppercase',
+                color: cardHovered ? '#8B6914' : 'rgba(20, 20, 20, 0.36)',
+                transition: 'color 0.25s ease',
+              }}>
+                Explore →
+              </span>
             )}
           </div>
         </div>
@@ -607,17 +666,17 @@ function WatchCard({ product, index }: { product: WatchProduct; index: number })
 }
 
 const miniArrowStyle: React.CSSProperties = {
-  width: '32px',
-  height: '32px',
+  width: '30px',
+  height: '30px',
   borderRadius: '50%',
-  border: '1px solid rgba(26, 18, 9, 0.08)',
-  background: 'rgba(255, 255, 255, 0.95)',
-  color: '#1a1209',
-  fontSize: '18px',
+  border: '1px solid rgba(20, 20, 20, 0.1)',
+  background: 'rgba(255, 255, 255, 0.96)',
+  color: '#141414',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
   cursor: 'pointer',
+  boxShadow: '0 4px 12px rgba(20, 16, 10, 0.08)',
   pointerEvents: 'auto',
   transition: 'all 0.2s ease',
 };
@@ -782,6 +841,7 @@ export default function CollectionsSection() {
     }
   };
 
+  const activeSectionObj = SECTIONS.find(s => s.key === activeSection);
   const activeSectionLabel = activeSection === 'sports' ? 'SPORTS'
     : activeSection === 'luxury' ? 'CLASSIC'
       : activeSection === 'limited' ? 'LIMITED EDITION'
@@ -805,8 +865,8 @@ export default function CollectionsSection() {
         }
         .wn-card-fade {
           opacity: 0;
-          transform: translateY(24px);
-          animation: wn-card-in 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+          transform: translateY(16px);
+          animation: wn-card-in 0.38s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
         }
         @keyframes wn-card-in {
           to { opacity:1; transform:translateY(0); }
@@ -830,8 +890,8 @@ export default function CollectionsSection() {
         }
         .wn-cat-card:hover {
           background: #ffffff !important;
-          border-color: rgba(20, 20, 20, 0.25) !important;
-          box-shadow: 0 12px 28px rgba(0, 0, 0, 0.07) !important;
+          border-color: rgba(139, 105, 20, 0.45) !important;
+          box-shadow: 0 12px 28px rgba(20, 16, 10, 0.07) !important;
           transform: translateY(-4px) !important;
         }
         .wn-cat-card:hover .wn-cat-img {
@@ -839,9 +899,20 @@ export default function CollectionsSection() {
         }
         .wn-wishlist-btn:hover {
           transform: scale(1.06) !important;
-          background: #141414 !important;
+          background: #FAF8F4 !important;
+          color: #8B6914 !important;
+          border-color: rgba(139, 105, 20, 0.5) !important;
+        }
+        .wn-wishlist-btn.is-fav:hover {
+          background: #684E0D !important;
           color: #ffffff !important;
-          border-color: #141414 !important;
+          border-color: #684E0D !important;
+        }
+        .wn-mini-arrow:hover {
+          border-color: #8B6914 !important;
+          color: #8B6914 !important;
+          background: #FAF8F4 !important;
+          transform: scale(1.06);
         }
       `}</style>
 
@@ -885,14 +956,14 @@ export default function CollectionsSection() {
                     justifyContent: 'space-between',
                     background: isActive
                       ? '#ffffff'
-                      : 'rgba(255, 255, 255, 0.92)',
+                      : 'rgba(255, 255, 255, 0.96)',
                     backdropFilter: 'blur(16px)',
                     WebkitBackdropFilter: 'blur(16px)',
                     borderRadius: isMobile ? '8px' : '10px',
-                    border: isActive ? '1.5px solid #141414' : '1px solid rgba(20, 20, 20, 0.08)',
+                    border: isActive ? '1.5px solid #8B6914' : '1px solid rgba(20, 20, 20, 0.08)',
                     boxShadow: isActive
-                      ? '0 10px 28px rgba(0, 0, 0, 0.08)'
-                      : '0 4px 16px rgba(0, 0, 0, 0.04)',
+                      ? '0 12px 30px rgba(139, 105, 20, 0.12)'
+                      : '0 4px 16px rgba(20, 16, 10, 0.04)',
                     padding: isMobile ? '8px 4px 7px' : '18px 12px 14px',
                     cursor: 'pointer',
                     outline: 'none',
@@ -960,7 +1031,7 @@ export default function CollectionsSection() {
                       display: 'block',
                       fontFamily: "'Jost', sans-serif",
                       fontSize: isMobile ? '7px' : '9px',
-                      fontWeight: 500,
+                      fontWeight: 600,
                       textTransform: 'uppercase',
                       letterSpacing: '0.12em',
                       color: isActive ? '#8B6914' : 'rgba(20, 20, 20, 0.45)',
@@ -978,37 +1049,52 @@ export default function CollectionsSection() {
         {/* Section Header */}
         <div style={{
           display: 'flex',
-          alignItems: 'center',
+          alignItems: 'flex-end',
           justifyContent: 'space-between',
           padding: isMobile ? '0 16px' : '0 80px',
-          marginBottom: '24px',
+          marginBottom: '26px',
           marginTop: '24px',
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-            <h2 style={{
-              fontFamily: "'Cormorant Garamond', serif",
-              fontSize: isMobile ? '20px' : '28px',
-              fontWeight: 500,
-              textTransform: 'uppercase',
-              letterSpacing: '0.06em',
-              color: '#141414',
-              margin: 0
-            }}>
-              {activeSectionLabel}
-            </h2>
-            <div style={{ width: '36px', height: '1px', background: 'rgba(20, 20, 20, 0.2)' }} />
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+              <h2 style={{
+                fontFamily: "'Cormorant Garamond', serif",
+                fontSize: isMobile ? '22px' : '30px',
+                fontWeight: 500,
+                textTransform: 'uppercase',
+                letterSpacing: '0.06em',
+                color: '#141414',
+                margin: 0
+              }}>
+                {activeSectionLabel}
+              </h2>
+              <div style={{ width: '32px', height: '1px', background: '#8B6914', opacity: 0.7 }} />
+            </div>
+            {activeSectionObj?.sub && (
+              <p style={{
+                fontFamily: "'Jost', sans-serif",
+                fontSize: isMobile ? '12px' : '13px',
+                color: 'rgba(20, 20, 20, 0.52)',
+                margin: '4px 0 0',
+                letterSpacing: '0.015em',
+              }}>
+                {activeSectionObj.sub}
+              </p>
+            )}
           </div>
           <Link href="/collections" style={{
             fontFamily: "'Jost', sans-serif",
             fontSize: '11px',
             fontWeight: 600,
             textTransform: 'uppercase',
-            letterSpacing: '0.1em',
+            letterSpacing: '0.12em',
             color: '#141414',
             textDecoration: 'none',
             display: 'flex',
             alignItems: 'center',
             gap: '6px',
+            whiteSpace: 'nowrap',
+            paddingBottom: '4px',
           }}>
             View All <span style={{ fontSize: '12px', color: '#8B6914' }}>→</span>
           </Link>
@@ -1048,7 +1134,7 @@ export default function CollectionsSection() {
                   textAlign: 'center',
                   fontFamily: "'Jost', sans-serif",
                   fontSize: '13px',
-                  color: 'rgba(26,18,9,0.5)'
+                  color: 'rgba(20,20,20,0.52)'
                 }}>
                   No timepieces found in this collection.
                 </div>
@@ -1069,7 +1155,7 @@ export default function CollectionsSection() {
           <div style={{
             flexGrow: 1,
             height: '2px',
-            background: 'rgba(26, 18, 9, 0.08)',
+            background: 'rgba(20, 20, 20, 0.08)',
             position: 'relative',
             marginRight: '40px',
           }}>
@@ -1079,7 +1165,7 @@ export default function CollectionsSection() {
               left: `${(scrollProgress / 100) * 80}%`,
               width: '20%',
               height: '100%',
-              background: '#1a1209',
+              background: '#8B6914',
               transition: 'left 0.1s ease-out',
             }} />
           </div>
@@ -1096,12 +1182,14 @@ export default function CollectionsSection() {
                 e.currentTarget.style.color = '#ffffff';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = 'rgba(26, 18, 9, 0.12)';
+                e.currentTarget.style.borderColor = 'rgba(20, 20, 20, 0.12)';
                 e.currentTarget.style.background = '#ffffff';
-                e.currentTarget.style.color = '#1a1209';
+                e.currentTarget.style.color = '#141414';
               }}
             >
-              ‹
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="15 18 9 12 15 6" />
+              </svg>
             </button>
             <button
               onClick={() => scrollProducts('right')}
@@ -1113,12 +1201,14 @@ export default function CollectionsSection() {
                 e.currentTarget.style.color = '#ffffff';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = 'rgba(26, 18, 9, 0.12)';
+                e.currentTarget.style.borderColor = 'rgba(20, 20, 20, 0.12)';
                 e.currentTarget.style.background = '#ffffff';
-                e.currentTarget.style.color = '#1a1209';
+                e.currentTarget.style.color = '#141414';
               }}
             >
-              ›
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="9 18 15 12 9 6" />
+              </svg>
             </button>
           </div>
         </div>
