@@ -351,11 +351,12 @@ export default function CollectionsPage() {
 
   if (error) {
     return (
-      <div style={{ minHeight: '80vh', background: '#faf7f0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Jost', sans-serif" }}>
-        <div style={{ textAlign: 'center', padding: '40px' }}>
-          <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '32px', color: '#1a1209', marginBottom: '16px' }}>Connection Error</h2>
-          <p style={{ color: 'rgba(26,18,9,0.6)', marginBottom: '24px' }}>{error}</p>
-          <button onClick={() => window.location.reload()} style={{ background: '#8B6914', color: '#fff', border: 'none', padding: '12px 28px', fontFamily: "'Jost', sans-serif", fontSize: '12px', letterSpacing: '0.15em', textTransform: 'uppercase', cursor: 'pointer', transition: 'background 0.2s' }}>
+      <div style={{ minHeight: '80vh', background: '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Jost', sans-serif", paddingTop: '110px' }}>
+        <div style={{ textAlign: 'center', padding: '44px 36px', maxWidth: '440px', width: '100%', background: '#FFFFFF', border: '1px solid rgba(20,20,20,0.08)', borderTop: '2.5px solid #8B6914', borderRadius: '12px', boxShadow: '0 12px 36px rgba(20,16,10,0.04)' }}>
+          <div style={{ fontSize: '10.5px', fontWeight: 600, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#8B6914', marginBottom: '10px' }}>Winsor Boutique</div>
+          <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '32px', color: '#141414', marginBottom: '12px', fontWeight: 500 }}>Connection Error</h2>
+          <p style={{ color: 'rgba(20,20,20,0.58)', fontSize: '14px', lineHeight: 1.6, marginBottom: '26px' }}>{error}</p>
+          <button onClick={() => window.location.reload()} style={{ background: 'linear-gradient(135deg, #9C7A3C 0%, #8B6914 100%)', color: '#fff', border: 'none', borderRadius: '4px', padding: '13px 30px', fontFamily: "'Jost', sans-serif", fontSize: '12px', fontWeight: 600, letterSpacing: '0.15em', textTransform: 'uppercase', cursor: 'pointer' }}>
             Try Again
           </button>
         </div>
@@ -366,26 +367,26 @@ export default function CollectionsPage() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=Jost:wght@300;400;500;600;700&display=swap');
         
         .col-container {
           background-color: #ffffff;
           min-height: 100vh;
           font-family: 'Jost', sans-serif;
           color: #141414;
-          padding-bottom: 20px;
+          padding-bottom: 40px;
         }
 
         /* ── HERO BANNER ── */
         .collections-hero-banner {
           position: relative;
-          background: radial-gradient(circle at right, #1e1e1e 0%, #0d0d0d 100%);
+          background: radial-gradient(circle at right, #1c1a17 0%, #0c0b09 100%);
           color: #fff;
           display: flex;
           align-items: center;
           justify-content: space-between;
           overflow: hidden;
-          padding: 130px 6% 60px;
+          padding: 138px 6% 74px;
           min-height: 520px;
           margin-bottom: 0;
         }
@@ -395,37 +396,46 @@ export default function CollectionsPage() {
           z-index: 10;
         }
         .hero-banner-tag {
-          color: #8b6914;
-          font-size: 10px;
-          letter-spacing: 0.35em;
+          color: #D4AF63;
+          font-size: 10.5px;
+          letter-spacing: 0.3em;
           font-weight: 600;
           text-transform: uppercase;
           margin-bottom: 18px;
-          display: block;
+          display: inline-flex;
+          align-items: center;
+          gap: 10px;
+        }
+        .hero-banner-tag::before {
+          content: '';
+          width: 24px;
+          height: 1px;
+          background: #D4AF63;
+          display: inline-block;
         }
         .hero-banner-title {
           font-family: 'Cormorant Garamond', serif;
-          font-size: clamp(32px, 4vw, 56px);
-          line-height: 1.15;
+          font-size: clamp(34px, 4vw, 56px);
+          line-height: 1.12;
           font-weight: 400;
-          letter-spacing: 0.01em;
+          letter-spacing: -0.01em;
           margin-bottom: 20px;
           color: #fff;
-          min-height: calc(2 * 1.15em);
+          min-height: calc(2 * 1.12em);
         }
         .hero-banner-desc {
           font-family: 'Jost', sans-serif;
-          font-size: clamp(14px, 1.5vw, 16px);
+          font-size: clamp(14px, 1.4vw, 15.5px);
           font-weight: 300;
-          color: rgba(255,255,255,0.75);
-          line-height: 1.6;
+          color: rgba(255,255,255,0.8);
+          line-height: 1.65;
           margin-bottom: 36px;
           min-height: calc(2 * 1.45em);
         }
         .typewriter-line {
           display: block;
-          min-height: 1.15em;
-          line-height: 1.15;
+          min-height: 1.12em;
+          line-height: 1.12;
         }
         .typewriter-desc-line {
           display: block;
@@ -434,14 +444,15 @@ export default function CollectionsPage() {
         }
         .hero-banner-actions {
           display: flex;
-          gap: 16px;
+          gap: 14px;
           align-items: center;
+          flex-wrap: wrap;
         }
         .hero-btn-primary {
           background: linear-gradient(135deg, #9C7A3C 0%, #8B6914 100%);
           color: #ffffff;
           border: 1px solid #8B6914;
-          padding: 14px 32px;
+          padding: 14px 30px;
           font-size: 11px;
           letter-spacing: 0.16em;
           text-transform: uppercase;
@@ -449,7 +460,7 @@ export default function CollectionsPage() {
           cursor: pointer;
           transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
           border-radius: 4px;
-          box-shadow: 0 4px 16px rgba(139, 105, 20, 0.28);
+          box-shadow: 0 6px 20px rgba(139, 105, 20, 0.28);
           display: inline-flex;
           align-items: center;
           justify-content: center;
@@ -459,15 +470,15 @@ export default function CollectionsPage() {
           border-color: #B58F49;
           color: #ffffff;
           transform: translateY(-2px);
-          box-shadow: 0 8px 24px rgba(160, 124, 39, 0.45);
+          box-shadow: 0 8px 24px rgba(160, 124, 39, 0.42);
         }
         .hero-btn-secondary {
-          background: rgba(20, 20, 20, 0.5);
+          background: rgba(16, 14, 10, 0.52);
           backdrop-filter: blur(8px);
           -webkit-backdrop-filter: blur(8px);
           color: #ffffff;
-          border: 1px solid rgba(255, 255, 255, 0.35);
-          padding: 14px 30px;
+          border: 1px solid rgba(255, 255, 255, 0.34);
+          padding: 14px 28px;
           font-size: 11px;
           letter-spacing: 0.16em;
           text-transform: uppercase;
@@ -480,27 +491,27 @@ export default function CollectionsPage() {
           border-radius: 4px;
         }
         .hero-btn-secondary .play-icon {
-          color: #dfb15b;
+          color: #D4AF63;
           font-size: 10px;
           transition: transform 0.3s ease, color 0.3s ease;
         }
         .hero-btn-secondary:hover {
-          border-color: #8B6914;
-          background: rgba(139, 105, 20, 0.22);
+          border-color: #9C7A3C;
+          background: rgba(139, 105, 20, 0.24);
           color: #ffffff;
           transform: translateY(-2px);
-          box-shadow: 0 6px 20px rgba(139, 105, 20, 0.3);
+          box-shadow: 0 6px 20px rgba(139, 105, 20, 0.25);
         }
         .hero-btn-secondary:hover .play-icon {
           color: #ffffff;
-          transform: scale(1.18);
+          transform: scale(1.15);
         }
         .hero-banner-image-container {
           position: absolute;
           right: 0;
           top: 0;
           height: 100%;
-          width: 50%;
+          width: 52%;
           z-index: 1;
           overflow: hidden;
         }
@@ -526,18 +537,18 @@ export default function CollectionsPage() {
         .hero-banner-watch-bg {
           position: absolute;
           inset: 0;
-          background: linear-gradient(to right, #0a0a0a 0%, transparent 40%);
+          background: linear-gradient(to right, #0c0b09 0%, rgba(12, 11, 9, 0.65) 28%, transparent 58%);
           z-index: 2;
         }
         .hero-banner-slides {
           position: absolute;
           right: 6%;
-          bottom: 40px;
+          bottom: 46px;
           display: flex;
           align-items: center;
           gap: 12px;
           font-size: 11px;
-          color: rgba(255,255,255,0.4);
+          color: rgba(255,255,255,0.45);
           z-index: 10;
         }
         .active-slide {
@@ -546,8 +557,8 @@ export default function CollectionsPage() {
         }
         .slide-progress-line {
           width: 48px;
-          height: 1px;
-          background: rgba(255,255,255,0.15);
+          height: 1.5px;
+          background: rgba(255,255,255,0.18);
           position: relative;
         }
         .slide-progress-active {
@@ -556,42 +567,40 @@ export default function CollectionsPage() {
           top: 0;
           height: 100%;
           width: 33%;
-          background: #8b6914;
+          background: #9C7A3C;
         }
 
         /* ── INNER BODY PAGE ── */
         .collections-inner-body {
-          padding: 0 4% 80px;
+          padding: 0 4% 64px;
         }
 
         /* ── GENDER FILTER HEADER ── */
         .gender-header-row {
           display: grid;
           grid-template-columns: repeat(4, 1fr);
-          gap: 24px;
-          margin: 0 auto 40px;
+          gap: 22px;
+          margin: 0 auto 48px;
           max-width: 1400px;
           width: 100%;
         }
         .gender-header-card {
-          height: 260px;
+          height: 256px;
           position: relative;
-          border-radius: 12px;
+          border-radius: 10px;
           overflow: hidden;
           cursor: pointer;
-          transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), border-color 0.3s, box-shadow 0.3s;
-          border: 2px solid transparent;
+          transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94), border-color 0.3s, box-shadow 0.35s;
+          border: 1px solid rgba(20, 20, 20, 0.08);
           display: block;
           text-decoration: none;
+          box-shadow: 0 8px 24px rgba(20, 16, 10, 0.06);
         }
-        .gender-header-card.active {
-          border-color: #8b6914;
-          box-shadow: 0 8px 24px rgba(139, 105, 20, 0.22);
-        }
+        .gender-header-card.active,
         .gender-header-card:hover {
           transform: translateY(-4px);
           border-color: #8b6914;
-          box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18), 0 4px 16px rgba(139, 105, 20, 0.25);
+          box-shadow: 0 16px 36px rgba(20, 16, 10, 0.14);
         }
         .gender-card-img-wrapper {
           position: absolute;
@@ -609,52 +618,72 @@ export default function CollectionsPage() {
         .gender-header-overlay {
           position: absolute;
           inset: 0;
-          background: linear-gradient(to bottom, rgba(26, 18, 9, 0.1) 0%, rgba(26, 18, 9, 0.65) 100%);
+          background: linear-gradient(to top, rgba(12, 10, 8, 0.82) 0%, rgba(12, 10, 8, 0.25) 52%, rgba(12, 10, 8, 0.04) 100%);
           transition: background 0.3s;
           z-index: 1;
         }
         .gender-header-card:hover .gender-header-overlay {
-          background: linear-gradient(to bottom, rgba(26, 18, 9, 0.05) 0%, rgba(26, 18, 9, 0.75) 100%);
+          background: linear-gradient(to top, rgba(12, 10, 8, 0.88) 0%, rgba(12, 10, 8, 0.3) 55%, rgba(12, 10, 8, 0.06) 100%);
         }
         .gender-header-content {
           position: absolute;
-          bottom: 24px;
-          left: 24px;
+          bottom: 22px;
+          left: 22px;
+          right: 54px;
           color: #fff;
           z-index: 2;
           text-decoration: none;
         }
+        .gender-card-eyebrow {
+          display: block;
+          font-size: 9px;
+          font-weight: 600;
+          letter-spacing: 0.2em;
+          text-transform: uppercase;
+          color: #D4AF63;
+          margin-bottom: 4px;
+        }
         .gender-header-content h2 {
           font-family: 'Cormorant Garamond', serif;
           font-size: 24px;
-          font-weight: 400;
-          margin-bottom: 2px;
+          font-weight: 500;
+          margin: 0 0 2px;
           letter-spacing: 0.04em;
           color: #ffffff;
+          line-height: 1.15;
         }
-        .gender-header-content span {
-          font-size: 11px;
-          opacity: 0.75;
-          letter-spacing: 0.04em;
+        .gender-header-content span.gender-sub {
+          font-size: 11.5px;
+          opacity: 0.8;
+          letter-spacing: 0.02em;
           font-weight: 300;
           color: #ffffff;
+          display: block;
         }
         .gender-header-arrow {
           position: absolute;
-          bottom: 24px;
-          right: 24px;
+          bottom: 22px;
+          right: 20px;
+          width: 32px;
+          height: 32px;
+          border-radius: 50%;
+          border: 1px solid rgba(255, 255, 255, 0.3);
+          background: rgba(16, 14, 10, 0.35);
+          display: flex;
+          align-items: center;
+          justify-content: center;
           color: #fff;
-          opacity: 0.65;
           transition: all 0.3s ease;
           z-index: 2;
         }
         .gender-header-card:hover .gender-header-arrow {
-          opacity: 1;
-          transform: scale(1.15) translateX(2px);
-          color: #dfb15b;
+          border-color: #D4AF63;
+          background: #8B6914;
+          color: #FFFFFF;
+          transform: translateX(2px);
         }
 
-        /* ── ATTACHED BENEFITS BAR (MATCHING IMG2 LUXURY ATTACHED DESIGN) ── */
+        /* ── ATTACHED BENEFITS / PROVENANCE BAR ── */
         @keyframes hero-benefits-marquee {
           0% {
             transform: translate3d(0, 0, 0);
@@ -667,41 +696,41 @@ export default function CollectionsPage() {
           position: relative;
           z-index: 30;
           max-width: 1400px;
-          margin: -34px auto 20px;
+          margin: -34px auto 32px;
           padding: 0 4%;
           width: 100%;
         }
         .hero-attached-benefits-bar {
           position: relative;
           background: #ffffff;
-          border-radius: 14px;
-          border: 1.5px solid rgba(139, 105, 20, 0.2);
-          box-shadow: 0 12px 36px rgba(0, 0, 0, 0.09);
-          padding: 20px 32px;
-          backdrop-filter: blur(12px);
+          border-radius: 12px;
+          border: 1px solid rgba(20, 20, 20, 0.08);
+          border-top: 2px solid #8B6914;
+          box-shadow: 0 14px 36px rgba(20, 16, 10, 0.06);
+          padding: 20px 28px;
           overflow: hidden;
         }
         .hero-attached-benefit-item {
           display: flex;
           align-items: center;
-          gap: 14px;
-          color: #1a1209;
+          gap: 13px;
+          color: #141414;
         }
         .hero-attached-benefit-item svg {
           color: #8b6914;
           flex-shrink: 0;
         }
         .hero-attached-benefit-item h4 {
-          font-size: 13px;
+          font-size: 12.5px;
           font-weight: 600;
-          margin: 0;
-          letter-spacing: 0.01em;
-          color: #1a1209;
+          margin: 0 0 2px;
+          letter-spacing: 0.02em;
+          color: #141414;
           white-space: nowrap;
         }
         .hero-attached-benefit-item span {
-          font-size: 10.5px;
-          color: rgba(26, 18, 9, 0.5);
+          font-size: 11px;
+          color: rgba(20, 20, 20, 0.56);
           margin: 0;
           display: block;
           white-space: nowrap;
@@ -718,6 +747,10 @@ export default function CollectionsPage() {
             align-items: center;
             width: 100%;
           }
+          .hero-attached-benefits-track .hero-attached-benefit-item:not(:last-child) {
+            border-right: 1px solid rgba(20, 20, 20, 0.07);
+            padding-right: 14px;
+          }
           .hero-attached-benefits-track.duplicate {
             display: none !important;
           }
@@ -725,13 +758,13 @@ export default function CollectionsPage() {
 
         @media (max-width: 1024px) {
           .hero-attached-benefits-wrapper {
-            margin: -24px auto 16px;
+            margin: -26px auto 24px;
             padding: 0 16px;
           }
           .hero-attached-benefits-bar {
-            padding: 16px 0;
+            padding: 15px 0;
             display: flex;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+            box-shadow: 0 10px 28px rgba(20, 16, 10, 0.07);
           }
           .hero-attached-benefits-bar::before,
           .hero-attached-benefits-bar::after {
@@ -754,7 +787,7 @@ export default function CollectionsPage() {
           .hero-attached-benefits-marquee-container {
             display: flex;
             width: max-content;
-            animation: hero-benefits-marquee 25s linear infinite;
+            animation: hero-benefits-marquee 26s linear infinite;
             will-change: transform;
           }
           .hero-attached-benefits-marquee-container:hover {
@@ -771,61 +804,66 @@ export default function CollectionsPage() {
             flex-shrink: 0;
           }
         }
-        .benefit-item {
-          display: flex;
-          align-items: center;
-          gap: 16px;
-          color: #1a1209;
-        }
-        .benefit-item svg {
-          color: #8b6914;
-          flex-shrink: 0;
-        }
-        .benefit-item h4 {
-          font-size: 13.5px;
-          font-weight: 600;
-          margin: 0;
-          letter-spacing: 0.02em;
-        }
-        .benefit-item span {
-          font-size: 11px;
-          color: rgba(26, 18, 9, 0.5);
-          margin: 0;
-          display: block;
-        }
 
         /* ── FEATURED TITLE BLOCK ── */
         .featured-section-header {
-          margin: 0 auto 36px;
+          margin: 0 auto 28px;
           max-width: 1400px;
           width: 100%;
+        }
+        .featured-eyebrow {
+          display: inline-flex;
+          align-items: center;
+          gap: 10px;
+          font-size: 10.5px;
+          font-weight: 600;
+          letter-spacing: 0.22em;
+          text-transform: uppercase;
+          color: #8B6914;
+          margin-bottom: 8px;
+        }
+        .featured-eyebrow-rule {
+          width: 24px;
+          height: 1px;
+          background: #8B6914;
+          display: inline-block;
         }
         .featured-title-block {
           display: flex;
           justify-content: space-between;
-          align-items: baseline;
+          align-items: flex-end;
+          gap: 16px;
           margin-bottom: 24px;
           border-bottom: 1px solid rgba(20, 20, 20, 0.08);
-          padding-bottom: 16px;
+          padding-bottom: 18px;
         }
         .featured-title {
           font-family: 'Cormorant Garamond', serif;
-          font-size: 28px;
-          letter-spacing: 0.04em;
+          font-size: 32px;
+          letter-spacing: 0.03em;
           font-weight: 500;
           text-transform: uppercase;
-          margin: 0;
+          margin: 0 0 4px;
           color: #141414;
+          line-height: 1.1;
+        }
+        .featured-subtitle {
+          font-size: 13px;
+          color: rgba(20, 20, 20, 0.56);
+          margin: 0;
         }
         .view-all-link {
-          font-size: 12px;
+          font-size: 11.5px;
+          font-weight: 600;
           color: #8b6914;
-          letter-spacing: 0.05em;
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
           text-decoration: none;
           transition: color 0.2s;
           display: inline-flex;
           align-items: center;
-          gap: 4px;
+          gap: 6px;
+          white-space: nowrap;
         }
         .view-all-link:hover {
           color: #141414;
@@ -834,44 +872,47 @@ export default function CollectionsPage() {
         /* ── CAPSULE FILTER ROW ── */
         .capsule-filter-row {
           display: flex;
-          gap: 10px;
+          gap: 8px;
           flex-wrap: wrap;
-          margin-bottom: 32px;
+          margin-bottom: 24px;
         }
         .capsule-btn {
-          background: #F8F7F4;
-          color: #555555;
-          border: 1px solid rgba(20, 20, 20, 0.08);
-          padding: 10px 22px;
-          font-size: 10.5px;
+          background: #FFFFFF;
+          color: rgba(20, 20, 20, 0.72);
+          border: 1px solid rgba(20, 20, 20, 0.12);
+          padding: 9px 20px;
+          font-size: 11px;
           letter-spacing: 0.14em;
-          font-weight: 500;
+          font-weight: 600;
           text-transform: uppercase;
-          border-radius: 6px;
+          border-radius: 4px;
           cursor: pointer;
-          transition: all 0.25s ease;
+          transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .capsule-btn.active {
-          background: #141414;
-          color: #fff;
-          border-color: #141414;
+          background: linear-gradient(135deg, #9C7A3C 0%, #8B6914 100%);
+          color: #FFFFFF;
+          border-color: #8B6914;
+          box-shadow: 0 4px 14px rgba(139, 105, 20, 0.22);
         }
         .capsule-btn:hover:not(.active) {
-          border-color: rgba(20, 20, 20, 0.22);
-          color: #141414;
+          border-color: rgba(139, 105, 20, 0.45);
+          background: #FAF8F4;
+          color: #8B6914;
         }
 
         /* ── TOOLBAR CONTROLS ── */
         .col-toolbar {
           display: flex;
           flex-wrap: wrap;
-          gap: 16px;
+          gap: 14px;
           align-items: center;
           margin: 0 auto 36px;
-          padding: 16px 24px;
-          background-color: #fff;
+          padding: 16px 22px;
+          background-color: #FFFFFF;
           border: 1px solid rgba(20, 20, 20, 0.08);
           border-radius: 10px;
+          box-shadow: 0 6px 20px rgba(20, 16, 10, 0.025);
           max-width: 1400px;
           width: 100%;
         }
@@ -883,17 +924,19 @@ export default function CollectionsPage() {
         }
         .search-input {
           width: 100%;
-          background: #F8F7F4;
-          border: 1px solid rgba(20, 20, 20, 0.08);
-          border-radius: 6px;
+          background: #FFFFFF;
+          border: 1px solid rgba(20, 20, 20, 0.12);
+          border-radius: 4px;
           padding: 10px 16px 10px 38px;
-          font-size: 12.5px;
+          font-size: 13px;
           color: #141414;
           font-family: inherit;
+          transition: border-color 0.2s ease, box-shadow 0.2s ease;
         }
         .search-input:focus {
           outline: none;
-          border-color: #141414;
+          border-color: #8B6914;
+          box-shadow: 0 0 0 3px rgba(139, 105, 20, 0.1);
           background: #ffffff;
         }
         .search-icon {
@@ -901,42 +944,45 @@ export default function CollectionsPage() {
           left: 14px;
           top: 50%;
           transform: translateY(-50%);
-          color: rgba(20, 20, 20, 0.45);
+          color: rgba(139, 105, 20, 0.75);
           pointer-events: none;
         }
         .toolbar-select {
-          background: #F8F7F4;
-          border: 1px solid rgba(20, 20, 20, 0.08);
-          border-radius: 6px;
-          padding: 10px 16px;
+          background: #FFFFFF;
+          border: 1px solid rgba(20, 20, 20, 0.12);
+          border-radius: 4px;
+          padding: 10px 14px;
           font-size: 12.5px;
           color: #141414;
           cursor: pointer;
           font-family: inherit;
           min-width: 160px;
+          transition: border-color 0.2s ease;
         }
         .toolbar-select:focus {
           outline: none;
-          border-color: #141414;
+          border-color: #8B6914;
+          box-shadow: 0 0 0 3px rgba(139, 105, 20, 0.1);
           background: #ffffff;
         }
         .toolbar-reset-btn {
-          background: transparent;
-          border: 1px solid rgba(20, 20, 20, 0.16);
-          color: rgba(20, 20, 20, 0.7);
-          padding: 10px 20px;
+          background: #FFFFFF;
+          border: 1px solid rgba(139, 105, 20, 0.34);
+          color: #8B6914;
+          padding: 10px 18px;
           font-size: 11px;
-          letter-spacing: 0.1em;
+          font-weight: 600;
+          letter-spacing: 0.12em;
           text-transform: uppercase;
           cursor: pointer;
-          border-radius: 6px;
+          border-radius: 4px;
           transition: all 0.2s;
           margin-left: auto;
         }
         .toolbar-reset-btn:hover {
-          border-color: #141414;
-          color: #141414;
-          background: #F8F7F4;
+          border-color: #8B6914;
+          color: #684E0D;
+          background: #FAF8F4;
         }
 
         /* ── PRODUCT GRID ── */
@@ -948,7 +994,7 @@ export default function CollectionsPage() {
         .product-grid {
           display: grid;
           grid-template-columns: repeat(4, 1fr);
-          gap: 30px;
+          gap: 26px;
         }
         
         /* ── WATCH CARD CONTAINER ── */
@@ -961,52 +1007,76 @@ export default function CollectionsPage() {
           flex-direction: column;
           height: 100%;
           transition: all 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+          box-shadow: 0 4px 16px rgba(20, 16, 10, 0.025);
           text-decoration: none;
           color: inherit;
           position: relative;
         }
+        .watch-card-container::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          height: 2px;
+          background: linear-gradient(90deg, #9C7A3C 0%, #8B6914 100%);
+          opacity: 0;
+          transition: opacity 0.3s ease;
+          z-index: 4;
+          pointer-events: none;
+        }
         .watch-card-container:hover {
           transform: translateY(-4px);
-          box-shadow: 0 14px 32px rgba(0, 0, 0, 0.06);
-          border-color: rgba(20, 20, 20, 0.18);
+          box-shadow: 0 18px 40px rgba(20, 16, 10, 0.08);
+          border-color: rgba(139, 105, 20, 0.42);
           background: #ffffff;
+        }
+        .watch-card-container:hover::before {
+          opacity: 1;
         }
         .watch-img-container {
           position: relative;
           aspect-ratio: 1;
-          background: #F6F5F2;
+          background: #FFFFFF;
           padding: 24px;
           display: flex;
           align-items: center;
           justify-content: center;
           overflow: hidden;
+          border-bottom: 1px solid rgba(20, 20, 20, 0.06);
         }
         .watch-card-image {
           width: 100%;
           height: 100%;
           object-fit: contain;
-          transition: transform 0.5s ease;
+          transition: transform 0.55s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
         .watch-card-container:hover .watch-card-image {
-          transform: scale(1.04);
+          transform: scale(1.05);
         }
         .watch-card-badge {
           position: absolute;
           left: 14px;
           top: 14px;
-          background: #141414;
-          color: #fff;
+          background: linear-gradient(135deg, #9C7A3C 0%, #8B6914 100%);
+          color: #ffffff;
           font-size: 9px;
-          font-weight: 500;
+          font-weight: 600;
           letter-spacing: 0.14em;
-          padding: 4px 9px;
-          border-radius: 2px;
+          padding: 4px 10px;
+          border-radius: 3px;
           z-index: 2;
           text-transform: uppercase;
+          box-shadow: 0 2px 8px rgba(139, 105, 20, 0.2);
+        }
+        .watch-card-badge.sold-out {
+          background: #F4F3F0;
+          color: rgba(20, 20, 20, 0.68);
+          border: 1px solid rgba(20, 20, 20, 0.1);
+          box-shadow: none;
         }
         .watch-card-info {
-          padding: 18px 20px;
+          padding: 18px 20px 20px;
           flex: 1;
           display: flex;
           flex-direction: column;
@@ -1016,33 +1086,71 @@ export default function CollectionsPage() {
         .watch-card-title-link {
           text-decoration: none;
           color: inherit;
+          display: block;
         }
         .watch-card-title {
-          font-size: 14.5px;
-          font-weight: 500;
+          font-family: 'Jost', sans-serif;
+          font-size: 13px;
+          font-weight: 600;
+          letter-spacing: 0.07em;
+          text-transform: uppercase;
+          line-height: 1.4;
           margin: 0 0 6px;
+          min-height: 36px;
           color: #141414;
-          letter-spacing: 0.01em;
-          font-variant-numeric: lining-nums;
-          font-feature-settings: "lnum" 1;
+          word-break: break-word;
+          overflow-wrap: anywhere;
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+          transition: color 0.25s ease;
+        }
+        .watch-card-container:hover .watch-card-title {
+          color: #8B6914;
         }
         .watch-card-specs {
           font-size: 11.5px;
-          color: #666666;
+          color: rgba(20, 20, 20, 0.56);
           margin: 0;
+          line-height: 1.45;
+          word-break: break-word;
+          overflow-wrap: anywhere;
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
+        .watch-card-meta-row {
+          display: flex;
+          align-items: center;
+          gap: 5px;
+          margin: 8px 0 2px;
+          min-height: 18px;
+        }
+        .watch-card-verified-tag {
+          font-size: 10.5px;
+          color: #8B6914;
+          font-weight: 500;
+          letter-spacing: 0.04em;
+          display: inline-flex;
+          align-items: center;
+          gap: 5px;
         }
         .watch-card-footer {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          margin-top: 16px;
+          margin-top: 14px;
           border-top: 1px solid rgba(20, 20, 20, 0.06);
           padding-top: 14px;
         }
         .watch-card-price {
-          font-size: 14px;
+          font-size: 14.5px;
           font-weight: 600;
           color: #141414;
+          font-variant-numeric: tabular-nums;
+          letter-spacing: 0.01em;
         }
         .watch-card-actions {
           display: flex;
@@ -1050,7 +1158,7 @@ export default function CollectionsPage() {
           align-items: center;
         }
         .card-action-btn {
-          background: transparent;
+          background: #FFFFFF;
           border: 1px solid rgba(20, 20, 20, 0.1);
           width: 32px;
           height: 32px;
@@ -1058,98 +1166,49 @@ export default function CollectionsPage() {
           display: flex;
           align-items: center;
           justify-content: center;
-          color: rgba(20, 20, 20, 0.7);
+          color: rgba(20, 20, 20, 0.72);
           cursor: pointer;
           transition: all 0.25s ease;
         }
         .card-action-btn:hover {
-          background: rgba(20, 20, 20, 0.04);
-          color: #141414;
-          border-color: #141414;
+          background: #FAF8F4;
+          color: #8B6914;
+          border-color: rgba(139, 105, 20, 0.45);
         }
         .card-action-btn.active {
-          background: #ffebeb;
-          color: #ff3b30;
-          border-color: #ff3b30;
+          background: #8B6914;
+          color: #FFFFFF;
+          border-color: #8B6914;
         }
         .card-action-btn.highlight:hover {
-          background: #141414;
+          background: linear-gradient(135deg, #9C7A3C 0%, #8B6914 100%);
           color: #fff;
-          border-color: #141414;
+          border-color: #8B6914;
+          box-shadow: 0 4px 12px rgba(139, 105, 20, 0.22);
         }
 
-        /* ── BLACK RIBBON BANNER ── */
-        .ribbon-banner {
-          background: #141414;
-          color: #fff;
-          padding: 22px 0;
-          overflow: hidden;
-          width: 100vw;
-          position: relative;
-          left: 50%;
-          right: 50%;
-          margin-left: -50vw;
-          margin-right: -50vw;
-          margin-top: 64px;
-          margin-bottom: 64px;
-        }
-        .ribbon-content.marquee-content {
-          display: flex;
-          overflow: hidden;
-          white-space: nowrap;
-          width: 100%;
-        }
-        .marquee-track {
-          display: flex;
-          align-items: center;
-          gap: 28px;
-          animation: marquee 25s linear infinite;
-          flex-shrink: 0;
-          padding-right: 28px;
-          font-size: 11px;
-          letter-spacing: 0.18em;
-          font-weight: 400;
-        }
-        @keyframes marquee {
-          0% {
-            transform: translate3d(0, 0, 0);
-          }
-          100% {
-            transform: translate3d(-100%, 0, 0);
-          }
-        }
-        .ribbon-highlight {
-          color: #8b6914;
-          font-weight: 500;
-          display: inline-flex;
-          align-items: center;
-        }
-        .ribbon-sep {
-          opacity: 0.25;
-        }
-
-        /* ── NEWSLETTER BANNER (WINSOR CIRCLE) ── */
+        /* ── PRIVATE CLIENTELE BANNER ── */
         .newsletter-banner {
           display: grid;
-          grid-template-columns: 1fr 1fr;
-          border-radius: 12px;
+          grid-template-columns: 1fr 1.15fr;
+          border-radius: 14px;
           overflow: hidden;
-          border: 1px solid rgba(139, 105, 20, 0.2);
-          background: linear-gradient(145deg, #FFFFFF 0%, #FAF8F5 45%, #F4EFEB 100%);
-          margin: 40px auto 30px;
-          max-width: 1350px;
+          border: 1px solid rgba(20, 20, 20, 0.08);
+          border-top: 2.5px solid #8B6914;
+          background: #FFFFFF;
+          margin: 68px auto 30px;
+          max-width: 1400px;
           width: 100%;
-          box-shadow: 0 16px 48px -12px rgba(20, 20, 20, 0.08), 0 4px 16px rgba(139, 105, 20, 0.06);
-          transition: transform 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease;
+          box-shadow: 0 14px 40px rgba(20, 16, 10, 0.04);
+          transition: box-shadow 0.35s ease, border-color 0.35s ease;
         }
         .newsletter-banner:hover {
-          border-color: rgba(139, 105, 20, 0.35);
-          box-shadow: 0 24px 56px -12px rgba(20, 20, 20, 0.12), 0 6px 20px rgba(139, 105, 20, 0.1);
+          box-shadow: 0 20px 50px rgba(20, 16, 10, 0.07);
         }
         .newsletter-image-block {
           height: 100%;
           position: relative;
-          min-height: 440px;
+          min-height: 410px;
           overflow: hidden;
         }
         .newsletter-image-block img {
@@ -1164,39 +1223,32 @@ export default function CollectionsPage() {
         .newsletter-image-overlay {
           position: absolute;
           inset: 0;
-          background: linear-gradient(to right, rgba(20, 20, 20, 0.15) 0%, rgba(20, 20, 20, 0.4) 60%, rgba(20, 20, 20, 0.6) 100%);
+          background: linear-gradient(to top, rgba(14, 12, 10, 0.68) 0%, rgba(14, 12, 10, 0.18) 55%, rgba(14, 12, 10, 0.08) 100%);
         }
         .newsletter-image-badge {
           position: absolute;
           bottom: 24px;
           left: 24px;
-          background: rgba(18, 18, 18, 0.88);
-          backdrop-filter: blur(10px);
-          -webkit-backdrop-filter: blur(10px);
-          border: 1px solid rgba(212, 167, 83, 0.35);
+          background: rgba(16, 14, 10, 0.82);
+          backdrop-filter: blur(8px);
+          -webkit-backdrop-filter: blur(8px);
+          border: 1px solid rgba(212, 175, 99, 0.35);
           padding: 8px 16px;
-          border-radius: 6px;
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          color: #DFB15B;
-          box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
-        }
-        .badge-gold-dot {
-          width: 6px;
-          height: 6px;
-          border-radius: 50%;
-          background: #dfb15b;
-          box-shadow: 0 0 8px rgba(223, 177, 91, 0.6);
+          border-radius: 4px;
+          color: #D4AF63;
+          font-size: 10px;
+          font-weight: 600;
+          letter-spacing: 0.18em;
+          text-transform: uppercase;
         }
 
         .newsletter-form-block {
-          padding: 48px 8%;
+          padding: 52px 8%;
           display: flex;
           flex-direction: column;
           justify-content: center;
           position: relative;
-          background: transparent;
+          background: #FFFFFF;
         }
         .newsletter-tag-container {
           display: flex;
@@ -1207,87 +1259,47 @@ export default function CollectionsPage() {
         .gold-line {
           height: 1px;
           width: 24px;
-          background: linear-gradient(90deg, transparent, #8B6914);
-        }
-        .gold-line:last-child {
-          background: linear-gradient(90deg, #8B6914, transparent);
+          background: #8B6914;
         }
         .newsletter-tag {
           font-size: 10.5px;
           color: #8B6914;
-          letter-spacing: 0.25em;
+          letter-spacing: 0.22em;
           font-weight: 600;
           text-transform: uppercase;
         }
         .newsletter-title {
           font-family: 'Cormorant Garamond', Georgia, serif;
-          font-size: 35px;
+          font-size: 36px;
           font-weight: 500;
           color: #141414;
-          margin: 0 0 10px;
+          margin: 0 0 12px;
           letter-spacing: -0.01em;
           line-height: 1.15;
         }
         .newsletter-desc {
-          font-size: 13.5px;
-          color: #555555;
+          font-size: 14px;
+          color: rgba(20, 20, 20, 0.6);
           line-height: 1.65;
-          margin: 0 0 24px;
+          margin: 0 0 26px;
+          max-width: 480px;
         }
-
-        .newsletter-perks-grid {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 14px;
-          margin-bottom: 24px;
-        }
-        .perk-item {
+        .newsletter-privileges {
           display: flex;
+          flex-wrap: wrap;
+          gap: 18px 28px;
+          margin-bottom: 28px;
+          padding-bottom: 24px;
+          border-bottom: 1px solid rgba(20, 20, 20, 0.07);
+        }
+        .newsletter-privilege-item {
+          display: inline-flex;
           align-items: center;
-          gap: 12px;
-          background: rgba(255, 255, 255, 0.95);
-          border: 1px solid rgba(139, 105, 20, 0.16);
-          padding: 12px 16px;
-          border-radius: 8px;
-          box-shadow: 0 2px 8px rgba(139, 105, 20, 0.04);
-          transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        .perk-item:hover {
-          transform: translateY(-2px);
-          border-color: rgba(139, 105, 20, 0.45);
-          box-shadow: 0 8px 20px rgba(139, 105, 20, 0.12);
-          background: #ffffff;
-        }
-        .perk-icon {
-          width: 36px;
-          height: 36px;
-          border-radius: 50%;
-          background: linear-gradient(135deg, rgba(236, 196, 120, 0.22) 0%, rgba(139, 105, 20, 0.12) 100%);
-          border: 1px solid rgba(139, 105, 20, 0.25);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          flex-shrink: 0;
-          transition: transform 0.3s ease;
-        }
-        .perk-item:hover .perk-icon {
-          transform: scale(1.08);
-        }
-        .perk-title {
-          font-size: 11px;
-          font-weight: 600;
+          gap: 8px;
+          font-size: 12px;
+          font-weight: 500;
           color: #141414;
-          text-transform: uppercase;
-          letter-spacing: 0.07em;
-          margin: 0 0 2px;
         }
-        .perk-desc {
-          font-size: 10.5px;
-          color: #666666;
-          margin: 0;
-          line-height: 1.25;
-        }
-
         .newsletter-form {
           display: flex;
           flex-direction: row;
@@ -1303,33 +1315,32 @@ export default function CollectionsPage() {
           left: 15px;
           top: 50%;
           transform: translateY(-50%);
-          width: 17px;
-          height: 17px;
+          width: 16px;
+          height: 16px;
           color: #8B6914;
           pointer-events: none;
         }
         .input-wrapper input {
           width: 100%;
           background: #ffffff;
-          border: 1px solid rgba(139, 105, 20, 0.25);
+          border: 1px solid rgba(20, 20, 20, 0.14);
           padding: 14px 16px 14px 44px;
           font-size: 13px;
           font-family: inherit;
-          border-radius: 6px;
+          border-radius: 4px;
           color: #141414;
           transition: all 0.25s ease;
-          box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.02), 0 2px 6px rgba(139, 105, 20, 0.04);
         }
         .input-wrapper input:focus {
           outline: none;
           border-color: #8B6914;
-          box-shadow: 0 0 0 3px rgba(139, 105, 20, 0.14);
+          box-shadow: 0 0 0 3px rgba(139, 105, 20, 0.12);
           background: #ffffff;
         }
         .newsletter-submit-btn {
           background: linear-gradient(135deg, #9C7A3C 0%, #8B6914 100%);
           color: #ffffff;
-          border: 1px solid #8B6914;
+          border: none;
           padding: 14px 26px;
           font-size: 11px;
           letter-spacing: 0.16em;
@@ -1337,51 +1348,49 @@ export default function CollectionsPage() {
           font-weight: 600;
           font-family: 'Jost', sans-serif;
           cursor: pointer;
-          transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-          border-radius: 6px;
+          transition: all 0.25s ease;
+          border-radius: 4px;
           display: flex;
           align-items: center;
+          justify-content: center;
           gap: 8px;
           white-space: nowrap;
-          box-shadow: 0 4px 16px rgba(139, 105, 20, 0.28);
+          box-shadow: 0 6px 20px rgba(139, 105, 20, 0.2);
         }
         .newsletter-submit-btn:hover {
-          background: linear-gradient(135deg, #B58F49 0%, #9C7A3C 100%);
-          border-color: #B58F49;
+          background: linear-gradient(135deg, #7A5C10 0%, #684E0D 100%);
           color: #ffffff;
-          transform: translateY(-2px);
-          box-shadow: 0 8px 24px rgba(160, 124, 39, 0.42);
-        }
-        .newsletter-submit-btn:hover svg {
-          transform: translateX(3px);
+          transform: translateY(-1px);
+          box-shadow: 0 8px 24px rgba(139, 105, 20, 0.28);
         }
         .newsletter-submit-btn svg {
           transition: transform 0.25s ease;
+        }
+        .newsletter-submit-btn:hover svg {
+          transform: translateX(3px);
         }
 
         .newsletter-footer-note {
           display: flex;
           align-items: center;
           gap: 7px;
-          font-size: 11px;
-          color: #666666;
+          font-size: 11.5px;
+          line-height: 1.45;
+          color: rgba(20, 20, 20, 0.52);
         }
-          display: flex;
-          align-items: center;
-          gap: 6px;
-          font-size: 11px;
-          color: rgba(20, 20, 20, 0.5);
+        .newsletter-footer-note svg {
+          flex-shrink: 0;
         }
 
         .hero-video-mute-btn {
           position: absolute;
           right: 6%;
-          bottom: 90px;
-          background: rgba(0, 0, 0, 0.45);
+          bottom: 94px;
+          background: rgba(16, 14, 10, 0.55);
           border: 1px solid rgba(255, 255, 255, 0.25);
           color: #fff;
-          width: 42px;
-          height: 42px;
+          width: 40px;
+          height: 40px;
           border-radius: 50%;
           display: flex;
           align-items: center;
@@ -1394,16 +1403,17 @@ export default function CollectionsPage() {
         .hero-video-mute-btn:hover {
           background: #8b6914;
           border-color: #8b6914;
-          transform: scale(1.08);
+          transform: scale(1.06);
         }
 
         /* ── SKELETON CARD ── */
         .skeleton-card {
-          height: 380px;
-          background: linear-gradient(90deg, #f3f0e7 25%, #eae6da 50%, #f3f0e7 75%);
+          height: 390px;
+          background: linear-gradient(90deg, #fafafa 25%, #f2f2f2 50%, #fafafa 75%);
           background-size: 200% 100%;
           animation: loading 1.5s infinite;
-          border-radius: 12px;
+          border-radius: 10px;
+          border: 1px solid rgba(20, 20, 20, 0.06);
         }
         @keyframes loading {
           0% { background-position: 200% 0; }
@@ -1416,20 +1426,26 @@ export default function CollectionsPage() {
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            padding: 100px 24px 40px;
+            padding: 120px 24px 72px;
             text-align: center;
-            min-height: 520px;
-            height: 80vh;
+            min-height: 480px;
+            height: auto;
             position: relative;
           }
           .hero-banner-content {
-            max-width: 100%;
+            max-width: 560px;
             margin-bottom: 0;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             z-index: 10;
+          }
+          .hero-banner-tag {
+            justify-content: center;
+          }
+          .hero-banner-actions {
+            justify-content: center;
           }
           .hero-banner-image-container {
             position: absolute !important;
@@ -1453,41 +1469,24 @@ export default function CollectionsPage() {
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.42) 0%, rgba(0,0,0,0.25) 35%, rgba(0,0,0,0.72) 100%) !important;
+            background: linear-gradient(to bottom, rgba(10, 9, 8, 0.58) 0%, rgba(10, 9, 8, 0.52) 50%, rgba(10, 9, 8, 0.82) 100%) !important;
             z-index: 2;
           }
           .hero-video-mute-btn {
             right: 16px;
-            bottom: 24px;
+            bottom: 34px;
             width: 36px;
             height: 36px;
           }
           .hero-banner-slides {
             display: flex;
             position: absolute;
-            bottom: 18px;
+            bottom: 34px;
             left: 50%;
             transform: translateX(-50%);
             right: auto;
             z-index: 15;
             gap: 8px;
-          }
-          .benefits-bar {
-            display: flex;
-            flex-wrap: nowrap;
-            overflow-x: auto;
-            gap: 16px;
-            padding: 20px 24px;
-            scroll-snap-type: x mandatory;
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: none;
-          }
-          .benefits-bar::-webkit-scrollbar {
-            display: none;
-          }
-          .benefit-item {
-            flex: 0 0 65%;
-            scroll-snap-align: center;
           }
           .product-grid {
             grid-template-columns: repeat(3, 1fr);
@@ -1497,74 +1496,40 @@ export default function CollectionsPage() {
             grid-template-columns: 1fr;
           }
           .newsletter-image-block {
-            min-height: 250px;
+            min-height: 260px;
           }
         }
 
         @media (max-width: 768px) {
           .gender-header-row {
             grid-template-columns: repeat(2, 1fr);
-            gap: 16px;
+            gap: 14px;
+            margin-bottom: 36px;
           }
           .gender-header-card {
-            height: 180px;
+            height: 175px;
           }
-          .benefits-carousel-wrapper {
-            overflow: hidden;
-            width: 100vw;
-            position: relative;
-            left: 50%;
-            right: 50%;
-            margin-left: -50vw;
-            margin-right: -50vw;
-            padding: 0 0 10px;
+          .gender-header-content {
+            bottom: 16px;
+            left: 16px;
+            right: 48px;
           }
-          .benefits-bar {
-            display: flex;
-            flex-wrap: nowrap;
-            width: max-content;
-            border: none;
-            background: transparent;
-            padding: 0;
-            margin: 0;
-            gap: 0;
+          .gender-header-content h2 {
+            font-size: 20px;
           }
-          .benefits-marquee-track {
-            display: flex !important;
-            align-items: center;
-            gap: 16px;
-            animation: benefits-marquee 25s linear infinite;
-            flex-shrink: 0;
-            padding-right: 16px;
-          }
-          .benefits-marquee-track[aria-hidden="true"] {
-            display: flex !important;
-          }
-          .benefit-item {
-            flex: 0 0 280px;
-            width: 280px;
-            box-sizing: border-box;
-            background: #fff;
-            border-radius: 12px;
-            padding: 16px 20px;
-            border: 1px solid rgba(26, 18, 9, 0.05);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.015);
-          }
-          @keyframes benefits-marquee {
-            0% {
-              transform: translate3d(0, 0, 0);
-            }
-            100% {
-              transform: translate3d(-100%, 0, 0);
-            }
+          .gender-header-arrow {
+            bottom: 16px;
+            right: 14px;
+            width: 28px;
+            height: 28px;
           }
           .capsule-filter-row {
             display: flex;
             flex-wrap: nowrap;
             overflow-x: auto;
             gap: 8px;
-            margin-bottom: 24px;
-            padding-bottom: 8px;
+            margin-bottom: 20px;
+            padding-bottom: 6px;
             -webkit-overflow-scrolling: touch;
             scrollbar-width: none;
           }
@@ -1573,39 +1538,33 @@ export default function CollectionsPage() {
           }
           .capsule-btn {
             flex: 0 0 auto;
-            padding: 8px 16px;
+            padding: 8px 15px;
             font-size: 10px;
           }
           .product-grid {
             grid-template-columns: repeat(2, 1fr);
-            gap: 16px;
+            gap: 14px;
           }
           .watch-img-container {
-            padding: 12px;
+            padding: 14px;
           }
           .watch-card-info {
-            padding: 12px;
+            padding: 14px;
           }
           .watch-card-title {
-            font-size: 13.5px;
-            margin-bottom: 4px;
+            font-size: 12px;
+            min-height: 34px;
           }
           .watch-card-specs {
             font-size: 11px;
           }
           .watch-card-footer {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 10px;
+            gap: 8px;
             margin-top: 12px;
             padding-top: 10px;
           }
           .watch-card-price {
             font-size: 13px;
-          }
-          .watch-card-actions {
-            width: 100%;
-            justify-content: flex-end;
           }
           .card-action-btn {
             width: 28px;
@@ -1616,6 +1575,7 @@ export default function CollectionsPage() {
             flex-direction: column;
             align-items: stretch;
             gap: 12px;
+            padding: 16px;
           }
           .col-toolbar.show {
             display: flex;
@@ -1631,9 +1591,14 @@ export default function CollectionsPage() {
             width: 100%;
             text-align: center;
           }
-          .ribbon-content {
-            font-size: 9px;
-            gap: 16px;
+          .newsletter-banner {
+            margin: 44px auto 24px;
+          }
+          .newsletter-form-block {
+            padding: 36px 24px;
+          }
+          .newsletter-title {
+            font-size: 30px;
           }
           .newsletter-form {
             flex-direction: column;
@@ -1645,7 +1610,6 @@ export default function CollectionsPage() {
           .newsletter-form button {
             width: 100%;
             padding: 14px 20px;
-            text-align: center;
           }
         }
 
@@ -1655,11 +1619,65 @@ export default function CollectionsPage() {
             gap: 10px;
           }
           .gender-header-card {
-            height: 140px;
+            height: 158px;
+          }
+          .gender-header-content {
+            left: 12px;
+            right: 40px;
+            bottom: 12px;
+          }
+          .gender-card-eyebrow {
+            font-size: 8px;
+            margin-bottom: 3px;
+          }
+          .gender-header-content h2 {
+            font-size: 14.5px;
+            letter-spacing: 0.08em;
+          }
+          .gender-header-content span.gender-sub {
+            font-size: 9.5px;
+            line-height: 1.25;
+          }
+          .gender-header-arrow {
+            width: 24px;
+            height: 24px;
+            bottom: 12px;
+            right: 10px;
           }
           .product-grid {
             grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
+            gap: 10px;
+          }
+          .watch-card-info {
+            padding: 12px 11px 13px;
+          }
+          .watch-card-title {
+            min-height: 36px;
+          }
+          .watch-card-meta-row {
+            min-height: 20px;
+          }
+          .watch-card-verified-tag {
+            font-size: 9px;
+            gap: 4px;
+            white-space: nowrap;
+          }
+          .watch-card-verified-tag svg {
+            flex-shrink: 0;
+          }
+          .watch-card-footer {
+            gap: 6px;
+          }
+          .watch-card-price {
+            font-size: 12.5px;
+            white-space: nowrap;
+          }
+          .watch-card-actions {
+            gap: 5px;
+          }
+          .card-action-btn {
+            width: 26px;
+            height: 26px;
           }
           .hero-btn-primary,
           .hero-btn-secondary {
@@ -1857,42 +1875,42 @@ export default function CollectionsPage() {
               {/* Track 1 */}
               <div className="hero-attached-benefits-track">
                 <div className="hero-attached-benefit-item">
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><path d="m12 6-2 4h4l-2 4" /></svg>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" /></svg>
                   <div>
-                    <h4>Japan Movement</h4>
-                    <span>UAE Registered Brand</span>
+                    <h4>Japanese Calibre</h4>
+                    <span>Tested Precision Movements</span>
                   </div>
                 </div>
 
                 <div className="hero-attached-benefit-item">
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>
                   <div>
-                    <h4>International Warranty</h4>
-                    <span>Sri Lanka & UAE</span>
+                    <h4>24-Month Warranty</h4>
+                    <span>Official Winsor Coverage</span>
                   </div>
                 </div>
 
                 <div className="hero-attached-benefit-item">
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="3" width="15" height="13" rx="2" ry="2" /><line x1="16" y1="8" x2="20" y2="8" /><line x1="16" y1="12" x2="22" y2="12" /></svg>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="3" width="15" height="13" rx="2" ry="2" /><line x1="16" y1="8" x2="20" y2="8" /><line x1="16" y1="12" x2="22" y2="12" /></svg>
                   <div>
-                    <h4>Free Shipping</h4>
-                    <span>Island-wide in Sri Lanka</span>
+                    <h4>Insured Delivery</h4>
+                    <span>Complimentary Island-Wide</span>
                   </div>
                 </div>
 
                 <div className="hero-attached-benefit-item">
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" /><path d="M21 3v5h-5" /></svg>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" /><path d="M21 3v5h-5" /></svg>
                   <div>
-                    <h4>Easy Returns</h4>
-                    <span>Within 14 Days</span>
+                    <h4>14-Day Exchange</h4>
+                    <span>Hassle-Free Inspection</span>
                   </div>
                 </div>
 
                 <div className="hero-attached-benefit-item">
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
                   <div>
-                    <h4>Secure Payments</h4>
-                    <span>100% Secure Checkout with payhere.lk</span>
+                    <h4>Verified Checkout</h4>
+                    <span>Encrypted PayHere Gateway</span>
                   </div>
                 </div>
               </div>
@@ -1900,42 +1918,42 @@ export default function CollectionsPage() {
               {/* Track 2 (Duplicate for Seamless Infinite Marquee Loop on Mobile) */}
               <div className="hero-attached-benefits-track duplicate" aria-hidden="true">
                 <div className="hero-attached-benefit-item">
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><path d="m12 6-2 4h4l-2 4" /></svg>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" /></svg>
                   <div>
-                    <h4>Japan Movement</h4>
-                    <span>UAE Registered Brand</span>
+                    <h4>Japanese Calibre</h4>
+                    <span>Tested Precision Movements</span>
                   </div>
                 </div>
 
                 <div className="hero-attached-benefit-item">
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>
                   <div>
-                    <h4>International Warranty</h4>
-                    <span>Sri Lanka & UAE</span>
+                    <h4>24-Month Warranty</h4>
+                    <span>Official Winsor Coverage</span>
                   </div>
                 </div>
 
                 <div className="hero-attached-benefit-item">
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="3" width="15" height="13" rx="2" ry="2" /><line x1="16" y1="8" x2="20" y2="8" /><line x1="16" y1="12" x2="22" y2="12" /></svg>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="3" width="15" height="13" rx="2" ry="2" /><line x1="16" y1="8" x2="20" y2="8" /><line x1="16" y1="12" x2="22" y2="12" /></svg>
                   <div>
-                    <h4>Free Shipping</h4>
-                    <span>Island-wide in Sri Lanka</span>
+                    <h4>Insured Delivery</h4>
+                    <span>Complimentary Island-Wide</span>
                   </div>
                 </div>
 
                 <div className="hero-attached-benefit-item">
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" /><path d="M21 3v5h-5" /></svg>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" /><path d="M21 3v5h-5" /></svg>
                   <div>
-                    <h4>Easy Returns</h4>
-                    <span>Within 14 Days</span>
+                    <h4>14-Day Exchange</h4>
+                    <span>Hassle-Free Inspection</span>
                   </div>
                 </div>
 
                 <div className="hero-attached-benefit-item">
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
                   <div>
-                    <h4>Secure Payments</h4>
-                    <span>100% Secure Checkout with payhere.lk</span>
+                    <h4>Verified Checkout</h4>
+                    <span>Encrypted PayHere Gateway</span>
                   </div>
                 </div>
               </div>
@@ -1965,11 +1983,12 @@ export default function CollectionsPage() {
               </div>
               <div className="gender-header-overlay" />
               <div className="gender-header-content">
+                <span className="gender-card-eyebrow">Collection</span>
                 <h2>GENTS</h2>
-                <span>Shop Men's Watches</span>
+                <span className="gender-sub">Explore Men&apos;s Calibres</span>
               </div>
               <div className="gender-header-arrow">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="12" cy="12" r="10" /><path d="M8 12h8M12 8l4 4-4 4" /></svg>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
               </div>
             </Link>
 
@@ -1992,11 +2011,12 @@ export default function CollectionsPage() {
               </div>
               <div className="gender-header-overlay" />
               <div className="gender-header-content">
+                <span className="gender-card-eyebrow">Collection</span>
                 <h2>LADIES</h2>
-                <span>Shop Women's Watches</span>
+                <span className="gender-sub">Explore Women&apos;s Editions</span>
               </div>
               <div className="gender-header-arrow">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="12" cy="12" r="10" /><path d="M8 12h8M12 8l4 4-4 4" /></svg>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
               </div>
             </Link>
 
@@ -2019,11 +2039,12 @@ export default function CollectionsPage() {
               </div>
               <div className="gender-header-overlay" />
               <div className="gender-header-content">
+                <span className="gender-card-eyebrow">Collection</span>
                 <h2>GIFTS</h2>
-                <span>Shop Gift Timepieces</span>
+                <span className="gender-sub">Curated Presentation Sets</span>
               </div>
               <div className="gender-header-arrow">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="12" cy="12" r="10" /><path d="M8 12h8M12 8l4 4-4 4" /></svg>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
               </div>
             </Link>
 
@@ -2046,11 +2067,12 @@ export default function CollectionsPage() {
               </div>
               <div className="gender-header-overlay" />
               <div className="gender-header-content">
+                <span className="gender-card-eyebrow">Atelier Reserve</span>
                 <h2>LIMITED EDITION</h2>
-                <span>Exclusive Timepieces</span>
+                <span className="gender-sub">Numbered Collector Runs</span>
               </div>
               <div className="gender-header-arrow">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="12" cy="12" r="10" /><path d="M8 12h8M12 8l4 4-4 4" /></svg>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
               </div>
             </Link>
           </div>
@@ -2060,8 +2082,25 @@ export default function CollectionsPage() {
           {/* SECTION TITLE & TABS */}
           <div className="featured-section-header" id="featured-products-section">
             <div className="featured-title-block">
-              <h2 className="featured-title">FEATURED TIMEPIECES</h2>
-              <Link href="#" className="view-all-link">View All Collections <span className="arrow">→</span></Link>
+              <div>
+                <div className="featured-eyebrow">
+                  <span className="featured-eyebrow-rule" />
+                  <span>Winsor Catalogue</span>
+                </div>
+                <h2 className="featured-title">FEATURED TIMEPIECES</h2>
+                <p className="featured-subtitle">Curated quartz and automatic calibres backed by our official 24-month warranty.</p>
+              </div>
+              <Link
+                href="#featured-products-section"
+                onClick={(e) => {
+                  e.preventDefault();
+                  resetFilters();
+                  document.getElementById('featured-products-section')?.scrollIntoView({ behavior: 'smooth' });
+                }}
+                className="view-all-link"
+              >
+                View All Collections <span className="arrow">→</span>
+              </Link>
             </div>
 
             <div className="capsule-filter-row">
@@ -2111,27 +2150,27 @@ export default function CollectionsPage() {
               className="mobile-filter-toggle-btn"
               style={{
                 width: '100%',
-                background: '#fff',
-                border: '1px solid rgba(26,18,9,0.08)',
+                background: '#FFFFFF',
+                border: '1px solid rgba(20,20,20,0.12)',
                 borderRadius: '8px',
-                padding: '14px 20px',
+                padding: '13px 18px',
                 fontSize: '11px',
-                fontWeight: 500,
-                letterSpacing: '0.06em',
+                fontWeight: 600,
+                letterSpacing: '0.1em',
                 textTransform: 'uppercase',
-                color: '#1a1209',
+                color: '#141414',
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
                 cursor: 'pointer',
-                transition: 'all 0.3s'
+                transition: 'all 0.25s'
               }}
             >
               <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" /></svg>
-                {showMobileFilters ? 'Hide Filters & Search' : 'Show Filters & Search'}
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.8"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" /></svg>
+                {showMobileFilters ? 'Hide Filters & Search' : 'Filter & Search Timepieces'}
               </span>
-              <span>{showMobileFilters ? '▲' : '▼'}</span>
+              <span style={{ color: '#8B6914', fontSize: '10px' }}>{showMobileFilters ? '▲' : '▼'}</span>
             </button>
           </div>
 
@@ -2191,8 +2230,8 @@ export default function CollectionsPage() {
             </select>
 
             {/* Results Count */}
-            <span style={{ fontSize: '12.5px', color: 'rgba(26, 18, 9, 0.45)', marginLeft: '12px' }} className="hidden md:inline">
-              {!loading && `${filteredProducts.length} Timepiece${filteredProducts.length === 1 ? '' : 's'} found`}
+            <span style={{ fontSize: '12px', color: 'rgba(20, 20, 20, 0.5)', letterSpacing: '0.02em', marginLeft: '10px' }} className="hidden md:inline">
+              {!loading && `${filteredProducts.length} Timepiece${filteredProducts.length === 1 ? '' : 's'} shown`}
             </span>
 
             {/* Reset button */}
@@ -2210,11 +2249,11 @@ export default function CollectionsPage() {
                 ))}
               </div>
             ) : filteredProducts.length === 0 ? (
-              <div style={{ textAlign: 'center', padding: '70px 20px', border: '1px dashed rgba(26,18,9,0.1)', borderRadius: '6px', backgroundColor: 'rgba(255,255,255,0.2)' }}>
-                <h3 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '24px', color: '#1a1209', marginBottom: '8px' }}>No Watches Found</h3>
-                <p style={{ color: 'rgba(26,18,9,0.45)', fontSize: '13px', marginBottom: '16px' }}>Try resetting filters or search terms.</p>
-                <button onClick={resetFilters} style={{ background: '#8B6914', color: '#fff', border: 'none', padding: '10px 20px', fontSize: '11px', letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer', borderRadius: '4px' }}>
-                  Clear Filters
+              <div style={{ textAlign: 'center', padding: '72px 24px', border: '1px solid rgba(20,20,20,0.08)', borderRadius: '8px', backgroundColor: '#FFFFFF', boxShadow: '0 6px 24px rgba(17,17,17,0.03)' }}>
+                <h3 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '26px', color: '#141414', marginBottom: '8px' }}>No Matching Timepieces</h3>
+                <p style={{ color: 'rgba(20,20,20,0.52)', fontSize: '13.5px', marginBottom: '20px' }}>Adjust your collection filter or search query to explore the full Winsor catalogue.</p>
+                <button onClick={resetFilters} style={{ background: 'linear-gradient(135deg, #9C7A3C 0%, #8B6914 100%)', color: '#FFFFFF', border: 'none', padding: '11px 24px', fontSize: '11px', fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', cursor: 'pointer', borderRadius: '6px' }}>
+                  View All Timepieces
                 </button>
               </div>
             ) : (
@@ -2232,7 +2271,7 @@ export default function CollectionsPage() {
                       {/* Image block inside a click Link */}
                       <Link href={`/collections/${product._id}`} className="watch-img-container">
                         {isSoldOut ? (
-                          <span className="watch-card-badge">Sold Out</span>
+                          <span className="watch-card-badge sold-out">Sold Out</span>
                         ) : product.stickerEnabled && product.stickerText ? (
                           <span className="watch-card-badge">{product.stickerText}</span>
                         ) : product.collectionSections?.includes('new') ? (
@@ -2260,21 +2299,22 @@ export default function CollectionsPage() {
                         <Link href={`/collections/${product._id}`} className="watch-card-title-link">
                           <h3 className="watch-card-title">{product.title}</h3>
                           <p className="watch-card-specs">
-                            {product.specifications?.Material || 'Stainless Steel'} - {product.specifications?.['Case Size'] || '40mm'}
+                            {product.specifications?.Material || '316L Stainless Steel'} · {product.specifications?.['Case Size'] || '40mm'}
                           </p>
                         </Link>
 
-                        {/* ⭐ Review Stars */}
+                        {/* Rating or Official Warranty Cue */}
                         {reviewCount > 0 ? (
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '4px', margin: '5px 0 2px' }}>
+                          <div className="watch-card-meta-row">
                             {[1, 2, 3, 4, 5].map(s => {
                               const filled = avgRating >= s;
                               const half = !filled && avgRating >= s - 0.5;
+                              const gradId = `half-${product._id}-${s}`;
                               return (
-                                <svg key={s} width="11" height="11" viewBox="0 0 24 24" fill={filled ? '#8B6914' : half ? 'url(#half)' : 'none'} stroke="#8B6914" strokeWidth="1.5">
+                                <svg key={s} width="11" height="11" viewBox="0 0 24 24" fill={filled ? '#8B6914' : half ? `url(#${gradId})` : 'none'} stroke="#8B6914" strokeWidth="1.5">
                                   {half && (
                                     <defs>
-                                      <linearGradient id="half">
+                                      <linearGradient id={gradId}>
                                         <stop offset="50%" stopColor="#8B6914" />
                                         <stop offset="50%" stopColor="transparent" />
                                       </linearGradient>
@@ -2284,18 +2324,19 @@ export default function CollectionsPage() {
                                 </svg>
                               );
                             })}
-                            <span style={{ fontSize: '10px', color: 'rgba(26,18,9,0.45)', fontFamily: "'Jost',sans-serif", fontWeight: 500, marginLeft: '2px' }}>
+                            <span style={{ fontSize: '10.5px', color: 'rgba(20,20,20,0.58)', fontFamily: "'Jost',sans-serif", fontWeight: 500, marginLeft: '2px' }}>
                               {avgRating.toFixed(1)} ({reviewCount})
                             </span>
                           </div>
                         ) : (
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '3px', margin: '5px 0 2px' }}>
-                            {[1, 2, 3, 4, 5].map(s => (
-                              <svg key={s} width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="rgba(26,18,9,0.18)" strokeWidth="1.5">
-                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                          <div className="watch-card-meta-row">
+                            <span className="watch-card-verified-tag">
+                              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                                <path d="m9 12 2 2 4-4" />
                               </svg>
-                            ))}
-                            <span style={{ fontSize: '9.5px', color: 'rgba(26,18,9,0.3)', fontFamily: "'Jost',sans-serif", marginLeft: '2px' }}>No reviews</span>
+                              24M Warranty · Authentic
+                            </span>
                           </div>
                         )}
 
@@ -2336,72 +2377,13 @@ export default function CollectionsPage() {
             )}
           </div>
 
-          {/* BLACK RIBBON BANNER */}
-          <div className="ribbon-banner">
-            <div className="ribbon-content marquee-content">
-              <div className="marquee-track">
-                <span className="ribbon-highlight font-semibold">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: '6px', verticalAlign: 'middle', display: 'inline-block', color: '#8b6914' }}><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>
-                  TRUSTED BY WATCH ENTHUSIASTS WORLDWIDE
-                </span>
-                <span className="ribbon-sep">|</span>
-                <span>
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: '6px', verticalAlign: 'middle', display: 'inline-block', color: '#8b6914' }}><circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" /></svg>
-                  JAPAN MOVEMENT
-                </span>
-                <span className="ribbon-sep">|</span>
-                <span>
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: '6px', verticalAlign: 'middle', display: 'inline-block', color: '#8b6914' }}><path d="M6 3h12l4 6-10 12L2 9z" /></svg>
-                  SAPPHIRE CRYSTAL
-                </span>
-                <span className="ribbon-sep">|</span>
-                <span>
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: '6px', verticalAlign: 'middle', display: 'inline-block', color: '#8b6914' }}><path d="M12 22a7 7 0 0 0 7-7c0-4.3-7-11-7-11S5 10.7 5 15a7 7 0 0 0 7 7z" /></svg>
-                  WATER RESISTANT
-                </span>
-                <span className="ribbon-sep">|</span>
-                <span>
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: '6px', verticalAlign: 'middle', display: 'inline-block', color: '#8b6914' }}><circle cx="12" cy="8" r="7" /><path d="M8.21 13.89L7 23l5-3 5 3-1.21-9.12" /></svg>
-                  PREMIUM MATERIALS
-                </span>
-              </div>
-              <div className="marquee-track" aria-hidden="true">
-                <span className="ribbon-highlight font-semibold">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: '6px', verticalAlign: 'middle', display: 'inline-block', color: '#8b6914' }}><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>
-                  TRUSTED BY WATCH ENTHUSIASTS WORLDWIDE
-                </span>
-                <span className="ribbon-sep">|</span>
-                <span>
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: '6px', verticalAlign: 'middle', display: 'inline-block', color: '#8b6914' }}><circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" /></svg>
-                  JAPAN MOVEMENT
-                </span>
-                <span className="ribbon-sep">|</span>
-                <span>
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: '6px', verticalAlign: 'middle', display: 'inline-block', color: '#8b6914' }}><path d="M6 3h12l4 6-10 12L2 9z" /></svg>
-                  SAPPHIRE CRYSTAL
-                </span>
-                <span className="ribbon-sep">|</span>
-                <span>
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: '6px', verticalAlign: 'middle', display: 'inline-block', color: '#8b6914' }}><path d="M12 22a7 7 0 0 0 7-7c0-4.3-7-11-7-11S5 10.7 5 15a7 7 0 0 0 7 7z" /></svg>
-                  WATER RESISTANT
-                </span>
-                <span className="ribbon-sep">|</span>
-                <span>
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: '6px', verticalAlign: 'middle', display: 'inline-block', color: '#8b6914' }}><circle cx="12" cy="8" r="7" /><path d="M8.21 13.89L7 23l5-3 5 3-1.21-9.12" /></svg>
-                  PREMIUM MATERIALS
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* NEWSLETTER BANNER — SUBSCRIBE FOR UPDATES */}
-          <div className="newsletter-banner shadow-2xl">
+          {/* PRIVATE CLIENTELE — INVITATION DISPATCH */}
+          <div className="newsletter-banner">
             <div className="newsletter-image-block">
-              <Image src="/collections_pg.webp" alt="Winsor Timepiece Collection" width={600} height={400} className="w-full h-full object-cover" />
+              <Image src="/collections_pg.webp" alt="Winsor Private Clientele Collection" width={600} height={400} className="w-full h-full object-cover" />
               <div className="newsletter-image-overlay" />
               <div className="newsletter-image-badge">
-                <span className="badge-gold-dot" />
-                <span className="badge-text font-mono uppercase tracking-widest text-[10px]">WINSOR VIP INSIDER</span>
+                <span className="badge-text font-mono uppercase tracking-[0.22em] text-[10px]">WINSOR PRIVATE CLIENTELE</span>
               </div>
             </div>
 
@@ -2409,58 +2391,41 @@ export default function CollectionsPage() {
               <div className="newsletter-header">
                 <div className="newsletter-tag-container">
                   <span className="gold-line" />
-                  <span className="newsletter-tag">STAY IN THE LOOP</span>
+                  <span className="newsletter-tag">PRIVATE REGISTRY</span>
                   <span className="gold-line" />
                 </div>
-                <h3 className="newsletter-title font-serif">Subscribe To Winsor Updates</h3>
+                <h3 className="newsletter-title font-serif">Private Release Invitations</h3>
                 <p className="newsletter-desc">
-                  Be the first to know about new timepiece launches, brand news, exclusive offers, and special promotions delivered straight to your inbox.
+                  Receive quiet dispatches on numbered timepiece allocations, seasonal atelier releases, and private collector viewings.
                 </p>
               </div>
 
-              {/* Luxury Subscription Perks Grid */}
-              <div className="newsletter-perks-grid">
-                <div className="perk-item">
-                  <div className="perk-icon">
-                    <svg className="w-4 h-4 text-[#8B6914]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                    </svg>
-                  </div>
-                  <div>
-                    <h4 className="perk-title">New Product Releases</h4>
-                    <p className="perk-desc">First look at new watch collections</p>
-                  </div>
-                </div>
-
-                <div className="perk-item">
-                  <div className="perk-icon">
-                    <svg className="w-4 h-4 text-[#8B6914]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-                    </svg>
-                  </div>
-                  <div>
-                    <h4 className="perk-title">News & Special Offers</h4>
-                    <p className="perk-desc">Exclusive deals & brand updates</p>
-                  </div>
-                </div>
+              <div className="newsletter-privileges">
+                <span className="newsletter-privilege-item">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+                  Priority access to numbered drops
+                </span>
+                <span className="newsletter-privilege-item">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+                  Private collector trunk invitations
+                </span>
               </div>
 
-              {/* Form */}
               <form onSubmit={handleSubscribe} className="newsletter-form">
                 <div className="input-wrapper">
                   <svg className="input-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.6} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                   </svg>
                   <input
                     type="email"
                     value={subscriberEmail}
                     onChange={(e) => setSubscriberEmail(e.target.value)}
-                    placeholder="Enter your email address..."
+                    placeholder="Enter your email address"
                     required
                   />
                 </div>
                 <button type="submit" disabled={subscribing} className="newsletter-submit-btn">
-                  {subscribing ? 'SUBSCRIBING…' : 'SUBSCRIBE NOW'}
+                  {subscribing ? 'JOINING…' : 'JOIN LIST'}
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                   </svg>
@@ -2469,9 +2434,9 @@ export default function CollectionsPage() {
 
               <div className="newsletter-footer-note">
                 <svg className="w-3.5 h-3.5 text-[#8B6914]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                 </svg>
-                <span>Instant updates. Zero spam. Unsubscribe anytime in 1-click.</span>
+                <span>Discreet quarterly dispatches. Private client data is never shared.</span>
               </div>
             </div>
           </div>
