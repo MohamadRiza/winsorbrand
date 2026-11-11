@@ -5,8 +5,9 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useCurrency } from '@/app/context/CurrencyContext';
 import { useCart } from '@/app/context/CartContext';
-import { toast } from 'react-hot-toast';
 import { showWishlistToast } from '@/components/WinsorToaster';
+import NewsletterCard from '@/components/NewsletterCard';
+import ProductCardSkeletonGrid from '@/components/ProductCardSkeletonGrid';
 import { IProduct, IGiftCategory, CollectionSection } from '@/types';
 
 // Constants for Collection Sections
@@ -137,24 +138,6 @@ export default function CollectionsPage() {
 
   // Mobile Filters Toggle State
   const [showMobileFilters, setShowMobileFilters] = useState(false);
-
-  // Newsletter Subscribe State
-  const [subscriberEmail, setSubscriberEmail] = useState('');
-  const [subscribing, setSubscribing] = useState(false);
-
-  const handleSubscribe = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!subscriberEmail || !subscriberEmail.includes('@')) {
-      toast.error('Please enter a valid email address.');
-      return;
-    }
-    setSubscribing(true);
-    setTimeout(() => {
-      toast.success('Welcome to The Winsor Circle! Check your inbox shortly.');
-      setSubscriberEmail('');
-      setSubscribing(false);
-    }, 800);
-  };
 
   // API States
   const [products, setProducts] = useState<IProduct[]>([]);
@@ -1189,201 +1172,6 @@ export default function CollectionsPage() {
           box-shadow: 0 4px 12px rgba(139, 105, 20, 0.22);
         }
 
-        /* ── PRIVATE CLIENTELE BANNER ── */
-        .newsletter-banner {
-          display: grid;
-          grid-template-columns: 1fr 1.15fr;
-          border-radius: 14px;
-          overflow: hidden;
-          border: 1px solid rgba(20, 20, 20, 0.08);
-          border-top: 2.5px solid #8B6914;
-          background: #FFFFFF;
-          margin: 68px auto 30px;
-          max-width: 1400px;
-          width: 100%;
-          box-shadow: 0 14px 40px rgba(20, 16, 10, 0.04);
-          transition: box-shadow 0.35s ease, border-color 0.35s ease;
-        }
-        .newsletter-banner:hover {
-          box-shadow: 0 20px 50px rgba(20, 16, 10, 0.07);
-        }
-        .newsletter-image-block {
-          height: 100%;
-          position: relative;
-          min-height: 410px;
-          overflow: hidden;
-        }
-        .newsletter-image-block img {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-          transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-        }
-        .newsletter-banner:hover .newsletter-image-block img {
-          transform: scale(1.03);
-        }
-        .newsletter-image-overlay {
-          position: absolute;
-          inset: 0;
-          background: linear-gradient(to top, rgba(14, 12, 10, 0.68) 0%, rgba(14, 12, 10, 0.18) 55%, rgba(14, 12, 10, 0.08) 100%);
-        }
-        .newsletter-image-badge {
-          position: absolute;
-          bottom: 24px;
-          left: 24px;
-          background: rgba(16, 14, 10, 0.82);
-          backdrop-filter: blur(8px);
-          -webkit-backdrop-filter: blur(8px);
-          border: 1px solid rgba(212, 175, 99, 0.35);
-          padding: 8px 16px;
-          border-radius: 4px;
-          color: #D4AF63;
-          font-size: 10px;
-          font-weight: 600;
-          letter-spacing: 0.18em;
-          text-transform: uppercase;
-        }
-
-        .newsletter-form-block {
-          padding: 52px 8%;
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          position: relative;
-          background: #FFFFFF;
-        }
-        .newsletter-tag-container {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-          margin-bottom: 12px;
-        }
-        .gold-line {
-          height: 1px;
-          width: 24px;
-          background: #8B6914;
-        }
-        .newsletter-tag {
-          font-size: 10.5px;
-          color: #8B6914;
-          letter-spacing: 0.22em;
-          font-weight: 600;
-          text-transform: uppercase;
-        }
-        .newsletter-title {
-          font-family: 'Cormorant Garamond', Georgia, serif;
-          font-size: 36px;
-          font-weight: 500;
-          color: #141414;
-          margin: 0 0 12px;
-          letter-spacing: -0.01em;
-          line-height: 1.15;
-        }
-        .newsletter-desc {
-          font-size: 14px;
-          color: rgba(20, 20, 20, 0.6);
-          line-height: 1.65;
-          margin: 0 0 26px;
-          max-width: 480px;
-        }
-        .newsletter-privileges {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 18px 28px;
-          margin-bottom: 28px;
-          padding-bottom: 24px;
-          border-bottom: 1px solid rgba(20, 20, 20, 0.07);
-        }
-        .newsletter-privilege-item {
-          display: inline-flex;
-          align-items: center;
-          gap: 8px;
-          font-size: 12px;
-          font-weight: 500;
-          color: #141414;
-        }
-        .newsletter-form {
-          display: flex;
-          flex-direction: row;
-          gap: 10px;
-          margin-bottom: 14px;
-        }
-        .input-wrapper {
-          position: relative;
-          flex: 1;
-        }
-        .input-icon {
-          position: absolute;
-          left: 15px;
-          top: 50%;
-          transform: translateY(-50%);
-          width: 16px;
-          height: 16px;
-          color: #8B6914;
-          pointer-events: none;
-        }
-        .input-wrapper input {
-          width: 100%;
-          background: #ffffff;
-          border: 1px solid rgba(20, 20, 20, 0.14);
-          padding: 14px 16px 14px 44px;
-          font-size: 13px;
-          font-family: inherit;
-          border-radius: 4px;
-          color: #141414;
-          transition: all 0.25s ease;
-        }
-        .input-wrapper input:focus {
-          outline: none;
-          border-color: #8B6914;
-          box-shadow: 0 0 0 3px rgba(139, 105, 20, 0.12);
-          background: #ffffff;
-        }
-        .newsletter-submit-btn {
-          background: linear-gradient(135deg, #9C7A3C 0%, #8B6914 100%);
-          color: #ffffff;
-          border: none;
-          padding: 14px 26px;
-          font-size: 11px;
-          letter-spacing: 0.16em;
-          text-transform: uppercase;
-          font-weight: 600;
-          font-family: 'Jost', sans-serif;
-          cursor: pointer;
-          transition: all 0.25s ease;
-          border-radius: 4px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 8px;
-          white-space: nowrap;
-          box-shadow: 0 6px 20px rgba(139, 105, 20, 0.2);
-        }
-        .newsletter-submit-btn:hover {
-          background: linear-gradient(135deg, #7A5C10 0%, #684E0D 100%);
-          color: #ffffff;
-          transform: translateY(-1px);
-          box-shadow: 0 8px 24px rgba(139, 105, 20, 0.28);
-        }
-        .newsletter-submit-btn svg {
-          transition: transform 0.25s ease;
-        }
-        .newsletter-submit-btn:hover svg {
-          transform: translateX(3px);
-        }
-
-        .newsletter-footer-note {
-          display: flex;
-          align-items: center;
-          gap: 7px;
-          font-size: 11.5px;
-          line-height: 1.45;
-          color: rgba(20, 20, 20, 0.52);
-        }
-        .newsletter-footer-note svg {
-          flex-shrink: 0;
-        }
-
         .hero-video-mute-btn {
           position: absolute;
           right: 6%;
@@ -1406,20 +1194,6 @@ export default function CollectionsPage() {
           background: #8b6914;
           border-color: #8b6914;
           transform: scale(1.06);
-        }
-
-        /* ── SKELETON CARD ── */
-        .skeleton-card {
-          height: 390px;
-          background: linear-gradient(90deg, #fafafa 25%, #f2f2f2 50%, #fafafa 75%);
-          background-size: 200% 100%;
-          animation: loading 1.5s infinite;
-          border-radius: 10px;
-          border: 1px solid rgba(20, 20, 20, 0.06);
-        }
-        @keyframes loading {
-          0% { background-position: 200% 0; }
-          100% { background-position: -200% 0; }
         }
 
         /* ── RESPONSIVE STYLES ── */
@@ -1493,12 +1267,6 @@ export default function CollectionsPage() {
           .product-grid {
             grid-template-columns: repeat(3, 1fr);
             gap: 20px;
-          }
-          .newsletter-banner {
-            grid-template-columns: 1fr;
-          }
-          .newsletter-image-block {
-            min-height: 260px;
           }
         }
 
@@ -1592,26 +1360,6 @@ export default function CollectionsPage() {
             margin-left: 0;
             width: 100%;
             text-align: center;
-          }
-          .newsletter-banner {
-            margin: 44px auto 24px;
-          }
-          .newsletter-form-block {
-            padding: 36px 24px;
-          }
-          .newsletter-title {
-            font-size: 30px;
-          }
-          .newsletter-form {
-            flex-direction: column;
-            gap: 10px;
-          }
-          .newsletter-form input {
-            width: 100%;
-          }
-          .newsletter-form button {
-            width: 100%;
-            padding: 14px 20px;
           }
         }
 
@@ -2245,11 +1993,7 @@ export default function CollectionsPage() {
           {/* PRODUCT GRID SECTION */}
           <div className="product-catalog">
             {loading ? (
-              <div className="product-grid">
-                {[...Array(8)].map((_, i) => (
-                  <div key={i} className="skeleton-card" />
-                ))}
-              </div>
+              <ProductCardSkeletonGrid count={8} />
             ) : filteredProducts.length === 0 ? (
               <div style={{ textAlign: 'center', padding: '72px 24px', border: '1px solid rgba(20,20,20,0.08)', borderRadius: '8px', backgroundColor: '#FFFFFF', boxShadow: '0 6px 24px rgba(17,17,17,0.03)' }}>
                 <h3 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '26px', color: '#141414', marginBottom: '8px' }}>No Matching Timepieces</h3>
@@ -2380,67 +2124,17 @@ export default function CollectionsPage() {
           </div>
 
           {/* PRIVATE CLIENTELE — INVITATION DISPATCH */}
-          <div className="newsletter-banner">
-            <div className="newsletter-image-block">
-              <Image src="/collections_pg.webp" alt="Winsor Private Clientele Collection" width={600} height={400} className="w-full h-full object-cover" />
-              <div className="newsletter-image-overlay" />
-              <div className="newsletter-image-badge">
-                <span className="badge-text font-mono uppercase tracking-[0.22em] text-[10px]">WINSOR PRIVATE CLIENTELE</span>
-              </div>
-            </div>
-
-            <div className="newsletter-form-block">
-              <div className="newsletter-header">
-                <div className="newsletter-tag-container">
-                  <span className="gold-line" />
-                  <span className="newsletter-tag">PRIVATE REGISTRY</span>
-                  <span className="gold-line" />
-                </div>
-                <h3 className="newsletter-title font-serif">Private Release Invitations</h3>
-                <p className="newsletter-desc">
-                  Receive quiet dispatches on numbered timepiece allocations, seasonal atelier releases, and private collector viewings.
-                </p>
-              </div>
-
-              <div className="newsletter-privileges">
-                <span className="newsletter-privilege-item">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
-                  Priority access to numbered drops
-                </span>
-                <span className="newsletter-privilege-item">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
-                  Private collector trunk invitations
-                </span>
-              </div>
-
-              <form onSubmit={handleSubscribe} className="newsletter-form">
-                <div className="input-wrapper">
-                  <svg className="input-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.6} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                  </svg>
-                  <input
-                    type="email"
-                    value={subscriberEmail}
-                    onChange={(e) => setSubscriberEmail(e.target.value)}
-                    placeholder="Enter your email address"
-                    required
-                  />
-                </div>
-                <button type="submit" disabled={subscribing} className="newsletter-submit-btn">
-                  {subscribing ? 'JOINING…' : 'JOIN LIST'}
-                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                  </svg>
-                </button>
-              </form>
-
-              <div className="newsletter-footer-note">
-                <svg className="w-3.5 h-3.5 text-[#8B6914]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                </svg>
-                <span>Discreet quarterly dispatches. Private client data is never shared.</span>
-              </div>
-            </div>
+          <div style={{ marginTop: '48px' }}>
+            <NewsletterCard
+              imageSrc="/collections_pg.webp"
+              badgeText="WINSOR PRIVATE CLIENTELE"
+              tagText="PRIVATE REGISTRY"
+              title="Private Release Invitations"
+              description="Receive quiet dispatches on numbered timepiece allocations, seasonal atelier releases, and private collector viewings."
+              buttonText="JOIN LIST"
+              footnoteText="Discreet quarterly dispatches. Private client data is never shared."
+              hideMarquee
+            />
           </div>
         </div>
       </div>

@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { toast } from 'react-hot-toast';
 import Image from 'next/image';
+import WinsorLoader from '@/components/WinsorLoader';
 
 interface Retailer {
   _id: string;
@@ -810,9 +811,8 @@ export default function AdminRetailersPage() {
 
             {/* Outlets Catalog List */}
             {loading ? (
-              <div className="bg-white/95 backdrop-blur-sm border border-[#1a1209]/10 rounded-2xl p-12 text-center">
-                <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#8B6914] mx-auto" />
-                <p className="mt-3 text-xs font-semibold text-[#8B6914] uppercase tracking-wider">Loading Boutique Outlets…</p>
+              <div className="bg-white/95 backdrop-blur-sm border border-[#1a1209]/10 rounded-2xl">
+                <WinsorLoader label="Loading Boutique Outlets…" />
               </div>
             ) : filteredRetailers.length === 0 ? (
               <div className="bg-white/95 backdrop-blur-sm border border-dashed border-[#8B6914]/30 rounded-2xl p-16 text-center">

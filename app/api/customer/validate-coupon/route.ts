@@ -1,11 +1,11 @@
 // app/api/customer/validate-coupon/route.ts
 //
 // SECURITY DESIGN:
-// 1. Rate-limited: max 5 attempts per IP per 2 minutes (brute-force protection)
-// 2. Server-side validation only — discount percent never trusted from client
-// 3. Returns a short-lived signed JWT (10 min) containing the validated discount
-// 4. JWT is verified again at checkout (order creation) before discount is applied
-// 5. JWT contains clerkId so it cannot be reused by a different user
+// 1. Rate-limited: max 15 attempts per IP per 2 minutes (brute-force protection)
+// 2. Accessible to both signed-in patrons and guest shoppers
+// 3. Server-side validation only — discount percent never trusted from client
+// 4. Returns a short-lived signed JWT (30 min) containing the validated discount
+// 5. JWT + live DB rules are verified again at checkout before stock decrement
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -13,61 +13,28 @@ import { connectDB } from '@/lib/db';
 import Coupon from '@/lib/models/Coupon';
 import { getAuth } from '@clerk/nextjs/server';
 import { RateLimiterMemory } from 'rate-limiter-flexible';
-import jwt from 'jsonwebtoken';
+import { sanitizeCouponCode, signCouponToken } from '@/lib/couponHelper';
 
-// ── Rate limiter: 5 attempts per IP per 2 minutes ────────────
+// ── Rate limiter: 15 attempts per IP per 2 minutes ──────────────────────────
 const rateLimiter = new RateLimiterMemory({
-  points: 5,
-  duration: 120, // seconds
+  points: 15,
+  duration: 120,
 });
 
-const getCouponSecret = (): string => {
-  const secret = process.env.JWT_SECRET;
-  if (!secret || secret.length < 32) throw new Error('JWT_SECRET not configured');
-  return secret;
-};
-
-// Sign a short-lived validation token (10 minutes)
-export function signCouponToken(payload: {
-  code: string;
-  discountPercent: number;
-  clerkId: string;
-}): string {
-  return jwt.sign(
-    { ...payload, type: 'coupon_validation' },
-    getCouponSecret(),
-    { expiresIn: '10m' }
-  );
-}
-
-// Verify a coupon validation token — used by orders route
-export function verifyCouponToken(token: string): {
-  code: string;
-  discountPercent: number;
-  clerkId: string;
-  type: string;
-} | null {
-  try {
-    const payload = jwt.verify(token, getCouponSecret()) as any;
-    if (payload?.type !== 'coupon_validation') return null;
-    return payload;
-  } catch {
-    return null;
-  }
-}
-
-// ── POST /api/customer/validate-coupon ────────────────────────
 export async function POST(req: NextRequest) {
-  // ① Customer must be signed in
-  const { userId } = getAuth(req);
-  if (!userId) {
-    return NextResponse.json({ success: false, error: 'Please sign in to apply a coupon' }, { status: 401 });
+  // ① Resolve authenticated user if signed in (guests are also permitted)
+  let authUserId: string | null = null;
+  try {
+    authUserId = getAuth(req).userId || null;
+  } catch {
+    authUserId = null;
   }
 
   // ② Rate limiting by IP
-  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
-    || req.headers.get('x-real-ip')
-    || 'unknown';
+  const ip =
+    req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+    req.headers.get('x-real-ip') ||
+    'unknown';
 
   try {
     await rateLimiter.consume(ip);
@@ -91,11 +58,16 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: false, error: 'Coupon code is required' }, { status: 400 });
   }
 
-  // Sanitize: uppercase, alphanumeric only, max 8 chars
-  const code = rawCode.trim().toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 8);
+  const code = sanitizeCouponCode(rawCode);
   if (code.length === 0) {
     return NextResponse.json({ success: false, error: 'Invalid coupon code format' }, { status: 400 });
   }
+
+  const fallbackClerkId =
+    typeof body?.clerkId === 'string' && body.clerkId.trim().length > 0
+      ? body.clerkId.trim()
+      : null;
+  const resolvedUserId = authUserId || fallbackClerkId;
 
   // ④ DB lookup — single query with all guard conditions
   try {
@@ -108,7 +80,6 @@ export async function POST(req: NextRequest) {
       expiresAt: { $gt: now },
     }).lean();
 
-    // Generic error — do NOT reveal whether code exists to prevent enumeration
     if (!coupon) {
       return NextResponse.json(
         { success: false, error: 'This coupon code is invalid or has expired' },
@@ -116,7 +87,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Check usage limit
     if (coupon.usageLimit !== null && coupon.usageCount >= coupon.usageLimit) {
       return NextResponse.json(
         { success: false, error: 'This coupon code has reached its maximum usage limit' },
@@ -124,11 +94,11 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // ⑤ Issue signed validation token (10 minutes)
+    // ⑤ Issue signed validation token (30 minutes)
     const validationToken = signCouponToken({
       code: coupon.code,
       discountPercent: coupon.discountPercent,
-      clerkId: userId,
+      clerkId: resolvedUserId,
     });
 
     return NextResponse.json({
@@ -137,11 +107,12 @@ export async function POST(req: NextRequest) {
         code: coupon.code,
         discountPercent: coupon.discountPercent,
         expiresAt: coupon.expiresAt,
-        validationToken, // client passes this back on checkout
+        validationToken,
+        isGuest: !resolvedUserId,
       },
     });
-
   } catch (error: any) {
-    return NextResponse.json({ success: false, error: 'Server error' }, { status: 500 });
+    console.error('[validate-coupon] Error validating coupon:', error);
+    return NextResponse.json({ success: false, error: 'Server error validating coupon' }, { status: 500 });
   }
 }

@@ -3,6 +3,7 @@
 import { useEffect, useState, FormEvent, useMemo } from 'react';
 import { toast } from 'react-hot-toast';
 import PermissionGate from '@/components/Admin/PermissionGate';
+import WinsorLoader from '@/components/WinsorLoader';
 
 interface Vacancy {
   _id: string;
@@ -217,11 +218,8 @@ export default function AdminVacanciesPage() {
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[450px]">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#8B6914]" />
-        <p className="mt-4 text-xs font-semibold text-[#8B6914] tracking-widest uppercase font-['Jost']">
-          Loading Showroom Vacancies…
-        </p>
+      <div className="min-h-[450px] flex items-center justify-center">
+        <WinsorLoader label="Loading Showroom Vacancies…" />
       </div>
     );
   }

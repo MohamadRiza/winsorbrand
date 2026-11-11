@@ -5,6 +5,12 @@ import Link from 'next/link';
 import { useClerk, SignInButton } from '@clerk/nextjs';
 import toast from 'react-hot-toast';
 import { generateReceiptPdf } from '@/lib/utils/generateReceiptPdf';
+import {
+  ClientCouponResult,
+  computeCouponTotals,
+  normalizeCouponInput,
+  validateCouponCodeRequest,
+} from '@/lib/couponClient';
 
 // ── Types ────────────────────────────────────────────────────────────────────
 export interface GuestCheckoutItem {
@@ -17,10 +23,21 @@ export interface GuestCheckoutItem {
   price: number;
 }
 
+interface CompletedReceiptSnapshot {
+  items: GuestCheckoutItem[];
+  subtotal: number;
+  couponCode?: string;
+  discountPercent?: number;
+  discountAmount?: number;
+  finalTotal: number;
+}
+
 interface GuestCheckoutModalProps {
   isOpen: boolean;
   onClose: () => void;
   items: GuestCheckoutItem[];
+  appliedCoupon?: ClientCouponResult | null;
+  onCouponChange?: (coupon: ClientCouponResult | null) => void;
   onLoginClick?: () => void;
   onOrderSuccess?: (orderRef: string, guestName: string) => void;
 }
@@ -53,6 +70,8 @@ export default function GuestCheckoutModal({
   isOpen,
   onClose,
   items,
+  appliedCoupon = null,
+  onCouponChange,
   onLoginClick,
   onOrderSuccess,
 }: GuestCheckoutModalProps) {
@@ -63,6 +82,13 @@ export default function GuestCheckoutModal({
   const [orderRef, setOrderRef] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [copiedRef, setCopiedRef] = useState(false);
+
+  // Coupon state (synced with CartPage prop and editable inside Step 3 summary)
+  const [localCoupon, setLocalCoupon] = useState<ClientCouponResult | null>(appliedCoupon);
+  const [modalCouponInput, setModalCouponInput] = useState(appliedCoupon?.code || '');
+  const [modalCouponLoading, setModalCouponLoading] = useState(false);
+  const [modalCouponError, setModalCouponError] = useState<string | null>(null);
+  const [receiptSnapshot, setReceiptSnapshot] = useState<CompletedReceiptSnapshot | null>(null);
 
   // Payment state
   const [payMethod, setPayMethod] = useState<'payhere' | 'bank_transfer'>('payhere');
@@ -98,8 +124,19 @@ export default function GuestCheckoutModal({
       setBankReceiptName('');
       setBankTransferConfirmed(false);
       setGuestEmail('');
+      setReceiptSnapshot(null);
+      setLocalCoupon(appliedCoupon ?? null);
+      setModalCouponInput(appliedCoupon?.code || '');
+      setModalCouponError(null);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);
+
+  // Keep modal coupon state synced if parent prop updates externally
+  useEffect(() => {
+    setLocalCoupon(appliedCoupon ?? null);
+    setModalCouponInput(appliedCoupon?.code || '');
+  }, [appliedCoupon]);
 
   // Lock body scroll when open
   useEffect(() => {
@@ -115,6 +152,42 @@ export default function GuestCheckoutModal({
 
   const subtotal = items.reduce((acc, i) => acc + i.price * i.quantity, 0);
   const totalQty = items.reduce((acc, i) => acc + i.quantity, 0);
+  const { discountAmount, finalTotal } = computeCouponTotals(subtotal, localCoupon?.discountPercent);
+
+  const handleApplyModalCoupon = async () => {
+    const code = normalizeCouponInput(modalCouponInput.trim());
+    if (!code) {
+      setModalCouponError('Please enter a coupon code');
+      toast.error('Please enter a coupon code');
+      return;
+    }
+
+    setModalCouponLoading(true);
+    setModalCouponError(null);
+    const result = await validateCouponCodeRequest(code, null);
+    setModalCouponLoading(false);
+
+    if (result.ok) {
+      setLocalCoupon(result.data);
+      setModalCouponInput(result.data.code);
+      setModalCouponError(null);
+      onCouponChange?.(result.data);
+      toast.success(`Coupon "${result.data.code}" applied — ${result.data.discountPercent}% off!`);
+    } else {
+      setLocalCoupon(null);
+      setModalCouponError(result.error);
+      onCouponChange?.(null);
+      toast.error(result.error);
+    }
+  };
+
+  const handleRemoveModalCoupon = () => {
+    setLocalCoupon(null);
+    setModalCouponInput('');
+    setModalCouponError(null);
+    onCouponChange?.(null);
+    toast.success('Coupon removed');
+  };
 
   // ── Form validation ─────────────────────────────────────────────────────
   const validateForm = () => {
@@ -176,11 +249,54 @@ export default function GuestCheckoutModal({
       const ref = orderRef || `WG-${Math.random().toString(36).slice(2, 10).toUpperCase()}`;
       setOrderRef(ref);
 
+      const resolvedEmail = form.email.trim().toLowerCase();
+      const buildOrderRequestBody = (
+        method: 'card' | 'bank_transfer',
+        status: 'paid' | 'pending',
+        paymentId?: string
+      ) => ({
+        guestInfo: {
+          name: form.name.trim(),
+          email: resolvedEmail,
+          mobile: `${form.mobileCode} ${form.mobile.trim()}`,
+        },
+        items: items.map(i => ({
+          productId: i.productId,
+          colorVariant: i.colorVariant,
+          quantity: i.quantity,
+        })),
+        shippingAddress: {
+          address: form.address.trim(),
+          city: form.city.trim(),
+          postalCode: form.postalCode.trim(),
+          country: form.country,
+          mobile: form.mobile.trim(),
+          mobileCode: form.mobileCode,
+        },
+        couponCode: localCoupon?.code || null,
+        validationToken: localCoupon?.validationToken || null,
+        paymentMethod: method,
+        paymentStatus: status,
+        ...(paymentId ? { payhereOrderId: paymentId } : {}),
+        customOrderRef: ref,
+      });
+
+      const captureOrderSnapshot = (serverData?: any) => {
+        setReceiptSnapshot({
+          items: items.map(i => ({ ...i })),
+          subtotal: serverData?.subtotal ?? subtotal,
+          couponCode: serverData?.couponCode || localCoupon?.code || undefined,
+          discountPercent: serverData?.couponDiscountPercent ?? localCoupon?.discountPercent ?? undefined,
+          discountAmount: serverData?.couponDiscountAmount ?? (localCoupon ? discountAmount : undefined),
+          finalTotal: serverData?.finalTotal ?? finalTotal,
+        });
+      };
+
       if (payMethod === 'payhere') {
         const hashRes = await fetch('/api/payment/payhere-hash', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ orderRef: ref, amount: subtotal, currency: 'LKR', isGuest: true, guestEmail }),
+          body: JSON.stringify({ orderRef: ref, amount: finalTotal, currency: 'LKR', isGuest: true, guestEmail }),
         });
         const hashData = await hashRes.json();
         if (!hashData.success) throw new Error('Failed to initialise payment gateway.');
@@ -199,7 +315,7 @@ export default function GuestCheckoutModal({
             notify_url: `${window.location.origin}/api/payment/payhere-notify`,
             order_id: ref,
             items: items.map(i => i.productTitle).join(', ').slice(0, 100),
-            amount: subtotal.toFixed(2), currency: 'LKR',
+            amount: finalTotal.toFixed(2), currency: 'LKR',
             first_name: form.name.trim().split(' ')[0] || 'Guest',
             last_name: form.name.trim().split(' ').slice(1).join(' ') || 'Customer',
             email: guestEmail,
@@ -214,34 +330,12 @@ export default function GuestCheckoutModal({
         const res = await fetch('/api/orders/guest', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            guestInfo: {
-              name: form.name.trim(),
-              email: form.email.trim().toLowerCase(),
-              mobile: `${form.mobileCode} ${form.mobile.trim()}`,
-            },
-            items: items.map(i => ({
-              productId: i.productId,
-              colorVariant: i.colorVariant,
-              quantity: i.quantity,
-            })),
-            shippingAddress: {
-              address: form.address.trim(),
-              city: form.city.trim(),
-              postalCode: form.postalCode.trim(),
-              country: form.country,
-              mobile: form.mobile.trim(),
-              mobileCode: form.mobileCode,
-            },
-            paymentMethod: 'card',
-            paymentStatus: 'paid',
-            payhereOrderId: payherePaymentId,
-            customOrderRef: ref,
-          }),
+          body: JSON.stringify(buildOrderRequestBody('card', 'paid', payherePaymentId)),
         });
         const data = await res.json();
         if (!data.success) throw new Error(data.error || 'Failed to place guest order.');
 
+        captureOrderSnapshot(data.data);
         if (onOrderSuccess) onOrderSuccess(ref, form.name.trim());
         setStep('success');
         toast.success('Payment confirmed! Your timepiece order is placed.');
@@ -250,29 +344,7 @@ export default function GuestCheckoutModal({
         const res = await fetch('/api/orders/guest', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            guestInfo: {
-              name: form.name.trim(),
-              email: form.email.trim().toLowerCase(),
-              mobile: `${form.mobileCode} ${form.mobile.trim()}`,
-            },
-            items: items.map(i => ({
-              productId: i.productId,
-              colorVariant: i.colorVariant,
-              quantity: i.quantity,
-            })),
-            shippingAddress: {
-              address: form.address.trim(),
-              city: form.city.trim(),
-              postalCode: form.postalCode.trim(),
-              country: form.country,
-              mobile: form.mobile.trim(),
-              mobileCode: form.mobileCode,
-            },
-            paymentMethod: 'bank_transfer',
-            paymentStatus: 'pending',
-            customOrderRef: ref,
-          }),
+          body: JSON.stringify(buildOrderRequestBody('bank_transfer', 'pending')),
         });
         const data = await res.json();
         if (!data.success) throw new Error(data.error || 'Failed to place guest order.');
@@ -291,7 +363,8 @@ export default function GuestCheckoutModal({
         setBankReceiptUploading(false);
         const receiptData = await receiptRes.json();
         if (!receiptData.success) throw new Error(receiptData.error || 'Failed to upload receipt.');
-        if (onOrderSuccess) onOrderSuccess(orderRef, form.name.trim());
+        captureOrderSnapshot(data.data);
+        if (onOrderSuccess) onOrderSuccess(ref, form.name.trim());
         setStep('success');
         toast.success('Order placed! We will verify your bank transfer within 24 hours.');
       }
@@ -328,6 +401,9 @@ export default function GuestCheckoutModal({
     if (!orderRef) return;
     const countryName = COUNTRIES.find(c => c.code === form.country)?.name || form.country;
     const resolvedMobile = `${form.mobileCode} ${form.mobile.trim()}`.trim();
+    const snapItems = receiptSnapshot?.items || items;
+    const snapSubtotal = receiptSnapshot?.subtotal ?? subtotal;
+    const snapFinalTotal = receiptSnapshot?.finalTotal ?? finalTotal;
 
     generateReceiptPdf({
       orderRef,
@@ -341,15 +417,18 @@ export default function GuestCheckoutModal({
         country: countryName,
       },
       customerMobile: resolvedMobile,
-      items: items.map(i => ({
+      items: snapItems.map(i => ({
         productTitle: i.productTitle,
         productModelNo: i.productModelNo,
         colorVariant: i.colorVariant,
         quantity: i.quantity,
         price: i.price,
       })),
-      subtotal,
-      finalTotal: subtotal,
+      subtotal: snapSubtotal,
+      couponCode: receiptSnapshot?.couponCode || localCoupon?.code || undefined,
+      discountPercent: receiptSnapshot?.discountPercent ?? localCoupon?.discountPercent ?? undefined,
+      discountAmount: receiptSnapshot?.discountAmount ?? (localCoupon ? discountAmount : undefined),
+      finalTotal: snapFinalTotal,
       paymentMethod: payMethod === 'payhere' ? 'PayHere Card Payment' : 'Direct Bank Transfer',
       paymentStatus: payMethod === 'payhere' ? 'paid' : 'pending',
     });
@@ -975,8 +1054,105 @@ export default function GuestCheckoutModal({
                     ))}
                   </div>
 
+                  {/* Privilege / Coupon Box */}
+                  <div style={{ borderTop: '1px solid rgba(20,20,20,0.08)', paddingTop: 12, marginTop: 12 }}>
+                    {!localCoupon ? (
+                      <>
+                        <div style={{ fontSize: '9.5px', fontWeight: 600, color: '#7A5C10', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>
+                          Privilege / Coupon Code
+                        </div>
+                        <div style={{ display: 'flex', gap: 8 }}>
+                          <input
+                            type="text"
+                            placeholder="Enter code..."
+                            value={modalCouponInput}
+                            maxLength={24}
+                            onChange={e => {
+                              setModalCouponInput(normalizeCouponInput(e.target.value));
+                              if (modalCouponError) setModalCouponError(null);
+                            }}
+                            onKeyDown={e => {
+                              if (e.key === 'Enter') {
+                                e.preventDefault();
+                                handleApplyModalCoupon();
+                              }
+                            }}
+                            style={{
+                              flex: 1,
+                              padding: '8px 11px',
+                              border: modalCouponError ? '1px solid #dc2626' : '1px solid rgba(20,20,20,0.14)',
+                              borderRadius: 6,
+                              fontFamily: "'Jost', sans-serif",
+                              fontSize: '12.5px',
+                              fontWeight: 600,
+                              letterSpacing: '0.08em',
+                              color: '#141414',
+                              background: '#ffffff',
+                              outline: 'none',
+                            }}
+                          />
+                          <button
+                            type="button"
+                            onClick={handleApplyModalCoupon}
+                            disabled={modalCouponLoading || !modalCouponInput.trim()}
+                            style={{
+                              padding: '8px 14px',
+                              background: (modalCouponLoading || !modalCouponInput.trim())
+                                ? 'rgba(139,105,20,0.16)'
+                                : 'linear-gradient(135deg, #9C7A3C 0%, #8B6914 100%)',
+                              color: (modalCouponLoading || !modalCouponInput.trim()) ? 'rgba(20,20,20,0.4)' : '#ffffff',
+                              border: 'none',
+                              borderRadius: 6,
+                              fontFamily: "'Jost', sans-serif",
+                              fontSize: '11px',
+                              fontWeight: 600,
+                              cursor: (modalCouponLoading || !modalCouponInput.trim()) ? 'not-allowed' : 'pointer',
+                              letterSpacing: '0.08em',
+                              textTransform: 'uppercase',
+                            }}
+                          >
+                            {modalCouponLoading ? '...' : 'Apply'}
+                          </button>
+                        </div>
+                        {modalCouponError && (
+                          <div style={{ fontSize: '11px', color: '#b91c1c', marginTop: 6, fontWeight: 500 }}>
+                            {modalCouponError}
+                          </div>
+                        )}
+                      </>
+                    ) : (
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(21,128,61,0.06)', border: '1px solid rgba(21,128,61,0.2)', borderRadius: 8, padding: '8px 11px' }}>
+                        <div>
+                          <div style={{ fontSize: '11.5px', fontWeight: 700, color: '#15803d', letterSpacing: '0.06em' }}>
+                            ✓ {localCoupon.code} Applied
+                          </div>
+                          <div style={{ fontSize: '10.5px', color: '#555555' }}>
+                            {localCoupon.discountPercent}% discount active
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={handleRemoveModalCoupon}
+                          style={{
+                            background: 'transparent',
+                            border: '1px solid rgba(220,38,38,0.3)',
+                            borderRadius: 6,
+                            padding: '3px 9px',
+                            color: '#dc2626',
+                            fontFamily: "'Jost', sans-serif",
+                            fontSize: '10.5px',
+                            fontWeight: 600,
+                            cursor: 'pointer',
+                          }}
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    )}
+                  </div>
+
                   {/* Financial Breakdown */}
-                  <div style={{ borderTop: '1px solid rgba(20,20,20,0.08)', paddingTop: 12, marginTop: 10, display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <div style={{ borderTop: '1px solid rgba(20,20,20,0.08)', paddingTop: 12, marginTop: 12, display: 'flex', flexDirection: 'column', gap: 6 }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '12px', color: '#666666' }}>
                       <span>Timepieces Subtotal</span>
                       <span style={{ fontWeight: 500, color: '#141414' }}>LKR {subtotal.toLocaleString()}</span>
@@ -985,14 +1161,27 @@ export default function GuestCheckoutModal({
                       <span>Insured Express Delivery</span>
                       <span style={{ fontWeight: 600, color: '#15803d', textTransform: 'uppercase', fontSize: '11px', letterSpacing: '0.04em' }}>Complimentary</span>
                     </div>
+                    {localCoupon && (
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '12px', color: '#15803d', fontWeight: 500 }}>
+                        <span>Discount ({localCoupon.discountPercent}% — {localCoupon.code})</span>
+                        <span>- LKR {discountAmount.toLocaleString()}</span>
+                      </div>
+                    )}
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: 8, marginTop: 4, borderTop: '1px solid rgba(20,20,20,0.1)' }}>
                       <div>
                         <div style={{ fontSize: '12.5px', fontWeight: 600, color: '#141414', letterSpacing: '0.04em', textTransform: 'uppercase' }}>Order Total</div>
                         <div style={{ fontSize: '10.5px', color: '#777777' }}>Inclusive of taxes & insured delivery</div>
                       </div>
-                      <span style={{ fontSize: '18px', fontWeight: 600, color: '#141414', fontFamily: "'Jost', sans-serif", fontVariantNumeric: 'tabular-nums' }}>
-                        LKR {subtotal.toLocaleString()}
-                      </span>
+                      <div style={{ textAlign: 'right' }}>
+                        {localCoupon && (
+                          <div style={{ fontSize: '11px', color: '#777777', textDecoration: 'line-through' }}>
+                            LKR {subtotal.toLocaleString()}
+                          </div>
+                        )}
+                        <span style={{ fontSize: '18px', fontWeight: 600, color: '#141414', fontFamily: "'Jost', sans-serif", fontVariantNumeric: 'tabular-nums' }}>
+                          LKR {finalTotal.toLocaleString()}
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -1039,8 +1228,22 @@ export default function GuestCheckoutModal({
               <div>
                 {/* Total bar */}
                 <div className="gcm-card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '14px 18px' }}>
-                  <span style={{ fontSize: '11px', color: '#666666', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Order Total</span>
-                  <span style={{ fontSize: '18px', fontWeight: 600, color: '#141414' }}>LKR {subtotal.toLocaleString()}</span>
+                  <div>
+                    <span style={{ fontSize: '11px', color: '#666666', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Order Total</span>
+                    {localCoupon && (
+                      <div style={{ fontSize: '10.5px', color: '#15803d', fontWeight: 600, marginTop: 2 }}>
+                        {localCoupon.code} ({localCoupon.discountPercent}% off applied)
+                      </div>
+                    )}
+                  </div>
+                  <div style={{ textAlign: 'right' }}>
+                    {localCoupon && (
+                      <div style={{ fontSize: '11px', color: '#777777', textDecoration: 'line-through' }}>
+                        LKR {subtotal.toLocaleString()}
+                      </div>
+                    )}
+                    <span style={{ fontSize: '18px', fontWeight: 600, color: '#141414' }}>LKR {finalTotal.toLocaleString()}</span>
+                  </div>
                 </div>
 
                 <div style={{ fontSize: '10.5px', fontWeight: 600, color: '#666666', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 10 }}>Payment Method</div>
@@ -1104,7 +1307,7 @@ export default function GuestCheckoutModal({
                   <>
                     <div style={{ background: '#FAF8F4', border: '1px solid rgba(139, 105, 20, 0.16)', borderRadius: 12, padding: '14px 16px', marginTop: 12 }}>
                       <div style={{ fontSize: '9.5px', fontWeight: 600, color: '#7A5C10', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 8 }}>Bank Transfer Details</div>
-                      {[['Bank', 'NATIONS TRUST BANK'], ['Account No.', '100460045365'], ['Branch', 'Bankshall Street (PETTAH)'], ['Amount', `LKR ${subtotal.toLocaleString()}`]].map(([label, value], i) => (
+                      {[['Bank', 'NATIONS TRUST BANK'], ['Account No.', '100460045365'], ['Branch', 'Bankshall Street (PETTAH)'], ['Amount', `LKR ${finalTotal.toLocaleString()}`]].map(([label, value], i) => (
                         <div key={i} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', borderTop: i > 0 ? '1px solid rgba(139,105,20,0.1)' : undefined, marginTop: i > 0 ? 6 : 0, paddingTop: i > 0 ? 6 : 0, color: '#141414' }}>
                           <span style={{ color: '#666666', fontSize: '11.5px' }}>{label}</span>
                           <span style={{ fontWeight: 600, color: '#141414', fontFamily: label === 'Account No.' ? 'monospace' : undefined }}>{value}</span>
@@ -1141,7 +1344,7 @@ export default function GuestCheckoutModal({
                         {bankTransferConfirmed && <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3"><polyline points="20 6 9 17 4 12" /></svg>}
                       </div>
                       <span style={{ fontSize: '12px', color: '#444444', lineHeight: 1.5 }}>
-                        I confirm I have transferred <strong>LKR {subtotal.toLocaleString()}</strong> to the account above.
+                        I confirm I have transferred <strong>LKR {finalTotal.toLocaleString()}</strong> to the account above.
                       </span>
                     </div>
                   </>

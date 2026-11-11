@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { toast } from 'react-hot-toast';
 import PermissionGate from '@/components/Admin/PermissionGate';
+import WinsorLoader from '@/components/WinsorLoader';
 
 interface PendingApprovalItem {
   _id: string;
@@ -1053,22 +1054,14 @@ export default function ApprovalsPage() {
           {loading ? (
             <div
               style={{
-                textAlign: 'center',
-                padding: '90px 0',
                 background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.92) 0%, rgba(250, 247, 240, 0.92) 100%)',
                 backdropFilter: 'blur(12px)',
                 borderRadius: '20px',
                 border: '1px solid rgba(139, 105, 20, 0.22)',
                 boxShadow: '0 8px 30px rgba(26, 18, 9, 0.04)',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                gap: '14px',
               }}
             >
-              <div style={{ width: '40px', height: '40px', border: '3px solid rgba(139, 105, 20, 0.2)', borderTopColor: '#8B6914', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
-              <span style={{ fontSize: '13.5px', color: 'rgba(26, 18, 9, 0.65)', fontWeight: 500 }}>Synchronizing governance records...</span>
-              <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+              <WinsorLoader label="Synchronizing governance records…" />
             </div>
           ) : items.length === 0 ? (
             <div

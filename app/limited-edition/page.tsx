@@ -9,6 +9,8 @@ import { useCart } from '@/app/context/CartContext';
 import { IProduct, CollectionSection } from '@/types';
 import NewsletterCard from '@/components/NewsletterCard';
 import ProductCard from '@/components/ProductCard';
+import ProductCardSkeletonGrid from '@/components/ProductCardSkeletonGrid';
+import WinsorLoader from '@/components/WinsorLoader';
 import { showWishlistToast } from '@/components/WinsorToaster';
 import LimitedEditionHeroTypewriter from './LimitedEditionHeroTypewriter';
 
@@ -730,15 +732,7 @@ function LimitedEditionContent() {
 
         {/* ── PRODUCT GRID ── */}
         {loading ? (
-          <div style={{ textAlign: 'center', padding: '80px 20px' }}>
-            <div 
-              style={{ 
-                width: '36px', height: '36px', border: '3px solid rgba(139,105,20,0.2)', borderTopColor: '#8b6914', 
-                borderRadius: '50%', animation: 'spin 0.8s linear infinite', margin: '0 auto 16px' 
-              }} 
-            />
-            <p style={{ color: 'rgba(26,18,9,0.5)', fontSize: '13px' }}>Loading Limited Edition timepieces…</p>
-          </div>
+          <ProductCardSkeletonGrid count={8} />
         ) : error ? (
           <div style={{ textAlign: 'center', padding: '60px 20px', color: '#c93b2b' }}>
             <p>{error}</p>
@@ -780,9 +774,10 @@ function LimitedEditionContent() {
 export default function LimitedEditionPage() {
   return (
     <Suspense fallback={
-      <div style={{ minHeight: '100vh', background: '#ffffff' }}>
+      <>
         <h1 className="sr-only">Limited Edition Timepiece Collection</h1>
-      </div>
+        <WinsorLoader fullScreen size="lg" label="Loading Limited Edition…" />
+      </>
     }>
       <LimitedEditionContent />
     </Suspense>

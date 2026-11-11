@@ -5,6 +5,7 @@ import { useUser, SignInButton } from '@clerk/nextjs';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useCurrency } from '@/app/context/CurrencyContext';
+import WinsorLoader from '@/components/WinsorLoader';
 import toast from 'react-hot-toast';
 
 interface OrderItem {
@@ -215,16 +216,8 @@ export default function CustomerOrdersPage() {
 
   if (!isLoaded || loading) {
     return (
-      <div style={{ minHeight: '85vh', background: '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Jost', sans-serif", paddingTop: '110px' }}>
-        <div style={{ textAlign: 'center' }}>
-          <div style={{ width: '44px', height: '44px', borderRadius: '50%', border: '1.5px solid rgba(139,105,20,0.14)', borderTopColor: '#8B6914', animation: 'orders-spin 0.9s linear infinite', margin: '0 auto 18px' }} />
-          <p style={{ color: 'rgba(20,20,20,0.52)', fontSize: '11.5px', fontWeight: 500, letterSpacing: '0.16em', textTransform: 'uppercase', margin: 0 }}>Loading your orders...</p>
-        </div>
-        <style>{`
-          @keyframes orders-spin {
-            to { transform: rotate(360deg); }
-          }
-        `}</style>
+      <div style={{ paddingTop: '90px' }}>
+        <WinsorLoader fullScreen size="lg" label="Loading your orders…" />
       </div>
     );
   }

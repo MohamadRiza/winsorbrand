@@ -5,6 +5,7 @@ import { useUser, SignInButton, useClerk } from '@clerk/nextjs';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
 import { showWishlistToast } from '@/components/WinsorToaster';
+import WinsorLoader from '@/components/WinsorLoader';
 
 const COUNTRIES = [
   { code: 'LK', name: 'Sri Lanka' },
@@ -514,20 +515,7 @@ export default function ProfilePage() {
           color: #141414;
         }
 
-        /* ── Loading ── */
-        .profile-loading-wrapper {
-          min-height: 80vh;
-          display: flex; align-items: center; justify-content: center;
-          background-color: #FBFBFC;
-        }
-        .profile-spinner {
-          width: 36px; height: 36px;
-          border: 2px solid rgba(20,20,20,0.1);
-          border-top: 2px solid #141414;
-          border-radius: 50%;
-          animation: spin 0.8s linear infinite;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
+        /* ── Section Transitions ── */
 
         /* ── Access Card (Unauthenticated) ── */
         .access-card {
@@ -1519,12 +1507,7 @@ export default function ProfilePage() {
 
   // Clerk Loading State
   if (!isLoaded) {
-    return (
-      <div className="profile-loading-wrapper">
-        <style>{`${profileStyles}`}</style>
-        <div className="profile-spinner" />
-      </div>
-    );
+    return <WinsorLoader fullScreen size="lg" label="Loading Your Profile…" />;
   }
 
   // Unauthenticated State
@@ -1852,9 +1835,7 @@ export default function ProfilePage() {
                 </div>
 
                 {loading ? (
-                  <div style={{ display: 'flex', justifyContent: 'center', padding: '40px 0' }}>
-                    <div className="profile-spinner" />
-                  </div>
+                  <WinsorLoader size="sm" showBrandWordmark={false} label="Loading…" />
                 ) : (
                   <form onSubmit={handleSubmit} className="profile-custom-form">
 
@@ -2566,7 +2547,7 @@ export default function ProfilePage() {
                     <p className="card-subtitle">Products eligible for review (up to 90 days after delivery).</p>
                   </div>
                   {loadingReviews ? (
-                    <p style={{ fontSize: '13px', color: 'rgba(26,18,9,0.5)', textAlign: 'center', padding: '20px 0' }}>Loading items...</p>
+                    <WinsorLoader size="sm" showBrandWordmark={false} label="Loading items…" />
                   ) : pendingReviews.length === 0 ? (
                     <p style={{ fontSize: '13.5px', color: 'rgba(26,18,9,0.5)', textAlign: 'center', padding: '30px 0', margin: 0 }}>
                       No pending reviews. Products from delivered orders are eligible for review up to 90 days after delivery.
@@ -2609,7 +2590,7 @@ export default function ProfilePage() {
                     <p className="card-subtitle">Track status and details of your previous product reviews.</p>
                   </div>
                   {loadingReviews ? (
-                    <p style={{ fontSize: '13px', color: 'rgba(26,18,9,0.5)', textAlign: 'center', padding: '20px 0' }}>Loading reviews...</p>
+                    <WinsorLoader size="sm" showBrandWordmark={false} label="Loading reviews…" />
                   ) : myReviews.length === 0 ? (
                     <p style={{ fontSize: '13.5px', color: 'rgba(26,18,9,0.5)', textAlign: 'center', padding: '30px 0', margin: 0 }}>
                       You have not submitted any reviews yet.

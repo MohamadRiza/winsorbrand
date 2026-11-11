@@ -4,6 +4,7 @@ import { useEffect, useState, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import Navbar from '@/components/Navbar/Navbar';
+import WinsorLoader from '@/components/WinsorLoader';
 import CareersHeroTypewriter from './CareersHeroTypewriter';
 
 interface Vacancy {
@@ -195,10 +196,7 @@ export default function CareersPage() {
         </div>
 
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-20 space-y-4">
-            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#8B6914]"></div>
-            <p className="text-xs text-[#141414]/60 tracking-widest uppercase" style={{ fontFamily: "'Jost', sans-serif" }}>Loading Openings…</p>
-          </div>
+          <WinsorLoader label="Loading Openings…" />
         ) : filteredVacancies.length === 0 ? (
           <div className="text-center py-20 bg-white border border-black/[0.08] rounded-xl shadow-sm p-8">
             <svg className="w-12 h-12 text-[#8B6914]/40 mx-auto mb-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">

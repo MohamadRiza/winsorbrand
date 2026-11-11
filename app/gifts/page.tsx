@@ -8,12 +8,60 @@ import { useCart } from '@/app/context/CartContext';
 import { IGiftCategory, IProduct } from '@/types';
 import NewsletterCard from '@/components/NewsletterCard';
 import { showWishlistToast } from '@/components/WinsorToaster';
+import HorologyWaveBackdrop from '@/components/Footer/HorologyWaveBackdrop';
+import ProductCardSkeletonGrid from '@/components/ProductCardSkeletonGrid';
 import GiftsHeroTypewriter from './GiftsHeroTypewriter';
+
+type WatchTypeFilter = 'all' | 'mens' | 'womens' | 'new' | 'limited';
+
+const WATCH_FILTER_OPTIONS: { id: WatchTypeFilter; label: string }[] = [
+  { id: 'all', label: 'All' },
+  { id: 'mens', label: "Men's Watches" },
+  { id: 'womens', label: "Women's Watches" },
+  { id: 'new', label: 'New Arrivals' },
+  { id: 'limited', label: 'Limited Edition' },
+];
 
 const stripEmojis = (text: string) => {
   if (!text) return '';
   return text.replace(/[\u00a9\u00ae\u2000-\u3300\ud83c-\udbff\udc00-\udfff]/g, '').trim();
 };
+
+function getProductGender(product: IProduct): 'Gents' | 'Ladies' | 'Unisex' {
+  const specs = (product.specifications || {}) as Record<string, string>;
+  for (const key of Object.keys(specs)) {
+    if (key.toLowerCase() === 'gender') {
+      const val = String(specs[key]).toLowerCase();
+      if (val.includes('lady') || val.includes('women') || val.includes('female') || val.includes('ladies')) {
+        return 'Ladies';
+      }
+      if (val.includes('gent') || val.includes('men') || val.includes('male') || val.includes('gents')) {
+        return 'Gents';
+      }
+      return 'Unisex';
+    }
+  }
+  const text = `${product.title || ''} ${product.description || ''}`.toLowerCase();
+  if (text.includes('ladies') || text.includes('women') || text.includes('diamond')) return 'Ladies';
+  if (text.includes('gents') || text.includes('men')) return 'Gents';
+  return 'Unisex';
+}
+
+function matchesWatchTypeFilter(product: IProduct, filter: WatchTypeFilter): boolean {
+  if (filter === 'all') return true;
+  if (filter === 'mens' || filter === 'womens') {
+    const gender = getProductGender(product);
+    const target = filter === 'mens' ? 'Gents' : 'Ladies';
+    return gender === target || gender === 'Unisex';
+  }
+  if (product.collectionSections?.includes(filter)) return true;
+  const text = `${product.title || ''} ${product.description || ''}`.toLowerCase();
+  const keywordMap: Record<'new' | 'limited', string[]> = {
+    new: ['new', '2026', 'latest'],
+    limited: ['limited', 'reserve', 'edition'],
+  };
+  return keywordMap[filter].some(kw => text.includes(kw));
+}
 
 // Slug to image mapping for active gift categories inside public/gift_categories
 function getGiftCategoryImage(slug: string, dbImage?: string): string {
@@ -52,11 +100,9 @@ export default function GiftsPage() {
   const [error, setError] = useState<string | null>(null);
   const [reviewRatings, setReviewRatings] = useState<Record<string, { averageRating: number; reviewCount: number }>>({});
 
-  // Filter & Search states
+  // Filter states
   const [selectedCategorySlug, setSelectedCategorySlug] = useState<string>('all');
-  const [searchQuery, setSearchQuery] = useState<string>('');
-  const [priceSort, setPriceSort] = useState<'none' | 'low-to-high' | 'high-to-low'>('none');
-  const [showMobileFilters, setShowMobileFilters] = useState<boolean>(false);
+  const [selectedWatchType, setSelectedWatchType] = useState<WatchTypeFilter>('all');
   const [wishlist, setWishlist] = useState<string[]>([]);
 
   // Fetch products and active categories on mount
@@ -149,35 +195,19 @@ export default function GiftsPage() {
   // Reset filters helper
   const resetFilters = () => {
     setSelectedCategorySlug('all');
-    setSearchQuery('');
-    setPriceSort('none');
+    setSelectedWatchType('all');
   };
 
   // Products come from the curated gifts endpoint; retain the category guard for resilience.
   const giftingProducts = products.filter(p => p.giftCategories && p.giftCategories.length > 0);
 
-  let filteredProducts = giftingProducts.filter(p => {
-    // Category filter
+  const filteredProducts = giftingProducts.filter(p => {
+    // Occasion category filter
     const catMatch = selectedCategorySlug === 'all' || p.giftCategories.includes(selectedCategorySlug);
-    // Search query filter
-    let searchMatch = true;
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase();
-      const titleMatch = p.title?.toLowerCase().includes(q);
-      const modelMatch = p.modelNo?.toLowerCase().includes(q);
-      const descMatch = p.description?.toLowerCase().includes(q);
-      const specMatch = p.specifications && Object.values(p.specifications).some(val => String(val).toLowerCase().includes(q));
-      searchMatch = Boolean(titleMatch || modelMatch || descMatch || specMatch);
-    }
-    return catMatch && searchMatch;
+    // Watch type / collection pill filter
+    const watchTypeMatch = matchesWatchTypeFilter(p, selectedWatchType);
+    return catMatch && watchTypeMatch;
   });
-
-  // Price sorting
-  if (priceSort === 'low-to-high') {
-    filteredProducts = [...filteredProducts].sort((a, b) => a.price - b.price);
-  } else if (priceSort === 'high-to-low') {
-    filteredProducts = [...filteredProducts].sort((a, b) => b.price - a.price);
-  }
 
   return (
     <main style={{ backgroundColor: '#ffffff', minHeight: '100vh', width: '100%', paddingBottom: '20px' }}>
@@ -250,36 +280,62 @@ export default function GiftsPage() {
         /* ── BODY CONTAINER ── */
         .gifts-container {
           background-color: #ffffff;
-          min-height: 100vh;
+          min-height: 60vh;
           font-family: 'Jost', sans-serif;
           color: #141414;
-          padding: 0 4% 60px;
+          padding: 20px 4% 60px;
         }
 
-        /* ── CIRCULAR LUXURY OCCASION BADGES (.|.) ── */
+        /* ── FULL-BLEED PEARL WAVE SHOWCASE BAND ── */
+        .gifts-showcase-outer {
+          position: relative;
+          width: 100%;
+          background-color: #ffffff;
+          z-index: 20;
+        }
+        .gifts-showcase-wave-bg {
+          position: absolute;
+          inset: 0;
+          overflow: hidden;
+          pointer-events: none;
+          z-index: 1;
+        }
+        .gifts-showcase-content {
+          position: relative;
+          z-index: 15;
+          max-width: 1400px;
+          margin: 0 auto;
+          padding: 36px 4% 46px;
+        }
+
+        /* ── CIRCULAR LUXURY OCCASION BADGES ── */
         .gifts-category-row {
           display: flex;
           flex-wrap: wrap;
           align-items: flex-start;
           justify-content: center;
-          gap: 20px 32px;
-          margin-bottom: 32px;
-          padding: 0;
+          gap: 24px 36px;
+          margin-bottom: 34px;
+          padding: 4px 0;
         }
 
         .gift-circle-item {
+          background: transparent;
+          border: none;
+          padding: 0;
+          font-family: inherit;
           display: flex;
           flex-direction: column;
           align-items: center;
           cursor: pointer;
-          transition: all 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+          transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
           text-decoration: none;
           outline: none;
-          max-width: 125px;
-          width: 100%;
+          min-width: 118px;
+          max-width: 152px;
         }
 
-        /* ── ATTACHED BENEFITS BAR (MATCHING IMG2 LUXURY ATTACHED DESIGN) ── */
+        /* ── ATTACHED BENEFITS BAR (DIRECTLY OVERLAPS HERO SEAM) ── */
         @keyframes hero-benefits-marquee {
           0% {
             transform: translate3d(0, 0, 0);
@@ -292,7 +348,7 @@ export default function GiftsPage() {
           position: relative;
           z-index: 30;
           max-width: 1400px;
-          margin: -34px auto 16px;
+          margin: -34px auto 0;
           padding: 0 4%;
           width: 100%;
         }
@@ -350,7 +406,7 @@ export default function GiftsPage() {
 
         @media (max-width: 1024px) {
           .hero-attached-benefits-wrapper {
-            margin: -24px auto 16px;
+            margin: -24px auto 0;
             padding: 0 16px;
           }
           .hero-attached-benefits-bar {
@@ -399,28 +455,32 @@ export default function GiftsPage() {
 
         .gift-circle-badge {
           position: relative;
-          width: 108px;
-          height: 108px;
+          width: 118px;
+          height: 118px;
           border-radius: 50%;
-          padding: 3px;
-          background: linear-gradient(135deg, rgba(139,105,20,0.3) 0%, rgba(223,177,91,0.65) 50%, rgba(139,105,20,0.3) 100%);
-          border: 1.5px solid rgba(139,105,20,0.35);
-          box-shadow: 0 4px 16px rgba(26,18,9,0.06);
+          padding: 4.5px;
+          background: conic-gradient(
+            from 135deg,
+            #9A7222 0deg,
+            #E8CE82 65deg,
+            #FFF3C4 120deg,
+            #C79739 195deg,
+            #8B6418 270deg,
+            #E2BE68 325deg,
+            #9A7222 360deg
+          );
+          box-shadow: 0 10px 26px rgba(139, 105, 20, 0.15), 0 4px 12px rgba(26, 18, 9, 0.08);
           transition: all 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
 
         .gift-circle-item:hover .gift-circle-badge {
-          transform: translateY(-4px) scale(1.05);
-          border-color: #8b6914;
-          background: linear-gradient(135deg, #8b6914 0%, #dfb15b 50%, #8b6914 100%);
-          box-shadow: 0 8px 24px rgba(139,105,20,0.3), 0 0 16px rgba(223,177,91,0.25);
+          transform: translateY(-4px) scale(1.045);
+          box-shadow: 0 14px 30px rgba(139, 105, 20, 0.24), 0 0 0 3px rgba(223, 177, 91, 0.24);
         }
 
         .gift-circle-item.active .gift-circle-badge {
-          transform: translateY(-2px) scale(1.06);
-          border-color: #8b6914;
-          background: linear-gradient(135deg, #8b6914 0%, #dfb15b 50%, #8b6914 100%);
-          box-shadow: 0 0 20px rgba(139,105,20,0.4), 0 6px 20px rgba(26,18,9,0.12);
+          transform: translateY(-3px) scale(1.055);
+          box-shadow: 0 14px 32px rgba(139, 105, 20, 0.3), 0 0 0 3.5px rgba(212, 175, 55, 0.34);
         }
 
         .gift-circle-inner {
@@ -429,7 +489,8 @@ export default function GiftsPage() {
           height: 100%;
           border-radius: 50%;
           overflow: hidden;
-          background: #110e0b;
+          background: #14110e;
+          box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 248, 226, 0.72);
         }
 
         .gift-circle-bg-img {
@@ -440,19 +501,19 @@ export default function GiftsPage() {
         }
 
         .gift-circle-item:hover .gift-circle-bg-img {
-          transform: scale(1.12);
+          transform: scale(1.1);
         }
 
         .gift-circle-overlay {
           position: absolute;
           inset: 0;
-          background: radial-gradient(circle at center, rgba(17,14,11,0.35) 0%, rgba(17,14,11,0.75) 100%);
+          background: radial-gradient(circle at center, rgba(16, 13, 10, 0.14) 0%, rgba(16, 13, 10, 0.54) 100%);
           z-index: 2;
-          transition: opacity 0.3s ease;
+          transition: background 0.3s ease;
         }
 
         .gift-circle-item:hover .gift-circle-overlay {
-          background: radial-gradient(circle at center, rgba(17,14,11,0.25) 0%, rgba(17,14,11,0.65) 100%);
+          background: radial-gradient(circle at center, rgba(16, 13, 10, 0.08) 0%, rgba(16, 13, 10, 0.42) 100%);
         }
 
         .gift-circle-watch-wrapper {
@@ -469,56 +530,123 @@ export default function GiftsPage() {
           width: 58%;
           height: 58%;
           object-fit: contain;
-          filter: drop-shadow(0 4px 10px rgba(0,0,0,0.65));
+          filter: drop-shadow(0 5px 12px rgba(0, 0, 0, 0.58));
           transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
         .gift-circle-item:hover .gift-circle-watch-img {
-          transform: scale(1.14);
+          transform: scale(1.12);
         }
 
         .gift-circle-label {
-          font-family: 'Cormorant Garamond', serif;
-          font-size: 13.5px;
+          font-family: 'Jost', sans-serif;
+          font-size: 11.5px;
           font-weight: 600;
           letter-spacing: 0.1em;
-          color: rgba(26,18,9,0.75);
+          color: rgba(26, 18, 9, 0.68);
           text-transform: uppercase;
           text-align: center;
-          margin-top: 12px;
+          margin-top: 13px;
           transition: color 0.3s ease;
-          line-height: 1.25;
+          line-height: 1.3;
+          white-space: nowrap;
         }
 
-        .gift-circle-item:hover .gift-circle-label,
-        .gift-circle-item.active .gift-circle-label {
+        .gift-circle-item:hover .gift-circle-label {
           color: #8b6914;
         }
 
-        .gift-by-occasion-wrapper {
-          border-top: 1px solid rgba(26,18,9,0.08);
-          padding-top: 20px;
-          margin-top: 8px;
-          margin-bottom: 24px;
+        .gift-circle-item.active .gift-circle-label {
+          color: #8b6914;
+          font-weight: 700;
         }
+
+        .gift-by-occasion-wrapper {
+          padding-top: 4px;
+          margin: 0;
+        }
+
+        .gift-occasion-heading-row {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 18px;
+          max-width: 620px;
+          margin: 0 auto 30px;
+        }
+
+        .gift-heading-rule {
+          flex: 1;
+          height: 1px;
+          max-width: 112px;
+        }
+        .gift-heading-rule.left {
+          background: linear-gradient(90deg, rgba(184, 138, 40, 0) 0%, rgba(184, 138, 40, 0.42) 55%, rgba(154, 114, 34, 0.78) 100%);
+        }
+        .gift-heading-rule.right {
+          background: linear-gradient(90deg, rgba(154, 114, 34, 0.78) 0%, rgba(184, 138, 40, 0.42) 45%, rgba(184, 138, 40, 0) 100%);
+        }
+
         .gift-by-occasion-title {
           font-family: 'Cormorant Garamond', 'Cinzel', serif;
-          font-size: 19px;
-          font-weight: 500;
-          letter-spacing: 0.18em;
+          font-size: 21px;
+          font-weight: 600;
+          letter-spacing: 0.16em;
           color: #1a1209;
           text-transform: uppercase;
           text-align: center;
-          margin: 0 0 20px 0;
+          margin: 0;
+          white-space: nowrap;
         }
 
-        .gift-circle-active-bar {
-          width: 32px;
-          height: 2px;
-          background: #8b6914;
-          margin: 6px auto 0;
-          border-radius: 2px;
-          box-shadow: 0 0 6px rgba(139,105,20,0.5);
+        /* ── WATCH FILTER PILL CAPSULE BELOW OCCASION CIRCLES ── */
+        .gift-watch-pills-wrap {
+          display: flex;
+          justify-content: center;
+          width: 100%;
+          margin-top: 2px;
+        }
+        .gift-watch-pills-bar {
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+          padding: 5px;
+          background: rgba(246, 243, 236, 0.94);
+          border: 1px solid rgba(184, 146, 62, 0.18);
+          border-radius: 999px;
+          box-shadow: 0 8px 24px rgba(26, 18, 9, 0.045), inset 0 1px 0 rgba(255, 255, 255, 0.85);
+          max-width: 100%;
+          overflow-x: auto;
+          scrollbar-width: none;
+          -webkit-overflow-scrolling: touch;
+        }
+        .gift-watch-pills-bar::-webkit-scrollbar {
+          display: none;
+        }
+        .gift-watch-pill-btn {
+          border: none;
+          background: transparent;
+          color: rgba(26, 18, 9, 0.78);
+          font-family: 'Jost', sans-serif;
+          font-size: 12.5px;
+          font-weight: 500;
+          letter-spacing: 0.03em;
+          padding: 9px 22px;
+          border-radius: 999px;
+          cursor: pointer;
+          white-space: nowrap;
+          flex-shrink: 0;
+          transition: all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        .gift-watch-pill-btn:hover:not(.active) {
+          color: #1a1209;
+          background: rgba(184, 146, 62, 0.09);
+        }
+        .gift-watch-pill-btn.active {
+          background: linear-gradient(135deg, #BA8E34 0%, #9A6F1A 55%, #C79A3E 100%);
+          color: #ffffff;
+          font-weight: 600;
+          box-shadow: 0 4px 12px rgba(154, 111, 26, 0.28), inset 0 1px 0 rgba(255, 240, 195, 0.35);
         }
 
         /* ── PRODUCT SECTION ── */
@@ -669,23 +797,7 @@ export default function GiftsPage() {
           border-color: #1a1209;
         }
 
-        /* ── LOADING & ERROR SKELETON ── */
-        .gifts-loader {
-          text-align: center;
-          padding: 80px 20px;
-        }
-        .spinner {
-          width: 32px;
-          height: 32px;
-          border: 2px solid rgba(139,105,20,0.15);
-          border-top-color: #8b6914;
-          border-radius: 50%;
-          animation: spin 0.8s linear infinite;
-          margin: 0 auto 16px;
-        }
-        @keyframes spin {
-          to { transform: rotate(360deg); }
-        }
+        /* ── ERROR STATE ── */
 
         /* ── BENEFITS BAR ── */
         @keyframes benefits-marquee {
@@ -783,63 +895,6 @@ export default function GiftsPage() {
           }
         }
 
-        /* ── TOOLBAR CONTROLS ── */
-        .col-toolbar {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 16px;
-          align-items: center;
-          margin: 0 auto 36px;
-          padding: 16px 24px;
-          background-color: #fff;
-          border: 1px solid rgba(26, 18, 9, 0.06);
-          border-radius: 12px;
-          max-width: 1400px;
-          width: 100%;
-        }
-        .search-wrapper {
-          position: relative;
-          flex: 1;
-          min-width: 200px;
-          max-width: 320px;
-        }
-        .search-input {
-          width: 100%;
-          background: #F8F7F4;
-          border: 1px solid rgba(20, 20, 20, 0.1);
-          border-radius: 6px;
-          padding: 10px 16px 10px 38px;
-          font-size: 12.5px;
-          color: #141414;
-          font-family: inherit;
-        }
-        .search-input:focus {
-          outline: none;
-          border-color: #8b6914;
-        }
-        .search-icon {
-          position: absolute;
-          left: 14px;
-          top: 50%;
-          transform: translateY(-50%);
-          color: rgba(20, 20, 20, 0.4);
-          pointer-events: none;
-        }
-        .toolbar-select {
-          background: #F8F7F4;
-          border: 1px solid rgba(20, 20, 20, 0.1);
-          border-radius: 6px;
-          padding: 10px 16px;
-          font-size: 12.5px;
-          color: #141414;
-          cursor: pointer;
-          font-family: inherit;
-          min-width: 160px;
-        }
-        .toolbar-select:focus {
-          outline: none;
-          border-color: #8b6914;
-        }
         .toolbar-reset-btn {
           background: transparent;
           border: 1px dashed rgba(26,18,9,0.25);
@@ -948,15 +1003,29 @@ export default function GiftsPage() {
         }
 
         @media (max-width: 768px) {
+          .gifts-showcase-content {
+            padding: 26px 3.5% 32px;
+          }
+          .gift-occasion-heading-row {
+            gap: 12px;
+            margin-bottom: 22px;
+          }
+          .gift-by-occasion-title {
+            font-size: 17px;
+            letter-spacing: 0.14em;
+          }
           .gifts-category-row {
             display: flex;
             flex-wrap: nowrap;
             overflow-x: auto;
             scroll-snap-type: x mandatory;
             justify-content: flex-start;
-            padding: 8px 12px 20px;
+            width: fit-content;
+            max-width: 100%;
+            margin: 0 auto 24px;
+            padding: 8px 6px 12px;
             gap: 18px;
-            margin-bottom: 36px;
+            scrollbar-width: none;
             -webkit-overflow-scrolling: touch;
           }
           .gifts-category-row::-webkit-scrollbar {
@@ -965,15 +1034,25 @@ export default function GiftsPage() {
           .gift-circle-item {
             flex-shrink: 0;
             scroll-snap-align: start;
-            max-width: 90px;
+            min-width: 90px;
+            max-width: 112px;
           }
           .gift-circle-badge {
-            width: 82px;
-            height: 82px;
+            width: 88px;
+            height: 88px;
+            padding: 4px;
           }
           .gift-circle-label {
+            font-size: 10.5px;
+            margin-top: 9px;
+            white-space: normal;
+          }
+          .gift-watch-pills-bar {
+            padding: 4px;
+          }
+          .gift-watch-pill-btn {
+            padding: 8px 16px;
             font-size: 11.5px;
-            margin-top: 8px;
           }
           .benefits-bar {
             display: flex;
@@ -987,19 +1066,6 @@ export default function GiftsPage() {
             scroll-snap-align: start;
             min-width: 220px;
           }
-          .col-toolbar {
-            display: none;
-            flex-direction: column;
-            align-items: stretch;
-            gap: 12px;
-            padding: 16px;
-          }
-          .col-toolbar.show {
-            display: flex;
-          }
-          .search-wrapper {
-            max-width: 100%;
-          }
           .toolbar-reset-btn {
             margin-left: 0;
             width: 100%;
@@ -1007,13 +1073,32 @@ export default function GiftsPage() {
           }
         }
 
+        @media (max-width: 640px) {
+          .gift-watch-pills-bar {
+            flex-wrap: wrap;
+            justify-content: center;
+            border-radius: 20px;
+            padding: 5px 6px;
+            gap: 4px;
+          }
+          .gift-watch-pill-btn {
+            padding: 7px 14px;
+            font-size: 11.5px;
+          }
+        }
+
         @media (max-width: 480px) {
           .gift-circle-badge {
-            width: 74px;
-            height: 74px;
+            width: 78px;
+            height: 78px;
+            padding: 3.5px;
+          }
+          .gift-circle-item {
+            min-width: 82px;
+            max-width: 100px;
           }
           .gift-circle-label {
-            font-size: 10.5px;
+            font-size: 10px;
           }
           .product-grid {
             grid-template-columns: repeat(2, 1fr);
@@ -1097,8 +1182,14 @@ export default function GiftsPage() {
         </div>
       </section>
 
-      {/* ── ATTACHED BENEFITS BAR (DIRECTLY ATTACHED TO HERO BANNER - IMG2 REPLICATE) ── */}
-      <div className="hero-attached-benefits-wrapper">
+      {/* ── FULL-BLEED SCULPTED PEARL WAVE SHOWCASE (BENEFITS BAR + SHOP BY OCCASION + PILL BAR) ── */}
+      <div className="gifts-showcase-outer">
+        <div className="gifts-showcase-wave-bg">
+          <HorologyWaveBackdrop variant="occasion" />
+        </div>
+
+        {/* ── ATTACHED BENEFITS BAR (OVERLAPS HERO SEAM ABOVE WAVE BACKDROP) ── */}
+        <div className="hero-attached-benefits-wrapper">
         <div className="hero-attached-benefits-bar">
           <div className="hero-attached-benefits-marquee-container">
             {/* Track 1 */}
@@ -1190,12 +1281,113 @@ export default function GiftsPage() {
         </div>
       </div>
 
+        {/* OCCASION MEDALLIONS & WATCH TYPE PILL BAR OVER WAVE BACKDROP */}
+        {!loading && !error && (
+          <div className="gifts-showcase-content">
+            {giftCategories.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '28px 20px', border: '1px dashed rgba(26,18,9,0.1)', borderRadius: '12px', backgroundColor: 'rgba(255,255,255,0.6)', marginBottom: '22px' }}>
+                <h3 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '22px', color: '#1a1209', marginBottom: '6px' }}>No Active Gift Collections</h3>
+                <p style={{ color: 'rgba(26,18,9,0.5)', fontSize: '13px', margin: 0 }}>
+                  We are currently preparing our seasonal collections. Please browse our full timepiece filter below or contact our concierge service.
+                </p>
+              </div>
+            ) : (
+              <div className="gift-by-occasion-wrapper">
+                <div className="gift-occasion-heading-row">
+                  <span className="gift-heading-rule left" aria-hidden="true" />
+                  <h2 className="gift-by-occasion-title">SHOP BY OCCASION</h2>
+                  <span className="gift-heading-rule right" aria-hidden="true" />
+                </div>
+
+                <div className="gifts-category-row">
+                  {[
+                    {
+                      key: 'all',
+                      slug: 'all',
+                      label: 'ALL OCCASIONS',
+                      bgSrc: '/graduation_gift.png',
+                      watchSrc: '/winsor_hero_backgroundremoved.webp',
+                    },
+                    ...giftCategories.map(cat => ({
+                      key: cat._id || cat.slug,
+                      slug: cat.slug,
+                      label: stripEmojis(cat.label),
+                      bgSrc: getGiftCategoryImage(cat.slug, cat.image),
+                      watchSrc: cat.slug.includes('sport')
+                        ? '/winsor_hero_backgroundremoved_sport.webp'
+                        : '/winsor_hero_backgroundremoved.webp',
+                    })),
+                  ].map(item => {
+                    const isActive = selectedCategorySlug === item.slug;
+                    return (
+                      <button
+                        key={item.key}
+                        type="button"
+                        className={`gift-circle-item ${isActive ? 'active' : ''}`}
+                        aria-pressed={isActive}
+                        onClick={() => setSelectedCategorySlug(item.slug)}
+                      >
+                        <div className="gift-circle-badge">
+                          <div className="gift-circle-inner">
+                            <Image
+                              src={item.bgSrc}
+                              alt={item.label}
+                              fill
+                              sizes="120px"
+                              style={{ objectFit: 'cover', objectPosition: 'center center' }}
+                              className="gift-circle-bg-img"
+                              priority
+                            />
+                            <div className="gift-circle-overlay" />
+                            <div className="gift-circle-watch-wrapper">
+                              <Image
+                                src={item.watchSrc}
+                                alt={`${item.label} Watch`}
+                                width={68}
+                                height={68}
+                                style={{ objectFit: 'contain' }}
+                                className="gift-circle-watch-img"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                        <span className="gift-circle-label">{item.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Centered luxury pill capsule below circular occasion medallions */}
+            <div className="gift-watch-pills-wrap" role="tablist" aria-label="Filter curated gifts by timepiece category">
+              <div className="gift-watch-pills-bar">
+                {WATCH_FILTER_OPTIONS.map(opt => {
+                  const isActive = selectedWatchType === opt.id;
+                  return (
+                    <button
+                      key={opt.id}
+                      type="button"
+                      role="tab"
+                      aria-selected={isActive}
+                      className={`gift-watch-pill-btn ${isActive ? 'active' : ''}`}
+                      onClick={() => setSelectedWatchType(opt.id)}
+                    >
+                      {opt.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
       {/* BODY CONTENT */}
       <div className="gifts-container">
         {loading ? (
-          <div className="gifts-loader">
-            <div className="spinner" />
-            <p style={{ color: 'rgba(26,18,9,0.45)', fontSize: '13px' }}>Loading Gifting Collections…</p>
+          <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
+            <ProductCardSkeletonGrid count={8} />
           </div>
         ) : error ? (
           <div style={{ textAlign: 'center', padding: '60px 20px', color: '#ff3b30' }}>
@@ -1205,193 +1397,23 @@ export default function GiftsPage() {
         ) : (
           <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
 
-
-
-            {/* GIFT CATEGORIES (SHOW CARDS THAT ADMIN TURNED ON) */}
-            {giftCategories.length === 0 ? (
-              <div style={{ textAlign: 'center', padding: '60px 20px', border: '1px dashed rgba(26,18,9,0.1)', borderRadius: '12px', backgroundColor: 'rgba(255,255,255,0.45)', marginBottom: '56px' }}>
-                <h3 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '24px', color: '#1a1209', marginBottom: '8px' }}>No Active Gift Collections</h3>
-                <p style={{ color: 'rgba(26,18,9,0.45)', fontSize: '13px' }}>
-                  We are currently preparing our seasonal collections. Please contact our concierge service for customized gifting options.
-                </p>
-              </div>
-            ) : (
-              <div className="gift-by-occasion-wrapper">
-                <h2 className="gift-by-occasion-title">GIFT BY OCCASION</h2>
-
-                <div className="gifts-category-row">
-                  {/* Reset / All Occasions option */}
-                  <div
-                    className={`gift-circle-item ${selectedCategorySlug === 'all' ? 'active' : ''}`}
-                    onClick={() => setSelectedCategorySlug('all')}
-                  >
-                    <div className="gift-circle-badge">
-                      <div className="gift-circle-inner" style={{ position: 'relative', width: '100%', height: '100%', borderRadius: '50%', overflow: 'hidden', background: '#110e0b' }}>
-                        <Image
-                          src="/graduation_gift.png"
-                          alt="All Occasions"
-                          fill
-                          sizes="110px"
-                          style={{ objectFit: 'cover', objectPosition: 'center center' }}
-                          className="gift-circle-bg-img"
-                          priority
-                        />
-                        <div className="gift-circle-overlay" />
-                        <div className="gift-circle-watch-wrapper">
-                          <Image
-                            src="/winsor_hero_backgroundremoved.webp"
-                            alt="Luxury Watch"
-                            width={65}
-                            height={65}
-                            style={{ objectFit: 'contain' }}
-                            className="gift-circle-watch-img"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                    <span className="gift-circle-label">ALL OCCASIONS</span>
-                    {selectedCategorySlug === 'all' && <div className="gift-circle-active-bar" />}
-                  </div>
-
-                  {/* Categories cards dynamically mapped */}
-                  {giftCategories.map(cat => (
-                    <div
-                      key={cat._id}
-                      className={`gift-circle-item ${selectedCategorySlug === cat.slug ? 'active' : ''}`}
-                      onClick={() => setSelectedCategorySlug(cat.slug)}
-                    >
-                      <div className="gift-circle-badge">
-                        <div className="gift-circle-inner" style={{ position: 'relative', width: '100%', height: '100%', borderRadius: '50%', overflow: 'hidden', background: '#110e0b' }}>
-                          <Image
-                            src={getGiftCategoryImage(cat.slug, cat.image)}
-                            alt={cat.label}
-                            fill
-                            sizes="110px"
-                            style={{ objectFit: 'cover', objectPosition: 'center center' }}
-                            className="gift-circle-bg-img"
-                            priority
-                          />
-                          <div className="gift-circle-overlay" />
-                          <div className="gift-circle-watch-wrapper">
-                            <Image
-                              src={cat.slug.includes('sport') ? "/winsor_hero_backgroundremoved_sport.webp" : "/winsor_hero_backgroundremoved.webp"}
-                              alt="Luxury Watch"
-                              width={65}
-                              height={65}
-                              style={{ objectFit: 'contain' }}
-                              className="gift-circle-watch-img"
-                            />
-                          </div>
-                        </div>
-                      </div>
-                      <span className="gift-circle-label">{stripEmojis(cat.label)}</span>
-                      {selectedCategorySlug === cat.slug && <div className="gift-circle-active-bar" />}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Mobile Filter Toggle Button */}
-            <div className="mobile-filter-toggle-container md:hidden" style={{ margin: '30px auto 16px', maxWidth: '1400px', width: '100%' }}>
-              <button
-                onClick={() => setShowMobileFilters(!showMobileFilters)}
-                className="mobile-filter-toggle-btn"
-                style={{
-                  width: '100%',
-                  background: '#fff',
-                  border: '1px solid rgba(26,18,9,0.08)',
-                  borderRadius: '8px',
-                  padding: '14px 20px',
-                  fontSize: '11px',
-                  fontWeight: 500,
-                  letterSpacing: '0.06em',
-                  textTransform: 'uppercase',
-                  color: '#1a1209',
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  cursor: 'pointer',
-                  transition: 'all 0.3s'
-                }}
-              >
-                <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" /></svg>
-                  {showMobileFilters ? 'Hide Filters & Search' : 'Show Filters & Search'}
-                </span>
-                <span>{showMobileFilters ? '▲' : '▼'}</span>
-              </button>
-            </div>
-
-            {/* TOOLBAR CONTROLS (SEARCH BAR & FILTERING) */}
-            <div className={`col-toolbar ${showMobileFilters ? 'show' : ''}`} style={{ marginTop: '30px' }}>
-              {/* Search bar */}
-              <div className="search-wrapper">
-                <input
-                  type="text"
-                  placeholder="Search gifting watches..."
-                  value={searchQuery}
-                  onChange={e => setSearchQuery(e.target.value)}
-                  className="search-input"
-                />
-                <svg className="search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" /></svg>
-              </div>
-
-              {/* Gift Occasion Filter */}
-              {giftCategories.length > 0 && (
-                <select
-                  value={selectedCategorySlug}
-                  onChange={e => setSelectedCategorySlug(e.target.value)}
-                  className="toolbar-select"
-                  aria-label="Filter by gift occasion"
-                >
-                  <option value="all">All Occasions</option>
-                  {giftCategories.map(cat => (
-                    <option key={cat.slug} value={cat.slug}>
-                      {stripEmojis(cat.label)}
-                    </option>
-                  ))}
-                </select>
-              )}
-
-              {/* Price Sorting */}
-              <select
-                value={priceSort}
-                onChange={e => setPriceSort(e.target.value as any)}
-                className="toolbar-select"
-                aria-label="Sort by price"
-              >
-                <option value="none">Sort By: Featured</option>
-                <option value="low-to-high">Price: Low to High</option>
-                <option value="high-to-low">Price: High to Low</option>
-              </select>
-
-              {/* Results Count */}
-              <span style={{ fontSize: '12.5px', color: 'rgba(26, 18, 9, 0.45)', marginLeft: '12px' }} className="hidden md:inline">
-                {!loading && `${filteredProducts.length} Timepiece${filteredProducts.length === 1 ? '' : 's'} found`}
-              </span>
-
-              {/* Reset button */}
-              {(selectedCategorySlug !== 'all' || searchQuery || priceSort !== 'none') && (
-                <button onClick={resetFilters} className="toolbar-reset-btn">
-                  Reset Filters
-                </button>
-              )}
-            </div>
-
             {/* PRODUCT GRID SECTION */}
             <h2 className="section-header-title">
               {selectedCategorySlug === 'all'
                 ? 'All Curated Gifts'
                 : `${stripEmojis(giftCategories.find(c => c.slug === selectedCategorySlug)?.label || 'Curated')} Selection`}
+              {selectedWatchType !== 'all' && ` — ${WATCH_FILTER_OPTIONS.find(o => o.id === selectedWatchType)?.label}`}
             </h2>
 
             {filteredProducts.length === 0 ? (
               <div style={{ textAlign: 'center', padding: '70px 20px', border: '1px dashed rgba(26,18,9,0.1)', borderRadius: '12px', backgroundColor: 'rgba(255,255,255,0.45)' }}>
                 <h3 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '24px', color: '#1a1209', marginBottom: '8px' }}>No Watches Available</h3>
-                <p style={{ color: 'rgba(26,18,9,0.45)', fontSize: '13px' }}>
-                  There are no watches currently allocated to this gifting category. Select another category or view all gifts.
+                <p style={{ color: 'rgba(26,18,9,0.45)', fontSize: '13px', marginBottom: '18px' }}>
+                  There are no watches currently matching your selected filters. Select another option or view all gifts.
                 </p>
+                <button onClick={resetFilters} className="toolbar-reset-btn" style={{ marginLeft: 0 }}>
+                  View All Gifts
+                </button>
               </div>
             ) : (
               <div className="product-grid">

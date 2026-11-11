@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast';
 import { Turnstile, type TurnstileInstance } from '@marsidev/react-turnstile';
 import Navbar from '@/components/Navbar/Navbar';
+import WinsorLoader from '@/components/WinsorLoader';
 
 interface Vacancy {
   _id: string;
@@ -230,7 +231,7 @@ export default function JobDetailsClient({ id }: { id: string }) {
       <div className="min-h-screen bg-[#faf7f0] flex flex-col">
         <Navbar />
         <div className="flex-1 flex items-center justify-center">
-          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#8B6914]"></div>
+          <WinsorLoader size="lg" label="Loading Role Details…" />
         </div>
       </div>
     );

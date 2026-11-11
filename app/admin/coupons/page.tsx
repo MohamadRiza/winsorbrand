@@ -4,6 +4,7 @@
 import { useEffect, useState, useMemo } from 'react';
 import toast from 'react-hot-toast';
 import PermissionGate from '@/components/Admin/PermissionGate';
+import WinsorLoader from '@/components/WinsorLoader';
 
 interface Coupon {
   _id: string;
@@ -632,10 +633,7 @@ export default function AdminCouponsPage() {
             <div className="bg-white/95 backdrop-blur-sm border border-[#1a1209]/10 rounded-2xl overflow-hidden shadow-lg">
               <div className="overflow-x-auto">
                 {loading ? (
-                  <div className="p-12 text-center">
-                    <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#8B6914] mx-auto" />
-                    <p className="mt-3 text-xs font-semibold text-[#8B6914] uppercase tracking-wider">Loading Vouchers…</p>
-                  </div>
+                  <WinsorLoader label="Loading Vouchers…" />
                 ) : filteredCoupons.length === 0 ? (
                   <div className="p-16 text-center">
                     <svg className="w-12 h-12 text-[#8B6914]/30 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">

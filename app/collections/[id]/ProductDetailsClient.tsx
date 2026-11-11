@@ -11,6 +11,7 @@ import { useUser } from '@clerk/nextjs';
 import GuestCheckoutModal from '@/components/Checkout/GuestCheckoutModal';
 import BuyNowModal from '@/components/Checkout/BuyNowModal';
 import AmbientVideoPlayer from '@/components/Video/AmbientVideoPlayer';
+import WinsorLoader from '@/components/WinsorLoader';
 
 interface ProductDetailsClientProps {
   id: string;
@@ -431,18 +432,10 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
 
   if (loading) {
     return (
-      <div style={{ minHeight: '80vh', background: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Jost', sans-serif" }}>
+      <>
         <h1 className="sr-only">Timepiece Details</h1>
-        <div style={{ textAlign: 'center' }}>
-          <div className="shimmer-circle" style={{ width: '48px', height: '48px', borderRadius: '50%', border: '3px solid rgba(139,105,20,0.1)', borderTopColor: '#8B6914', animation: 'spin 1s linear infinite', margin: '0 auto 16px' }} />
-          <p style={{ color: 'rgba(20,20,20,0.5)', fontSize: '13px', letterSpacing: '0.05em' }}>Loading Timepiece...</p>
-        </div>
-        <style>{`
-          @keyframes spin {
-            to { transform: rotate(360deg); }
-          }
-        `}</style>
-      </div>
+        <WinsorLoader fullScreen size="lg" label="Loading Timepiece…" />
+      </>
     );
   }
 

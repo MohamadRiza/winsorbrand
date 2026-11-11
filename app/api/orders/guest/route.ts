@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db';
 import Order from '@/lib/models/Order';
 import Product from '@/lib/models/Product';
+import { validateAndConsumeCouponForOrder } from '@/lib/couponHelper';
 
 // ── Security helper: sanitize strings ──────────────────────────────────────
 function sanitize(val: unknown): string {
@@ -24,7 +25,10 @@ export async function POST(req: NextRequest) {
     await connectDB();
 
     const body = await req.json();
-    const { guestInfo, items, shippingAddress, paymentMethod, customOrderRef, paymentStatus, payhereOrderId } = body;
+    const {
+      guestInfo, items, shippingAddress, paymentMethod, customOrderRef,
+      paymentStatus, payhereOrderId, couponCode, validationToken,
+    } = body;
 
     // ── 1. Validate guest info ──────────────────────────────────────────────
     if (!guestInfo || typeof guestInfo !== 'object') {
@@ -147,11 +151,31 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // ── 5. Generate cryptographically safe order reference ──────────────────
+    // ── 5. Verify & consume coupon BEFORE decrementing stock ────────────────
+    const couponResult = await validateAndConsumeCouponForOrder({
+      couponCode,
+      validationToken,
+      subtotal: serverSubtotal,
+      expectedClerkId: null,
+    });
+    if (!couponResult.ok) {
+      return NextResponse.json(
+        { success: false, error: couponResult.error },
+        { status: couponResult.status }
+      );
+    }
+    const {
+      appliedCouponCode,
+      couponDiscountPercent,
+      couponDiscountAmount,
+      finalTotal,
+    } = couponResult;
+
+    // ── 6. Generate cryptographically safe order reference ──────────────────
     const uid = crypto.randomUUID().replace(/-/g, '').slice(0, 8).toUpperCase();
     const orderRef = customOrderRef && typeof customOrderRef === 'string' ? customOrderRef : `WG-${uid}`;
 
-    // ── 6. Atomically decrement stock ───────────────────────────────────────
+    // ── 7. Atomically decrement stock ───────────────────────────────────────
     for (const item of validatedItems) {
       const product = await Product.findById(item.productId);
       if (!product) continue;
@@ -201,7 +225,10 @@ export async function POST(req: NextRequest) {
       items: validatedItems,
       shippingAddress: safeAddress,
       subtotal: serverSubtotal,
-      finalTotal: serverSubtotal,
+      couponCode: appliedCouponCode,
+      couponDiscountPercent,
+      couponDiscountAmount,
+      finalTotal: appliedCouponCode ? finalTotal : serverSubtotal,
       status: isPaid ? 'processing' : 'pending',
       isGift: false,
       // Payment
@@ -215,6 +242,10 @@ export async function POST(req: NextRequest) {
       data: {
         orderRef: newOrder.orderRef,
         subtotal: newOrder.subtotal,
+        couponCode: newOrder.couponCode,
+        couponDiscountPercent: newOrder.couponDiscountPercent,
+        couponDiscountAmount: newOrder.couponDiscountAmount,
+        finalTotal: newOrder.finalTotal,
         status: newOrder.status,
         guestName: newOrder.guestName,
       },

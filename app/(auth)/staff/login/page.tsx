@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Toaster, toast } from 'react-hot-toast';
 import { Turnstile, type TurnstileInstance } from '@marsidev/react-turnstile';
+import WinsorLoader from '@/components/WinsorLoader';
 
 function StaffLoginContent() {
   const [username, setUsername] = useState('');
@@ -581,11 +582,7 @@ function StaffLoginContent() {
 
 export default function StaffLogin() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen w-full flex items-center justify-center bg-[#f7f4ee]">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#8B6914]"></div>
-      </div>
-    }>
+    <Suspense fallback={<WinsorLoader fullScreen size="lg" label="Opening Staff Portal…" />}>
       <StaffLoginContent />
     </Suspense>
   );

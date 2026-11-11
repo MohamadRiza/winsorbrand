@@ -9,6 +9,8 @@ import { useCart } from '@/app/context/CartContext';
 import { IProduct, CollectionSection } from '@/types';
 import NewsletterCard from '@/components/NewsletterCard';
 import ProductCard from '@/components/ProductCard';
+import ProductCardSkeletonGrid from '@/components/ProductCardSkeletonGrid';
+import WinsorLoader from '@/components/WinsorLoader';
 import { showWishlistToast } from '@/components/WinsorToaster';
 import NewArrivalsHeroTypewriter from './NewArrivalsHeroTypewriter';
 
@@ -838,15 +840,7 @@ function NewArrivalsContent() {
 
         {/* ── PRODUCT GRID ── */}
         {loading ? (
-          <div style={{ textAlign: 'center', padding: '80px 20px' }}>
-            <div 
-              style={{ 
-                width: '36px', height: '36px', border: '3px solid rgba(139,105,20,0.2)', borderTopColor: '#8b6914', 
-                borderRadius: '50%', animation: 'spin 0.8s linear infinite', margin: '0 auto 16px' 
-              }} 
-            />
-            <p style={{ color: 'rgba(26,18,9,0.5)', fontSize: '13px' }}>Loading New Arrival timepieces…</p>
-          </div>
+          <ProductCardSkeletonGrid count={8} />
         ) : error ? (
           <div style={{ textAlign: 'center', padding: '60px 20px', color: '#c93b2b' }}>
             <p>{error}</p>
@@ -888,9 +882,10 @@ function NewArrivalsContent() {
 export default function NewArrivalsPage() {
   return (
     <Suspense fallback={
-      <div style={{ minHeight: '100vh', background: '#faf7f0' }}>
+      <>
         <h1 className="sr-only">New Arrivals Collection</h1>
-      </div>
+        <WinsorLoader fullScreen size="lg" label="Loading New Arrivals…" />
+      </>
     }>
       <NewArrivalsContent />
     </Suspense>

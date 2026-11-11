@@ -4,6 +4,7 @@ import { useEffect, useState, useMemo } from 'react';
 import toast from 'react-hot-toast';
 import Image from 'next/image';
 import PermissionGate from '@/components/Admin/PermissionGate';
+import WinsorLoader from '@/components/WinsorLoader';
 
 interface ProductInfo {
   _id: string;
@@ -384,11 +385,8 @@ export default function AdminReviewsPage() {
 
         {/* ── Reviews Cards List ── */}
         {loading ? (
-          <div className="flex flex-col items-center justify-center min-h-[350px]">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#8B6914]" />
-            <p className="mt-4 text-xs font-semibold text-[#8B6914] tracking-widest uppercase font-['Jost']">
-              Loading Product Reviews…
-            </p>
+          <div className="min-h-[350px] flex items-center justify-center">
+            <WinsorLoader label="Loading Product Reviews…" />
           </div>
         ) : filteredReviews.length === 0 ? (
           <div className="bg-white/90 backdrop-blur-sm border border-dashed border-[#8B6914]/30 rounded-2xl p-16 text-center">

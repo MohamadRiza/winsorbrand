@@ -145,7 +145,10 @@ export async function GET(req: NextRequest) {
         status: order.status || 'pending',
         createdAt: order.createdAt,
         subtotal: order.subtotal || 0,
-        finalTotal: order.finalTotal || order.subtotal || 0,
+        couponCode: order.couponCode || null,
+        couponDiscountPercent: order.couponDiscountPercent || 0,
+        couponDiscountAmount: order.couponDiscountAmount || 0,
+        finalTotal: order.finalTotal ?? order.subtotal ?? 0,
         mobile: orderMobile,
         items: enrichedItems,
         shippingAddress: {

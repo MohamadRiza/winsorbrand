@@ -6,6 +6,7 @@ import { toast } from 'react-hot-toast';
 import { CollectionSection, WarrantyOption, CloudinaryAsset, ColorVariant } from '@/types';
 import UploadProgressModal, { UploadProgressInfo } from '@/components/Admin/UploadProgressModal';
 import { uploadSingleFileWithXHR } from '@/lib/uploadHelper';
+import WinsorLoader from '@/components/WinsorLoader';
 
 const EMPTY_ASSET: CloudinaryAsset = { url: '', publicId: '' };
 
@@ -694,7 +695,7 @@ export default function EditProductPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#8B6914]"></div>
+        <WinsorLoader label="Loading Timepiece Details…" />
       </div>
     );
   }

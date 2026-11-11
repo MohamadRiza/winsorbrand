@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { toast } from 'react-hot-toast';
 import PermissionGate from '@/components/Admin/PermissionGate';
+import WinsorLoader from '@/components/WinsorLoader';
 
 // ── Date Relative Formatter ────────────────────────────────────────────────
 const formatRelativeTime = (dateStr: string) => {
@@ -491,15 +492,7 @@ export default function AdminDashboard(): React.JSX.Element {
   if (loading) {
     return (
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '400px' }}>
-        <div style={{
-          width: '48px',
-          height: '48px',
-          border: '3px solid rgba(139,105,20,0.2)',
-          borderTopColor: '#8B6914',
-          borderRadius: '50%',
-          animation: 'spin 1s linear infinite',
-        }} />
-        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+        <WinsorLoader label="Loading Overview…" />
       </div>
     );
   }

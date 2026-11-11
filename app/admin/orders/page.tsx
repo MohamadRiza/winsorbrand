@@ -5,6 +5,7 @@ import { toast } from 'react-hot-toast';
 import { IOrder, OrderStatus } from '@/types';
 import PermissionGate from '@/components/Admin/PermissionGate';
 import { generateReceiptPdf } from '@/lib/utils/generateReceiptPdf';
+import WinsorLoader from '@/components/WinsorLoader';
 
 export default function AdminOrdersPage() {
   const [orders, setOrders] = useState<IOrder[]>([]);
@@ -313,7 +314,7 @@ export default function AdminOrdersPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#8B6914]"></div>
+        <WinsorLoader label="Loading Orders…" />
       </div>
     );
   }

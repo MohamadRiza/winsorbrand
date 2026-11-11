@@ -2,6 +2,7 @@
 
 import { ReactNode, useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
+import WinsorLoader from '@/components/WinsorLoader';
 
 interface PermissionGateProps {
   children: ReactNode;
@@ -115,35 +116,9 @@ export default function PermissionGate({
     checkAuth();
   }, [permission, permissions, mode, pathname, router]);
 
-  // 1. Loading State (Premium Luxury Gold Spinner)
+  // 1. Loading State (Signature Winsor Butterfly Crest Loader)
   if (loading) {
-    return (
-      <div 
-        style={{ 
-          display: 'flex', 
-          flexDirection: 'column',
-          alignItems: 'center', 
-          justifyContent: 'center', 
-          minHeight: '80vh',
-          fontFamily: "'Jost', sans-serif"
-        }}
-      >
-        <div style={{
-          width: '48px',
-          height: '48px',
-          border: '3px solid rgba(139,105,20,0.15)',
-          borderTopColor: '#8B6914',
-          borderRadius: '50%',
-          animation: 'spin 1s linear infinite',
-        }} />
-        <p style={{ color: '#8B6914', fontSize: '12px', letterSpacing: '0.15em', textTransform: 'uppercase', marginTop: '16px', fontWeight: 500 }}>
-          Verifying Credentials…
-        </p>
-        <style>{`
-          @keyframes spin { to { transform: rotate(360deg); } }
-        `}</style>
-      </div>
-    );
+    return <WinsorLoader fullScreen size="lg" label="Verifying Credentials…" />;
   }
 
   // 2. Account Expired State (Temporary Staff expiration)

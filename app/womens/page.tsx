@@ -10,6 +10,8 @@ import { showWishlistToast } from '@/components/WinsorToaster';
 import { IProduct, IGiftCategory, CollectionSection } from '@/types';
 import NewsletterCard from '@/components/NewsletterCard';
 import ProductCard from '@/components/ProductCard';
+import ProductCardSkeletonGrid from '@/components/ProductCardSkeletonGrid';
+import WinsorLoader from '@/components/WinsorLoader';
 import WomensHeroTypewriter from './WomensHeroTypewriter';
 
 // Helper to determine product gender
@@ -932,9 +934,7 @@ function WomensCollectionContent() {
 
         {/* ── PRODUCT GRID ── */}
         {loading ? (
-          <div style={{ textAlign: 'center', padding: '80px 20px', color: 'rgba(26,18,9,0.45)' }}>
-            <p>Loading Women's Timepieces…</p>
-          </div>
+          <ProductCardSkeletonGrid count={8} />
         ) : error ? (
           <div style={{ textAlign: 'center', padding: '60px 20px', color: '#ff3b30' }}>
             <p>{error}</p>
@@ -971,10 +971,10 @@ function WomensCollectionContent() {
 export default function WomensCollectionPage() {
   return (
     <Suspense fallback={
-      <div style={{ padding: '100px 0', textAlign: 'center' }}>
+      <>
         <h1 className="sr-only">Women&apos;s Collection</h1>
-        Loading Women&apos;s Collection…
-      </div>
+        <WinsorLoader fullScreen size="lg" label="Loading Women's Collection…" />
+      </>
     }>
       <WomensCollectionContent />
     </Suspense>

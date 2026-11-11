@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { toast } from 'react-hot-toast';
 import dynamic from 'next/dynamic';
+import WinsorLoader from '@/components/WinsorLoader';
 import RetailersHeroTypewriter from './RetailersHeroTypewriter';
 
 const RetailersMap = dynamic(() => import('@/components/RetailersMap'), { ssr: false });
@@ -1153,16 +1154,7 @@ export default function StoreLocatorPage() {
       {/* ── MAIN WORKSPACE CONTAINER ── */}
       <div className="locator-main-wrapper">
         {loading ? (
-          <div style={{ textAlign: 'center', padding: '90px 20px' }}>
-            <div style={{
-              width: '30px', height: '30px', border: '2px solid rgba(20,20,20,0.12)', borderTopColor: '#141414',
-              borderRadius: '50%', animation: 'spin 0.8s linear infinite', margin: '0 auto 14px'
-            }} />
-            <p style={{ color: '#666666', fontSize: '12px', letterSpacing: '0.04em' }}>Loading authorized showrooms…</p>
-            <style>{`
-              @keyframes spin { to { transform: rotate(360deg); } }
-            `}</style>
-          </div>
+          <WinsorLoader label="Loading authorized showrooms…" />
         ) : (
           <>
             <div className="locator-workspace-grid">

@@ -3,9 +3,8 @@ import { getAuth } from '@clerk/nextjs/server';
 import { connectDB } from '@/lib/db';
 import Order from '@/lib/models/Order';
 import Product from '@/lib/models/Product';
-import Coupon from '@/lib/models/Coupon';
 import Customer from '@/lib/models/Customer';
-import { verifyCouponToken } from '@/app/api/customer/validate-coupon/route';
+import { validateAndConsumeCouponForOrder } from '@/lib/couponHelper';
 
 export async function GET(req: NextRequest) {
   try {
@@ -154,7 +153,27 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // 2. Decrement stock for variants
+    // 2. Verify and consume coupon BEFORE decrementing stock so invalid coupons never subtract inventory
+    const couponResult = await validateAndConsumeCouponForOrder({
+      couponCode,
+      validationToken,
+      subtotal,
+      expectedClerkId: userId,
+    });
+    if (!couponResult.ok) {
+      return NextResponse.json(
+        { success: false, error: couponResult.error },
+        { status: couponResult.status }
+      );
+    }
+    const {
+      appliedCouponCode,
+      couponDiscountPercent,
+      couponDiscountAmount,
+      finalTotal,
+    } = couponResult;
+
+    // 3. Decrement stock for variants
     for (const item of items) {
       const product = await Product.findById(item.productId);
       if (product) {
@@ -175,76 +194,6 @@ export async function POST(req: NextRequest) {
         
         await product.save();
       }
-    }
-
-    // ── Coupon Verification (server-side, cryptographically secure) ──────────
-    let appliedCouponCode: string | null = null;
-    let couponDiscountPercent = 0;
-    let couponDiscountAmount = 0;
-    let finalTotal = subtotal;
-
-    if (couponCode && validationToken) {
-      // ① Verify the signed JWT issued by validate-coupon route
-      const tokenPayload = verifyCouponToken(validationToken);
-
-      if (!tokenPayload) {
-        return NextResponse.json(
-          { success: false, error: 'Invalid or expired coupon validation. Please re-apply your coupon.' },
-          { status: 400 }
-        );
-      }
-
-      // ② Token must belong to this user (prevents token sharing)
-      if (tokenPayload.clerkId !== userId) {
-        return NextResponse.json(
-          { success: false, error: 'Coupon validation mismatch. Please re-apply your coupon.' },
-          { status: 403 }
-        );
-      }
-
-      // ③ Token code must match submitted code
-      const submittedCode = couponCode.trim().toUpperCase();
-      if (tokenPayload.code !== submittedCode) {
-        return NextResponse.json(
-          { success: false, error: 'Coupon code mismatch. Please re-apply your coupon.' },
-          { status: 400 }
-        );
-      }
-
-      // ④ Re-validate coupon in DB (final authoritative check)
-      const now = new Date();
-      const coupon = await Coupon.findOne({
-        code: submittedCode,
-        isActive: true,
-        expiresAt: { $gt: now },
-      });
-
-      if (!coupon) {
-        return NextResponse.json(
-          { success: false, error: 'This coupon has expired or been deactivated. Please proceed without it.' },
-          { status: 410 }
-        );
-      }
-
-      if (coupon.usageLimit !== null && coupon.usageCount >= coupon.usageLimit) {
-        return NextResponse.json(
-          { success: false, error: 'This coupon has reached its usage limit.' },
-          { status: 409 }
-        );
-      }
-
-      // ⑤ Compute discount server-side (NEVER trust client amount)
-      const discountPct = coupon.discountPercent;
-      couponDiscountAmount = Math.round((subtotal * discountPct) / 100);
-      finalTotal = Math.max(0, subtotal - couponDiscountAmount);
-      couponDiscountPercent = discountPct;
-      appliedCouponCode = coupon.code;
-
-      // ⑥ Atomically increment usage count to prevent race conditions
-      await Coupon.findOneAndUpdate(
-        { _id: coupon._id },
-        { $inc: { usageCount: 1 } }
-      );
     }
 
     const isPaid = paymentStatus === 'paid' || (paymentMethod === 'card' && paymentStatus === 'paid');

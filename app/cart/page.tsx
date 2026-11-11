@@ -8,6 +8,13 @@ import { useCart, CartItem } from '@/app/context/CartContext';
 import { useCurrency } from '@/app/context/CurrencyContext';
 import toast from 'react-hot-toast';
 import GuestCheckoutModal from '@/components/Checkout/GuestCheckoutModal';
+import WinsorLoader from '@/components/WinsorLoader';
+import {
+  ClientCouponResult,
+  computeCouponTotals,
+  normalizeCouponInput,
+  validateCouponCodeRequest,
+} from '@/lib/couponClient';
 
 // Helper to reliably extract the color variant image with fallback to main thumbnail
 const getItemImage = (item: CartItem): string => {
@@ -59,13 +66,8 @@ export default function CartPage() {
   // ── Coupon / Discount States ────────────────────────────────
   const [couponInput, setCouponInput] = useState('');
   const [couponValidating, setCouponValidating] = useState(false);
-  interface CouponResult {
-    code: string;
-    discountPercent: number;
-    expiresAt: string;
-    validationToken: string;
-  }
-  const [appliedCoupon, setAppliedCoupon] = useState<CouponResult | null>(null);
+  const [couponError, setCouponError] = useState<string | null>(null);
+  const [appliedCoupon, setAppliedCoupon] = useState<ClientCouponResult | null>(null);
 
   // Guest checkout modal
   const [showGuestCheckoutModal, setShowGuestCheckoutModal] = useState(false);
@@ -350,43 +352,46 @@ export default function CartPage() {
     return acc + price * item.quantity;
   }, 0);
 
+  const { discountAmount: selectedDiscountAmount, finalTotal: selectedFinalTotal } = computeCouponTotals(
+    selectedSubtotal,
+    appliedCoupon?.discountPercent
+  );
+
   const selectedCount = selectedItemsList.reduce((acc, item) => acc + item.quantity, 0);
 
   const hasGiftItem = selectedItemsList.some(item =>
     item.product?.giftCategories && item.product.giftCategories.length > 0
   );
 
-  // ── Apply Coupon Code ──────────────────────────────────────
+  // ── Apply Coupon Code (Available for both Guests & Signed-In Customers) ─────
   const handleApplyCoupon = async () => {
-    const code = couponInput.trim().toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 8);
-    if (!code) { toast.error('Please enter a coupon code'); return; }
-    if (!isSignedIn) { toast.error('Please sign in to apply a coupon'); return; }
+    const code = normalizeCouponInput(couponInput.trim());
+    if (!code) {
+      setCouponError('Please enter a coupon code');
+      toast.error('Please enter a coupon code');
+      return;
+    }
 
     setCouponValidating(true);
-    try {
-      const res = await fetch('/api/customer/validate-coupon', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code }),
-      });
-      const data = await res.json();
-      if (data.success) {
-        setAppliedCoupon(data.data);
-        toast.success(`Coupon "${data.data.code}" applied — ${data.data.discountPercent}% off!`);
-      } else {
-        toast.error(data.error || 'Invalid coupon code');
-        setAppliedCoupon(null);
-      }
-    } catch {
-      toast.error('Failed to validate coupon. Please try again.');
-    } finally {
-      setCouponValidating(false);
+    setCouponError(null);
+    const result = await validateCouponCodeRequest(code, isSignedIn && user?.id ? user.id : null);
+    setCouponValidating(false);
+
+    if (result.ok) {
+      setAppliedCoupon(result.data);
+      setCouponError(null);
+      toast.success(`Coupon "${result.data.code}" applied — ${result.data.discountPercent}% off!`);
+    } else {
+      setAppliedCoupon(null);
+      setCouponError(result.error);
+      toast.error(result.error);
     }
   };
 
   const handleRemoveCoupon = () => {
     setAppliedCoupon(null);
     setCouponInput('');
+    setCouponError(null);
     toast.success('Coupon removed');
   };
 
@@ -455,9 +460,7 @@ export default function CartPage() {
 
       // ── Step 2a: Card payment via PayHere ────────────────────────────────
       if (paymentMethod === 'card') {
-        const finalAmount = appliedCoupon
-          ? Math.max(0, selectedSubtotal - Math.round((selectedSubtotal * appliedCoupon.discountPercent) / 100))
-          : selectedSubtotal;
+        const finalAmount = selectedFinalTotal;
 
         // Get server-generated hash (secret stays server-side)
         const hashRes = await fetch('/api/payment/payhere-hash', {
@@ -623,18 +626,10 @@ export default function CartPage() {
 
   if (cartLoading || !userLoaded) {
     return (
-      <div style={{ minHeight: '80vh', background: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Jost', sans-serif" }}>
+      <>
         <h1 className="sr-only">Shopping Bag</h1>
-        <div style={{ textAlign: 'center' }}>
-          <div className="shimmer-circle" style={{ width: '48px', height: '48px', borderRadius: '50%', border: '3px solid rgba(139,105,20,0.1)', borderTopColor: '#8B6914', animation: 'spin 1s linear infinite', margin: '0 auto 16px' }} />
-          <p style={{ color: 'rgba(20,20,20,0.7)', fontSize: '13px', letterSpacing: '0.05em' }}>Loading Shopping Bag...</p>
-        </div>
-        <style>{`
-          @keyframes spin {
-            to { transform: rotate(360deg); }
-          }
-        `}</style>
-      </div>
+        <WinsorLoader fullScreen size="lg" label="Loading Shopping Bag…" />
+      </>
     );
   }
 
@@ -2271,7 +2266,7 @@ export default function CartPage() {
                         <>
                           <div style={{ fontSize: '11px', color: '#666666', textDecoration: 'line-through' }}>{convertPrice(selectedSubtotal)}</div>
                           <div style={{ fontSize: '18px', fontWeight: 600, color: '#141414' }}>
-                            {convertPrice(Math.max(0, selectedSubtotal - Math.round((selectedSubtotal * appliedCoupon.discountPercent) / 100)))}
+                            {convertPrice(selectedFinalTotal)}
                           </div>
                         </>
                       ) : (
@@ -2327,9 +2322,7 @@ export default function CartPage() {
                   <div className="bnm-card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '14px 18px' }}>
                     <span style={{ fontSize: '11.5px', color: '#666666', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Order Total</span>
                     <span style={{ fontSize: '18px', fontWeight: 600, color: '#141414' }}>
-                      {appliedCoupon
-                        ? convertPrice(Math.max(0, selectedSubtotal - Math.round((selectedSubtotal * appliedCoupon.discountPercent) / 100)))
-                        : convertPrice(selectedSubtotal)}
+                      {convertPrice(appliedCoupon ? selectedFinalTotal : selectedSubtotal)}
                     </span>
                   </div>
 
@@ -2391,9 +2384,7 @@ export default function CartPage() {
                         <div className="bnm-bank-row">
                           <span style={{ color: '#666666', fontSize: '12px' }}>Amount</span>
                           <span style={{ fontWeight: 700, color: '#141414' }}>
-                            {appliedCoupon
-                              ? convertPrice(Math.max(0, selectedSubtotal - Math.round((selectedSubtotal * appliedCoupon.discountPercent) / 100)))
-                              : convertPrice(selectedSubtotal)}
+                            {convertPrice(appliedCoupon ? selectedFinalTotal : selectedSubtotal)}
                           </span>
                         </div>
                       </div>
@@ -2426,7 +2417,7 @@ export default function CartPage() {
                           {bankTransferConfirmed && <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3"><polyline points="20 6 9 17 4 12" /></svg>}
                         </div>
                         <span style={{ fontSize: '12.5px', color: '#141414', lineHeight: 1.5 }}>
-                          I confirm I have transferred <strong>{appliedCoupon ? convertPrice(Math.max(0, selectedSubtotal - Math.round(selectedSubtotal * appliedCoupon.discountPercent / 100))) : convertPrice(selectedSubtotal)}</strong> to the account above.
+                          I confirm I have transferred <strong>{convertPrice(appliedCoupon ? selectedFinalTotal : selectedSubtotal)}</strong> to the account above.
                         </span>
                       </div>
                     </>
@@ -2976,86 +2967,96 @@ export default function CartPage() {
                     {appliedCoupon && (
                       <div className="summary-row" style={{ color: '#15803d' }}>
                         <span>Discount ({appliedCoupon.discountPercent}% off — {appliedCoupon.code}):</span>
-                        <span>- {convertPrice(Math.round((selectedSubtotal * appliedCoupon.discountPercent) / 100))}</span>
+                        <span>- {convertPrice(selectedDiscountAmount)}</span>
                       </div>
                     )}
 
                     <div className="summary-row total-row">
                       <span>Order Total:</span>
-                      <span>{appliedCoupon
-                        ? convertPrice(Math.max(0, selectedSubtotal - Math.round((selectedSubtotal * appliedCoupon.discountPercent) / 100)))
-                        : convertPrice(selectedSubtotal)}
-                      </span>
+                      <span>{convertPrice(appliedCoupon ? selectedFinalTotal : selectedSubtotal)}</span>
                     </div>
 
-                    {/* ── COUPON CODE SECTION ── */}
-                    {isSignedIn && (
-                      <div style={{ marginTop: 12, marginBottom: 22, padding: '14px 16px', background: '#FCFBF8', border: '1px solid rgba(139,105,20,0.2)', borderRadius: 10 }}>
-                        {!appliedCoupon ? (
-                          <>
-                            <p style={{ margin: '0 0 10px', fontSize: 11, fontWeight: 600, color: '#8B6914', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
-                              Privilege / Coupon Code
-                            </p>
-                            <div style={{ display: 'flex', gap: 8 }}>
-                              <input
-                                type="text"
-                                placeholder="Enter code..."
-                                value={couponInput}
-                                maxLength={8}
-                                onChange={e => setCouponInput(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ''))}
-                                onKeyDown={e => e.key === 'Enter' && handleApplyCoupon()}
-                                style={{
-                                  flex: 1, padding: '9px 12px',
-                                  border: '1px solid rgba(20,20,20,0.14)', borderRadius: 6,
-                                  fontFamily: "'Jost', sans-serif", fontSize: 13,
-                                  fontWeight: 600, letterSpacing: '0.08em', color: '#141414',
-                                  background: '#ffffff', outline: 'none',
-                                }}
-                              />
-                              <button
-                                onClick={handleApplyCoupon}
-                                disabled={couponValidating || !couponInput.trim()}
-                                style={{
-                                  padding: '9px 18px',
-                                  background: (couponValidating || !couponInput.trim()) ? 'rgba(139,105,20,0.16)' : 'linear-gradient(135deg, #9C7A3C 0%, #8B6914 100%)',
-                                  color: (couponValidating || !couponInput.trim()) ? 'rgba(20,20,20,0.4)' : '#ffffff',
-                                  border: 'none', borderRadius: 6,
-                                  fontFamily: "'Jost', sans-serif", fontSize: 11,
-                                  fontWeight: 600, cursor: (couponValidating || !couponInput.trim()) ? 'not-allowed' : 'pointer',
-                                  letterSpacing: '0.1em', whiteSpace: 'nowrap',
-                                  textTransform: 'uppercase',
-                                  transition: 'all 0.2s ease',
-                                }}
-                              >
-                                {couponValidating ? '...' : 'Apply'}
-                              </button>
-                            </div>
-                          </>
-                        ) : (
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <div>
-                              <p style={{ margin: 0, fontSize: 12, fontWeight: 700, color: '#15803d', letterSpacing: '0.08em' }}>
-                                ✓ {appliedCoupon.code} Applied
-                              </p>
-                              <p style={{ margin: '2px 0 0', fontSize: 11, color: 'rgba(20,20,20,0.55)' }}>
-                                {appliedCoupon.discountPercent}% discount active
-                              </p>
-                            </div>
-                            <button
-                              onClick={handleRemoveCoupon}
+                    {/* ── COUPON CODE SECTION (Available to Guests & Signed-In Customers) ── */}
+                    <div style={{ marginTop: 12, marginBottom: 22, padding: '14px 16px', background: '#FCFBF8', border: '1px solid rgba(139,105,20,0.2)', borderRadius: 10 }}>
+                      {!appliedCoupon ? (
+                        <>
+                          <p style={{ margin: '0 0 10px', fontSize: 11, fontWeight: 600, color: '#8B6914', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+                            Privilege / Coupon Code
+                          </p>
+                          <div style={{ display: 'flex', gap: 8 }}>
+                            <input
+                              type="text"
+                              placeholder="Enter code..."
+                              value={couponInput}
+                              maxLength={24}
+                              onChange={e => {
+                                setCouponInput(normalizeCouponInput(e.target.value));
+                                if (couponError) setCouponError(null);
+                              }}
+                              onKeyDown={e => {
+                                if (e.key === 'Enter') {
+                                  e.preventDefault();
+                                  handleApplyCoupon();
+                                }
+                              }}
                               style={{
-                                background: 'transparent', border: '1px solid rgba(220,38,38,0.3)',
-                                borderRadius: 6, padding: '4px 10px', color: '#dc2626',
-                                fontFamily: "'Jost', sans-serif", fontSize: 11, fontWeight: 600,
-                                cursor: 'pointer',
+                                flex: 1, padding: '9px 12px',
+                                border: couponError ? '1px solid #dc2626' : '1px solid rgba(20,20,20,0.14)', borderRadius: 6,
+                                fontFamily: "'Jost', sans-serif", fontSize: 13,
+                                fontWeight: 600, letterSpacing: '0.08em', color: '#141414',
+                                background: '#ffffff', outline: 'none',
+                              }}
+                            />
+                            <button
+                              type="button"
+                              onClick={handleApplyCoupon}
+                              disabled={couponValidating || !couponInput.trim()}
+                              style={{
+                                padding: '9px 18px',
+                                background: (couponValidating || !couponInput.trim()) ? 'rgba(139,105,20,0.16)' : 'linear-gradient(135deg, #9C7A3C 0%, #8B6914 100%)',
+                                color: (couponValidating || !couponInput.trim()) ? 'rgba(20,20,20,0.4)' : '#ffffff',
+                                border: 'none', borderRadius: 6,
+                                fontFamily: "'Jost', sans-serif", fontSize: 11,
+                                fontWeight: 600, cursor: (couponValidating || !couponInput.trim()) ? 'not-allowed' : 'pointer',
+                                letterSpacing: '0.1em', whiteSpace: 'nowrap',
+                                textTransform: 'uppercase',
+                                transition: 'all 0.2s ease',
                               }}
                             >
-                              Remove
+                              {couponValidating ? '...' : 'Apply'}
                             </button>
                           </div>
-                        )}
-                      </div>
-                    )}
+                          {couponError && (
+                            <p role="alert" style={{ margin: '8px 0 0', fontSize: 11.5, color: '#b91c1c', fontWeight: 500 }}>
+                              {couponError}
+                            </p>
+                          )}
+                        </>
+                      ) : (
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <div>
+                            <p style={{ margin: 0, fontSize: 12, fontWeight: 700, color: '#15803d', letterSpacing: '0.08em' }}>
+                              ✓ {appliedCoupon.code} Applied
+                            </p>
+                            <p style={{ margin: '2px 0 0', fontSize: 11, color: 'rgba(20,20,20,0.55)' }}>
+                              {appliedCoupon.discountPercent}% discount active
+                            </p>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={handleRemoveCoupon}
+                            style={{
+                              background: 'transparent', border: '1px solid rgba(220,38,38,0.3)',
+                              borderRadius: 6, padding: '4px 10px', color: '#dc2626',
+                              fontFamily: "'Jost', sans-serif", fontSize: 11, fontWeight: 600,
+                              cursor: 'pointer',
+                            }}
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      )}
+                    </div>
                     {/* GATE 2: INCOMPLETE PROFILE DETAILS (Signed-in only) */}
                     {isSignedIn && !profileLoading && !isProfileComplete && (
                       <div className="guard-banner banner-warning">
@@ -3155,9 +3156,18 @@ export default function CartPage() {
           quantity: item.quantity,
           price: item.product?.price || 0,
         }))}
+        appliedCoupon={appliedCoupon}
+        onCouponChange={(nextCoupon) => {
+          setAppliedCoupon(nextCoupon);
+          setCouponInput(nextCoupon ? nextCoupon.code : '');
+          setCouponError(null);
+        }}
         onLoginClick={() => setShowGuestCheckoutModal(false)}
-        onOrderSuccess={(orderRef) => {
+        onOrderSuccess={() => {
           clearCart();
+          setAppliedCoupon(null);
+          setCouponInput('');
+          setCouponError(null);
           // Keep modal open so step 4 success popup (ref code + copy button + PDF receipt) is displayed to guest
         }}
       />

@@ -9,6 +9,8 @@ import { useCart } from '@/app/context/CartContext';
 import { IProduct, CollectionSection, IGiftCategory } from '@/types';
 import NewsletterCard from '@/components/NewsletterCard';
 import ProductCard from '@/components/ProductCard';
+import ProductCardSkeletonGrid from '@/components/ProductCardSkeletonGrid';
+import WinsorLoader from '@/components/WinsorLoader';
 import { showWishlistToast } from '@/components/WinsorToaster';
 import MensHeroTypewriter from './MensHeroTypewriter';
 
@@ -931,9 +933,7 @@ function MensCollectionContent() {
 
         {/* ── PRODUCT GRID ── */}
         {loading ? (
-          <div style={{ textAlign: 'center', padding: '80px 20px', color: 'rgba(26,18,9,0.45)' }}>
-            <p>Loading Men's Timepieces…</p>
-          </div>
+          <ProductCardSkeletonGrid count={8} />
         ) : error ? (
           <div style={{ textAlign: 'center', padding: '60px 20px', color: '#ff3b30' }}>
             <p>{error}</p>
@@ -970,10 +970,10 @@ function MensCollectionContent() {
 export default function MensCollectionPage() {
   return (
     <Suspense fallback={
-      <div style={{ padding: '100px 0', textAlign: 'center' }}>
+      <>
         <h1 className="sr-only">Men&apos;s Collection</h1>
-        Loading Men&apos;s Collection…
-      </div>
+        <WinsorLoader fullScreen size="lg" label="Loading Men's Collection…" />
+      </>
     }>
       <MensCollectionContent />
     </Suspense>

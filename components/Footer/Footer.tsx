@@ -7,6 +7,7 @@ import { useCurrency, CURRENCIES, CurrencyOption } from '@/app/context/CurrencyC
 import { useState } from 'react';
 import CountryFlag from '@/components/CountryFlag';
 import WatchClock from './WatchClock';
+import HorologyWaveBackdrop from './HorologyWaveBackdrop';
 
 // ─────────────────────────────────────────────────────────────
 // ICON COMPONENTS
@@ -283,15 +284,16 @@ export default function Footer() {
           outline: none;
         }
 
-        /* ── Horology Pre-Footer Brand Showcase (TAG Heuer Style) ── */
+        /* ── Horology Pre-Footer Brand Showcase ── */
         .ft-banner-logo-link {
           transition: opacity 0.25s ease, transform 0.25s ease;
           display: inline-flex;
           align-items: center;
           justify-content: center;
+          opacity: 0.96;
         }
         .ft-banner-logo-link:hover {
-          opacity: 0.82;
+          opacity: 1;
           transform: translateY(-1px);
         }
 
@@ -300,13 +302,13 @@ export default function Footer() {
         }
 
         .ft-horology-container {
-          max-width: 900px;
+          max-width: 960px;
           margin: 0 auto;
-          padding: 34px 24px 28px;
+          padding: 36px 24px 30px;
           display: flex;
           align-items: center;
           justify-content: center;
-          gap: 56px;
+          gap: 64px;
           position: relative;
           z-index: 2;
         }
@@ -316,6 +318,7 @@ export default function Footer() {
           height: auto;
           display: block;
           object-fit: contain;
+          filter: drop-shadow(0 2px 6px rgba(139, 105, 20, 0.14));
         }
 
         @media (max-width: 1024px) {
@@ -498,13 +501,16 @@ export default function Footer() {
           className="ft-horology-banner"
           style={{
             position: 'relative',
-            borderTop: '1px solid rgba(20,20,20,0.08)',
-            borderBottom: '1px solid rgba(20,20,20,0.08)',
-            background: '#ffffff',
+            borderTop: '1px solid rgba(180, 145, 70, 0.14)',
+            borderBottom: '1px solid rgba(180, 145, 70, 0.14)',
+            background: '#FFFFFF',
+            boxShadow: 'inset 0 10px 22px -18px rgba(26, 18, 9, 0.1), inset 0 -10px 20px -18px rgba(139, 105, 20, 0.08)',
             overflow: 'hidden',
           }}
           aria-label="Winsor Real-Time Precision Showcase"
         >
+          <HorologyWaveBackdrop />
+
           <div className="ft-horology-container">
             {/* ── Left Side: Pure Clean Winsor Brand Logo ── */}
             <div

@@ -8,6 +8,7 @@ import Image from 'next/image';
 import toast from 'react-hot-toast';
 import { useCurrency } from '@/app/context/CurrencyContext';
 import { generateReceiptPdf } from '@/lib/utils/generateReceiptPdf';
+import WinsorLoader from '@/components/WinsorLoader';
 import TrackHeroTypewriter from './TrackHeroTypewriter';
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string; border: string }> = {
@@ -61,6 +62,9 @@ interface OrderData {
   status: string;
   createdAt: string;
   subtotal: number;
+  couponCode?: string | null;
+  couponDiscountPercent?: number;
+  couponDiscountAmount?: number;
   finalTotal?: number;
   mobile?: string;
   items: OrderItemData[];
@@ -205,7 +209,10 @@ function OrderTrackingContent() {
         price: i.price,
       })),
       subtotal: order.subtotal,
-      finalTotal: order.finalTotal || order.subtotal,
+      couponCode: order.couponCode || undefined,
+      discountPercent: order.couponDiscountPercent || undefined,
+      discountAmount: order.couponDiscountAmount || undefined,
+      finalTotal: order.finalTotal ?? order.subtotal,
       paymentMethod: isBank ? 'Direct Bank Transfer' : 'PayHere Card Payment',
       paymentStatus: isPaid ? 'paid' : 'pending',
     });
@@ -588,8 +595,13 @@ function OrderTrackingContent() {
                   <div style={{ background: '#faf7f0', border: '1px solid rgba(139,105,20,0.12)', borderRadius: 12, padding: '14px' }}>
                     <div style={{ fontSize: '9px', fontWeight: 700, color: 'rgba(26,18,9,0.4)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 4 }}>Grand Total</div>
                     <div style={{ fontSize: '13px', fontWeight: 700, color: '#8b6914', fontFamily: "'Cinzel', sans-serif" }}>
-                      {convertPrice(order.finalTotal || order.subtotal)}
+                      {convertPrice(order.finalTotal ?? order.subtotal)}
                     </div>
+                    {order.couponCode && (
+                      <div style={{ fontSize: '10px', fontWeight: 600, color: '#15803d', marginTop: 2 }}>
+                        Code {order.couponCode} (-{order.couponDiscountPercent || 0}%)
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -691,12 +703,7 @@ function OrderTrackingContent() {
 export default function GuestOrderTrackingPage() {
   return (
     <Suspense
-      fallback={
-        <div style={{ minHeight: '100vh', background: '#faf7f0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <div style={{ width: 36, height: 36, border: '3px solid rgba(139,105,20,0.15)', borderTop: '3px solid #8B6914', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
-          <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-        </div>
-      }
+      fallback={<WinsorLoader fullScreen size="lg" label="Loading Order Tracker…" />}
     >
       <OrderTrackingContent />
     </Suspense>
