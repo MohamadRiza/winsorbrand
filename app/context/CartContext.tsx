@@ -1,10 +1,10 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
-import Link from 'next/link';
 import { useUser } from '@clerk/nextjs';
 import { IProduct } from '@/types';
 import { toast } from 'react-hot-toast';
+import { showCartToast } from '@/components/WinsorToaster';
 
 export interface CartItem {
   productId: string;
@@ -362,106 +362,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     // 1. Immediately persist synchronously (0ms) - ensures localStorage & state are written BEFORE any user navigation
     persistCart(updated);
 
-    // 2. Show custom toast notification with Next.js Link
-    const watchName = resolvedProduct?.title || 'Timepiece';
-    const watchImg = variantImage || resolvedProduct?.thumbnail?.url || '/graduation_gift.png';
-    const variantText = colorVariant ? ` (${colorVariant})` : '';
-
-    toast.custom(
-      (t) => (
-        <div
-          className={t.visible ? 'animate-enter' : 'animate-leave'}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '16px',
-            background: '#1a1209',
-            border: '1px solid #8B6914',
-            padding: '12px 18px',
-            borderRadius: '8px',
-            boxShadow: '0 10px 30px rgba(0, 0, 0, 0.25)',
-            minWidth: '320px',
-            maxWidth: '450px',
-            position: 'relative',
-            overflow: 'hidden',
-            fontFamily: "'Jost', sans-serif",
-            animation: t.visible ? 'toastSlideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards' : 'toastSlideOut 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards',
-            pointerEvents: 'auto',
-          }}
-        >
-          {/* Watch thumbnail */}
-          <div style={{ width: '48px', height: '48px', position: 'relative', borderRadius: '4px', overflow: 'hidden', background: '#fff', border: '1px solid rgba(255, 255, 255, 0.1)', flexShrink: 0 }}>
-            <img
-              src={watchImg}
-              alt={watchName}
-              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-            />
-          </div>
-
-          {/* Details */}
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <p style={{ margin: 0, fontSize: '9px', letterSpacing: '0.15em', color: '#dfb15b', fontWeight: 600, textTransform: 'uppercase' }}>
-              Timepiece Added
-            </p>
-            <h4 style={{ margin: '2px 0 0', fontSize: '13px', color: '#ffffff', fontWeight: 400, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', letterSpacing: '0.02em' }}>
-              {watchName}{variantText}
-            </h4>
-          </div>
-
-          {/* Action button - Next.js Link for instant SPA navigation */}
-          <Link
-            href="/cart"
-            onClick={() => toast.dismiss(t.id)}
-            style={{
-              padding: '6px 14px',
-              background: '#8B6914',
-              color: '#ffffff',
-              fontSize: '11px',
-              fontWeight: 500,
-              textTransform: 'uppercase',
-              letterSpacing: '0.1em',
-              textDecoration: 'none',
-              borderRadius: '4px',
-              transition: 'background 0.2s ease',
-              display: 'inline-block',
-            }}
-          >
-            Cart
-          </Link>
-
-          {/* Durative progress bar */}
-          <div 
-            style={{
-              position: 'absolute',
-              bottom: 0,
-              left: 0,
-              height: '2px',
-              background: '#dfb15b',
-              width: '100%',
-              transformOrigin: 'left',
-              animation: 'toastProgress 4s linear forwards',
-            }}
-          />
-
-          {/* Embedded animations style */}
-          <style>{`
-            @keyframes toastSlideIn {
-              from { transform: translateY(-20px); opacity: 0; }
-              to { transform: translateY(0); opacity: 1; }
-            }
-            @keyframes toastSlideOut {
-              from { transform: translateY(0); opacity: 1; }
-              to { transform: translateY(-20px); opacity: 0; }
-            }
-            @keyframes toastProgress {
-              from { transform: scaleX(1); }
-              to { transform: scaleX(0); }
-            }
-          `}</style>
-        </div>
-      ),
-      { duration: 4000 }
-    );
+    // 2. Show custom luxury toast notification with shared WinsorToaster helper
+    showCartToast({
+      title: resolvedProduct?.title || 'Timepiece',
+      variant: colorVariant,
+      image: variantImage || resolvedProduct?.thumbnail?.url || '/winsor_hero_backgroundremoved.webp',
+    });
   };
 
   const removeFromCart = (productId: string, colorVariant?: string) => {

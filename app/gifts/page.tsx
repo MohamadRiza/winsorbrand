@@ -7,7 +7,7 @@ import { useCurrency } from '@/app/context/CurrencyContext';
 import { useCart } from '@/app/context/CartContext';
 import { IGiftCategory, IProduct } from '@/types';
 import NewsletterCard from '@/components/NewsletterCard';
-import { toast } from 'react-hot-toast';
+import { showWishlistToast } from '@/components/WinsorToaster';
 import GiftsHeroTypewriter from './GiftsHeroTypewriter';
 
 const stripEmojis = (text: string) => {
@@ -132,13 +132,15 @@ export default function GiftsPage() {
 
   // Toggle wishlist item
   const toggleWishlist = (productId: string) => {
+    const prod = products.find(p => p._id === productId);
     const isFav = wishlist.includes(productId);
     let updated: string[];
     if (isFav) {
       updated = wishlist.filter(id => id !== productId);
+      showWishlistToast({ added: false, title: prod?.title, image: prod?.thumbnail?.url, productId });
     } else {
       updated = [...wishlist, productId];
-      toast.success('Added to wishlist');
+      showWishlistToast({ added: true, title: prod?.title, image: prod?.thumbnail?.url, productId });
     }
     setWishlist(updated);
     localStorage.setItem('winsor_wishlist', JSON.stringify(updated));

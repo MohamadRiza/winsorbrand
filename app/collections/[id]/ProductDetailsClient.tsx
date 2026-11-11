@@ -73,9 +73,14 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
   const [activeMediaType, setActiveMediaType] = useState<'image' | 'video'>('image');
 
   // Cart Interaction States
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
-  const [showToast, setShowToast] = useState(false);
   const [suggestions, setSuggestions] = useState<IProduct[]>([]);
+  const [suggestionRatings, setSuggestionRatings] = useState<Record<string, { averageRating: number; reviewCount: number }>>({});
+  const [storyVideoPlaying, setStoryVideoPlaying] = useState(false);
+  const [storySlideState, setStorySlideState] = useState<{ active: number; prev: number | null }>({
+    active: 0,
+    prev: null,
+  });
+  const [storySlideshowPaused, setStorySlideshowPaused] = useState(false);
 
   // Accordion States
   const [detailsOpen, setDetailsOpen] = useState(true);
@@ -249,6 +254,35 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
     return imagesList;
   }, [product]);
 
+  const hasUploadedVideo = Boolean(product?.video?.url?.trim());
+  const storyImages = useMemo(() => {
+    if (galleryImages.length > 0) return galleryImages;
+    return ['/collections_pg.webp'];
+  }, [galleryImages]);
+
+  useEffect(() => {
+    setStoryVideoPlaying(false);
+    setStorySlideshowPaused(false);
+    setStorySlideState({ active: 0, prev: null });
+  }, [id]);
+
+  useEffect(() => {
+    if (!product || hasUploadedVideo || storySlideshowPaused || storyImages.length <= 1) {
+      return;
+    }
+    const timer = setInterval(() => {
+      setStorySlideState((s) => ({
+        prev: s.active,
+        active: (s.active + 1) % storyImages.length,
+      }));
+    }, 4500);
+    return () => clearInterval(timer);
+  }, [product, hasUploadedVideo, storySlideshowPaused, storyImages.length]);
+
+  const goToStorySlide = (targetIdx: number) => {
+    setStorySlideState((s) => (s.active === targetIdx ? s : { prev: s.active, active: targetIdx }));
+  };
+
   const reviewsStats = useMemo(() => {
     if (!reviews || reviews.length === 0) {
       return { count: 0, average: 0 };
@@ -338,6 +372,21 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
 
           const combined = [...matchingGender, ...otherGender].slice(0, 4);
           setSuggestions(combined);
+
+          const ids = combined.map(p => p._id).filter(Boolean).join(',');
+          if (ids) {
+            try {
+              const rRes = await fetch(`/api/reviews/ratings?ids=${ids}`);
+              if (rRes.ok) {
+                const rData = await rRes.json();
+                if (rData.success && rData.data) {
+                  setSuggestionRatings(rData.data);
+                }
+              }
+            } catch {
+              // non-blocking ratings fetch
+            }
+          }
         }
       } catch (err) {
         console.error('Failed to load suggestions:', err);
@@ -351,10 +400,6 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
     if (!product) return;
     const colorVariantName = selectedVariant?.colorName || '';
     addToCart(product._id!, 1, colorVariantName, product);
-
-    const variantStr = selectedVariant ? ` (${selectedVariant.colorName})` : '';
-    setToastMessage(`"${product.title}${variantStr}" has been added to your cart.`);
-    setShowToast(true);
   };
 
   // Buy Now — auth-aware
@@ -383,16 +428,6 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
     }
     setShowBuyNowModal(true);
   };
-
-  // Close toast automatically after 4 seconds
-  useEffect(() => {
-    if (showToast) {
-      const timer = setTimeout(() => {
-        setShowToast(false);
-      }, 4000);
-      return () => clearTimeout(timer);
-    }
-  }, [showToast]);
 
   if (loading) {
     return (
@@ -437,35 +472,90 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=Jost:wght@300;400;500;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Jost:wght@300;400;500;600;700&display=swap');
 
-        .detail-container {
-          background-color: #ffffff;
+        .pdp-page {
+          background-color: #FFFFFF;
           min-height: 100vh;
-          padding: 130px 40px 80px;
           font-family: 'Jost', sans-serif;
           color: #141414;
+          overflow-x: hidden;
+        }
+
+        /* ── 1. LUMINOUS SILK PRODUCT HERO BAND ── */
+        .pdp-hero-band {
+          position: relative;
+          width: 100%;
+          padding: 122px 40px 56px;
+          background-color: #FFFFFF;
+          overflow: hidden;
+        }
+        .pdp-hero-silk-bg {
+          position: absolute;
+          inset: 0;
+          background-image: url('/hero_silk_pearl.jpg');
+          background-size: cover;
+          background-position: right center;
+          opacity: 0.72;
+          pointer-events: none;
+          z-index: 0;
+        }
+        .pdp-hero-silk-scrim {
+          position: absolute;
+          inset: 0;
+          background:
+            linear-gradient(180deg, rgba(255,255,255,0.68) 0%, rgba(255,255,255,0.18) 45%, rgba(255,255,255,0.75) 84%, #FFFFFF 100%),
+            linear-gradient(90deg, rgba(255,255,255,0.82) 0%, rgba(255,255,255,0.34) 48%, rgba(255,255,255,0.45) 100%);
+          pointer-events: none;
+          z-index: 1;
+        }
+        .pdp-hero-inner {
+          position: relative;
+          z-index: 2;
+          max-width: 1300px;
+          margin: 0 auto;
+        }
+        .pdp-breadcrumb {
+          margin-bottom: 24px;
+          font-size: 12px;
+          color: rgba(20, 20, 20, 0.56);
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          flex-wrap: wrap;
+          letter-spacing: 0.02em;
+        }
+        .pdp-breadcrumb a {
+          color: inherit;
+          text-decoration: none;
+          transition: color 0.2s ease;
+        }
+        .pdp-breadcrumb a:hover {
+          color: #8B6914;
         }
         .detail-wrapper {
           max-width: 1300px;
           margin: 0 auto;
           display: flex;
-          gap: 60px;
+          gap: 56px;
+          align-items: flex-start;
         }
-        
-        /* GALLERY SECTION */
+
+        /* GALLERY */
         .gallery-container {
-          width: 55%;
+          width: 54%;
           display: flex;
-          gap: 20px;
+          gap: 18px;
+          position: sticky;
+          top: 108px;
         }
         .thumbnails-column {
-          width: 80px;
+          width: 76px;
           flex-shrink: 0;
           display: flex;
           flex-direction: column;
-          gap: 12px;
-          max-height: 560px;
+          gap: 11px;
+          max-height: 556px;
           overflow-y: auto;
           scrollbar-width: none;
         }
@@ -474,34 +564,39 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
         }
         .thumbnail-item {
           aspect-ratio: 1;
-          border-radius: 8px;
-          border: 1px solid rgba(20, 20, 20, 0.08);
-          background: #F6F5F2;
+          border-radius: 10px;
+          border: 1px solid rgba(20, 20, 20, 0.1);
+          background: #FFFFFF;
+          padding: 4px;
           cursor: pointer;
           position: relative;
           overflow: hidden;
-          transition: all 0.3s;
+          transition: border-color 0.22s ease, box-shadow 0.22s ease, transform 0.22s ease;
+          box-shadow: 0 2px 10px rgba(20, 16, 10, 0.04);
         }
         .thumbnail-item.active {
-          border-color: #141414;
-          box-shadow: 0 0 0 1px #141414;
+          border-color: #8B6914;
+          box-shadow: 0 0 0 1.5px #8B6914, 0 6px 16px rgba(139, 105, 20, 0.14);
         }
-        .thumbnail-item:hover {
-          border-color: rgba(20, 20, 20, 0.35);
+        .thumbnail-item:hover:not(.active) {
+          border-color: rgba(139, 105, 20, 0.55);
+          transform: translateY(-1px);
         }
         .main-image-view {
           flex-grow: 1;
           aspect-ratio: 1;
-          max-height: 560px;
+          max-height: 556px;
           position: relative;
-          border-radius: 12px;
-          border: 1px solid rgba(20, 20, 20, 0.06);
-          background: #F6F5F2;
+          border-radius: 16px;
+          border: 1px solid rgba(20, 20, 20, 0.07);
+          background: #FFFFFF;
+          box-shadow: 0 22px 54px rgba(20, 16, 10, 0.06);
           overflow: hidden;
           isolation: isolate;
         }
         .main-watch-img {
-          transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1) !important;
+          padding: 18px;
+          transition: transform 0.55s cubic-bezier(0.16, 1, 0.3, 1) !important;
           transform-origin: center center !important;
           will-change: transform;
           backface-visibility: hidden;
@@ -509,738 +604,713 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
         }
         @media (min-width: 1025px) {
           .main-image-view:hover .main-watch-img {
-            transform: scale(1.08) !important;
+            transform: scale(1.06) !important;
           }
         }
         @media (max-width: 1024px) {
+          .gallery-container {
+            position: relative;
+            top: 0;
+          }
           .main-watch-img {
             transform: none !important;
             transition: none !important;
           }
         }
-        
-        /* DETAILS INFO SECTION */
+
+        /* INFO PANEL */
         .info-container {
-          width: 45%;
+          width: 46%;
           display: flex;
           flex-direction: column;
         }
-        .brand-label {
+        .pdp-badge-row {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          flex-wrap: wrap;
+          margin-bottom: 12px;
+        }
+        .pdp-gold-pill {
+          display: inline-flex;
+          align-items: center;
+          background: linear-gradient(135deg, #9C7A3C 0%, #8B6914 100%);
+          color: #FFFFFF;
+          font-size: 9.5px;
+          font-weight: 700;
+          letter-spacing: 0.18em;
+          text-transform: uppercase;
+          padding: 5px 14px;
+          border-radius: 999px;
+          box-shadow: 0 4px 12px rgba(139, 105, 20, 0.2);
+        }
+        .pdp-gold-pill.sold-out {
+          background: rgba(20, 20, 20, 0.72);
+          box-shadow: none;
+        }
+        .pdp-ref-chip {
+          font-size: 10.5px;
+          font-weight: 500;
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
+          color: rgba(20, 20, 20, 0.5);
+        }
+        .pdp-title {
+          font-family: 'Cormorant Garamond', serif;
+          font-size: clamp(32px, 3.4vw, 44px);
+          font-weight: 500;
+          line-height: 1.08;
+          color: #141414;
+          margin: 0 0 6px 0;
+          letter-spacing: 0.01em;
+          overflow-wrap: anywhere;
+        }
+        .pdp-tagline {
+          font-size: 14px;
+          color: rgba(20, 20, 20, 0.62);
+          margin: 0 0 12px 0;
+          font-weight: 400;
+          letter-spacing: 0.01em;
+        }
+        .pdp-price {
+          font-family: 'Jost', sans-serif;
+          font-size: clamp(24px, 2.3vw, 30px);
+          font-weight: 600;
+          color: #141414;
+          letter-spacing: 0.01em;
+          line-height: 1.15;
+        }
+        .pdp-tax-note {
           font-size: 11px;
+          color: rgba(20, 20, 20, 0.5);
+          margin-top: 3px;
+        }
+        .pdp-cta-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 12px;
+          margin-bottom: 12px;
+        }
+        .pdp-btn-cart {
+          height: 48px;
+          padding: 0 20px;
+          background: linear-gradient(135deg, #9C7A3C 0%, #8B6914 100%);
+          color: #FFFFFF;
+          border: none;
+          border-radius: 999px;
+          font-size: 11.5px;
+          font-weight: 600;
+          letter-spacing: 0.14em;
+          text-transform: uppercase;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          cursor: pointer;
+          box-shadow: 0 8px 22px rgba(139, 105, 20, 0.24);
+          transition: transform 0.22s ease, box-shadow 0.22s ease, background 0.22s ease;
+        }
+        .pdp-btn-cart:hover:not(:disabled) {
+          background: linear-gradient(135deg, #7A5C10 0%, #684E0D 100%);
+          transform: translateY(-1.5px);
+          box-shadow: 0 10px 26px rgba(139, 105, 20, 0.32);
+        }
+        .pdp-btn-cart:disabled {
+          background: rgba(20, 20, 20, 0.18);
+          color: rgba(20, 20, 20, 0.45);
+          box-shadow: none;
+          cursor: not-allowed;
+        }
+        .pdp-btn-buy {
+          height: 48px;
+          padding: 0 20px;
+          background: #FFFFFF;
+          color: #8B6914;
+          border: 1.5px solid #8B6914;
+          border-radius: 999px;
+          font-size: 11.5px;
+          font-weight: 600;
+          letter-spacing: 0.14em;
+          text-transform: uppercase;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          cursor: pointer;
+          transition: transform 0.22s ease, background 0.22s ease, color 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
+        }
+        .pdp-btn-buy:hover:not(:disabled) {
+          background: #141414;
+          border-color: #141414;
+          color: #FFFFFF;
+          transform: translateY(-1.5px);
+          box-shadow: 0 8px 22px rgba(20, 20, 20, 0.16);
+        }
+        .pdp-btn-buy:disabled {
+          border-color: rgba(20, 20, 20, 0.15);
+          color: rgba(20, 20, 20, 0.35);
+          cursor: not-allowed;
+        }
+        .pdp-btn-whatsapp {
+          width: 100%;
+          height: 42px;
+          padding: 0 18px;
+          background: rgba(255, 255, 255, 0.92);
+          color: #141414;
+          border: 1px solid rgba(20, 20, 20, 0.14);
+          border-radius: 999px;
+          font-size: 11px;
+          font-weight: 600;
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          text-decoration: none;
+          transition: all 0.22s ease;
+          margin-bottom: 18px;
+        }
+        .pdp-btn-whatsapp:hover {
+          border-color: #8B6914;
+          color: #8B6914;
+          background: #FFFFFF;
+        }
+        .pdp-inline-trust {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          background: rgba(255, 255, 255, 0.94);
+          border: 1px solid rgba(20, 20, 20, 0.08);
+          border-radius: 10px;
+          padding: 11px 10px;
+          margin-bottom: 10px;
+          font-size: 11px;
+          font-weight: 500;
+          color: rgba(20, 20, 20, 0.82);
+        }
+        .pdp-inline-trust-cell {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 6px;
+          text-align: center;
+          padding: 0 6px;
+        }
+        .pdp-inline-trust-cell:nth-child(2) {
+          border-left: 1px solid rgba(20, 20, 20, 0.08);
+          border-right: 1px solid rgba(20, 20, 20, 0.08);
+        }
+        .pdp-accordion-wrap {
+          border-top: 1px solid rgba(20, 20, 20, 0.08);
+          margin-top: 16px;
+        }
+        .pdp-accordion-item {
+          border-bottom: 1px solid rgba(20, 20, 20, 0.08);
+        }
+        .pdp-accordion-btn {
+          width: 100%;
+          padding: 13px 0;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          background: none;
+          border: none;
+          font-size: 11.5px;
+          font-weight: 600;
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
+          color: #141414;
+          cursor: pointer;
+          text-align: left;
+        }
+        .pdp-accordion-btn:hover {
+          color: #8B6914;
+        }
+
+        /* ── 2. 4-PILLAR CRAFTSMANSHIP BAR ── */
+        .pdp-craft-bar {
+          background: #FFFFFF;
+          border-top: 1px solid rgba(20, 20, 20, 0.07);
+          border-bottom: 1px solid rgba(20, 20, 20, 0.07);
+          padding: 28px 40px;
+        }
+        .pdp-craft-grid {
+          max-width: 1300px;
+          margin: 0 auto;
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+        }
+        .pdp-craft-cell {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          text-align: center;
+          padding: 6px 20px;
+          border-right: 1px solid rgba(20, 20, 20, 0.07);
+          gap: 8px;
+        }
+        .pdp-craft-cell:last-child {
+          border-right: none;
+        }
+        .pdp-craft-cell h4 {
+          margin: 0;
+          font-size: 12.5px;
+          font-weight: 600;
+          color: #141414;
+          letter-spacing: 0.02em;
+        }
+        .pdp-craft-cell span {
+          font-size: 11px;
+          color: rgba(20, 20, 20, 0.52);
+        }
+
+        /* ── 3. DARK STORYTELLING CINEMA BAND ── */
+        .pdp-story-band {
+          position: relative;
+          background: #0A0806;
+          color: #FFFFFF;
+          padding: 88px 40px;
+          overflow: hidden;
+          border-top: 1px solid rgba(212, 175, 99, 0.22);
+          border-bottom: 1px solid rgba(212, 175, 99, 0.22);
+        }
+        .pdp-story-backdrop {
+          position: absolute;
+          inset: 0;
+          background-image: url('/pdp_story_luxury_bg.jpg');
+          background-size: cover;
+          background-position: right center;
+          opacity: 0.92;
+          pointer-events: none;
+        }
+        .pdp-story-scrim {
+          position: absolute;
+          inset: 0;
+          background:
+            linear-gradient(95deg, rgba(9, 7, 5, 0.9) 0%, rgba(11, 9, 6, 0.56) 44%, rgba(10, 8, 6, 0.16) 76%, rgba(10, 8, 6, 0.42) 100%),
+            linear-gradient(180deg, rgba(9, 7, 5, 0.45) 0%, rgba(9, 7, 5, 0) 24%, rgba(9, 7, 5, 0) 76%, rgba(9, 7, 5, 0.52) 100%);
+          pointer-events: none;
+        }
+        .pdp-story-inner {
+          position: relative;
+          z-index: 2;
+          max-width: 1300px;
+          margin: 0 auto;
+          display: grid;
+          grid-template-columns: 0.92fr 1.08fr;
+          gap: 56px;
+          align-items: center;
+        }
+        .pdp-story-eyebrow {
+          display: inline-flex;
+          align-items: center;
+          gap: 10px;
+          font-size: 10px;
           font-weight: 600;
           letter-spacing: 0.25em;
           text-transform: uppercase;
-          color: #8B6914;
-          margin-bottom: 6px;
+          color: #D4AF63;
+          margin-bottom: 14px;
         }
-        .detail-sticker {
-          display: inline-block;
-          background: #1a1209;
-          color: #fff;
-          font-size: 8px;
+        .pdp-story-eyebrow::before {
+          content: '';
+          width: 24px;
+          height: 1px;
+          background: #D4AF63;
+        }
+        .pdp-story-title {
+          font-family: 'Cormorant Garamond', serif;
+          font-size: clamp(36px, 4vw, 52px);
+          font-weight: 400;
+          line-height: 1.06;
+          color: #FFFFFF;
+          margin: 0 0 18px 0;
+          letter-spacing: 0.01em;
+        }
+        .pdp-story-desc {
+          font-size: 14px;
+          line-height: 1.7;
+          color: rgba(255, 255, 255, 0.72);
+          max-width: 470px;
+          margin: 0 0 24px 0;
+        }
+        .pdp-story-specs-mini {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 12px 20px;
+          margin-bottom: 28px;
+          padding: 16px 0;
+          border-top: 1px solid rgba(212, 175, 99, 0.18);
+          border-bottom: 1px solid rgba(212, 175, 99, 0.18);
+        }
+        .pdp-story-spec-item {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+        }
+        .pdp-story-spec-icon {
+          width: 32px;
+          height: 32px;
+          border-radius: 50%;
+          border: 1px solid rgba(212, 175, 99, 0.35);
+          background: rgba(212, 175, 99, 0.08);
+          color: #D4AF63;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+        }
+        .pdp-story-cta-row {
+          display: flex;
+          align-items: center;
+          gap: 14px;
+          flex-wrap: wrap;
+        }
+        .pdp-story-btn-gold {
+          display: inline-flex;
+          align-items: center;
+          gap: 10px;
+          padding: 11px 24px;
+          border-radius: 999px;
+          border: 1.5px solid #D4AF63;
+          background: rgba(212, 175, 99, 0.12);
+          color: #FFFFFF;
+          font-size: 11px;
           font-weight: 600;
+          letter-spacing: 0.16em;
+          text-transform: uppercase;
+          cursor: pointer;
+          text-decoration: none;
+          transition: all 0.25s ease;
+        }
+        .pdp-story-btn-gold:hover {
+          background: #D4AF63;
+          color: #141414;
+        }
+        .pdp-story-btn-link {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          font-size: 11px;
+          font-weight: 500;
           letter-spacing: 0.15em;
           text-transform: uppercase;
-          padding: 3px 8px;
-          border-radius: 2px;
-          align-self: flex-start;
-          margin-bottom: 12px;
+          color: rgba(255, 255, 255, 0.72);
+          text-decoration: none;
+          padding: 8px 4px;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+          transition: color 0.2s ease, border-color 0.2s ease;
         }
-        .detail-title {
-          font-family: 'Cormorant Garamond', serif;
-          font-size: 38px;
-          font-weight: 400;
-          line-height: 1.15;
-          margin-bottom: 4px;
-          color: #1a1209;
+        .pdp-story-btn-link:hover {
+          color: #D4AF63;
+          border-color: #D4AF63;
         }
-        .detail-subtitle {
-          font-size: 13.5px;
-          color: rgba(26, 18, 9, 0.55);
-          letter-spacing: 0.02em;
-          margin-bottom: 18px;
-          font-weight: 300;
+        .pdp-story-frame {
+          position: relative;
+          border-radius: 16px;
+          overflow: hidden;
+          aspect-ratio: 16 / 9;
+          background: #120F0B;
+          border: 1px solid rgba(212, 175, 99, 0.44);
+          box-shadow: 0 32px 80px rgba(0, 0, 0, 0.72), 0 0 48px rgba(212, 175, 99, 0.12);
         }
-        .model-no {
-          font-size: 11px;
-          color: rgba(26, 18, 9, 0.4);
-          letter-spacing: 0.05em;
-          margin-bottom: 20px;
-        }
-        .detail-price {
-          font-size: 26px;
-          font-weight: 500;
-          color: #8B6914;
-          margin-bottom: 24px;
-        }
-        
-        /* COLOR VARIANTS Swatches */
-        .swatch-label {
-          font-size: 11px;
-          font-weight: 600;
-          letter-spacing: 0.1em;
-          text-transform: uppercase;
-          color: rgba(26, 18, 9, 0.5);
-          margin-bottom: 12px;
-        }
-        .swatches-row {
+        .pdp-story-play-circle {
+          width: 68px;
+          height: 68px;
+          border-radius: 50%;
+          background: rgba(255, 255, 255, 0.94);
+          color: #141414;
+          border: 4px solid rgba(212, 175, 99, 0.38);
           display: flex;
+          align-items: center;
+          justify-content: center;
+          box-shadow: 0 14px 36px rgba(0, 0, 0, 0.55);
+          transition: transform 0.25s ease, background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+        }
+        .pdp-story-frame-trigger:hover .pdp-story-play-circle {
+          transform: scale(1.08);
+          background: #D4AF63;
+          border-color: rgba(255, 255, 255, 0.55);
+          color: #FFFFFF;
+        }
+
+        /* ── KEN BURNS HOROLOGY SLIDESHOW (WHEN NO VIDEO UPLOADED) ── */
+        @keyframes pdpKenBurnsA {
+          0% { transform: scale(1.02) translate3d(0%, 0%, 0); }
+          100% { transform: scale(1.18) translate3d(-1.2%, -0.8%, 0); }
+        }
+        @keyframes pdpKenBurnsB {
+          0% { transform: scale(1.03) translate3d(-0.6%, 0.4%, 0); }
+          100% { transform: scale(1.19) translate3d(1%, -0.8%, 0); }
+        }
+        @keyframes pdpKenBurnsSingle {
+          0% { transform: scale(1.02) translate3d(0%, 0%, 0); }
+          50% { transform: scale(1.16) translate3d(-0.7%, -0.6%, 0); }
+          100% { transform: scale(1.02) translate3d(0%, 0%, 0); }
+        }
+        @keyframes pdpSlideProgress {
+          0% { transform: scaleX(0); }
+          100% { transform: scaleX(1); }
+        }
+        @keyframes pdpPulseDot {
+          0%, 100% { opacity: 1; transform: scale(1); }
+          50% { opacity: 0.45; transform: scale(0.8); }
+        }
+        .pdp-kb-stage {
+          position: relative;
+          width: 100%;
+          height: 100%;
+          background: radial-gradient(ellipse at 50% 46%, #FFFFFF 68%, #FAF8F4 100%);
+          overflow: hidden;
+        }
+        .pdp-slide-media {
+          position: absolute;
+          inset: 0;
+          opacity: 0;
+          z-index: 0;
+          transition: opacity 1.15s cubic-bezier(0.22, 1, 0.36, 1);
+          pointer-events: none;
+          overflow: hidden;
+        }
+        .pdp-slide-media.is-prev {
+          opacity: 1;
+          z-index: 1;
+        }
+        .pdp-slide-media.is-active {
+          opacity: 1;
+          z-index: 2;
+          pointer-events: auto;
+        }
+        .pdp-slide-vignette {
+          position: absolute;
+          inset: 0;
+          background: radial-gradient(ellipse at 50% 44%, rgba(255, 255, 255, 0) 62%, rgba(139, 105, 20, 0.06) 100%);
+          box-shadow: inset 0 0 0 1px rgba(212, 175, 99, 0.25);
+          pointer-events: none;
+          z-index: 3;
+        }
+        .pdp-slide-zoom-wrap {
+          position: relative;
+          width: 100%;
+          height: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          will-change: transform;
+        }
+        .pdp-slide-zoom-wrap.is-animating.is-pan-a {
+          animation: pdpKenBurnsA 6.2s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+        }
+        .pdp-slide-zoom-wrap.is-animating.is-pan-b {
+          animation: pdpKenBurnsB 6.2s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+        }
+        .pdp-slide-zoom-wrap.is-single {
+          animation: pdpKenBurnsSingle 14s ease-in-out infinite;
+        }
+        .pdp-slide-zoom-wrap.is-paused {
+          animation-play-state: paused !important;
+        }
+        .pdp-slide-watch-img {
+          width: 100%;
+          height: 100%;
+          object-fit: contain;
+          padding: 16px 24px 44px;
+          -webkit-mask-image: radial-gradient(ellipse at 50% 50%, #000 85%, transparent 100%);
+          mask-image: radial-gradient(ellipse at 50% 50%, #000 85%, transparent 100%);
+          user-select: none;
+        }
+        .pdp-kb-hud {
+          position: absolute;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          z-index: 6;
+          padding: 20px 16px 12px;
+          background: linear-gradient(to top, rgba(10, 8, 6, 0.72) 0%, rgba(10, 8, 6, 0.25) 68%, transparent 100%);
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 14px;
+        }
+        .pdp-kb-caption-col {
+          display: flex;
+          align-items: center;
+          flex: 1;
+          max-width: 150px;
+        }
+        .pdp-kb-progress-track {
+          width: 100%;
+          height: 2px;
+          background: rgba(255, 255, 255, 0.26);
+          border-radius: 99px;
+          overflow: hidden;
+        }
+        .pdp-kb-progress-fill {
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(90deg, #8B6914, #D4AF63);
+          transform-origin: left center;
+          animation: pdpSlideProgress 4.5s linear forwards;
+        }
+        .pdp-kb-progress-fill.is-paused {
+          animation-play-state: paused !important;
+        }
+        .pdp-kb-controls {
+          display: flex;
+          align-items: center;
           gap: 10px;
-          flex-wrap: wrap;
-          margin-bottom: 24px;
-          align-items: flex-start;
         }
-        .swatch-item {
+        .pdp-kb-dots {
           display: flex;
-          flex-direction: column;
           align-items: center;
           gap: 5px;
         }
-        .swatch-btn {
-          width: 52px;
-          height: 52px;
-          border-radius: 10px;
-          border: 2px solid rgba(26, 18, 9, 0.12);
-          padding: 2px;
-          background: none;
+        .pdp-kb-dot {
+          width: 6px;
+          height: 6px;
+          border-radius: 99px;
+          background: rgba(255, 255, 255, 0.4);
+          border: none;
+          padding: 0;
           cursor: pointer;
-          transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          overflow: hidden;
-          position: relative;
+          transition: all 0.28s ease;
         }
-        .swatch-btn:hover {
-          border-color: #8B6914;
-          transform: scale(1.05);
-          box-shadow: 0 4px 12px rgba(139, 105, 20, 0.2);
+        .pdp-kb-dot:hover {
+          background: rgba(255, 255, 255, 0.78);
         }
-        .swatch-btn.active {
-          border-color: #8B6914;
-          box-shadow: 0 0 0 3px rgba(139, 105, 20, 0.2);
-          transform: scale(1.05);
+        .pdp-kb-dot.active {
+          width: 20px;
+          background: #D4AF63;
         }
-        .swatch-img {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-          border-radius: 8px;
-          display: block;
-        }
-        .swatch-fallback {
-          width: 100%;
-          height: 100%;
-          border-radius: 8px;
-          background: linear-gradient(135deg, #d4c5a0, #b8a882);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 9px;
-          font-weight: 600;
-          color: #6b5a30;
-          text-align: center;
-          letter-spacing: 0.02em;
-          padding: 2px;
-          line-height: 1.2;
-        }
-        .swatch-name {
-          font-size: 9px;
-          font-weight: 500;
-          color: rgba(26, 18, 9, 0.55);
-          text-align: center;
-          max-width: 56px;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          white-space: nowrap;
-          font-family: 'Jost', sans-serif;
-          letter-spacing: 0.04em;
-          text-transform: uppercase;
-          transition: color 0.2s;
-        }
-        .swatch-item:has(.swatch-btn.active) .swatch-name {
-          color: #8B6914;
-          font-weight: 600;
-        }
-        
-        /* INVENTORY STOCK STATUS */
-        .stock-badge {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          font-size: 12.5px;
-          font-weight: 500;
-          margin-bottom: 24px;
-        }
-        .stock-dot {
-          width: 8px;
-          height: 8px;
+        .pdp-kb-toggle-btn {
+          width: 28px;
+          height: 28px;
           border-radius: 50%;
-        }
-        
-        /* ACTION BUTTONS CONTAINER */
-        .actions-buttons-container {
-          display: flex;
-          gap: 16px;
-          margin-bottom: 24px;
-          width: 100%;
-        }
-        .cart-action-btn {
-          flex: 1;
-          background: #1a1209;
-          color: #faf7f0;
-          border: none;
-          border-radius: 4px;
-          padding: 16px;
-          font-family: 'Jost', sans-serif;
-          font-size: 13px;
-          font-weight: 500;
-          letter-spacing: 0.15em;
-          text-transform: uppercase;
-          cursor: pointer;
-          transition: all 0.3s;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 8px;
-        }
-        .cart-action-btn:hover:not(:disabled) {
-          background: #8B6914;
-          box-shadow: 0 4px 12px rgba(139,105,20,0.2);
-        }
-        .cart-action-btn:disabled {
-          background: rgba(26, 18, 9, 0.15);
-          color: rgba(26, 18, 9, 0.4);
-          cursor: not-allowed;
-        }
-        .buy-now-btn {
-          flex: 1;
-          background: #8B6914;
-          color: #fff;
-          border: none;
-          border-radius: 4px;
-          padding: 16px;
-          font-family: 'Jost', sans-serif;
-          font-size: 13px;
-          font-weight: 500;
-          letter-spacing: 0.15em;
-          text-transform: uppercase;
-          cursor: pointer;
-          transition: all 0.3s;
-        }
-        .buy-now-btn:hover:not(:disabled) {
-          background: #1a1209;
-          box-shadow: 0 4px 12px rgba(26,18,9,0.25);
-        }
-        .buy-now-btn:disabled {
-          background: rgba(26, 18, 9, 0.15);
-          color: rgba(26, 18, 9, 0.4);
-          cursor: not-allowed;
-        }
-        .find-retailer-btn {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 8px;
-          width: 100%;
-          background: transparent;
-          color: #8B6914;
-          border: 1.5px solid #8B6914;
-          border-radius: 4px;
-          padding: 14px 20px;
-          font-family: 'Jost', sans-serif;
-          font-size: 13px;
-          font-weight: 500;
-          letter-spacing: 0.15em;
-          text-transform: uppercase;
-          text-decoration: none;
-          cursor: pointer;
-          transition: all 0.3s ease;
-          box-sizing: border-box;
-        }
-        .find-retailer-btn:hover {
-          background: #8B6914;
-          color: #ffffff;
-          box-shadow: 0 4px 12px rgba(139,105,20,0.25);
-        }
-
-        /* THREE ACCENTED BADGES */
-        .features-badge-bar {
-          display: flex;
-          justify-content: space-between;
-          padding: 14px 4px;
-          border-top: 1px solid rgba(26,18,9,0.06);
-          border-bottom: 1px solid rgba(26,18,9,0.06);
-          margin-bottom: 24px;
-          font-size: 11px;
-          color: rgba(26,18,9,0.65);
-          font-weight: 500;
-          letter-spacing: 0.02em;
-        }
-
-        /* ACCORDIONS */
-        .accordion-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          width: 100%;
-          background: none;
-          border: none;
-          padding: 15px 0;
-          font-family: 'Jost', sans-serif;
-          font-size: 13px;
-          font-weight: 500;
-          letter-spacing: 0.05em;
-          text-transform: uppercase;
-          color: #1a1209;
-          cursor: pointer;
-          transition: color 0.2s;
-        }
-        .accordion-header:hover {
-          color: #8B6914;
-        }
-        .accordion-content {
-          padding: 0 0 16px 0;
-          font-size: 13px;
-          line-height: 1.5;
-          color: rgba(26,18,9,0.7);
-        }
-
-        .back-link {
+          border: 1px solid rgba(212, 175, 99, 0.45);
+          background: rgba(18, 14, 10, 0.75);
+          color: #FFFFFF;
           display: inline-flex;
           align-items: center;
-          gap: 8px;
-          color: rgba(26, 18, 9, 0.4);
-          font-size: 11.5px;
-          font-weight: 500;
-          letter-spacing: 0.08em;
-          text-decoration: none;
-          margin-top: 24px;
-          transition: color 0.2s;
+          justify-content: center;
+          cursor: pointer;
+          transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
         }
-        .back-link:hover {
-          color: #8b6914;
+        .pdp-kb-toggle-btn:hover {
+          background: #D4AF63;
+          border-color: #D4AF63;
+          color: #141414;
         }
 
-        /* LARGE IMAGES DETAILS GRID */
-        .large-gallery-section {
-          margin-top: 60px;
-          border-top: 1px solid rgba(26,18,9,0.08);
-          padding-top: 50px;
-        }
-        .large-gallery-section h3 {
-          font-family: 'Cormorant Garamond', serif;
-          font-size: 28px;
-          font-weight: 500;
+        /* ── SHARED EDITORIAL SECTION HEADER ── */
+        .pdp-sec-header {
           text-align: center;
-          margin-bottom: 36px;
-          letter-spacing: 0.05em;
+          margin-bottom: 38px;
         }
-        .large-gallery-container {
-          display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          gap: 24px;
+        .pdp-sec-eyebrow {
+          display: inline-flex;
+          align-items: center;
+          gap: 12px;
+          font-size: 10px;
+          font-weight: 600;
+          letter-spacing: 0.26em;
+          text-transform: uppercase;
+          color: #8B6914;
+          margin-bottom: 8px;
+        }
+        .pdp-sec-eyebrow span.rule {
+          width: 22px;
+          height: 1px;
+          background: rgba(139, 105, 20, 0.45);
+        }
+        .pdp-sec-title {
+          font-family: 'Cormorant Garamond', serif;
+          font-size: clamp(28px, 3vw, 38px);
+          font-weight: 500;
+          color: #141414;
+          margin: 0 0 6px 0;
+          letter-spacing: 0.02em;
+        }
+        .pdp-sec-sub {
+          font-size: 13.5px;
+          color: rgba(20, 20, 20, 0.55);
+          margin: 0;
+        }
+
+        /* ── 4. 5-COLUMN EXPLORE COLLECTIONS ── */
+        .pdp-collections-band {
+          background: #FFFFFF;
+          padding: 76px 40px 80px;
+        }
+        .pdp-collections-inner {
           max-width: 1300px;
           margin: 0 auto;
         }
-        .large-gallery-item {
-          width: 100%;
-          position: relative;
-          aspect-ratio: 1;
-          border-radius: 12px;
-          overflow: hidden;
-          background: transparent;
-        }
-        .large-gallery-video-item {
-          width: 100%;
-          aspect-ratio: 1.777;
-          border-radius: 12px;
-          overflow: hidden;
-          box-shadow: 0 4px 20px rgba(0,0,0,0.02);
-          background: #000;
-          margin-bottom: 30px;
-          max-width: 1300px;
-          margin-left: auto;
-          margin-right: auto;
-        }
-        .large-video-element {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-        }
-
-        /* STORE BANNER */
-        .store-banner-wrapper {
-          max-width: 1300px;
-          margin: 80px auto 0;
-          padding: 0;
-        }
-        .store-banner-container {
-          position: relative;
-          width: 100%;
-          height: 420px;
-          border-radius: 16px;
-          overflow: hidden;
-          display: flex;
-          align-items: center;
-          padding-left: 80px;
-          border: 1px solid rgba(26,18,9,0.06);
-          box-shadow: 0 8px 30px rgba(0,0,0,0.02);
-        }
-        .store-banner-overlay {
-          position: absolute;
-          inset: 0;
-          background: linear-gradient(90deg, rgba(15, 12, 10, 0.98) 0%, rgba(15, 12, 10, 0.75) 35%, rgba(15, 12, 10, 0.15) 100%);
-          z-index: 1;
-        }
-        .store-banner-content {
-          position: relative;
-          z-index: 2;
-          max-width: 480px;
-          color: #fff;
-        }
-        .store-banner-tag {
-          font-size: 10px;
-          letter-spacing: 0.25em;
-          text-transform: uppercase;
-          color: rgba(255, 255, 255, 0.55);
-          margin-bottom: 12px;
-          font-weight: 500;
-          display: block;
-        }
-        .store-banner-title {
-          font-family: 'Cormorant Garamond', serif;
-          font-size: 40px;
-          font-weight: 300;
-          line-height: 1.2;
-          margin-bottom: 16px;
-          color: #fff;
-        }
-        .store-banner-p {
-          font-size: 13.5px;
-          line-height: 1.6;
-          color: rgba(255, 255, 255, 0.75);
-          margin-bottom: 28px;
-          font-family: 'Jost', sans-serif;
-        }
-        .store-banner-btn {
-          display: inline-block;
-          background: #8B6914;
-          color: #fff;
-          border: none;
-          text-decoration: none;
-          padding: 12px 28px;
-          font-size: 11px;
-          letter-spacing: 0.15em;
-          font-weight: 500;
-          text-transform: uppercase;
-          border-radius: 4px;
-          transition: all 0.3s;
-        }
-        .store-banner-btn:hover {
-          background: #fff;
-          color: #1a1209;
-          box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        }
-
-        /* BRAND LIFESTYLE BANNER */
-        .brand-banner-wrapper {
-          max-width: 1300px;
-          margin: 60px auto 0;
-          padding: 0;
-        }
-        .brand-banner-container {
-          position: relative;
-          width: 100%;
-          height: 400px;
-          border-radius: 16px;
-          overflow: hidden;
-          display: flex;
-          align-items: center;
-          padding-left: 80px;
-          border: 1px solid rgba(26,18,9,0.06);
-          box-shadow: 0 8px 30px rgba(0,0,0,0.02);
-        }
-        .brand-banner-bg {
-          object-fit: cover;
-          object-position: center 20%;
-        }
-        .brand-banner-overlay {
-          position: absolute;
-          inset: 0;
-          background: linear-gradient(90deg, rgba(26,18,9,0.85) 0%, rgba(26,18,9,0.45) 50%, rgba(26,18,9,0.15) 100%);
-          z-index: 1;
-        }
-        .brand-banner-content {
-          position: relative;
-          z-index: 2;
-          max-width: 480px;
-          color: #fff;
-        }
-        .brand-banner-title {
-          font-family: 'Cormorant Garamond', serif;
-          font-size: 40px;
-          font-weight: 300;
-          letter-spacing: 0.05em;
-          line-height: 1.2;
-          margin-bottom: 16px;
-        }
-        .brand-banner-p {
-          font-size: 13.5px;
-          line-height: 1.6;
-          color: rgba(255,255,255,0.75);
-          margin-bottom: 28px;
-          font-family: 'Jost', sans-serif;
-        }
-        .brand-banner-btn {
-          display: inline-block;
-          background: transparent;
-          color: #fff;
-          border: 1px solid rgba(255,255,255,0.4);
-          text-decoration: none;
-          padding: 12px 28px;
-          font-size: 11px;
-          letter-spacing: 0.15em;
-          font-weight: 500;
-          text-transform: uppercase;
-          border-radius: 4px;
-          transition: all 0.3s;
-        }
-        .brand-banner-btn:hover {
-          background: #fff;
-          color: #1a1209;
-          border-color: #fff;
-          box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        }
-
-        /* TIMELESS PAIRINGS CATEGORY GRID */
         .pairings-grid {
           display: grid;
           grid-template-columns: repeat(5, 1fr);
-          gap: 20px;
+          gap: 18px;
           position: relative;
         }
-        @media (max-width: 1100px) and (min-width: 769px) {
-          .pairings-grid {
-            grid-template-columns: repeat(3, 1fr);
-            gap: 16px;
-          }
+        .pairing-card {
+          position: relative;
+          display: block;
+          aspect-ratio: 4 / 4.8;
+          border-radius: 12px;
+          overflow: hidden;
+          background: #141210;
+          border: 1px solid rgba(20, 20, 20, 0.08);
+          text-decoration: none;
+          transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s ease, border-color 0.35s ease;
         }
-        @media (max-width: 768px) {
-          .pairings-section {
-            margin-top: 48px !important;
-            padding-top: 36px !important;
-          }
-          .pairings-desc {
-            margin-bottom: 22px !important;
-          }
-          .pairings-grid {
-            display: flex !important;
-            flex-direction: row !important;
-            flex-wrap: nowrap !important;
-            overflow-x: auto !important;
-            overflow-y: hidden !important;
-            scroll-snap-type: x mandatory !important;
-            scroll-behavior: smooth !important;
-            -webkit-overflow-scrolling: touch !important;
-            touch-action: pan-x pan-y !important;
-            overscroll-behavior-x: contain !important;
-            scrollbar-width: none !important;
-            -ms-overflow-style: none !important;
-            gap: 14px !important;
-            padding: 6px 24px 18px 24px !important;
-            margin-left: -24px !important;
-            margin-right: -24px !important;
-            scroll-padding: 0 24px !important;
-          }
-          .pairings-grid::-webkit-scrollbar {
-            display: none !important;
-          }
-          .pairing-card {
-            flex: 0 0 220px !important;
-            width: 220px !important;
-            min-width: 220px !important;
-            max-width: 220px !important;
-            scroll-snap-align: start !important;
-            border-radius: 12px !important;
-            border: 1px solid rgba(26, 18, 9, 0.08) !important;
-            box-shadow: 0 4px 16px rgba(26, 18, 9, 0.05) !important;
-            user-select: none !important;
-            -webkit-user-select: none !important;
-            -webkit-touch-callout: none !important;
-          }
-          .pairing-card:active {
-            transform: scale(0.98);
-          }
-          .pairing-img-container {
-            aspect-ratio: 1.25 !important;
-          }
-          .pairing-info {
-            padding: 14px 12px !important;
-          }
-          .pairing-card-title {
-            font-size: 13px !important;
-            margin-bottom: 3px !important;
-          }
-          .pairing-card-desc {
-            font-size: 11px !important;
-            margin-bottom: 10px !important;
-          }
-          .pairing-card-link {
-            font-size: 10px !important;
-          }
-          .pairings-mobile-controls {
-            display: flex !important;
-            align-items: center;
-            justify-content: center;
-            gap: 14px;
-            margin-top: 10px;
-            padding: 4px 0;
-          }
-
-          /* REVIEWS SECTION RESPONSIVE */
-          .reviews-layout-grid {
-            grid-template-columns: 1fr !important;
-            gap: 24px !important;
-          }
-          .rev-summary-sidebar {
-            position: relative !important;
-            top: 0 !important;
-            padding: 20px !important;
-          }
-          .rev-filter-row {
-            display: flex !important;
-            flex-direction: row !important;
-            flex-wrap: nowrap !important;
-            overflow-x: auto !important;
-            overflow-y: hidden !important;
-            scroll-behavior: smooth !important;
-            -webkit-overflow-scrolling: touch !important;
-            touch-action: pan-x pan-y !important;
-            overscroll-behavior-x: contain !important;
-            scrollbar-width: none !important;
-            -ms-overflow-style: none !important;
-            gap: 8px !important;
-            margin-left: -24px !important;
-            margin-right: -24px !important;
-            padding: 4px 24px 12px 24px !important;
-            margin-bottom: 20px !important;
-          }
-          .rev-filter-row::-webkit-scrollbar {
-            display: none !important;
-          }
-          .rev-filter-btn {
-            flex-shrink: 0 !important;
-            padding: 8px 15px !important;
-            font-size: 11.5px !important;
-            border-radius: 100px !important;
-          }
-          .rev-filter-btn:active {
-            transform: scale(0.95);
-          }
-          .see-more-rev-btn {
-            padding: 12px 24px !important;
-            font-size: 11px !important;
-            border-radius: 9px !important;
-          }
-
-          /* TRUST FEATURES MOBILE CONTINUOUS MARQUEE */
-          .features-footer-grid {
-            display: none !important;
-          }
-          .features-mobile-marquee-wrap {
-            display: block !important;
-            overflow: hidden !important;
-            width: calc(100% + 48px) !important;
-            margin-left: -24px !important;
-            margin-right: -24px !important;
-            position: relative !important;
-            border-top: 1px solid rgba(20,20,20,0.08) !important;
-            border-bottom: 1px solid rgba(20,20,20,0.08) !important;
-            padding: 16px 0 !important;
-            margin-top: 36px !important;
-            user-select: none !important;
-            -webkit-user-select: none !important;
-            background: #F8F7F4 !important;
-          }
-          .features-mobile-marquee-wrap::before,
-          .features-mobile-marquee-wrap::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            width: 32px;
-            z-index: 2;
-            pointer-events: none;
-          }
-          .features-mobile-marquee-wrap::before {
-            left: 0;
-            background: linear-gradient(to right, #F8F7F4 0%, rgba(248, 247, 244, 0) 100%);
-          }
-          .features-mobile-marquee-wrap::after {
-            right: 0;
-            background: linear-gradient(to left, #F8F7F4 0%, rgba(248, 247, 244, 0) 100%);
-          }
-          .features-mobile-marquee-track {
-            display: flex !important;
-            width: max-content !important;
-            animation: features-footer-marquee 25s linear infinite !important;
-            will-change: transform !important;
-          }
-          .features-mobile-marquee-track:hover,
-          .features-mobile-marquee-track:active {
-            animation-play-state: paused !important;
-          }
-          .features-marquee-group {
-            display: flex !important;
-            align-items: center !important;
-            gap: 36px !important;
-            padding-right: 36px !important;
-            flex-shrink: 0 !important;
-          }
-          .features-marquee-item {
-            display: inline-flex !important;
-            align-items: center !important;
-            gap: 12px !important;
-            flex-shrink: 0 !important;
-            white-space: nowrap !important;
-          }
-          .features-marquee-icon {
-            flex-shrink: 0 !important;
-            width: 38px !important;
-            height: 38px !important;
-            border-radius: 50% !important;
-            background: rgba(139, 105, 20, 0.08) !important;
-            border: 1px solid rgba(139, 105, 20, 0.18) !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-          }
-          .features-marquee-text h4 {
-            font-size: 12px !important;
-            font-weight: 600 !important;
-            color: #1a1209 !important;
-            margin: 0 !important;
-            letter-spacing: 0.06em !important;
-            text-transform: uppercase !important;
-            font-family: 'Jost', sans-serif !important;
-            line-height: 1.2 !important;
-          }
-          .features-marquee-text p {
-            font-size: 10.5px !important;
-            color: rgba(26, 18, 9, 0.55) !important;
-            margin: 2px 0 0 0 !important;
-            font-family: 'Jost', sans-serif !important;
-            line-height: 1.2 !important;
-          }
-          @keyframes features-footer-marquee {
-            0% {
-              transform: translate3d(0, 0, 0);
-            }
-            100% {
-              transform: translate3d(-50%, 0, 0);
-            }
-          }
+        .pairing-card:hover {
+          transform: translateY(-4px);
+          box-shadow: 0 18px 40px rgba(20, 16, 10, 0.14);
+          border-color: rgba(139, 105, 20, 0.5);
+        }
+        .pairing-img {
+          transition: transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .pairing-card:hover .pairing-img {
+          transform: scale(1.06);
+        }
+        .pairing-overlay {
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(to top, rgba(10, 9, 8, 0.9) 0%, rgba(10, 9, 8, 0.36) 48%, rgba(10, 9, 8, 0.05) 100%);
+          z-index: 1;
+        }
+        .pairing-info {
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          z-index: 2;
+          padding: 18px 16px;
+          text-align: center;
+          color: #FFFFFF;
+        }
+        .pairing-card-title {
+          font-family: 'Cormorant Garamond', serif;
+          font-size: 20px;
+          font-weight: 500;
+          color: #FFFFFF;
+          margin: 0 0 4px 0;
+          letter-spacing: 0.02em;
+        }
+        .pairing-card-link {
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+          font-size: 10.5px;
+          font-weight: 500;
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
+          color: rgba(255, 255, 255, 0.8);
+          transition: color 0.25s ease, gap 0.25s ease;
+        }
+        .pairing-card:hover .pairing-card-link {
+          color: #D4AF63;
+          gap: 7px;
         }
         .pairings-mobile-controls {
           display: none;
@@ -1250,7 +1320,7 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
           height: 32px;
           border-radius: 50%;
           border: 1px solid rgba(20, 20, 20, 0.12);
-          background: #F8F7F4;
+          background: #FFFFFF;
           color: #141414;
           display: flex;
           align-items: center;
@@ -1263,7 +1333,6 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
           background: #8B6914;
           color: #ffffff;
           border-color: #8B6914;
-          transform: scale(0.94);
         }
         .pairings-nav-arrow:disabled {
           opacity: 0.25;
@@ -1282,7 +1351,7 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
           border: none;
           padding: 0;
           cursor: pointer;
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          transition: all 0.3s ease;
         }
         .pairings-dot.active {
           width: 22px;
@@ -1290,203 +1359,194 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
           background: #8B6914;
         }
 
-        .pairing-card {
-          display: flex;
-          flex-direction: column;
-          background: #ffffff;
-          border-radius: 10px;
-          overflow: hidden;
-          border: 1px solid rgba(20, 20, 20, 0.08);
-          text-decoration: none;
-          color: inherit;
-          transition: all 0.35s;
-        }
-        .pairing-card:hover {
-          transform: translateY(-4px);
-          box-shadow: 0 12px 30px rgba(0, 0, 0, 0.06);
-          border-color: rgba(20, 20, 20, 0.16);
-        }
-        .pairing-img-container {
-          position: relative;
-          width: 100%;
-          aspect-ratio: 1.35;
-          overflow: hidden;
-        }
-        .pairing-img {
-          transition: transform 0.6s ease;
-        }
-        .pairing-card:hover .pairing-img {
-          transform: scale(1.05);
-        }
-        .pairing-info {
-          padding: 16px;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          text-align: center;
-          flex-grow: 1;
-          justify-content: space-between;
-        }
-        .pairing-card-title {
-          font-family: 'Jost', sans-serif;
-          font-size: 13px;
-          font-weight: 600;
-          letter-spacing: 0.05em;
-          color: #141414;
-          margin: 0 0 4px 0;
-        }
-        .pairing-card-desc {
-          font-size: 11px;
-          color: rgba(20, 20, 20, 0.52);
-          margin: 0 0 12px 0;
-        }
-        .pairing-card-link {
-          font-size: 10px;
-          font-weight: 600;
-          letter-spacing: 0.1em;
-          color: #8B6914;
-          border-bottom: 1.5px solid transparent;
-          padding-bottom: 2px;
-          transition: all 0.3s;
-        }
-        .pairing-card:hover .pairing-card-link {
-          color: #141414;
-          border-color: #141414;
-        }
-
-        /* SUGGESTIONS SECTION (LUXURY CARDS) */
+        /* ── 5. CURATED SUGGESTED TIMEPIECES ── */
         .suggestions-section {
-          margin-top: 80px;
-          border-top: 1px solid rgba(20, 20, 20, 0.08);
-          padding-top: 60px;
-          margin-bottom: 40px;
+          background: #FFFFFF;
+          padding: 76px 40px 80px;
         }
-        .suggestions-section h3 {
-          font-family: 'Cormorant Garamond', serif;
-          font-size: 28px;
-          font-weight: 500;
-          text-align: center;
-          margin-bottom: 36px;
-          letter-spacing: 0.05em;
+        .suggestions-inner {
+          max-width: 1300px;
+          margin: 0 auto;
         }
         .suggestions-grid {
           display: grid;
           grid-template-columns: repeat(4, 1fr);
-          gap: 24px;
-        }
-        @media (max-width: 1024px) {
-          .suggestions-grid {
-            grid-template-columns: repeat(2, 1fr);
-            gap: 18px;
-          }
-        }
-        @media (max-width: 600px) {
-          .suggestions-grid {
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-          }
+          gap: 22px;
         }
         .suggested-card {
+          position: relative;
           display: flex;
           flex-direction: column;
-          background: #ffffff;
+          background: #FFFFFF;
           border: 1px solid rgba(20, 20, 20, 0.08);
-          border-radius: 10px;
-          padding: 14px;
-          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
-          transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-          text-decoration: none;
-          color: inherit;
+          border-radius: 12px;
+          overflow: hidden;
+          transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease, border-color 0.3s ease;
           height: 100%;
-          box-sizing: border-box;
+        }
+        .suggested-card::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          height: 2px;
+          background: linear-gradient(90deg, #9C7A3C 0%, #D4AF63 50%, #8B6914 100%);
+          transform: scaleX(0);
+          transform-origin: center;
+          transition: transform 0.35s ease;
+          z-index: 5;
         }
         .suggested-card:hover {
           transform: translateY(-4px);
-          background: #ffffff;
-          border-color: rgba(20, 20, 20, 0.16);
-          box-shadow: 0 14px 32px rgba(0, 0, 0, 0.06);
+          border-color: rgba(139, 105, 20, 0.28);
+          box-shadow: 0 18px 38px rgba(20, 16, 10, 0.08);
+        }
+        .suggested-card:hover::before {
+          transform: scaleX(1);
         }
         .suggested-img-container {
           position: relative;
           aspect-ratio: 1;
-          border-radius: 8px;
+          background: #FFFFFF;
+          border-bottom: 1px solid rgba(20, 20, 20, 0.05);
+          padding: 18px;
+          display: block;
           overflow: hidden;
-          background: #F6F5F2;
         }
         .suggested-img {
+          padding: 16px;
           transition: transform 0.5s ease;
         }
         .suggested-card:hover .suggested-img {
+          transform: scale(1.05);
+        }
+        .suggested-badge {
+          position: absolute;
+          top: 12px;
+          left: 12px;
+          z-index: 3;
+          background: linear-gradient(135deg, #9C7A3C 0%, #8B6914 100%);
+          color: #FFFFFF;
+          font-size: 8.5px;
+          font-weight: 700;
+          letter-spacing: 0.14em;
+          text-transform: uppercase;
+          padding: 4px 10px;
+          border-radius: 999px;
+        }
+        .suggested-badge.sold-out {
+          background: rgba(20, 20, 20, 0.72);
+        }
+        .suggested-bag-btn {
+          position: absolute;
+          top: 12px;
+          right: 12px;
+          z-index: 4;
+          width: 32px;
+          height: 32px;
+          border-radius: 50%;
+          background: #FFFFFF;
+          border: 1px solid rgba(20, 20, 20, 0.12);
+          color: #141414;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+          transition: all 0.2s ease;
+        }
+        .suggested-bag-btn:hover {
+          background: #8B6914;
+          border-color: #8B6914;
+          color: #FFFFFF;
           transform: scale(1.06);
         }
-
-        /* FOOTER FEATURES BANNER */
-        .features-footer-banner {
-          max-width: 1300px;
-          margin: 80px auto 0;
-          padding: 0;
-        }
-        .features-footer-grid {
-          display: grid;
-          grid-template-columns: repeat(4, 1fr);
-          gap: 30px;
-          border-top: 1px solid rgba(26,18,9,0.06);
-          padding-top: 40px;
-        }
-        .feature-footer-item {
+        .suggested-body {
+          padding: 16px 18px 18px;
           display: flex;
-          align-items: center;
-          gap: 16px;
+          flex-direction: column;
+          flex-grow: 1;
+          justify-content: space-between;
+          gap: 10px;
         }
-        .feature-footer-item h4 {
-          font-size: 13px;
+        .suggested-title {
+          font-family: 'Jost', sans-serif;
+          font-size: 13.5px;
           font-weight: 600;
-          color: #1a1209;
-          margin: 0;
-          letter-spacing: 0.05em;
-          text-transform: uppercase;
+          color: #141414;
+          margin: 0 0 4px 0;
+          line-height: 1.35;
+          min-height: 2.7em;
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+          overflow-wrap: anywhere;
         }
-        .feature-footer-item p {
-          font-size: 11px;
-          color: rgba(26,18,9,0.5);
-          margin: 2px 0 0 0;
-        }
-        .features-mobile-marquee-wrap {
-          display: none;
-        }
-
-        /* TOAST SUCCESS BOX */
-        .toast-box {
-          position: fixed;
-          top: 30px;
-          right: 30px;
-          z-index: 100;
-          background: #ffffff;
-          border: 1px solid rgba(20, 20, 20, 0.12);
-          box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
-          border-radius: 8px;
-          padding: 16px 24px;
-          max-width: 380px;
-          display: flex;
+        .pdp-view-all-btn {
+          display: inline-flex;
           align-items: center;
-          gap: 16px;
-          transform: translateY(-20px);
-          opacity: 0;
-          pointer-events: none;
-          transition: all 0.35s cubic-bezier(0.19, 1, 0.22, 1);
+          gap: 8px;
+          padding: 13px 32px;
+          background: #141414;
+          color: #FFFFFF;
+          border-radius: 999px;
+          font-size: 11px;
+          font-weight: 600;
+          letter-spacing: 0.16em;
+          text-transform: uppercase;
+          text-decoration: none;
+          transition: background 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
+          box-shadow: 0 8px 20px rgba(20, 20, 20, 0.15);
         }
-        .toast-box.active {
-          transform: translateY(0);
-          opacity: 1;
-          pointer-events: auto;
+        .pdp-view-all-btn:hover {
+          background: #8B6914;
+          transform: translateY(-1.5px);
+          box-shadow: 0 10px 24px rgba(139, 105, 20, 0.26);
         }
 
-        /* REVIEWS FILTER PILLS BASE */
+        /* ── 7. REVIEWS & TESTIMONIALS + BOTTOM TRUST BAR ── */
+        .reviews-band {
+          background: #FAF9F6;
+          border-top: 1px solid rgba(20, 20, 20, 0.06);
+          border-bottom: 1px solid rgba(20, 20, 20, 0.06);
+          padding: 76px 40px 80px;
+        }
+        .reviews-band-inner {
+          max-width: 1300px;
+          margin: 0 auto;
+        }
+        .reviews-layout-grid {
+          display: grid;
+          grid-template-columns: 300px 1fr;
+          gap: 40px;
+          align-items: flex-start;
+        }
+        .rev-summary-sidebar {
+          background: #FFFFFF;
+          border: 1px solid rgba(20, 20, 20, 0.08);
+          border-radius: 14px;
+          padding: 26px;
+          position: sticky;
+          top: 100px;
+          box-shadow: 0 8px 26px rgba(20, 16, 10, 0.03);
+        }
+        .rev-card-editorial {
+          background: #FFFFFF;
+          border: 1px solid rgba(20, 20, 20, 0.08);
+          border-radius: 14px;
+          padding: 22px 24px;
+          display: flex;
+          gap: 16px;
+          margin-bottom: 14px;
+          box-shadow: 0 4px 18px rgba(20, 16, 10, 0.025);
+        }
         .rev-filter-row {
           display: flex;
           flex-wrap: wrap;
           gap: 8px;
-          margin-bottom: 24px;
+          margin-bottom: 20px;
         }
         .rev-filter-btn {
           padding: 7px 14px;
@@ -1494,17 +1554,14 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
           font-size: 11.5px;
           font-weight: 600;
           font-family: 'Jost', sans-serif;
-          letter-spacing: 0.05em;
+          letter-spacing: 0.04em;
           cursor: pointer;
-          border: 1.5px solid rgba(26, 18, 9, 0.12);
-          background: #fff;
-          color: rgba(26, 18, 9, 0.7);
+          border: 1px solid rgba(20, 20, 20, 0.14);
+          background: #FFFFFF;
+          color: rgba(20, 20, 20, 0.72);
           transition: all 0.2s ease;
           white-space: nowrap;
           flex-shrink: 0;
-          user-select: none;
-          -webkit-user-select: none;
-          outline: none;
         }
         .rev-filter-btn:hover {
           border-color: #8B6914;
@@ -1513,890 +1570,1039 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
         .rev-filter-btn.active {
           border-color: #8B6914;
           background: #8B6914;
-          color: #fff;
-          box-shadow: 0 2px 8px rgba(139, 105, 20, 0.25);
+          color: #FFFFFF;
+          box-shadow: 0 4px 12px rgba(139, 105, 20, 0.24);
         }
-
-        /* SEE MORE REVIEWS BUTTON */
         .see-more-rev-btn {
           padding: 13px 32px;
           background: #8B6914;
-          color: #ffffff;
+          color: #FFFFFF;
           border: none;
-          border-radius: 10px;
-          font-size: 11.5px;
+          border-radius: 999px;
+          font-size: 11px;
           font-weight: 600;
-          font-family: 'Jost', sans-serif;
-          letter-spacing: 0.12em;
+          letter-spacing: 0.14em;
           text-transform: uppercase;
           cursor: pointer;
           display: inline-flex;
           align-items: center;
-          justify-content: center;
           gap: 10px;
-          box-shadow: 0 4px 14px rgba(139, 105, 20, 0.28);
-          transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-          user-select: none;
-          -webkit-user-select: none;
-          outline: none;
+          box-shadow: 0 6px 18px rgba(139, 105, 20, 0.25);
+          transition: all 0.25s ease;
         }
         .see-more-rev-btn:hover {
-          background: #6f5410;
-          transform: translateY(-2px);
-          box-shadow: 0 6px 20px rgba(139, 105, 20, 0.38);
+          background: #70540e;
+          transform: translateY(-1.5px);
         }
-        .see-more-rev-btn:hover svg {
-          transform: translateY(2px);
-        }
-        .see-more-rev-btn:active {
-          transform: translateY(0) scale(0.98);
-          box-shadow: 0 2px 8px rgba(139, 105, 20, 0.25);
-        }
-
-        /* SHOW REVIEWS WITH PHOTOS BUTTON */
         .show-photos-btn {
           margin-top: 10px;
           width: 100%;
           border: 1.5px solid #8B6914;
-          border-radius: 8px;
+          border-radius: 999px;
           padding: 9px 14px;
-          font-size: 11px;
+          font-size: 10.5px;
           font-weight: 600;
-          letter-spacing: 0.1em;
+          letter-spacing: 0.12em;
           text-transform: uppercase;
           cursor: pointer;
-          font-family: 'Jost', sans-serif;
-          transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-          user-select: none;
-          -webkit-user-select: none;
-          outline: none;
+          transition: all 0.22s ease;
           display: flex;
           align-items: center;
           justify-content: center;
-          text-align: center;
         }
         .show-photos-btn:not(.active) {
           background: transparent;
           color: #8B6914;
         }
-        .show-photos-btn:not(.active):hover {
-          background: #8B6914;
-          color: #ffffff;
-          transform: translateY(-1.5px);
-          box-shadow: 0 4px 14px rgba(139, 105, 20, 0.25);
-        }
+        .show-photos-btn:not(.active):hover,
         .show-photos-btn.active {
           background: #8B6914;
-          color: #ffffff;
-          box-shadow: 0 3px 10px rgba(139, 105, 20, 0.2);
-        }
-        .show-photos-btn.active:hover {
-          background: #6f5410;
-          border-color: #6f5410;
-          transform: translateY(-1.5px);
-          box-shadow: 0 5px 16px rgba(139, 105, 20, 0.32);
-        }
-        .show-photos-btn:active {
-          transform: translateY(0) scale(0.98);
+          color: #FFFFFF;
         }
 
-        /* Responsive styling */
+        /* RESPONSIVE BREAKPOINTS */
+        @media (max-width: 1100px) and (min-width: 769px) {
+          .pairings-grid {
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+          }
+          .pdp-story-inner {
+            gap: 36px;
+          }
+        }
         @media (max-width: 1024px) {
-          .detail-container {
-            padding: 100px 24px 60px;
+          .pdp-hero-band {
+            padding: 100px 24px 42px;
           }
           .detail-wrapper {
             flex-direction: column;
-            gap: 40px;
+            gap: 30px;
           }
-          .gallery-container {
-            width: 100%;
-          }
+          .gallery-container,
           .info-container {
             width: 100%;
           }
-          .large-gallery-container {
+          .pdp-craft-bar {
+            padding: 24px 20px;
+          }
+          .pdp-craft-grid {
             grid-template-columns: repeat(2, 1fr);
-            gap: 16px;
+            gap: 14px;
+          }
+          .pdp-craft-cell {
+            border-right: none;
+            padding: 10px 12px;
+          }
+          .pdp-story-band {
+            padding: 56px 24px;
+          }
+          .pdp-story-inner {
+            grid-template-columns: 1fr;
+            gap: 32px;
+          }
+          .pdp-collections-band,
+          .suggestions-section,
+          .reviews-band {
+            padding: 56px 24px;
           }
           .suggestions-grid {
             grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
+            gap: 16px;
           }
-          .features-footer-grid {
-            grid-template-columns: repeat(2, 1fr);
+          .reviews-layout-grid {
+            grid-template-columns: 1fr;
             gap: 24px;
           }
+          .rev-summary-sidebar {
+            position: relative;
+            top: 0;
+            padding: 22px;
+          }
         }
-        
+
+        @media (max-width: 768px) {
+          .pairings-grid {
+            display: flex !important;
+            flex-direction: row !important;
+            flex-wrap: nowrap !important;
+            overflow-x: auto !important;
+            scroll-snap-type: x mandatory !important;
+            scroll-behavior: smooth !important;
+            -webkit-overflow-scrolling: touch !important;
+            scrollbar-width: none !important;
+            gap: 12px !important;
+            padding: 4px 24px 14px 24px !important;
+            margin-left: -24px !important;
+            margin-right: -24px !important;
+          }
+          .pairings-grid::-webkit-scrollbar {
+            display: none !important;
+          }
+          .pairing-card {
+            flex: 0 0 230px !important;
+            width: 230px !important;
+            scroll-snap-align: start !important;
+          }
+          .pairing-card-title {
+            font-size: 18px;
+          }
+          .pairings-mobile-controls {
+            display: flex !important;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            margin-top: 8px;
+          }
+          .rev-filter-row {
+            flex-wrap: wrap;
+            gap: 8px;
+          }
+        }
+
         @media (max-width: 640px) {
+          .pdp-hero-band {
+            padding: 82px 16px 32px;
+          }
+          .pdp-breadcrumb {
+            margin-bottom: 12px;
+            font-size: 11px;
+          }
           .gallery-container {
             flex-direction: column-reverse;
-            gap: 16px;
+            gap: 10px;
+          }
+          .main-image-view {
+            border-radius: 14px;
+            padding: 16px;
           }
           .thumbnails-column {
             width: 100%;
             flex-direction: row;
             max-height: none;
             overflow-x: auto;
+            gap: 8px;
+            padding-bottom: 2px;
+            scrollbar-width: none;
+          }
+          .thumbnails-column::-webkit-scrollbar {
+            display: none;
           }
           .thumbnail-item {
-            width: 68px;
+            width: 60px;
+            border-radius: 10px;
             flex-shrink: 0;
           }
-          .detail-title {
+          .pdp-title {
             font-size: 32px;
           }
-          .specs-grid {
-            grid-template-columns: 1fr;
+          .pdp-price-main {
+            font-size: 25px;
           }
-          .actions-buttons-container {
+          .pdp-cta-row {
+            gap: 10px;
+          }
+          .pdp-btn-cart,
+          .pdp-btn-buy {
+            height: 46px;
+            font-size: 11px;
+            letter-spacing: 0.1em;
+            padding: 0 12px;
+          }
+          .pdp-inline-trust {
+            font-size: 10px;
+            padding: 10px 4px;
+          }
+          .pdp-inline-trust-cell {
             flex-direction: column;
-            gap: 12px;
+            gap: 4px;
+            padding: 4px;
+            line-height: 1.25;
           }
-          .large-gallery-container {
-            grid-template-columns: 1fr;
+          .pdp-craft-bar {
+            background: #FAF9F6;
+            padding: 20px 16px;
+          }
+          .pdp-craft-grid {
+            gap: 10px;
+          }
+          .pdp-craft-cell {
+            background: #FFFFFF;
+            border: 1px solid rgba(20, 20, 20, 0.06);
+            border-radius: 12px;
+            padding: 14px 10px;
+            gap: 6px;
+          }
+          .pdp-craft-cell h4 {
+            font-size: 11.5px;
+          }
+          .pdp-craft-cell span {
+            font-size: 10px;
+            line-height: 1.3;
+          }
+          .pdp-story-band {
+            padding: 48px 16px;
+          }
+          .pdp-story-title {
+            font-size: 32px;
+            margin-bottom: 12px;
+          }
+          .pdp-story-desc {
+            font-size: 13.5px;
+            margin-bottom: 18px;
+          }
+          .pdp-story-specs-mini {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px 10px;
+            margin-bottom: 22px;
+            padding: 14px 0;
+          }
+          .pdp-story-cta-row {
+            gap: 12px 18px;
+          }
+          .pdp-story-btn-gold {
+            width: 100%;
+            justify-content: center;
+          }
+          .pdp-story-frame {
+            aspect-ratio: 4 / 3;
+            border-radius: 14px;
+          }
+          .pdp-slide-watch-img {
+            padding: 14px 18px 42px;
+          }
+          .pdp-kb-hud {
+            padding: 14px 12px 10px;
+          }
+          .pdp-kb-caption-col {
+            max-width: 110px;
+          }
+          .pdp-collections-band,
+          .suggestions-section,
+          .reviews-band {
+            padding: 44px 16px;
+          }
+          .pdp-sec-header {
+            margin-bottom: 26px;
+          }
+          .pairings-grid {
+            padding: 4px 16px 14px 16px !important;
+            margin-left: -16px !important;
+            margin-right: -16px !important;
+          }
+          .pairing-card {
+            flex: 0 0 68% !important;
+            width: 68% !important;
+            max-width: 245px !important;
           }
           .suggestions-grid {
             grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
+            gap: 10px;
           }
-          .store-banner-container {
-            padding-left: 24px;
-            padding-right: 24px;
-            height: 380px;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
+          .suggested-img-container {
+            padding: 10px;
           }
-          .store-banner-overlay {
-            background: rgba(15, 12, 10, 0.85);
+          .suggested-body {
+            padding: 10px 11px 12px;
+            gap: 6px;
           }
-          .store-banner-title {
-            font-size: 32px;
+          .suggested-title {
+            font-size: 12.5px;
           }
-          .brand-banner-container {
-            padding-left: 20px;
-            padding-right: 20px;
-            height: 300px;
-            align-items: flex-end;
-            justify-content: center;
-            text-align: center;
-            padding-bottom: 24px;
+          .suggested-badge {
+            top: 8px;
+            left: 8px;
+            font-size: 8px;
+            padding: 3px 7px;
           }
-          .brand-banner-bg {
-            object-position: 53% center !important;
-          }
-          .brand-banner-overlay {
-            background: rgba(26,18,9,0.85);
-          }
-          .brand-banner-title {
-            font-size: 26px;
-            margin-bottom: 8px;
-          }
-          .brand-banner-p {
-            font-size: 11px;
-            max-width: 280px;
-            margin-left: auto;
-            margin-right: auto;
-            margin-bottom: 16px;
-          }
-          .brand-banner-btn {
-            padding: 8px 18px;
-            font-size: 9.5px;
-          }
-          .reviews-layout-grid {
-            grid-template-columns: 1fr !important;
-            gap: 24px !important;
+          .suggested-bag-btn {
+            top: 8px;
+            right: 8px;
+            width: 28px;
+            height: 28px;
           }
           .rev-summary-sidebar {
-            position: relative !important;
-            top: 0 !important;
-            padding: 20px !important;
+            padding: 18px;
+            border-radius: 12px;
           }
-          .rev-photo-strip {
-            gap: 6px !important;
+          .rev-filter-row {
+            gap: 7px;
+            margin-bottom: 16px;
           }
-          .rev-card {
-            padding: 16px !important;
+          .rev-filter-pill {
+            padding: 6px 11px;
+            font-size: 11px;
           }
-          .rev-img-thumb {
-            width: 56px !important;
-            height: 56px !important;
+          .rev-card-editorial {
+            padding: 16px;
+            border-radius: 12px;
           }
         }
       `}</style>
 
-      {/* TOAST NOTIFICATION */}
-      <div className={`toast-box ${showToast ? 'active' : ''}`}>
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
-        <div>
-          <h4 style={{ margin: 0, fontSize: '13px', fontWeight: 600, color: '#8B6914', letterSpacing: '0.05em', textTransform: 'uppercase', marginBottom: '2px' }}>Shopping Bag</h4>
-          <p style={{ margin: 0, fontSize: '12px', color: 'rgba(26,18,9,0.7)', lineHeight: 1.3 }}>{toastMessage}</p>
-        </div>
-        <button onClick={() => setShowToast(false)} style={{ background: 'none', border: 'none', fontSize: '16px', color: 'rgba(26,18,9,0.3)', cursor: 'pointer', marginLeft: 'auto' }}>✕</button>
-      </div>
+      <div className="pdp-page">
+        {/* ── BAND 1: LUMINOUS SILK PRODUCT HERO SHOWCASE ── */}
+        <section className="pdp-hero-band">
+          <div className="pdp-hero-silk-bg" aria-hidden="true" />
+          <div className="pdp-hero-silk-scrim" aria-hidden="true" />
 
-      <div className="detail-container">
-        {/* BREADCRUMB TRAIL */}
-        <div className="max-w-[1300px] mx-auto mb-6 text-xs text-[#1a1209]/60 flex items-center gap-2 flex-wrap font-['Jost',sans-serif]">
-          <Link href="/" className="hover:text-[#8b6914] transition-colors">Home</Link>
-          <span>&gt;</span>
-          <Link href={getProductGender(product) === 'Ladies' ? '/womens' : '/mens'} className="hover:text-[#8b6914] transition-colors">
-            {getProductGender(product) === 'Ladies' ? "Women's" : "Men's"}
-          </Link>
-          <span>&gt;</span>
-          <Link href="/collections" className="hover:text-[#8b6914] transition-colors">Classic Collection</Link>
-          <span>&gt;</span>
-          <span className="text-[#1a1209] font-medium capitalize">{product.title}</span>
-        </div>
+          <div className="pdp-hero-inner">
+            {/* Breadcrumb Trail */}
+            <nav aria-label="Breadcrumb" className="pdp-breadcrumb">
+              <Link href="/">Home</Link>
+              <span>/</span>
+              <Link href={getProductGender(product) === 'Ladies' ? '/womens' : '/mens'}>
+                {getProductGender(product) === 'Ladies' ? "Women's" : "Men's"}
+              </Link>
+              <span>/</span>
+              <Link href="/collections">Collections</Link>
+              <span>/</span>
+              <span className="text-[#141414] font-medium capitalize">{product.title}</span>
+            </nav>
 
-        <div className="detail-wrapper">
-          {/* LEFT: GALLERY */}
-          <div className="gallery-container">
-            <div className="thumbnails-column">
-              {galleryImages.map((imgUrl, i) => (
-                <div
-                  key={i}
-                  className={`thumbnail-item ${activeMediaType === 'image' && selectedImage === imgUrl ? 'active' : ''}`}
-                  onClick={() => {
-                    setSelectedImage(imgUrl);
-                    setActiveMediaType('image');
-                  }}
-                >
-                  <Image
-                    src={imgUrl}
-                    alt={`${product.title} gallery ${i}`}
-                    fill
-                    sizes="80px"
-                    style={{ objectFit: 'contain' }}
-                  />
+            <div className="detail-wrapper">
+              {/* LEFT: GALLERY */}
+              <div className="gallery-container">
+                <div className="thumbnails-column">
+                  {galleryImages.map((imgUrl, i) => (
+                    <div
+                      key={i}
+                      className={`thumbnail-item ${activeMediaType === 'image' && selectedImage === imgUrl ? 'active' : ''}`}
+                      onClick={() => {
+                        setSelectedImage(imgUrl);
+                        setActiveMediaType('image');
+                      }}
+                    >
+                      <Image
+                        src={imgUrl}
+                        alt={`${product.title} view ${i + 1}`}
+                        fill
+                        sizes="76px"
+                        style={{ objectFit: 'contain', padding: '4px' }}
+                      />
+                    </div>
+                  ))}
+
+                  {/* Video Thumbnail Button */}
+                  {product.video?.url && (
+                    <div
+                      className={`thumbnail-item relative flex items-center justify-center bg-[#141414] overflow-hidden ${activeMediaType === 'video' ? 'active' : ''}`}
+                      onClick={() => setActiveMediaType('video')}
+                      title="Watch Product Video"
+                    >
+                      <video
+                        src={`${product.video.url}#t=0.1`}
+                        preload="metadata"
+                        muted
+                        playsInline
+                        className="w-full h-full object-cover opacity-80 pointer-events-none"
+                      />
+                      <div className="w-8 h-8 rounded-full bg-[#8B6914] text-white flex items-center justify-center shadow-md absolute z-10 hover:scale-105 transition-transform">
+                        <span className="text-white text-[10px] pl-0.5 font-bold">▶</span>
+                      </div>
+                    </div>
+                  )}
                 </div>
-              ))}
 
-              {/* Video Thumbnail Button */}
-              {product.video?.url && (
-                <div
-                  className={`thumbnail-item relative flex items-center justify-center bg-black overflow-hidden ${activeMediaType === 'video' ? 'active ring-2 ring-[#8b6914]' : ''}`}
-                  onClick={() => setActiveMediaType('video')}
-                  title="Watch Product Video"
+                <div className={`main-image-view ${activeMediaType === 'video' ? '!overflow-visible' : ''}`}>
+                  {activeMediaType === 'video' && product.video?.url ? (
+                    <AmbientVideoPlayer
+                      src={product.video.url}
+                      controls
+                      autoPlay
+                      loop
+                      muted
+                      playsInline
+                      aspectRatio="aspect-square"
+                      roundedClassName="rounded-2xl"
+                      borderClassName="border border-[#c5a059]/40"
+                      className="w-full h-full"
+                      containerClassName="w-full h-full"
+                      showAmbientToggle={true}
+                      defaultAmbientOn={false}
+                      title={`${product.title} Product Video`}
+                    />
+                  ) : (
+                    selectedImage && (
+                      <Image
+                        src={selectedImage}
+                        alt={product.title}
+                        fill
+                        sizes="(max-width: 768px) 100vw, 54vw"
+                        style={{ objectFit: 'contain' }}
+                        className="main-watch-img"
+                        priority
+                      />
+                    )
+                  )}
+                </div>
+              </div>
+
+              {/* RIGHT: DETAILS PANEL */}
+              <div className="info-container">
+                {/* Badge + Ref */}
+                <div className="pdp-badge-row">
+                  <span className={`pdp-gold-pill ${isSoldOut ? 'sold-out' : ''}`}>
+                    {isSoldOut ? 'SOLD OUT' : product.stickerEnabled && product.stickerText ? product.stickerText : 'NEW ARRIVAL'}
+                  </span>
+                  {product.modelNo && (
+                    <span className="pdp-ref-chip">Ref. {product.modelNo}</span>
+                  )}
+                </div>
+
+                {/* Title & Subtitle */}
+                <h1 className="pdp-title capitalize lining-nums">{product.title}</h1>
+                <p className="pdp-tagline">
+                  Elegance in Every Second · {getProductGender(product) === 'Ladies' ? "Women's Collection" : "Men's Classic Collection"}
+                </p>
+
+                {/* Reviews Rating Row — shown cleanly when verified customer reviews exist */}
+                {reviewsStats.count > 0 && (
+                  <div
+                    className="flex items-center gap-2 mb-4 text-xs cursor-pointer hover:opacity-80 transition-opacity"
+                    onClick={() => {
+                      const el = document.querySelector('#customer-reviews-section');
+                      if (el) el.scrollIntoView({ behavior: 'smooth' });
+                    }}
+                  >
+                    <div className="flex items-center gap-0.5">
+                      {Array.from({ length: 5 }).map((_, i) => (
+                        <svg key={i} width="13" height="13" viewBox="0 0 24 24" fill={i < Math.round(reviewsStats.average) ? '#8B6914' : 'none'} stroke="#8B6914" strokeWidth="1.6">
+                          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                        </svg>
+                      ))}
+                    </div>
+                    <span className="font-semibold text-[#141414]">{reviewsStats.average}</span>
+                    <span className="text-[#141414]/55">
+                      ({reviewsStats.count} {reviewsStats.count === 1 ? 'review' : 'reviews'})
+                    </span>
+                  </div>
+                )}
+
+                {/* Price */}
+                <div className="mb-5">
+                  <div className="pdp-price lining-nums">{convertPrice(product.price)}</div>
+                  <div className="pdp-tax-note">Inclusive of all taxes · Nationwide Fixed MRP</div>
+                </div>
+
+                {/* Color Variant Swatches */}
+                {product.colorVariants && product.colorVariants.length > 0 && (
+                  <div className="mb-5">
+                    <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#141414]/65 mb-2.5">
+                      Color: <span className="text-[#8B6914]">{selectedVariant?.colorName || 'Standard'}</span>
+                    </div>
+                    <div className="flex items-center gap-3 flex-wrap">
+                      {product.colorVariants.map((variant) => {
+                        const isSelected = selectedVariant?.colorName === variant.colorName;
+                        return (
+                          <button
+                            key={variant.colorName}
+                            type="button"
+                            onClick={() => {
+                              handleVariantSelect(variant);
+                              setActiveMediaType('image');
+                            }}
+                            title={variant.colorName}
+                            className={`w-9 h-9 rounded-full p-0.5 border-2 transition-all duration-200 cursor-pointer overflow-hidden bg-white ${
+                              isSelected
+                                ? 'border-[#8B6914] ring-2 ring-[#8B6914]/25 scale-105'
+                                : 'border-[#141414]/15 hover:border-[#8B6914]/60'
+                            }`}
+                          >
+                            {variant.image?.url ? (
+                              <img src={variant.image.url} alt={variant.colorName} className="w-full h-full object-cover rounded-full" />
+                            ) : (
+                              <div className="w-full h-full rounded-full bg-gradient-to-br from-[#d4af37] to-[#8b6914] text-[9px] font-bold text-white flex items-center justify-center">
+                                {variant.colorName.slice(0, 2).toUpperCase()}
+                              </div>
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {/* Stock Status */}
+                <div className="flex items-center gap-2 mb-5 text-xs font-medium">
+                  <span className={`w-2 h-2 rounded-full ${isSoldOut ? 'bg-red-600' : 'bg-emerald-600'}`} />
+                  <span className={isSoldOut ? 'text-red-700' : 'text-[#141414]/80'}>
+                    {isSoldOut ? 'Currently Out of Stock' : 'In Stock — Ready to Ship (2–3 Days)'}
+                  </span>
+                </div>
+
+                {/* Primary CTA Grid */}
+                <div className="pdp-cta-grid">
+                  <button
+                    type="button"
+                    onClick={handleAddToCart}
+                    disabled={isSoldOut}
+                    className="pdp-btn-cart"
+                  >
+                    <svg className="w-4 h-4 text-white shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                    </svg>
+                    <span>ADD TO CART</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleBuyNow}
+                    disabled={isSoldOut}
+                    className="pdp-btn-buy"
+                  >
+                    {isSoldOut ? 'OUT OF STOCK' : 'BUY NOW'}
+                  </button>
+                </div>
+
+                {/* Concierge WhatsApp CTA */}
+                <a
+                  href={whatsappContactUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Inquire via WhatsApp (+94 77 071 6212)"
+                  className="pdp-btn-whatsapp group"
                 >
-                  <video
-                    src={`${product.video.url}#t=0.1`}
-                    preload="metadata"
-                    muted
-                    playsInline
-                    className="w-full h-full object-cover opacity-80 pointer-events-none"
-                  />
-                  <div className="w-9 h-9 rounded-full bg-[#8b6914] text-white flex items-center justify-center shadow-md absolute z-10 hover:scale-110 transition-transform">
-                    <span className="text-white text-xs pl-0.5 font-bold">▶</span>
+                  <svg className="w-4 h-4 shrink-0 text-[#25D366]" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <path d="M17.472 14.382c-.301-.15-1.78-.877-2.056-.977-.276-.101-.477-.15-.678.15-.2.301-.778.977-.954 1.177-.176.2-.351.226-.652.075-.302-.15-1.272-.469-2.423-1.496-.897-.801-1.503-1.79-1.68-2.091-.176-.301-.019-.464.132-.614.136-.135.302-.351.452-.527.151-.176.201-.301.302-.502.1-.2.05-.376-.025-.526-.075-.15-.678-1.633-.929-2.235-.244-.587-.492-.507-.678-.517-.176-.01-.377-.01-.578-.01s-.527.075-.802.376c-.276.301-1.054 1.03-1.054 2.511s1.079 2.911 1.23 3.112c.151.201 2.124 3.243 5.145 4.547.719.311 1.281.497 1.719.636.722.23 1.378.197 1.898.12.579-.086 1.78-.727 2.031-1.43.251-.703.251-1.305.176-1.43-.076-.126-.276-.201-.577-.351zM12.04 21.75c-1.748 0-3.46-.46-4.96-1.33l-.356-.21-3.684.966.983-3.593-.23-.367A9.774 9.774 0 0 1 2.25 12.04C2.25 6.64 6.64 2.25 12.04 2.25c2.618 0 5.079 1.02 6.93 2.871a9.754 9.754 0 0 1 2.87 6.919c0 5.4-4.39 9.71-9.8 9.71zm0-17.75a7.95 7.95 0 0 0-7.95 7.95c0 1.54.44 3.03 1.28 4.32l.21.32-.57 2.08 2.13-.56.31.18c1.25.75 2.68 1.14 4.14 1.14 4.38 0 7.95-3.57 7.95-7.95 0-2.12-.83-4.12-2.33-5.62A7.904 7.904 0 0 0 12.04 4z" />
+                  </svg>
+                  <span>Inquire Via Concierge</span>
+                </a>
+
+                {/* Compact 3-Column Trust Row */}
+                <div className="pdp-inline-trust">
+                  <div className="pdp-inline-trust-cell">
+                    <svg className="w-3.5 h-3.5 text-[#8B6914] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.8">
+                      <rect x="1" y="3" width="15" height="13" rx="1" />
+                      <polygon points="16 8 20 8 23 11 23 16 16 16 16 8" />
+                      <circle cx="5.5" cy="18.5" r="2.5" />
+                      <circle cx="18.5" cy="18.5" r="2.5" />
+                    </svg>
+                    <span>Free Delivery</span>
+                  </div>
+                  <Link href="/warranty" target="_blank" className="pdp-inline-trust-cell hover:text-[#8B6914] transition-colors">
+                    <svg className="w-3.5 h-3.5 text-[#8B6914] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.8">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                    </svg>
+                    <span className="underline decoration-[#8B6914]/35">1-Year Warranty</span>
+                  </Link>
+                  <div className="pdp-inline-trust-cell">
+                    <svg className="w-3.5 h-3.5 text-[#8B6914] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.8">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8M21 3v5h-5" />
+                    </svg>
+                    <span>14-Day Exchange</span>
                   </div>
                 </div>
-              )}
-            </div>
 
-            <div className={`main-image-view ${activeMediaType === 'video' ? '!overflow-visible' : ''}`}>
-              {activeMediaType === 'video' && product.video?.url ? (
-                <AmbientVideoPlayer
-                  src={product.video.url}
-                  controls
-                  autoPlay
-                  loop
-                  muted
-                  playsInline
-                  aspectRatio="aspect-square"
-                  roundedClassName="rounded-xl"
-                  borderClassName="border border-[#c5a059]/40"
-                  className="w-full h-full"
-                  containerClassName="w-full h-full"
-                  showAmbientToggle={true}
-                  defaultAmbientOn={false}
-                  title={`${product.title} Product Video`}
-                />
-              ) : (
-                selectedImage && (
-                  <Image
-                    src={selectedImage}
-                    alt={product.title}
-                    fill
-                    sizes="(max-width: 768px) 100vw, 55vw"
-                    style={{ objectFit: 'contain' }}
-                    className="main-watch-img"
-                    priority
-                  />
-                )
-              )}
-            </div>
-          </div>
-
-          {/* RIGHT: INFO DETAILS */}
-          <div className="info-container">
-            {/* Sticker / Badge */}
-            <div className="mb-3">
-              <span className="inline-block bg-[#141414] text-white text-[9.5px] font-medium tracking-[0.18em] uppercase px-3 py-1 rounded-[2px]">
-                {product.stickerEnabled && product.stickerText ? product.stickerText : 'NEW ARRIVAL'}
-              </span>
-            </div>
-
-            {/* Title */}
-            <h1 className="font-['Cormorant_Garamond',serif] text-2xl sm:text-3xl md:text-4xl font-normal text-[#141414] mb-2 tracking-normal leading-tight capitalize lining-nums">
-              {product.title}
-            </h1>
-
-            {/* Sub-header */}
-            <p className="text-xs md:text-sm text-[#141414]/60 mb-4 font-['Jost',sans-serif]">
-              {getProductGender(product) === 'Ladies' ? "Women's Watch" : "Men's Watch"} | Classic Collection
-            </p>
-
-            {/* Reviews Rating Row — Only shown when verified customer reviews exist */}
-            {reviewsStats.count > 0 && (
-              <div
-                className="flex items-center gap-2 mb-4 text-xs cursor-pointer hover:opacity-80 transition-opacity"
-                onClick={() => {
-                  const el = document.querySelector('.reviews-section');
-                  if (el) el.scrollIntoView({ behavior: 'smooth' });
-                }}
-              >
-                <div className="flex gap-0.5 text-[#8B6914]">
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <span key={i} className="text-sm">
-                      {i < Math.round(reviewsStats.average) ? '★' : '☆'}
-                    </span>
-                  ))}
+                {/* Discreet Policy Links */}
+                <div className="text-[10.5px] text-[#141414]/50 text-center mb-5 leading-relaxed">
+                  Covered by Winsor&apos;s{' '}
+                  <Link href="/terms" target="_blank" className="text-[#8B6914] underline font-medium hover:text-[#141414]">
+                    Terms &amp; Conditions
+                  </Link>
+                  ,{' '}
+                  <Link href="/privacy" target="_blank" className="text-[#8B6914] underline font-medium hover:text-[#141414]">
+                    Privacy Policy
+                  </Link>
+                  , and{' '}
+                  <Link href="/warranty" target="_blank" className="text-[#8B6914] underline font-medium hover:text-[#141414]">
+                    Warranty Policy
+                  </Link>
+                  .
                 </div>
-                <span className="font-semibold text-[#141414]">
-                  {reviewsStats.average}
-                </span>
-                <span className="text-[#141414]/50">
-                  ({reviewsStats.count} {reviewsStats.count === 1 ? 'review' : 'reviews'})
-                </span>
-              </div>
-            )}
 
-            {/* Price Tag & Tax Notice */}
-            <div className="mb-6">
-              <div className="font-['Jost',sans-serif] text-2xl md:text-3xl font-semibold text-[#141414] lining-nums">
-                {convertPrice(product.price)}
-              </div>
-              <span className="text-[11px] text-[#141414]/50 block mt-0.5">
-                Inclusive of all taxes
-              </span>
-            </div>
-
-            {/* Color Variants Circle Swatches */}
-            {product.colorVariants && product.colorVariants.length > 0 && (
-              <div className="mb-6">
-                <div className="text-xs font-semibold uppercase tracking-wider text-[#1a1209]/70 mb-2.5">
-                  COLOR: <span className="text-[#8b6914]">{selectedVariant?.colorName || 'Standard'}</span>
+                {/* Product Description */}
+                <div className="mb-2">
+                  <h3 className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#141414] mb-1.5">
+                    Timepiece Notes
+                  </h3>
+                  <p className="text-[13px] text-[#141414]/72 leading-relaxed">
+                    {product.description || `The ${product.title} embodies timeless restraint and everyday precision — pairing a balanced case silhouette with dependable Japanese movement architecture.`}
+                  </p>
                 </div>
-                <div className="flex items-center gap-3 flex-wrap">
-                  {product.colorVariants.map((variant) => {
-                    const isSelected = selectedVariant?.colorName === variant.colorName;
-                    return (
-                      <button
-                        key={variant.colorName}
-                        onClick={() => handleVariantSelect(variant)}
-                        title={variant.colorName}
-                        className={`w-9 h-9 rounded-full p-0.5 border-2 transition-all duration-200 cursor-pointer overflow-hidden ${isSelected ? 'border-[#8b6914] ring-2 ring-[#8b6914]/30 scale-105' : 'border-[#1a1209]/15 hover:border-[#8b6914]/60'
-                          }`}
-                      >
-                        {variant.image?.url ? (
-                          <img src={variant.image.url} alt={variant.colorName} className="w-full h-full object-cover rounded-full" />
-                        ) : (
-                          <div className="w-full h-full rounded-full bg-gradient-to-br from-[#d4af37] to-[#8b6914] text-[9px] font-bold text-white flex items-center justify-center">
-                            {variant.colorName.slice(0, 2).toUpperCase()}
+
+                {/* Hairline Specification & Care Accordions */}
+                <div className="pdp-accordion-wrap">
+                  <div className="pdp-accordion-item">
+                    <button
+                      type="button"
+                      onClick={() => setDetailsOpen(!detailsOpen)}
+                      className="pdp-accordion-btn"
+                    >
+                      <span>Specifications</span>
+                      <span className="text-[#8B6914] text-base leading-none">{detailsOpen ? '−' : '+'}</span>
+                    </button>
+                    {detailsOpen && (
+                      <div className="text-xs text-[#141414]/68 pt-1 pb-3 space-y-2 leading-relaxed">
+                        <p className="m-0">Hand-finished housing engineered around tested Japanese calibre accuracy.</p>
+                        {specs.length > 0 && (
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2 pt-2">
+                            {specs.map(([label, value]) => (
+                              <div key={label} className="flex items-center justify-between border-b border-[#8B6914]/15 pb-1.5">
+                                <span className="text-[10.5px] font-semibold text-[#8B6914] uppercase tracking-wider">
+                                  {label}
+                                </span>
+                                <span className="text-xs font-medium text-[#141414] capitalize">
+                                  {value}
+                                </span>
+                              </div>
+                            ))}
                           </div>
                         )}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-
-            {/* Stock Level Status */}
-            <div className="flex items-center gap-2 mb-6 text-xs font-medium">
-              <span className={`w-2.5 h-2.5 rounded-full ${isSoldOut ? 'bg-red-600' : 'bg-emerald-600 animate-pulse'}`} />
-              <span className={isSoldOut ? 'text-red-700' : 'text-emerald-700'}>
-                {isSoldOut ? 'Out of Stock' : 'In Stock — Delivery in 2-3 days'}
-              </span>
-            </div>
-
-            {/* Action Buttons: Add to Cart, Buy Now & WhatsApp Contact Us */}
-            <div className="grid grid-cols-2 gap-3 mb-6">
-              <button
-                onClick={handleAddToCart}
-                disabled={isSoldOut}
-                className="py-3.5 px-4 bg-[#1a1209] text-white rounded-xl text-xs font-semibold tracking-wider uppercase hover:bg-[#8b6914] transition-colors shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer"
-              >
-                <span>ADD TO CART</span>
-                <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                </svg>
-              </button>
-              <button
-                onClick={handleBuyNow}
-                disabled={isSoldOut}
-                className="py-3.5 px-4 bg-[#8b6914] text-white rounded-xl text-xs font-semibold tracking-wider uppercase hover:bg-[#a07d1a] transition-colors shadow-md disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-              >
-                {isSoldOut ? 'OUT OF STOCK' : 'BUY NOW'}
-              </button>
-              <a
-                href={whatsappContactUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Contact Us on WhatsApp (+94 77 071 6212)"
-                className="col-span-2 w-full box-border min-h-[44px] py-[12.5px] px-4 bg-white hover:bg-[#8b6914] text-[#8b6914] hover:text-white border-[1.5px] border-[#8b6914] rounded-xl text-xs font-semibold tracking-wider uppercase transition-all duration-300 shadow-sm hover:shadow-md flex items-center justify-center gap-2 cursor-pointer no-underline group"
-              >
-                <svg
-                  className="w-4 h-4 shrink-0 text-[#25D366] group-hover:text-white transition-colors duration-300"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                  aria-hidden="true"
-                >
-                  <path d="M17.472 14.382c-.301-.15-1.78-.877-2.056-.977-.276-.101-.477-.15-.678.15-.2.301-.778.977-.954 1.177-.176.2-.351.226-.652.075-.302-.15-1.272-.469-2.423-1.496-.897-.801-1.503-1.79-1.68-2.091-.176-.301-.019-.464.132-.614.136-.135.302-.351.452-.527.151-.176.201-.301.302-.502.1-.2.05-.376-.025-.526-.075-.15-.678-1.633-.929-2.235-.244-.587-.492-.507-.678-.517-.176-.01-.377-.01-.578-.01s-.527.075-.802.376c-.276.301-1.054 1.03-1.054 2.511s1.079 2.911 1.23 3.112c.151.201 2.124 3.243 5.145 4.547.719.311 1.281.497 1.719.636.722.23 1.378.197 1.898.12.579-.086 1.78-.727 2.031-1.43.251-.703.251-1.305.176-1.43-.076-.126-.276-.201-.577-.351zM12.04 21.75c-1.748 0-3.46-.46-4.96-1.33l-.356-.21-3.684.966.983-3.593-.23-.367A9.774 9.774 0 0 1 2.25 12.04C2.25 6.64 6.64 2.25 12.04 2.25c2.618 0 5.079 1.02 6.93 2.871a9.754 9.754 0 0 1 2.87 6.919c0 5.4-4.39 9.71-9.8 9.71zm0-17.75a7.95 7.95 0 0 0-7.95 7.95c0 1.54.44 3.03 1.28 4.32l.21.32-.57 2.08 2.13-.56.31.18c1.25.75 2.68 1.14 4.14 1.14 4.38 0 7.95-3.57 7.95-7.95 0-2.12-.83-4.12-2.33-5.62A7.904 7.904 0 0 0 12.04 4z" />
-                </svg>
-                <span>CONTACT US</span>
-              </a>
-            </div>
-
-            {/* Trust Badges Bar */}
-            <div className="grid grid-cols-3 gap-2 py-3 px-4 bg-white rounded-xl border border-[#8b6914]/20 mb-3 text-[11px] text-[#1a1209]/80 font-medium text-center">
-              <Link href="/warranty" target="_blank" className="flex items-center justify-center gap-1.5 hover:text-[#8b6914] transition-colors">
-                <svg className="w-4 h-4 text-[#8b6914]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.8">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                </svg>
-                <span className="underline decoration-[#8b6914]/30">1 Year Warranty</span>
-              </Link>
-              <div className="flex items-center justify-center gap-1.5 border-x border-[#1a1209]/10">
-                <svg className="w-4 h-4 text-[#8b6914]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.8">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-                </svg>
-                <span>100% Authentic</span>
-              </div>
-              <div className="flex items-center justify-center gap-1.5">
-                <svg className="w-4 h-4 text-[#8b6914]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.8">
-                  <rect x="2" y="5" width="20" height="14" rx="2" />
-                  <line x1="2" y1="10" x2="22" y2="10" />
-                </svg>
-                <span>Secure Payment</span>
-              </div>
-            </div>
-
-            {/* Legal Notice Line */}
-            <div className="text-[10.5px] text-[#1a1209]/55 text-center mb-6 leading-relaxed">
-              Covered by Winsor's{' '}
-              <Link href="/terms" target="_blank" className="text-[#8b6914] underline font-medium hover:text-[#1a1209]">
-                Terms &amp; Conditions
-              </Link>
-              ,{' '}
-              <Link href="/privacy" target="_blank" className="text-[#8b6914] underline font-medium hover:text-[#1a1209]">
-                Privacy Policy
-              </Link>
-              , and{' '}
-              <Link href="/warranty" target="_blank" className="text-[#8b6914] underline font-medium hover:text-[#1a1209]">
-                Warranty Policy
-              </Link>
-              .
-            </div>
-
-            {/* Description */}
-            <div className="mb-6">
-              <h3 className="text-xs font-semibold uppercase tracking-wider text-[#1a1209] mb-2">
-                Product Description
-              </h3>
-              <p className="text-xs md:text-sm text-[#1a1209]/75 leading-relaxed font-['Jost',sans-serif]">
-                {product.description || `The ${product.title} is a bold statement of elegance and precision. Featuring a striking custom dial, premium stainless steel build, and scratch-resistant glass, this timepiece is engineered for those who value style and reliability.`}
-              </p>
-            </div>
-
-            {/* Accordion Panel */}
-            <div className="border-t border-[#1a1209]/10 space-y-2 pt-2 mb-6">
-              {/* SPECIFICATIONS */}
-              <div className="border-b border-[#1a1209]/08 pb-2">
-                <button
-                  type="button"
-                  onClick={() => setDetailsOpen(!detailsOpen)}
-                  className="w-full py-2.5 flex items-center justify-between text-left text-xs font-semibold uppercase tracking-wider text-[#1a1209] cursor-pointer"
-                >
-                  <span>SPECIFICATIONS</span>
-                  <span className="text-[#8b6914] text-base">{detailsOpen ? '−' : '+'}</span>
-                </button>
-                {detailsOpen && (
-                  <div className="text-xs text-[#1a1209]/70 pt-1 pb-2 space-y-1.5 leading-relaxed">
-                    <p>Handcrafted using selected premium materials with Japanese movement reliability.</p>
-                    {specs.length > 0 && (
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2.5 pt-3">
-                        {specs.map(([label, value]) => (
-                          <div key={label} className="flex items-center justify-between border-b border-[#8b6914]/15 pb-2">
-                            <span className="text-[11px] font-semibold text-[#8b6914] uppercase tracking-wider font-['Jost',sans-serif]">
-                              {label}
-                            </span>
-                            <span className="text-xs font-medium text-[#1a1209] capitalize font-['Jost',sans-serif]">
-                              {value}
-                            </span>
-                          </div>
-                        ))}
                       </div>
                     )}
                   </div>
-                )}
-              </div>
 
-              {/* SHIPPING & RETURNS */}
-              <div className="border-b border-[#1a1209]/08 pb-2">
-                <button
-                  type="button"
-                  onClick={() => setDeliveryOpen(!deliveryOpen)}
-                  className="w-full py-2.5 flex items-center justify-between text-left text-xs font-semibold uppercase tracking-wider text-[#1a1209] cursor-pointer"
-                >
-                  <span>SHIPPING & RETURNS</span>
-                  <span className="text-[#8b6914] text-base">{deliveryOpen ? '−' : '+'}</span>
-                </button>
-                {deliveryOpen && (
-                  <div className="text-xs text-[#1a1209]/70 pt-1 pb-2 leading-relaxed">
-                    Enjoy FREE island-wide delivery in Sri Lanka on all orders. Returns are accepted within 14 days of delivery in pristine, unworn condition with original packaging.
+                  <div className="pdp-accordion-item">
+                    <button
+                      type="button"
+                      onClick={() => setDeliveryOpen(!deliveryOpen)}
+                      className="pdp-accordion-btn"
+                    >
+                      <span>Shipping &amp; Returns</span>
+                      <span className="text-[#8B6914] text-base leading-none">{deliveryOpen ? '−' : '+'}</span>
+                    </button>
+                    {deliveryOpen && (
+                      <div className="text-xs text-[#141414]/68 pt-1 pb-3 leading-relaxed">
+                        Complimentary insured courier delivery island-wide in Sri Lanka. Exchanges or returns accepted within 14 days in unworn condition with original presentation box.
+                      </div>
+                    )}
                   </div>
-                )}
-              </div>
 
-              {/* CARE INSTRUCTIONS */}
-              <div className="border-b border-[#1a1209]/08 pb-2">
-                <button
-                  type="button"
-                  onClick={() => setWarrantyOpen(!warrantyOpen)}
-                  className="w-full py-2.5 flex items-center justify-between text-left text-xs font-semibold uppercase tracking-wider text-[#1a1209] cursor-pointer"
-                >
-                  <span>CARE INSTRUCTIONS</span>
-                  <span className="text-[#8b6914] text-base">{warrantyOpen ? '−' : '+'}</span>
-                </button>
-                {warrantyOpen && (
-                  <div className="text-xs text-[#1a1209]/70 pt-1 pb-2 leading-relaxed">
-                    Avoid magnetic fields and extreme temperature variations. Clean casing and bracelet gently with a soft microfiber cloth. Free 1-year battery replacement & servicing available nationwide.
+                  <div className="pdp-accordion-item">
+                    <button
+                      type="button"
+                      onClick={() => setWarrantyOpen(!warrantyOpen)}
+                      className="pdp-accordion-btn"
+                    >
+                      <span>Care &amp; Servicing</span>
+                      <span className="text-[#8B6914] text-base leading-none">{warrantyOpen ? '−' : '+'}</span>
+                    </button>
+                    {warrantyOpen && (
+                      <div className="text-xs text-[#141414]/68 pt-1 pb-3 leading-relaxed">
+                        Avoid prolonged exposure to strong magnetic fields. Wipe casing and strap gently with a clean microfiber cloth. Supported by Winsor&apos;s 1-year official service &amp; battery care warranty.
+                      </div>
+                    )}
                   </div>
-                )}
+                </div>
               </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ── BAND 2: HERITAGE & CRAFTSMANSHIP PILLARS (SINGLE AUTHORITATIVE BAR) ── */}
+        <div className="pdp-craft-bar">
+          <div className="pdp-craft-grid">
+            <div className="pdp-craft-cell">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M2 4l3 12h14l3-12-6 7-4-7-4 7-6-7zm3 16h14" />
+              </svg>
+              <h4>Est. 2023 · Dubai</h4>
+              <span>Registered Horological Atelier</span>
+            </div>
+            <div className="pdp-craft-cell">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M6 3h12l4 6-10 12L2 9z" />
+              </svg>
+              <h4>Japanese Calibre</h4>
+              <span>Tested Movement Accuracy</span>
+            </div>
+            <div className="pdp-craft-cell">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                <path d="m9 12 2 2 4-4" />
+              </svg>
+              <h4>Fixed Official MRP</h4>
+              <span>Authentic Boutique Pricing</span>
+            </div>
+            <div className="pdp-craft-cell">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="20 12 20 22 4 22 4 12" />
+                <rect x="2" y="7" width="20" height="5" />
+                <line x1="12" y1="22" x2="12" y2="7" />
+                <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z" />
+                <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z" />
+              </svg>
+              <h4>Signature Gifting</h4>
+              <span>Luxury Presentation Case</span>
             </div>
           </div>
         </div>
 
-        {/* ── LOWER SECTION: THE TIMEPIECE IN FOCUS ── */}
-        <section className="max-w-[1300px] mx-auto mt-20 mb-16 pt-12 border-t border-black/[0.08] text-center">
-          <h2 className="font-['Cormorant_Garamond',serif] text-2xl md:text-4xl font-normal text-[#141414] mb-8 tracking-wide">
-            The Timepiece in Focus
-          </h2>
+        {/* ── BAND 3: WATCH OUR STORY (DARK CINEMA SHOWCASE + DYNAMIC SPECIFICATIONS) ── */}
+        <section className="pdp-story-band">
+          <div className="pdp-story-backdrop" aria-hidden="true" />
+          <div className="pdp-story-scrim" aria-hidden="true" />
+          <div className="pdp-story-inner">
+            <div>
+              <span className="pdp-story-eyebrow">Watch Our Story</span>
+              <h2 className="pdp-story-title">Timeless Elegance</h2>
+              <p className="pdp-story-desc">
+                Discover the blend of restrained aesthetics, regulated Japanese precision, and enduring architecture inside{' '}
+                {product.title && product.title.length > 42 ? (
+                  'this Winsor timepiece'
+                ) : (
+                  <>
+                    the <span className="capitalize">{product.title}</span>
+                  </>
+                )}
+                .
+              </p>
 
-          {/* Large Video Banner with Ambient Mode OR 3-Column Image Grid (When No Video Available) */}
-          {product.video?.url ? (
-            <div className="relative max-w-4xl mx-auto mb-10 px-2 sm:px-0">
-              <AmbientVideoPlayer
-                src={product.video.url}
-                controls
-                muted
-                loop
-                autoPlay
-                playsInline
-                aspectRatio="aspect-video"
-                roundedClassName="rounded-[22px] sm:rounded-[28px]"
-                borderClassName="border border-[#c5a059]/40"
-                containerClassName="w-full aspect-video"
-                showAmbientToggle={true}
-                defaultAmbientOn={true}
-                title={`${product.title} in Focus`}
-              />
-            </div>
-          ) : (
-            <div className="relative max-w-5xl mx-auto mb-10 px-2 sm:px-4">
-              {/* FLOWER / FAN PETAL COVERFLOW CAROUSEL */}
-              <div className="flex items-center justify-center gap-1 sm:gap-4 py-4 min-h-[300px] sm:min-h-[380px]">
-                {[0, 1, 2].map((idx) => {
-                  const imgSrc = galleryImages[idx] || galleryImages[0] || '/winsor_man.png';
-                  const isCenter = idx === focusSlideIdx;
+              {(() => {
+                const productSpecs = product.specifications || {};
+                const getVal = (keys: string[]) => {
+                  for (const k of Object.keys(productSpecs)) {
+                    if (keys.some(key => k.toLowerCase().includes(key.toLowerCase()))) {
+                      return productSpecs[k];
+                    }
+                  }
+                  return null;
+                };
+                const caseMat = getVal(['case', 'material', 'build']);
+                const glassMat = getVal(['glass', 'crystal', 'lens', 'dial']);
+                const rawWaterRes = getVal(['water', 'atm', 'depth', 'resistant']);
+                const waterRes = (!rawWaterRes || rawWaterRes.toLowerCase() === 'no' || rawWaterRes.toLowerCase() === 'none') ? 'Water Resistant' : rawWaterRes;
+                const movement = getVal(['movement', 'engine', 'mechanism']);
 
-                  return (
-                    <div
-                      key={idx}
-                      onClick={() => setFocusSlideIdx(idx)}
-                      className={`relative cursor-pointer transition-all duration-500 ease-out rounded-2xl overflow-hidden bg-transparent flex items-center justify-center p-3 sm:p-5 ${isCenter
-                          ? 'w-[68vw] sm:w-[300px] md:w-[320px] aspect-[4/5] z-20 scale-100 opacity-100'
-                          : 'w-[45vw] sm:w-[200px] md:w-[240px] aspect-[4/5] z-10 scale-90 opacity-70 hover:opacity-90'
-                        }`}
-                      style={{
-                        transform: `scale(${isCenter ? 1 : 0.88}) translateY(${isCenter ? '0px' : '8px'})`,
-                        filter: isCenter ? 'none' : 'brightness(0.96)'
-                      }}
-                    >
-                      <div className="relative w-full h-full">
-                        <Image
-                          src={imgSrc}
-                          alt={`${product.title} focus ${idx + 1}`}
-                          fill
-                          sizes="(max-width: 768px) 70vw, 33vw"
-                          className="object-contain transition-transform duration-500 hover:scale-105"
-                        />
+                const storyFeatures = [
+                  {
+                    title: 'Craft & Build',
+                    desc: caseMat || '316L Stainless Steel',
+                    icon: (
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                      </svg>
+                    ),
+                  },
+                  {
+                    title: 'Dial & Crystal',
+                    desc: glassMat || 'Protective Crystal Lens',
+                    icon: (
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 3h12l4 6-10 12L2 9z" />
+                      </svg>
+                    ),
+                  },
+                  {
+                    title: 'Water Protection',
+                    desc: waterRes,
+                    icon: (
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 22a7 7 0 007-7c0-4.3-7-11-7-11S5 10.7 5 15a7 7 0 007 7z" />
+                      </svg>
+                    ),
+                  },
+                  {
+                    title: 'Precision Movement',
+                    desc: movement || 'Regulated Precision',
+                    icon: (
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                        <circle cx="12" cy="12" r="9" />
+                        <polyline points="12 6 12 12 16 14" />
+                      </svg>
+                    ),
+                  },
+                ];
+
+                return (
+                  <div className="pdp-story-specs-mini">
+                    {storyFeatures.map((feat) => (
+                      <div key={feat.title} className="pdp-story-spec-item">
+                        <div className="pdp-story-spec-icon">{feat.icon}</div>
+                        <div>
+                          <div className="text-[11px] font-semibold text-white tracking-wide">{feat.title}</div>
+                          <div className="text-[11px] text-white/55">{feat.desc}</div>
+                        </div>
                       </div>
+                    ))}
+                  </div>
+                );
+              })()}
 
-                      {/* Center Focus Badge Icon (No Text) */}
-                      {isCenter && (
-                        <div className="absolute top-3 right-3 bg-[#8b6914] text-white w-6 h-6 sm:w-7 sm:h-7 rounded-full flex items-center justify-center shadow-md border border-white/30 backdrop-blur-sm">
-                          <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.2">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                          </svg>
+              <div className="pdp-story-cta-row">
+                {hasUploadedVideo ? (
+                  <button
+                    type="button"
+                    onClick={() => setStoryVideoPlaying((v) => !v)}
+                    className="pdp-story-btn-gold"
+                  >
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+                      <polygon points="5 3 19 12 5 21 5 3" />
+                    </svg>
+                    <span>{storyVideoPlaying ? 'Playing Film' : 'Watch Video'}</span>
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setStorySlideshowPaused((p) => !p)}
+                    className="pdp-story-btn-gold"
+                  >
+                    {storySlideshowPaused ? (
+                      <>
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+                          <polygon points="5 3 19 12 5 21 5 3" />
+                        </svg>
+                        <span>Play Showcase</span>
+                      </>
+                    ) : (
+                      <>
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+                          <rect x="6" y="4" width="4" height="16" rx="1" />
+                          <rect x="14" y="4" width="4" height="16" rx="1" />
+                        </svg>
+                        <span>Pause Showcase</span>
+                      </>
+                    )}
+                  </button>
+                )}
+                <Link href="/our-story" className="pdp-story-btn-link">
+                  Discover Our Story →
+                </Link>
+                <Link href="/retailers" className="pdp-story-btn-link">
+                  Find a Store →
+                </Link>
+              </div>
+            </div>
+
+            <div className="pdp-story-frame">
+              {hasUploadedVideo ? (
+                storyVideoPlaying ? (
+                  <AmbientVideoPlayer
+                    src={product.video!.url}
+                    controls
+                    autoPlay
+                    loop
+                    playsInline
+                    aspectRatio="aspect-video"
+                    roundedClassName="rounded-2xl"
+                    containerClassName="w-full h-full"
+                    className="w-full h-full"
+                    showAmbientToggle={false}
+                    defaultAmbientOn={false}
+                    title={`${product.title} Craft Film`}
+                  />
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setStoryVideoPlaying(true)}
+                    className="pdp-story-frame-trigger w-full h-full relative block border-none p-0 bg-transparent cursor-pointer"
+                    aria-label="Play Winsor craft video"
+                  >
+                    <Image
+                      src="/collections_pg.webp"
+                      alt={`${product.title} Craftsmanship Film`}
+                      fill
+                      sizes="(max-width: 1024px) 100vw, 55vw"
+                      style={{ objectFit: 'cover' }}
+                    />
+                    <div
+                      className="absolute inset-0 flex items-center justify-center"
+                      style={{ background: 'radial-gradient(circle, rgba(15,14,11,0.22) 0%, rgba(15,14,11,0.62) 100%)' }}
+                    >
+                      <span className="pdp-story-play-circle">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style={{ marginLeft: '2px' }}>
+                          <polygon points="5 3 19 12 5 21 5 3" />
+                        </svg>
+                      </span>
+                    </div>
+                  </button>
+                )
+              ) : (
+                <div className="pdp-kb-stage" aria-label={`${product.title} Timepiece Slideshow`}>
+                  {storyImages.map((imgSrc, idx) => {
+                    const isActive = idx === storySlideState.active;
+                    const isPrev = idx === storySlideState.prev && idx !== storySlideState.active;
+                    const isSingle = storyImages.length <= 1;
+                    const panVariant = idx % 2 === 0 ? 'is-pan-a' : 'is-pan-b';
+                    return (
+                      <div
+                        key={`${imgSrc}-${idx}`}
+                        className={`pdp-slide-media ${isActive ? 'is-active' : ''} ${isPrev ? 'is-prev' : ''}`}
+                      >
+                        <div className="pdp-slide-vignette" aria-hidden="true" />
+                        <div
+                          className={`pdp-slide-zoom-wrap ${
+                            isSingle
+                              ? 'is-single'
+                              : isActive || isPrev
+                                ? `is-animating ${panVariant}`
+                                : ''
+                          } ${storySlideshowPaused ? 'is-paused' : ''}`}
+                        >
+                          <img
+                            src={imgSrc}
+                            alt={`${product.title} showcase view ${idx + 1}`}
+                            className="pdp-slide-watch-img"
+                          />
+                        </div>
+                      </div>
+                    );
+                  })}
+
+                  {/* Minimal Editorial Timeline & Playback Controls */}
+                  <div className="pdp-kb-hud">
+                    <div className="pdp-kb-caption-col">
+                      {storyImages.length > 1 && (
+                        <div className="pdp-kb-progress-track">
+                          <div
+                            key={`prog-${storySlideState.active}`}
+                            className={`pdp-kb-progress-fill ${storySlideshowPaused ? 'is-paused' : ''}`}
+                          />
                         </div>
                       )}
                     </div>
-                  );
-                })}
-              </div>
 
-              {/* Interactive Navigation Dots */}
-              <div className="flex justify-center items-center gap-2 mt-2 mb-6">
-                {[0, 1, 2].map((idx) => (
-                  <button
-                    key={idx}
-                    type="button"
-                    onClick={() => setFocusSlideIdx(idx)}
-                    className={`transition-all duration-300 rounded-full cursor-pointer border-none ${focusSlideIdx === idx
-                        ? 'w-7 h-2 bg-[#8b6914]'
-                        : 'w-2 h-2 bg-[#1a1209]/20 hover:bg-[#8b6914]/50'
-                      }`}
-                    aria-label={`View focus shot ${idx + 1}`}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* 4-Column Feature Bar Below Video — Dynamic & Authentic Specifications (2x2 Mobile Grid) */}
-          {(() => {
-            const specs = product.specifications || {};
-            const getVal = (keys: string[]) => {
-              for (const k of Object.keys(specs)) {
-                if (keys.some(key => k.toLowerCase().includes(key.toLowerCase()))) {
-                  return specs[k];
-                }
-              }
-              return null;
-            };
-
-            const caseMat = getVal(['case', 'material', 'build']);
-            const glassMat = getVal(['glass', 'crystal', 'lens', 'dial']);
-
-            const rawWaterRes = getVal(['water', 'atm', 'depth', 'resistant']);
-            const waterRes = (!rawWaterRes || rawWaterRes.toLowerCase() === 'no' || rawWaterRes.toLowerCase() === 'none') ? 'Water Resistant' : rawWaterRes;
-
-            const movement = getVal(['movement', 'engine', 'mechanism']);
-
-            const dynamicFeatures = [
-              {
-                title: 'Craft & Build',
-                desc: caseMat || 'Dubai Certified Quality',
-                icon: (
-                  <svg className="w-4 h-4 sm:w-5 sm:h-5 text-[#8b6914]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.8">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                  </svg>
-                )
-              },
-              {
-                title: 'Dial & Glass',
-                desc: glassMat || 'Protective Dial Glass',
-                icon: (
-                  <svg className="w-4 h-4 sm:w-5 sm:h-5 text-[#8b6914]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.8">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 3h12l4 6-10 12L2 9z" />
-                  </svg>
-                )
-              },
-              {
-                title: 'Water Protection',
-                desc: waterRes,
-                icon: (
-                  <svg className="w-4 h-4 sm:w-5 sm:h-5 text-[#8b6914]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.8">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 22a7 7 0 007-7c0-4.3-7-11-7-11S5 10.7 5 15a7 7 0 007 7z" />
-                  </svg>
-                )
-              },
-              {
-                title: 'Precision Engine',
-                desc: movement || 'Japanese Precision Engine',
-                icon: (
-                  <svg className="w-4 h-4 sm:w-5 sm:h-5 text-[#8b6914]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.8">
-                    <circle cx="12" cy="12" r="9" />
-                    <polyline points="12 6 12 12 16 14" />
-                  </svg>
-                )
-              }
-            ];
-
-            return (
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 max-w-4xl mx-auto text-left px-2 sm:px-0">
-                {dynamicFeatures.map((feat, idx) => (
-                  <div key={idx} className="flex items-center gap-2.5 sm:gap-3.5 py-1">
-                    <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#8b6914]/10 border border-[#8b6914]/30 flex items-center justify-center text-[#8b6914] flex-shrink-0">
-                      {feat.icon}
-                    </div>
-                    <div>
-                      <h4 className="text-[11px] sm:text-xs font-semibold text-[#1a1209] leading-tight">{feat.title}</h4>
-                      <p className="text-[9.5px] sm:text-[10.5px] text-[#1a1209]/60 font-['Jost',sans-serif] leading-tight mt-0.5">{feat.desc}</p>
+                    <div className="pdp-kb-controls">
+                      {storyImages.length > 1 && (
+                        <div className="pdp-kb-dots" role="tablist" aria-label="Slideshow angles">
+                          {storyImages.map((_, idx) => (
+                            <button
+                              key={idx}
+                              type="button"
+                              role="tab"
+                              aria-selected={idx === storySlideState.active}
+                              aria-label={`View watch angle ${idx + 1}`}
+                              onClick={() => goToStorySlide(idx)}
+                              className={`pdp-kb-dot ${idx === storySlideState.active ? 'active' : ''}`}
+                            />
+                          ))}
+                        </div>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => setStorySlideshowPaused((p) => !p)}
+                        className="pdp-kb-toggle-btn"
+                        aria-label={storySlideshowPaused ? 'Resume slideshow motion' : 'Pause slideshow motion'}
+                        title={storySlideshowPaused ? 'Resume slideshow' : 'Pause slideshow'}
+                      >
+                        {storySlideshowPaused ? (
+                          <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" style={{ marginLeft: '1px' }}>
+                            <polygon points="5 3 19 12 5 21 5 3" />
+                          </svg>
+                        ) : (
+                          <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor">
+                            <rect x="6" y="4" width="4" height="16" rx="1" />
+                            <rect x="14" y="4" width="4" height="16" rx="1" />
+                          </svg>
+                        )}
+                      </button>
                     </div>
                   </div>
-                ))}
-              </div>
-            );
-          })()}
+                </div>
+              )}
+            </div>
+          </div>
         </section>
 
-        {/* ── SIDE-BY-SIDE EXPERIENCE & STORY BANNERS (RESPONSIVE FOR MOBILE & DESKTOP) ── */}
-        <div className="max-w-[1300px] mx-auto my-8 md:my-12 px-4 grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-          {/* TOP / LEFT: OUR STORES / FIND A STORE */}
-          <div
-            className="relative min-h-[170px] sm:min-h-[200px] md:h-[360px] rounded-xl md:rounded-2xl overflow-hidden shadow-lg flex flex-col justify-center md:justify-end p-5 md:p-8 border border-[#8b6914]/25 transition-all duration-300 hover:shadow-2xl"
-            style={{
-              backgroundImage: "linear-gradient(to right, rgba(10,8,4,0.92) 0%, rgba(10,8,4,0.65) 55%, rgba(10,8,4,0.15) 100%), url('/KCC.webp')",
-              backgroundSize: 'cover',
-              backgroundPosition: 'center 45%',
-              backgroundRepeat: 'no-repeat'
-            }}
-          >
-            <div className="relative z-10 text-white space-y-1.5 md:space-y-3">
-              <span className="text-[9px] md:text-[10px] font-semibold tracking-[0.2em] text-[#dfb15b] uppercase block">
-                OUR STORES
-              </span>
-              <h3 className="font-['Cinzel',serif] text-lg sm:text-xl md:text-3xl font-medium text-white tracking-wide">
-                Experience <span className="text-[#dfb15b]">Winsor</span>
-              </h3>
-              <p className="text-[11px] sm:text-xs text-white/85 max-w-[240px] sm:max-w-md leading-relaxed font-['Jost',sans-serif]">
-                Visit our exclusive stores and explore premium timepieces.
-              </p>
-              <div className="pt-1.5 md:pt-2">
-                <Link
-                  href="/retailers"
-                  className="inline-block py-2 px-4 md:py-3 md:px-6 bg-[#8b6914] hover:bg-[#a07d1a] text-white rounded-md md:rounded-lg text-[10px] md:text-xs font-semibold tracking-widest uppercase transition-all shadow-md hover:shadow-gold cursor-pointer"
-                >
-                  FIND A STORE
-                </Link>
+        {/* ── BAND 4: EXPLORE OUR COLLECTIONS (5-CARD EDITORIAL STRIP) ── */}
+        <section className="pdp-collections-band">
+          <div className="pdp-collections-inner">
+            <div className="pdp-sec-header">
+              <div className="pdp-sec-eyebrow">
+                <span className="rule" />
+                <span>Our Collections</span>
+                <span className="rule" />
               </div>
+              <h2 className="pdp-sec-title">Explore Our Collections</h2>
+              <p className="pdp-sec-sub">Find the curated Winsor calibre tailored to every occasion</p>
             </div>
-          </div>
-
-          {/* BOTTOM / RIGHT: CRAFTED FOR MOMENTS / DISCOVER OUR STORY */}
-          <div
-            className="relative min-h-[170px] sm:min-h-[200px] md:h-[360px] rounded-xl md:rounded-2xl overflow-hidden shadow-lg flex flex-col justify-center md:justify-end p-5 md:p-8 border border-[#8b6914]/25 transition-all duration-300 hover:shadow-2xl"
-            style={{
-              backgroundImage: "linear-gradient(to right, rgba(10,8,4,0.92) 0%, rgba(10,8,4,0.65) 55%, rgba(10,8,4,0.15) 100%), url('/actor_actress_winsor.webp')",
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-              backgroundRepeat: 'no-repeat'
-            }}
-          >
-            <div className="relative z-10 text-white space-y-1.5 md:space-y-3">
-              <span className="text-[9px] md:text-[10px] font-semibold tracking-[0.2em] text-[#dfb15b] uppercase block">
-                HERITAGE & CRAFT
-              </span>
-              <h3 className="font-['Cinzel',serif] text-lg sm:text-xl md:text-3xl font-medium text-white tracking-wide">
-                Crafted for <span className="text-[#dfb15b]">Moments</span>
-              </h3>
-              <p className="text-[11px] sm:text-xs text-white/85 max-w-[240px] sm:max-w-md leading-relaxed font-['Jost',sans-serif]">
-                Timeless designs for every occasion. Every second is a step.
-              </p>
-              <div className="pt-1.5 md:pt-2">
-                <Link
-                  href="/our-story"
-                  className="inline-block py-2 px-4 md:py-3 md:px-6 bg-transparent border border-white/80 hover:bg-white hover:text-[#1a1209] text-white rounded-md md:rounded-lg text-[10px] md:text-xs font-semibold tracking-widest uppercase transition-all shadow-md cursor-pointer"
-                >
-                  DISCOVER OUR STORY
-                </Link>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* TIMELESS PAIRINGS */}
-        <div className="detail-wrapper pairings-section" style={{ marginTop: '80px', borderTop: '1px solid rgba(26,18,9,0.08)', paddingTop: '60px' }}>
-          <div style={{ width: '100%' }}>
-            <span className="pairings-tag" style={{ display: 'block', textAlign: 'center', fontSize: '9px', letterSpacing: '0.3em', color: '#8B6914', textTransform: 'uppercase', marginBottom: '8px' }}>
-              Style Match
-            </span>
-            <h3 className="pairings-title" style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '28px', fontWeight: 500, textAlign: 'center', marginBottom: '6px', letterSpacing: '0.05em' }}>
-              Timeless Pairings
-            </h3>
-            <p className="pairings-desc" style={{ fontSize: '13px', color: 'rgba(26,18,9,0.5)', textAlign: 'center', marginBottom: '40px' }}>
-              Discover watches that complement your style
-            </p>
 
             <div className="pairings-grid" ref={pairingsScrollRef} onScroll={handlePairingsScroll}>
-              {/* Card 1: New Arrivals */}
-              <Link href="/new-arrivals" className="pairing-card" draggable={false}>
-                <div className="pairing-img-container">
-                  <Image src="/category_HomeS/new_arrivals_bg.webp" alt="New Arrivals" fill sizes="(max-width: 768px) 70vw, 20vw" style={{ objectFit: 'cover' }} className="pairing-img" draggable={false} />
-                </div>
-                <div className="pairing-info">
-                  <h4 className="pairing-card-title">New Arrivals</h4>
-                  <p className="pairing-card-desc">Explore Our Latest Additions</p>
-                  <span className="pairing-card-link">VIEW ALL</span>
-                </div>
-              </Link>
-
-              {/* Card 2: Classic */}
-              <Link href="/mens" className="pairing-card" draggable={false}>
-                <div className="pairing-img-container">
-                  <Image src="/category_HomeS/classic_bg.webp" alt="Classic" fill sizes="(max-width: 768px) 70vw, 20vw" style={{ objectFit: 'cover' }} className="pairing-img" draggable={false} />
-                </div>
-                <div className="pairing-info">
-                  <h4 className="pairing-card-title">Classic</h4>
-                  <p className="pairing-card-desc">Elegance Beyond Time</p>
-                  <span className="pairing-card-link">VIEW ALL</span>
-                </div>
-              </Link>
-
-              {/* Card 3: Sport */}
-              <Link href="/sports" className="pairing-card" draggable={false}>
-                <div className="pairing-img-container">
-                  <Image src="/category_HomeS/sport_bg.webp" alt="Sport" fill sizes="(max-width: 768px) 70vw, 20vw" style={{ objectFit: 'cover' }} className="pairing-img" draggable={false} />
-                </div>
-                <div className="pairing-info">
-                  <h4 className="pairing-card-title">Sport</h4>
-                  <p className="pairing-card-desc">Built for Performance</p>
-                  <span className="pairing-card-link">VIEW ALL</span>
-                </div>
-              </Link>
-
-              {/* Card 4: Limited Edition */}
-              <Link href="/limited-edition" className="pairing-card" draggable={false}>
-                <div className="pairing-img-container">
-                  <Image src="/category_HomeS/limitted_bg.webp" alt="Limited Edition" fill sizes="(max-width: 768px) 70vw, 20vw" style={{ objectFit: 'cover' }} className="pairing-img" draggable={false} />
-                </div>
-                <div className="pairing-info">
-                  <h4 className="pairing-card-title">Limited Edition</h4>
-                  <p className="pairing-card-desc">Exclusivity at Its Finest</p>
-                  <span className="pairing-card-link">VIEW ALL</span>
-                </div>
-              </Link>
-
-              {/* Card 5: Gifts */}
-              <Link href="/gifts" className="pairing-card" draggable={false}>
-                <div className="pairing-img-container">
-                  <Image src="/graduation_gift.png" alt="Gifts Collection" fill sizes="(max-width: 768px) 70vw, 20vw" style={{ objectFit: 'cover' }} className="pairing-img" draggable={false} />
-                </div>
-                <div className="pairing-info">
-                  <h4 className="pairing-card-title">Gifts</h4>
-                  <p className="pairing-card-desc">Curated Luxury Gifting</p>
-                  <span className="pairing-card-link">VIEW ALL</span>
-                </div>
-              </Link>
+              {[
+                { title: "Men's Watches", href: '/mens', img: '/category_HomeS/classic_bg.webp' },
+                { title: "Women's Watches", href: '/womens', img: '/category_HomeS/ladies_bg.webp' },
+                { title: 'Sport Watches', href: '/sports', img: '/category_HomeS/sport_bg.webp' },
+                { title: 'Classic Series', href: '/collections?section=luxury', img: '/category_HomeS/new_arrivals_bg.webp' },
+                { title: 'Limited Edition', href: '/limited-edition', img: '/category_HomeS/limitted_bg.webp' },
+              ].map((col) => (
+                <Link key={col.title} href={col.href} className="pairing-card" draggable={false}>
+                  <Image
+                    src={col.img}
+                    alt={col.title}
+                    fill
+                    sizes="(max-width: 768px) 60vw, 20vw"
+                    style={{ objectFit: 'cover' }}
+                    className="pairing-img"
+                    draggable={false}
+                  />
+                  <div className="pairing-overlay" />
+                  <div className="pairing-info">
+                    <h4 className="pairing-card-title">{col.title}</h4>
+                    <span className="pairing-card-link">Shop Now →</span>
+                  </div>
+                </Link>
+              ))}
             </div>
 
-            {/* Mobile Touch Carousel Controls */}
-            <div className="pairings-mobile-controls" aria-label="Timeless Pairings Navigation">
+            <div className="pairings-mobile-controls" aria-label="Collections Navigation">
               <button
                 type="button"
                 className="pairings-nav-arrow"
                 onClick={() => scrollPairingsByDir('left')}
                 disabled={activePairingIdx === 0}
-                aria-label="Previous pairing"
+                aria-label="Previous collection"
               >
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                  <polyline points="15 18 9 12 15 6"></polyline>
+                  <polyline points="15 18 9 12 15 6" />
                 </svg>
               </button>
 
@@ -2407,7 +2613,7 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
                     type="button"
                     className={`pairings-dot ${activePairingIdx === idx ? 'active' : ''}`}
                     onClick={() => scrollToPairing(idx)}
-                    aria-label={`Go to slide ${idx + 1}`}
+                    aria-label={`Go to collection ${idx + 1}`}
                   />
                 ))}
               </div>
@@ -2417,117 +2623,196 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
                 className="pairings-nav-arrow"
                 onClick={() => scrollPairingsByDir('right')}
                 disabled={activePairingIdx === 4}
-                aria-label="Next pairing"
+                aria-label="Next collection"
               >
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                  <polyline points="9 18 15 12 9 6"></polyline>
+                  <polyline points="9 18 15 12 9 6" />
                 </svg>
               </button>
             </div>
           </div>
-        </div>
+        </section>
 
-        {/* DYNAMIC SUGGESTIONS LIST (If any) */}
+        {/* ── BAND 5: FEATURED COMPLEMENTARY TIMEPIECES ── */}
         {suggestions.length > 0 && (
-          <div className="detail-wrapper suggestions-section">
-            <div style={{ width: '100%' }}>
-              <h3>Suggested Timepieces</h3>
+          <section className="suggestions-section">
+            <div className="suggestions-inner">
+              <div className="pdp-sec-header">
+                <div className="pdp-sec-eyebrow">
+                  <span className="rule" />
+                  <span>Curated Additions</span>
+                  <span className="rule" />
+                </div>
+                <h2 className="pdp-sec-title">Featured Timepieces</h2>
+                <p className="pdp-sec-sub">Complementing watches from our current studio collection</p>
+              </div>
+
               <div className="suggestions-grid">
                 {suggestions.map((p) => {
                   const gender = getProductGender(p);
+                  const rData = p._id ? suggestionRatings[p._id] : undefined;
+                  const rAvg = rData?.averageRating || 0;
+                  const rCount = rData?.reviewCount || 0;
+                  const badgeLabel = p.isSoldOut
+                    ? 'SOLD OUT'
+                    : p.stickerEnabled && p.stickerText
+                      ? p.stickerText
+                      : p.collectionSections?.includes('new')
+                        ? 'NEW'
+                        : p.collectionSections?.includes('limited')
+                          ? 'LIMITED'
+                          : null;
+
                   return (
-                    <Link
-                      key={p._id}
-                      href={`/collections/${p._id}`}
-                      style={{ textDecoration: 'none', color: 'inherit' }}
-                      className="suggested-card"
-                    >
-                      <div className="suggested-img-container">
-                        {p.thumbnail?.url && (
-                          <Image
-                            src={p.thumbnail.url}
-                            alt={p.title}
-                            fill
-                            sizes="(max-width: 768px) 50vw, 25vw"
-                            style={{ objectFit: 'contain' }}
-                            className="suggested-img"
-                          />
+                    <div key={p._id} className="suggested-card">
+                      <div className="relative">
+                        {badgeLabel && (
+                          <span className={`suggested-badge ${p.isSoldOut ? 'sold-out' : ''}`}>
+                            {badgeLabel}
+                          </span>
                         )}
+
+                        {!p.isSoldOut && p._id && (
+                          <button
+                            type="button"
+                            className="suggested-bag-btn"
+                            aria-label={`Add ${p.title} to shopping bag`}
+                            onClick={() => {
+                              addToCart(p._id!, 1, '', p);
+                            }}
+                          >
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9">
+                              <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+                              <line x1="3" y1="6" x2="21" y2="6" />
+                              <path d="M16 10a4 4 0 0 1-8 0" />
+                            </svg>
+                          </button>
+                        )}
+
+                        <Link href={`/collections/${p._id}`} className="suggested-img-container">
+                          {p.thumbnail?.url && (
+                            <Image
+                              src={p.thumbnail.url}
+                              alt={p.title}
+                              fill
+                              sizes="(max-width: 768px) 50vw, 25vw"
+                              style={{ objectFit: 'contain' }}
+                              className="suggested-img"
+                            />
+                          )}
+                        </Link>
                       </div>
-                      <div style={{ padding: '14px 4px 4px', display: 'flex', flexDirection: 'column', flexGrow: 1, justifyContent: 'space-between' }}>
+
+                      <div className="suggested-body">
                         <div>
-                          <span style={{ fontSize: '9.5px', fontWeight: 700, letterSpacing: '0.15em', textTransform: 'uppercase', color: '#8B6914', display: 'block', marginBottom: '4px' }}>
+                          <span className="block text-[9.5px] font-semibold uppercase tracking-[0.16em] text-[#8B6914] mb-1">
                             {gender}
                           </span>
-                          <h4 style={{ fontFamily: "'Jost', sans-serif", fontSize: '14px', fontWeight: 600, margin: '0 0 6px', color: '#1a1209', lineHeight: 1.3 }}>
-                            {p.title}
-                          </h4>
+                          <Link href={`/collections/${p._id}`} className="no-underline">
+                            <h4 className="suggested-title capitalize">{p.title}</h4>
+                          </Link>
+
+                          {rCount > 0 ? (
+                            <div className="flex items-center gap-1 mt-1.5">
+                              {[1, 2, 3, 4, 5].map((s) => (
+                                <svg
+                                  key={s}
+                                  width="11"
+                                  height="11"
+                                  viewBox="0 0 24 24"
+                                  fill={rAvg >= s ? '#8B6914' : 'none'}
+                                  stroke="#8B6914"
+                                  strokeWidth="1.6"
+                                >
+                                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                                </svg>
+                              ))}
+                              <span className="text-[10.5px] text-[#141414]/55 ml-1">
+                                {rAvg.toFixed(1)} ({rCount})
+                              </span>
+                            </div>
+                          ) : (
+                            <div className="inline-flex items-center gap-1 mt-1.5 text-[10px] font-medium text-[#141414]/55">
+                              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.8">
+                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                                <path d="m9 12 2 2 4-4" />
+                              </svg>
+                              <span>Official Warranty · Authentic</span>
+                            </div>
+                          )}
                         </div>
-                        <span style={{ fontSize: '13.5px', fontWeight: 700, color: '#8B6914', fontFamily: 'monospace', marginTop: '6px' }}>
+
+                        <div className="text-[14px] font-semibold text-[#141414] lining-nums pt-1 border-t border-[#141414]/[0.06]">
                           {convertPrice(p.price)}
-                        </span>
+                        </div>
                       </div>
-                    </Link>
+                    </div>
                   );
                 })}
               </div>
+
+              <div className="text-center mt-10">
+                <Link href="/collections" className="pdp-view-all-btn">
+                  <span>View All Timepieces</span>
+                  <span aria-hidden="true">→</span>
+                </Link>
+              </div>
             </div>
-          </div>
+          </section>
         )}
 
-        {/* CUSTOMER REVIEWS SECTION */}
-        <div className="detail-wrapper reviews-section" style={{ marginTop: '80px', borderTop: '1px solid rgba(26,18,9,0.08)', paddingTop: '60px' }}>
-          <div style={{ width: '100%' }}>
-            <span style={{ display: 'block', textAlign: 'center', fontSize: '9px', letterSpacing: '0.3em', color: '#8B6914', textTransform: 'uppercase', marginBottom: '8px' }}>
-              Verified Feedback
-            </span>
-            <h3 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '28px', fontWeight: 500, textAlign: 'center', marginBottom: '6px', letterSpacing: '0.05em' }}>
-              Customer Reviews
-            </h3>
-            <p style={{ fontSize: '13px', color: 'rgba(26,18,9,0.5)', textAlign: 'center', marginBottom: '40px' }}>
-              What our patrons have to say about this timepiece
-            </p>
+        {/* ── BAND 7: WHAT OUR CUSTOMERS SAY (VERIFIED REVIEWS & TESTIMONIALS) ── */}
+        <section id="customer-reviews-section" className="reviews-band">
+          <div className="reviews-band-inner">
+            <div className="pdp-sec-header">
+              <div className="pdp-sec-eyebrow">
+                <span className="rule" />
+                <span>Verified Patron Feedback</span>
+                <span className="rule" />
+              </div>
+              <h2 className="pdp-sec-title">What Our Customers Say</h2>
+              <p className="pdp-sec-sub">Authentic impressions shared by verified Winsor watch owners</p>
+            </div>
 
             {reviews.length === 0 ? (
-              <div style={{ textAlign: 'center', padding: '40px 20px', border: '1px dashed rgba(26,18,9,0.12)', borderRadius: '8px' }}>
-                <p style={{ fontSize: '14.5px', color: 'rgba(26,18,9,0.5)', margin: 0 }}>
-                  No reviews submitted yet for this timepiece.
+              <div style={{ maxWidth: '640px', margin: '0 auto', textAlign: 'center', padding: '44px 24px', border: '1px solid rgba(20,20,20,0.08)', borderRadius: '14px', background: '#FFFFFF' }}>
+                <p style={{ fontSize: '14px', color: 'rgba(20,20,20,0.58)', margin: 0 }}>
+                  No verified patron reviews have been posted yet for this timepiece.
                 </p>
               </div>
             ) : (() => {
-              // Compute filtered reviews
               const filteredRevs = reviews.filter(r => {
                 if (reviewFilter === 'photos') return r.images && r.images.length > 0;
                 if (typeof reviewFilter === 'number') return Math.round(r.rating) === reviewFilter;
                 return true;
               });
 
-              // Take initial 5 or expanded visible count
               const visibleRevs = filteredRevs.slice(0, visibleReviewsCount);
               const allPhotoUrls = reviews.flatMap(r => r.images || []);
 
               return (
-                <div className="reviews-layout-grid" style={{ display: 'grid', gridTemplateColumns: '300px 1fr', gap: '48px', alignItems: 'flex-start' }}>
+                <div className="reviews-layout-grid">
+                  {/* Rating Summary Sidebar */}
+                  <div className="rev-summary-sidebar">
+                    <h4 style={{ margin: '0 0 20px 0', fontSize: '12px', fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: '#141414', borderBottom: '1px solid rgba(20,20,20,0.08)', paddingBottom: '12px' }}>
+                      Rating Summary
+                    </h4>
 
-                  {/* ── LEFT: Summary Sidebar ── */}
-                  <div className="rev-summary-sidebar" style={{ background: '#F8F7F4', border: '1px solid rgba(20,20,20,0.08)', borderRadius: '12px', padding: '28px', position: 'sticky', top: '100px' }}>
-                    <h4 style={{ margin: '0 0 20px 0', fontSize: '13px', fontWeight: 700, letterSpacing: '0.15em', textTransform: 'uppercase', color: '#141414', borderBottom: '1px solid rgba(20,20,20,0.08)', paddingBottom: '14px' }}>Rating Summary</h4>
-
-                    {/* Big score */}
                     <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-                      <div style={{ fontSize: '60px', fontWeight: 500, fontFamily: "'Cormorant Garamond', serif", lineHeight: 1, color: '#1a1209' }}>{reviewsStats.average}</div>
+                      <div style={{ fontSize: '58px', fontWeight: 500, fontFamily: "'Cormorant Garamond', serif", lineHeight: 1, color: '#141414' }}>{reviewsStats.average}</div>
                       <div style={{ display: 'flex', justifyContent: 'center', gap: '4px', margin: '8px 0 6px' }}>
                         {Array.from({ length: 5 }).map((_, i) => (
-                          <svg key={i} width="16" height="16" viewBox="0 0 24 24" fill={i < Math.round(reviewsStats.average) ? '#8B6914' : 'none'} stroke="#8B6914" strokeWidth="1.5">
+                          <svg key={i} width="15" height="15" viewBox="0 0 24 24" fill={i < Math.round(reviewsStats.average) ? '#8B6914' : 'none'} stroke="#8B6914" strokeWidth="1.5">
                             <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
                           </svg>
                         ))}
                       </div>
-                      <span style={{ fontSize: '12px', color: 'rgba(26,18,9,0.45)' }}>{reviewsStats.count} verified review{reviewsStats.count !== 1 ? 's' : ''}</span>
+                      <span style={{ fontSize: '12px', color: 'rgba(20,20,20,0.5)' }}>
+                        {reviewsStats.count} verified review{reviewsStats.count !== 1 ? 's' : ''}
+                      </span>
                     </div>
 
-                    {/* Distribution bars — also act as filters */}
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '9px', marginBottom: '22px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '20px' }}>
                       {([5, 4, 3, 2, 1] as const).map(stars => {
                         const count = starDistribution[stars] || 0;
                         const pct = reviews.length > 0 ? (count / reviews.length) * 100 : 0;
@@ -2535,30 +2820,30 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
                         return (
                           <button
                             key={stars}
+                            type="button"
                             onClick={() => { setReviewFilter(isActive ? 'all' : stars); setVisibleReviewsCount(5); }}
                             style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '12px', background: isActive ? 'rgba(139,105,20,0.08)' : 'none', border: isActive ? '1px solid rgba(139,105,20,0.3)' : '1px solid transparent', borderRadius: '6px', padding: '4px 6px', cursor: 'pointer', width: '100%', textAlign: 'left', transition: 'all 0.2s' }}
                           >
-                            <span style={{ width: '38px', color: 'rgba(26,18,9,0.7)', fontWeight: 600, fontFamily: "'Jost',sans-serif", fontSize: '11px' }}>{stars} ★</span>
-                            <div style={{ flex: 1, height: '6px', background: 'rgba(26,18,9,0.06)', borderRadius: '3px', overflow: 'hidden' }}>
+                            <span style={{ width: '38px', color: 'rgba(20,20,20,0.75)', fontWeight: 600, fontSize: '11px' }}>{stars} ★</span>
+                            <div style={{ flex: 1, height: '6px', background: 'rgba(20,20,20,0.07)', borderRadius: '3px', overflow: 'hidden' }}>
                               <div style={{ width: `${pct}%`, height: '100%', background: '#8B6914', borderRadius: '3px', transition: 'width 0.4s ease' }} />
                             </div>
-                            <span style={{ width: '22px', textAlign: 'right', color: 'rgba(26,18,9,0.4)', fontSize: '11px' }}>{count}</span>
+                            <span style={{ width: '22px', textAlign: 'right', color: 'rgba(20,20,20,0.45)', fontSize: '11px' }}>{count}</span>
                           </button>
                         );
                       })}
                     </div>
 
-                    {/* Horizontal Scroll Photo gallery strip */}
                     {allPhotoUrls.length > 0 && (
                       <div>
-                        <div style={{ fontSize: '11px', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(26,18,9,0.5)', marginBottom: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <div style={{ fontSize: '10.5px', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(20,20,20,0.55)', marginBottom: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                           <span>Customer Photos ({allPhotoUrls.length})</span>
                           {allPhotoUrls.length > 3 && (
                             <div style={{ display: 'flex', gap: '4px' }}>
                               <button
                                 type="button"
                                 onClick={() => scrollPhotos('left')}
-                                style={{ width: '22px', height: '22px', borderRadius: '50%', border: '1px solid rgba(26,18,9,0.2)', background: '#fff', color: '#1a1209', fontSize: '12px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                                style={{ width: '22px', height: '22px', borderRadius: '50%', border: '1px solid rgba(20,20,20,0.18)', background: '#fff', color: '#141414', fontSize: '12px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                                 title="Scroll Left"
                               >
                                 ‹
@@ -2566,7 +2851,7 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
                               <button
                                 type="button"
                                 onClick={() => scrollPhotos('right')}
-                                style={{ width: '22px', height: '22px', borderRadius: '50%', border: '1px solid rgba(26,18,9,0.2)', background: '#fff', color: '#1a1209', fontSize: '12px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                                style={{ width: '22px', height: '22px', borderRadius: '50%', border: '1px solid rgba(20,20,20,0.18)', background: '#fff', color: '#141414', fontSize: '12px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                                 title="Scroll Right"
                               >
                                 ›
@@ -2575,7 +2860,6 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
                           )}
                         </div>
 
-                        {/* Horizontal Scroll Container */}
                         <div
                           ref={photoStripRef}
                           style={{
@@ -2591,9 +2875,10 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
                           {allPhotoUrls.map((url: string, i: number) => (
                             <button
                               key={i}
+                              type="button"
                               onClick={() => { setLightboxImg(url); setReviewFilter('photos'); setVisibleReviewsCount(5); }}
                               className="rev-img-thumb"
-                              style={{ width: '68px', height: '68px', borderRadius: '10px', overflow: 'hidden', border: '1.5px solid rgba(26,18,9,0.1)', cursor: 'pointer', padding: 0, background: '#fff', flexShrink: 0, transition: 'all 0.2s' }}
+                              style={{ width: '64px', height: '64px', borderRadius: '10px', overflow: 'hidden', border: '1px solid rgba(20,20,20,0.1)', cursor: 'pointer', padding: 0, background: '#fff', flexShrink: 0 }}
                             >
                               <img src={url} alt={`Review photo ${i + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                             </button>
@@ -2614,12 +2899,11 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
                     )}
                   </div>
 
-                  {/* ── RIGHT: Filter Tabs + Cards ── */}
+                  {/* Filter Pills + Editorial Quote Review Cards */}
                   <div style={{ minWidth: 0 }}>
-                    {/* Filter pill row */}
                     <div className="rev-filter-row">
                       {(['all', 'photos', 5, 4, 3, 2, 1] as const).map(f => {
-                        const label = f === 'all' ? `All (${reviews.length})` : f === 'photos' ? `📷 With Photos (${allPhotoUrls.length})` : `${'★'.repeat(f)} ${f} Star (${starDistribution[f as 1 | 2 | 3 | 4 | 5] || 0})`;
+                        const label = f === 'all' ? `All (${reviews.length})` : f === 'photos' ? `With Photos (${allPhotoUrls.length})` : `${'★'.repeat(f)} ${f} Star (${starDistribution[f as 1 | 2 | 3 | 4 | 5] || 0})`;
                         const isActive = reviewFilter === f;
                         return (
                           <button
@@ -2638,75 +2922,68 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
                       })}
                     </div>
 
-                    {/* Results count */}
                     {filteredRevs.length === 0 ? (
-                      <div style={{ textAlign: 'center', padding: '48px 20px', border: '1px dashed rgba(26,18,9,0.12)', borderRadius: '12px' }}>
-                        <p style={{ fontSize: '14px', color: 'rgba(26,18,9,0.4)', margin: 0 }}>No reviews match this filter.</p>
-                        <button onClick={() => { setReviewFilter('all'); setVisibleReviewsCount(5); }} style={{ marginTop: '12px', background: 'none', border: '1px solid rgba(26,18,9,0.2)', borderRadius: '8px', padding: '8px 16px', fontSize: '12px', cursor: 'pointer', color: '#8B6914', fontWeight: 600 }}>Clear Filter</button>
+                      <div style={{ textAlign: 'center', padding: '44px 20px', border: '1px solid rgba(20,20,20,0.08)', borderRadius: '14px', background: '#FFFFFF' }}>
+                        <p style={{ fontSize: '14px', color: 'rgba(20,20,20,0.48)', margin: 0 }}>No reviews match this filter.</p>
+                        <button onClick={() => { setReviewFilter('all'); setVisibleReviewsCount(5); }} style={{ marginTop: '12px', background: 'none', border: '1px solid rgba(20,20,20,0.2)', borderRadius: '999px', padding: '8px 18px', fontSize: '11.5px', cursor: 'pointer', color: '#8B6914', fontWeight: 600 }}>Clear Filter</button>
                       </div>
                     ) : (
                       <>
-                        <p style={{ fontSize: '12px', color: 'rgba(26,18,9,0.5)', marginBottom: '18px', fontFamily: "'Jost',sans-serif" }}>
+                        <p style={{ fontSize: '12px', color: 'rgba(20,20,20,0.52)', marginBottom: '16px' }}>
                           Showing 1–{Math.min(visibleReviewsCount, filteredRevs.length)} of {filteredRevs.length} review{filteredRevs.length !== 1 ? 's' : ''}
                         </p>
 
-                        {/* Review cards */}
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
+                        <div>
                           {visibleRevs.map((rev, idx) => {
                             const dispName = rev.isAnonymous ? maskReviewerName(rev.username) : rev.username;
                             return (
-                              <div
-                                key={idx}
-                                className="rev-card"
-                                style={{ padding: '20px 0', borderBottom: '1px solid rgba(26,18,9,0.07)', display: 'flex', gap: '14px' }}
-                              >
-                                {/* Avatar */}
+                              <div key={idx} className="rev-card-editorial">
                                 <div style={{ flexShrink: 0 }}>
                                   {rev.isAnonymous || !rev.userAvatar ? (
-                                    <div style={{ width: '42px', height: '42px', borderRadius: '50%', background: 'linear-gradient(135deg, #8B6914, #b8922a)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '17px', textTransform: 'uppercase', fontFamily: "'Jost',sans-serif", flexShrink: 0 }}>
+                                    <div style={{ width: '44px', height: '44px', borderRadius: '50%', background: 'linear-gradient(135deg, #9C7A3C, #8B6914)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600, fontSize: '17px', textTransform: 'uppercase' }}>
                                       {dispName ? dispName[0] : 'C'}
                                     </div>
                                   ) : (
-                                    <div style={{ width: '42px', height: '42px', borderRadius: '50%', overflow: 'hidden', border: '2px solid rgba(139,105,20,0.2)', flexShrink: 0 }}>
+                                    <div style={{ width: '44px', height: '44px', borderRadius: '50%', overflow: 'hidden', border: '1.5px solid rgba(139,105,20,0.28)' }}>
                                       <img src={rev.userAvatar} alt={dispName} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                     </div>
                                   )}
                                 </div>
 
-                                {/* Content */}
                                 <div style={{ flex: 1, minWidth: 0 }}>
-                                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '5px', flexWrap: 'wrap', gap: '4px' }}>
+                                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '4px', flexWrap: 'wrap', gap: '6px' }}>
                                     <div>
-                                      <span style={{ fontSize: '14px', fontWeight: 700, color: '#1a1209', fontFamily: "'Jost',sans-serif" }}>{dispName}</span>
-                                      <span style={{ marginLeft: '8px', fontSize: '10px', color: '#8B6914', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 600 }}>✓ Verified Purchase</span>
+                                      <span style={{ fontSize: '14px', fontWeight: 600, color: '#141414' }}>{dispName}</span>
+                                      <span style={{ marginLeft: '8px', fontSize: '10px', color: '#8B6914', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 600 }}>✓ Verified Purchase</span>
                                     </div>
-                                    <span style={{ fontSize: '11px', color: 'rgba(26,18,9,0.35)', fontFamily: "'Jost',sans-serif", flexShrink: 0 }}>
+                                    <span style={{ fontSize: '11px', color: 'rgba(20,20,20,0.42)' }}>
                                       {new Date(rev.createdAt).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })}
                                     </span>
                                   </div>
 
-                                  {/* Stars */}
                                   <div style={{ display: 'flex', gap: '3px', marginBottom: '10px', alignItems: 'center' }}>
                                     {Array.from({ length: 5 }).map((_, i) => (
-                                      <svg key={i} width="13" height="13" viewBox="0 0 24 24" fill={i < rev.rating ? '#8B6914' : 'none'} stroke="#8B6914" strokeWidth="1.5">
+                                      <svg key={i} width="12" height="12" viewBox="0 0 24 24" fill={i < rev.rating ? '#8B6914' : 'none'} stroke="#8B6914" strokeWidth="1.5">
                                         <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
                                       </svg>
                                     ))}
-                                    <span style={{ fontSize: '11px', color: 'rgba(26,18,9,0.45)', marginLeft: '4px', fontFamily: "'Jost',sans-serif" }}>{rev.rating}/5</span>
+                                    <span style={{ fontSize: '11px', color: 'rgba(20,20,20,0.45)', marginLeft: '4px' }}>{rev.rating}/5</span>
                                   </div>
 
-                                  {/* Comment */}
-                                  <p style={{ margin: '0 0 12px 0', fontSize: '13.5px', lineHeight: 1.65, color: 'rgba(26,18,9,0.72)', fontFamily: "'Jost',sans-serif" }}>{rev.comment}</p>
+                                  <p style={{ margin: '0 0 12px 0', fontSize: '13.5px', lineHeight: 1.65, color: 'rgba(20,20,20,0.78)' }}>
+                                    <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '20px', color: '#8B6914', lineHeight: 0, marginRight: '4px', verticalAlign: '-2px' }}>&ldquo;</span>
+                                    {rev.comment}
+                                  </p>
 
-                                  {/* Images */}
                                   {rev.images && rev.images.length > 0 && (
                                     <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                                       {rev.images.map((url: string, i: number) => (
                                         <button
                                           key={i}
+                                          type="button"
                                           onClick={() => setLightboxImg(url)}
                                           className="rev-img-thumb"
-                                          style={{ width: '72px', height: '72px', borderRadius: '8px', overflow: 'hidden', border: '1.5px solid rgba(26,18,9,0.08)', cursor: 'pointer', padding: 0, background: 'none', transition: 'border-color 0.2s, transform 0.2s', flexShrink: 0 }}
+                                          style={{ width: '68px', height: '68px', borderRadius: '8px', overflow: 'hidden', border: '1px solid rgba(20,20,20,0.1)', cursor: 'pointer', padding: 0, background: '#FFFFFF' }}
                                         >
                                           <img src={url} alt={`Review image ${i + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                                         </button>
@@ -2719,9 +2996,8 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
                           })}
                         </div>
 
-                        {/* SEE MORE REVIEWS BUTTON */}
                         {visibleReviewsCount < filteredRevs.length && (
-                          <div style={{ display: 'flex', justifyContent: 'center', marginTop: '32px' }}>
+                          <div style={{ display: 'flex', justifyContent: 'center', marginTop: '28px' }}>
                             <button
                               type="button"
                               onClick={() => setVisibleReviewsCount(prev => prev + 5)}
@@ -2729,9 +3005,6 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
                             >
                               <span>SEE MORE REVIEWS</span>
                               <span style={{ color: 'rgba(255, 255, 255, 0.85)', fontWeight: 500 }}>({visibleReviewsCount} of {filteredRevs.length})</span>
-                              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ transition: 'transform 0.25s ease' }}>
-                                <polyline points="6 9 12 15 18 9" />
-                              </svg>
                             </button>
                           </div>
                         )}
@@ -2742,7 +3015,7 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
               );
             })()}
           </div>
-        </div>
+        </section>
 
         {/* LIGHTBOX */}
         {lightboxImg && (
@@ -2751,8 +3024,9 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
             style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.88)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', cursor: 'zoom-out', backdropFilter: 'blur(4px)' }}
           >
             <button
+              type="button"
               onClick={() => setLightboxImg(null)}
-              style={{ position: 'absolute', top: '20px', right: '24px', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '50%', width: '44px', height: '44px', color: '#fff', fontSize: '22px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10000, lineHeight: 1, transition: 'background 0.2s' }}
+              style={{ position: 'absolute', top: '20px', right: '24px', background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '50%', width: '44px', height: '44px', color: '#fff', fontSize: '20px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10000 }}
             >✕</button>
             <img
               src={lightboxImg}
@@ -2762,159 +3036,6 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
             />
           </div>
         )}
-
-        {/* FEATURES FOOTER BANNER */}
-        <div className="features-footer-banner">
-          <div className="features-footer-grid">
-            <div className="feature-footer-item">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="3" width="15" height="13" /><polygon points="16 8 20 8 23 11 23 16 16 16 16 8" /><circle cx="5.5" cy="18.5" r="2.5" /><circle cx="18.5" cy="18.5" r="2.5" /></svg>
-              <div>
-                <h4>FREE ISLAND-WIDE SHIPPING</h4>
-                <p>Island-wide free delivery in Sri Lanka</p>
-              </div>
-            </div>
-
-            <div className="feature-footer-item">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67" /></svg>
-              <div>
-                <h4>Easy Returns</h4>
-                <p>Easy Return Within 14 Days</p>
-              </div>
-            </div>
-
-            <div className="feature-footer-item">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>
-              <div>
-                <h4>Genuine Products</h4>
-                <p>100% Authentic</p>
-              </div>
-            </div>
-
-            <div className="feature-footer-item">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
-              <div>
-                <h4>Secure Payments</h4>
-                <p>100% Secure Checkout with payhere.lk</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Mobile Continuous Smooth Marquee Ticker */}
-          <div className="features-mobile-marquee-wrap">
-            <div className="features-mobile-marquee-track">
-              {/* Track 1 */}
-              <div className="features-marquee-group">
-                <div className="features-marquee-item">
-                  <div className="features-marquee-icon">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-                      <rect x="1" y="3" width="15" height="13" />
-                      <polygon points="16 8 20 8 23 11 23 16 16 16 8" />
-                      <circle cx="5.5" cy="18.5" r="2.5" />
-                      <circle cx="18.5" cy="18.5" r="2.5" />
-                    </svg>
-                  </div>
-                  <div className="features-marquee-text">
-                    <h4>FREE ISLAND-WIDE SHIPPING</h4>
-                    <p>Island-wide free delivery in Sri Lanka</p>
-                  </div>
-                </div>
-
-                <div className="features-marquee-item">
-                  <div className="features-marquee-icon">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67" />
-                    </svg>
-                  </div>
-                  <div className="features-marquee-text">
-                    <h4>Easy Returns</h4>
-                    <p>Easy Return Within 14 Days</p>
-                  </div>
-                </div>
-
-                <div className="features-marquee-item">
-                  <div className="features-marquee-icon">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                    </svg>
-                  </div>
-                  <div className="features-marquee-text">
-                    <h4>Genuine Products</h4>
-                    <p>100% Authentic</p>
-                  </div>
-                </div>
-
-                <div className="features-marquee-item">
-                  <div className="features-marquee-icon">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-                      <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-                      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-                    </svg>
-                  </div>
-                  <div className="features-marquee-text">
-                    <h4>Secure Payments</h4>
-                    <p>100% Secure Checkout with payhere.lk</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Track 2 (Duplicate for Seamless Infinite Loop) */}
-              <div className="features-marquee-group" aria-hidden="true">
-                <div className="features-marquee-item">
-                  <div className="features-marquee-icon">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-                      <rect x="1" y="3" width="15" height="13" />
-                      <polygon points="16 8 20 8 23 11 23 16 16 16 8" />
-                      <circle cx="5.5" cy="18.5" r="2.5" />
-                      <circle cx="18.5" cy="18.5" r="2.5" />
-                    </svg>
-                  </div>
-                  <div className="features-marquee-text">
-                    <h4>FREE ISLAND-WIDE SHIPPING</h4>
-                    <p>Island-wide free delivery in Sri Lanka</p>
-                  </div>
-                </div>
-
-                <div className="features-marquee-item">
-                  <div className="features-marquee-icon">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67" />
-                    </svg>
-                  </div>
-                  <div className="features-marquee-text">
-                    <h4>Easy Returns</h4>
-                    <p>Easy Return Within 14 Days</p>
-                  </div>
-                </div>
-
-                <div className="features-marquee-item">
-                  <div className="features-marquee-icon">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                    </svg>
-                  </div>
-                  <div className="features-marquee-text">
-                    <h4>Genuine Products</h4>
-                    <p>100% Authentic</p>
-                  </div>
-                </div>
-
-                <div className="features-marquee-item">
-                  <div className="features-marquee-icon">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-                      <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-                      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-                    </svg>
-                  </div>
-                  <div className="features-marquee-text">
-                    <h4>Secure Payments</h4>
-                    <p>100% Secure Checkout with payhere.lk</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
       </div>
 
       {/* ── Guest Checkout Modal (not signed in) ──────────────────────── */}

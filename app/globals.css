@@ -57,23 +57,28 @@ video, img {
 /* Custom Hot Toast Styles to ensure it displays top-right under the navbar on all screens including mobile */
 .winsor-toaster {
   z-index: 999999 !important;
+  top: 96px !important;
+  right: 24px !important;
+  left: 24px !important;
 }
 
-/* Force container position to remain top-right under navbar on all viewports */
+/* Keep toasts anchored cleanly inside container bounds on all viewports */
 .winsor-toaster > div {
-  top: 96px !important; /* Under desktop navbar (86px height + offset) */
-  right: 24px !important;
-  left: auto !important;
+  left: 0 !important;
+  right: 0 !important;
   justify-content: flex-end !important;
   align-items: flex-end !important;
 }
 
 @media (max-width: 1024px) {
+  .winsor-toaster {
+    top: 64px !important;
+    right: 12px !important;
+    left: 12px !important;
+  }
   .winsor-toaster > div {
-    top: 60px !important; /* Under mobile navbar (44px height + offset) */
-    right: 16px !important;
-    left: auto !important;
-    align-items: flex-end !important;
+    justify-content: center !important;
+    align-items: center !important;
   }
 }
 

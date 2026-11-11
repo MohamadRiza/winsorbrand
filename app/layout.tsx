@@ -5,7 +5,7 @@ import { CartProvider } from '@/app/context/CartContext';
 import { validateEnv } from '@/lib/validateEnv';
 import LayoutShell from '@/components/LayoutShell';
 import { ClerkProvider } from '@clerk/nextjs';
-import { Toaster } from 'react-hot-toast';
+import WinsorToaster from '@/components/WinsorToaster';
 
 // Run validation in development
 if (process.env.NODE_ENV === 'development') {
@@ -167,33 +167,7 @@ export default function RootLayout({
               <LayoutShell>
                 {children}
               </LayoutShell>
-              <Toaster
-                position="top-right"
-                containerClassName="winsor-toaster"
-                toastOptions={{
-                  style: {
-                    background: '#ffffff',
-                    color: '#141414',
-                    border: '1px solid rgba(20, 20, 20, 0.12)',
-                    fontFamily: "'Jost', sans-serif",
-                    fontSize: '13px',
-                    borderRadius: '4px',
-                    boxShadow: '0 8px 24px rgba(0, 0, 0, 0.08)',
-                  },
-                  success: {
-                    iconTheme: {
-                      primary: '#8B6914',
-                      secondary: '#ffffff',
-                    },
-                  },
-                  error: {
-                    iconTheme: {
-                      primary: '#c62828',
-                      secondary: '#ffffff',
-                    },
-                  },
-                }}
-              />
+              <WinsorToaster />
             </CartProvider>
           </CurrencyProvider>
         </body>

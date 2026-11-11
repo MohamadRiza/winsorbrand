@@ -379,84 +379,91 @@ export default function GuestCheckoutModal({
 
         .gcm-dialog {
           background: #FFFFFF;
-          border: 1px solid rgba(20, 20, 20, 0.1);
-          border-radius: 12px;
+          border: 1px solid rgba(139, 105, 20, 0.18);
+          border-radius: 18px;
           width: 100%; max-width: 480px;
           max-height: 90vh;
           overflow-y: auto;
-          box-shadow: 0 24px 64px rgba(0, 0, 0, 0.18);
+          box-shadow: 0 28px 72px rgba(20, 16, 10, 0.22);
           animation: gcm-fade-in 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
           font-family: 'Jost', sans-serif;
           scrollbar-width: thin;
-          scrollbar-color: rgba(20, 20, 20, 0.2) transparent;
+          scrollbar-color: rgba(139, 105, 20, 0.25) transparent;
           position: relative;
         }
         .gcm-dialog::-webkit-scrollbar { width: 5px; }
-        .gcm-dialog::-webkit-scrollbar-thumb { background: rgba(20, 20, 20, 0.2); border-radius: 4px; }
+        .gcm-dialog::-webkit-scrollbar-thumb { background: rgba(139, 105, 20, 0.25); border-radius: 4px; }
 
         .gcm-header {
           padding: 22px 26px 16px;
           display: flex; align-items: flex-start; justify-content: space-between;
-          position: sticky; top: 0; background: #FFFFFF; z-index: 5;
-          border-bottom: 1px solid rgba(20, 20, 20, 0.06);
+          position: sticky; top: 0; background: rgba(255, 255, 255, 0.96);
+          backdrop-filter: blur(8px); z-index: 5;
+          border-bottom: 1px solid rgba(139, 105, 20, 0.12);
           margin-bottom: 18px;
         }
 
         .gcm-header-title {
           font-family: 'Cormorant Garamond', Georgia, serif;
-          font-size: 24px; font-weight: 500;
+          font-size: 25px; font-weight: 500;
           color: #141414; margin: 0; letter-spacing: 0.01em; line-height: 1.2;
         }
         .gcm-header-sub {
           font-family: 'Jost', sans-serif;
-          font-size: 12.5px; color: #666666; margin: 4px 0 0; font-weight: 400;
+          font-size: 12.5px; color: #6E675C; margin: 4px 0 0; font-weight: 400;
         }
 
         .gcm-close {
-          width: 32px; height: 32px; border-radius: 50%;
-          border: 1px solid rgba(20, 20, 20, 0.1);
-          background: #F8F7F4; color: #141414; cursor: pointer;
+          width: 34px; height: 34px; border-radius: 50%;
+          border: 1px solid rgba(139, 105, 20, 0.22);
+          background: #FAF8F3; color: #6B5B3E; cursor: pointer;
           display: flex; align-items: center; justify-content: center;
-          font-size: 16px; flex-shrink: 0; transition: all 0.2s ease;
+          font-size: 16px; flex-shrink: 0; transition: all 0.22s ease;
         }
-        .gcm-close:hover { background: #141414; color: #ffffff; border-color: #141414; }
+        .gcm-close:hover {
+          background: rgba(139, 105, 20, 0.1);
+          color: #8B6914;
+          border-color: rgba(139, 105, 20, 0.45);
+        }
 
         .gcm-stepper-container { padding: 0 26px 16px; }
         .gcm-stepper-track { display: flex; align-items: center; justify-content: space-between; position: relative; }
-        .gcm-stepper-line { flex: 1; height: 1.5px; background: rgba(20, 20, 20, 0.1); margin: 0 8px; transition: background 0.3s ease; }
-        .gcm-stepper-line.active { background: #141414; height: 1.5px; }
+        .gcm-stepper-line { flex: 1; height: 1.5px; background: rgba(139, 105, 20, 0.14); margin: 0 8px; transition: background 0.3s ease; }
+        .gcm-stepper-line.active { background: linear-gradient(90deg, #9C7A3C, #8B6914); height: 1.5px; }
 
-        .gcm-step-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(20, 20, 20, 0.18); }
+        .gcm-step-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(139, 105, 20, 0.25); }
         .gcm-step-dot.completed {
           width: 22px; height: 22px; border-radius: 50%;
-          background: #141414; display: flex; align-items: center; justify-content: center; color: #fff;
+          background: linear-gradient(135deg, #9C7A3C 0%, #8B6914 100%);
+          display: flex; align-items: center; justify-content: center; color: #fff;
+          box-shadow: 0 2px 8px rgba(139, 105, 20, 0.22);
         }
         .gcm-step-badge {
           width: 28px; height: 28px; border-radius: 50%;
-          background: #141414;
+          background: linear-gradient(135deg, #9C7A3C 0%, #8B6914 100%);
           display: flex; align-items: center; justify-content: center;
-          color: #ffffff; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.16);
+          color: #ffffff; box-shadow: 0 4px 12px rgba(139, 105, 20, 0.28);
         }
 
         .gcm-body { padding: 0 26px 24px; }
         .gcm-card {
-          background: #F8F7F4; border: 1px solid rgba(20, 20, 20, 0.08);
-          border-radius: 8px; padding: 16px 18px; margin-bottom: 14px;
+          background: #FAF8F4; border: 1px solid rgba(139, 105, 20, 0.15);
+          border-radius: 12px; padding: 16px 18px; margin-bottom: 14px;
           position: relative;
         }
 
         .gcm-input {
           width: 100%; height: 44px; box-sizing: border-box;
-          background: #F8F7F4; border: 1px solid rgba(20, 20, 20, 0.12);
-          border-radius: 6px; padding: 0 14px;
+          background: #FAF8F4; border: 1px solid rgba(20, 20, 20, 0.12);
+          border-radius: 10px; padding: 0 14px;
           font-family: 'Jost', sans-serif; font-size: 13px; color: #141414;
           outline: none; transition: all 0.2s ease;
           display: flex; align-items: center;
         }
         .gcm-input:focus {
-          border-color: #141414;
+          border-color: #9C7A3C;
           background: #ffffff;
-          box-shadow: 0 0 0 3px rgba(20, 20, 20, 0.04);
+          box-shadow: 0 0 0 3px rgba(139, 105, 20, 0.1);
         }
         .gcm-input.error { border-color: #b91c1c; background: #fffdfd; }
         .gcm-label {
@@ -468,54 +475,54 @@ export default function GuestCheckoutModal({
         .gcm-error { font-size: 10.5px; color: #b91c1c; margin-top: 4px; font-weight: 400; }
 
         .gcm-btn-primary {
-          width: 100%; height: 46px; box-sizing: border-box;
-          background: #141414;
-          color: #ffffff; border: 1px solid #141414; border-radius: 6px;
+          width: 100%; height: 48px; box-sizing: border-box;
+          background: linear-gradient(135deg, #9C7A3C 0%, #8B6914 100%);
+          color: #ffffff; border: 1px solid rgba(139, 105, 20, 0.45); border-radius: 999px;
           cursor: pointer; font-family: 'Jost', sans-serif;
-          font-size: 11.5px; font-weight: 500; letter-spacing: 0.1em;
-          text-transform: uppercase; transition: all 0.2s ease;
+          font-size: 11.5px; font-weight: 600; letter-spacing: 0.13em;
+          text-transform: uppercase; transition: all 0.22s ease;
           display: flex; align-items: center; justify-content: center; gap: 8px;
-          box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1); margin-top: 0;
+          box-shadow: 0 8px 20px rgba(139, 105, 20, 0.24); margin-top: 0;
         }
         .gcm-btn-primary:hover:not(:disabled) {
-          background: #2C2C2C; border-color: #2C2C2C;
-          box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15); transform: translateY(-1px);
+          background: linear-gradient(135deg, #7A5C10 0%, #684E0D 100%); border-color: #684E0D;
+          box-shadow: 0 10px 24px rgba(139, 105, 20, 0.32); transform: translateY(-1px);
         }
-        .gcm-btn-primary:disabled { opacity: 0.5; cursor: not-allowed; box-shadow: none; }
+        .gcm-btn-primary:disabled { opacity: 0.48; cursor: not-allowed; box-shadow: none; }
 
         .gcm-btn-outline {
-          width: 100%; height: 46px; box-sizing: border-box;
+          width: 100%; height: 48px; box-sizing: border-box;
           background: #FFFFFF;
-          border: 1px solid rgba(20, 20, 20, 0.2); color: #141414;
-          border-radius: 6px; cursor: pointer; font-family: 'Jost', sans-serif;
-          font-size: 11.5px; font-weight: 500; letter-spacing: 0.08em;
-          text-transform: uppercase; transition: all 0.2s ease;
+          border: 1.5px solid rgba(139, 105, 20, 0.34); color: #7A5C10;
+          border-radius: 999px; cursor: pointer; font-family: 'Jost', sans-serif;
+          font-size: 11.5px; font-weight: 600; letter-spacing: 0.11em;
+          text-transform: uppercase; transition: all 0.22s ease;
           display: flex; align-items: center; justify-content: center; gap: 8px;
           margin-top: 0;
         }
         .gcm-btn-outline:hover {
-          border-color: #141414; background: #F8F7F4; color: #141414;
+          border-color: #8B6914; background: #FAF8F3; color: #684E0D;
         }
 
         .gcm-edit-btn {
           display: inline-flex; align-items: center; gap: 5px;
           background: #FFFFFF;
-          border: 1px solid rgba(20, 20, 20, 0.14);
-          color: #141414; border-radius: 4px;
-          padding: 3px 10px; font-family: 'Jost', sans-serif;
-          font-size: 10px; font-weight: 500; text-transform: uppercase;
-          letter-spacing: 0.04em; cursor: pointer;
+          border: 1px solid rgba(139, 105, 20, 0.3);
+          color: #7A5C10; border-radius: 999px;
+          padding: 4px 11px; font-family: 'Jost', sans-serif;
+          font-size: 10px; font-weight: 600; text-transform: uppercase;
+          letter-spacing: 0.06em; cursor: pointer;
           transition: all 0.2s ease;
         }
         .gcm-edit-btn:hover {
-          background: #141414; color: #ffffff; border-color: #141414;
+          background: rgba(139, 105, 20, 0.1); color: #684E0D; border-color: #8B6914;
         }
 
         .gcm-actions-row {
           display: flex; gap: 10px; align-items: center; margin-top: 18px;
         }
         .gcm-btn-back {
-          width: 105px; flex-shrink: 0;
+          width: 108px; flex-shrink: 0;
         }
 
         .gcm-city-postal-grid {
@@ -524,53 +531,54 @@ export default function GuestCheckoutModal({
 
         .gcm-divider {
           display: flex; align-items: center; gap: 12px; margin: 16px 0;
-          color: #888888; font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.1em;
+          color: #888072; font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.1em;
         }
-        .gcm-divider::before, .gcm-divider::after { content: ''; flex: 1; height: 1px; background: rgba(20, 20, 20, 0.08); }
+        .gcm-divider::before, .gcm-divider::after { content: ''; flex: 1; height: 1px; background: rgba(139, 105, 20, 0.15); }
 
         .gcm-corner-ribbon {
           position: absolute; top: 0; right: 0; width: 26px; height: 26px;
-          background: #141414;
-          border-bottom-left-radius: 8px; display: flex; align-items: center;
+          background: linear-gradient(135deg, #9C7A3C 0%, #8B6914 100%);
+          border-bottom-left-radius: 10px; display: flex; align-items: center;
           justify-content: center; color: #ffffff;
         }
 
         .gcm-pay-option {
-          border: 1px solid rgba(20, 20, 20, 0.12); border-radius: 8px;
-          padding: 16px 18px; cursor: pointer; transition: all 0.2s ease;
+          border: 1px solid rgba(139, 105, 20, 0.18); border-radius: 12px;
+          padding: 16px 18px; cursor: pointer; transition: all 0.22s ease;
           background: #ffffff; display: flex; align-items: flex-start;
           gap: 14px; width: 100%; box-sizing: border-box; margin-bottom: 12px;
           text-align: left; position: relative; overflow: hidden;
         }
         .gcm-pay-option.active {
-          border-color: #141414; border-width: 1.5px;
-          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+          border-color: #8B6914; border-width: 1.5px;
+          background: #FFFEFA;
+          box-shadow: 0 6px 18px rgba(139, 105, 20, 0.1);
         }
-        .gcm-pay-option:hover { border-color: rgba(20, 20, 20, 0.35); }
+        .gcm-pay-option:hover { border-color: rgba(139, 105, 20, 0.45); }
 
         .gcm-summary-item {
           display: flex; gap: 12px; align-items: center;
-          padding: 10px 0; border-bottom: 1px solid rgba(20, 20, 20, 0.06);
+          padding: 10px 0; border-bottom: 1px solid rgba(139, 105, 20, 0.1);
         }
         .gcm-summary-item:last-child { border-bottom: none; }
 
         .gcm-trust-footer {
           display: flex; align-items: center; justify-content: space-around;
-          margin-top: 20px; padding-top: 16px; border-top: 1px solid rgba(20, 20, 20, 0.08);
+          margin-top: 20px; padding-top: 16px; border-top: 1px solid rgba(139, 105, 20, 0.12);
         }
         .gcm-trust-item {
           display: flex; align-items: center; gap: 6px;
-          font-size: 11px; font-weight: 500; color: #555555;
+          font-size: 11px; font-weight: 500; color: #555046;
         }
 
         @media (max-width: 520px) {
-          .gcm-dialog { max-height: 92vh; border-radius: 12px; }
+          .gcm-dialog { max-height: 92vh; border-radius: 16px; }
           .gcm-header { padding: 18px 20px 14px; }
           .gcm-stepper-container { padding: 0 20px 14px; }
           .gcm-body { padding: 0 20px 20px; }
-          .gcm-header-title { font-size: 21px; }
+          .gcm-header-title { font-size: 22px; }
           .gcm-trust-footer { flex-wrap: wrap; gap: 10px; justify-content: center; }
-          .gcm-btn-back { width: 90px; }
+          .gcm-btn-back { width: auto; min-width: 96px; padding-left: 16px; padding-right: 16px; }
         }
 
         @media (max-width: 480px) {
@@ -655,8 +663,8 @@ export default function GuestCheckoutModal({
             {step === 'choice' && (
               <div>
                 {/* Cart preview */}
-                <div style={{ background: '#F8F7F4', border: '1px solid rgba(20,20,20,0.08)', borderRadius: '8px', padding: '14px 16px', marginBottom: '20px' }}>
-                  <div style={{ fontSize: '10px', fontWeight: 600, color: '#666666', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '10px' }}>
+                <div style={{ background: '#FAF8F4', border: '1px solid rgba(139,105,20,0.16)', borderRadius: '12px', padding: '14px 16px', marginBottom: '20px' }}>
+                  <div style={{ fontSize: '10px', fontWeight: 600, color: '#7A5C10', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '10px' }}>
                     {totalQty} {totalQty === 1 ? 'Timepiece' : 'Timepieces'} · LKR {subtotal.toLocaleString()}
                   </div>
                   {items.slice(0, 3).map((item, idx) => (
@@ -664,7 +672,7 @@ export default function GuestCheckoutModal({
                       <img
                         src={item.productThumbnail || '/winsor_hero_backgroundremoved.webp'}
                         alt={item.productTitle}
-                        style={{ width: 44, height: 44, objectFit: 'contain', borderRadius: 6, background: '#ffffff', border: '1px solid rgba(20,20,20,0.08)', flexShrink: 0 }}
+                        style={{ width: 46, height: 46, objectFit: 'contain', borderRadius: 8, background: '#ffffff', border: '1px solid rgba(139,105,20,0.14)', flexShrink: 0 }}
                       />
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ fontSize: '13px', fontWeight: 500, color: '#141414', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.productTitle}</div>
@@ -918,13 +926,13 @@ export default function GuestCheckoutModal({
                     {form.address}, {form.city}, {form.postalCode}, {COUNTRIES.find(c => c.code === form.country)?.name || form.country}
                   </div>
 
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, paddingTop: 8, borderTop: '1px solid rgba(20,20,20,0.06)' }}>
-                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: '11px', color: '#141414', background: '#FFFFFF', border: '1px solid rgba(20,20,20,0.1)', borderRadius: '4px', padding: '3px 8px', fontFamily: 'monospace' }}>
-                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#141414" strokeWidth="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" /></svg>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, paddingTop: 8, borderTop: '1px solid rgba(139,105,20,0.12)' }}>
+                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: '11px', color: '#141414', background: '#FFFFFF', border: '1px solid rgba(139,105,20,0.18)', borderRadius: '6px', padding: '3px 9px', fontFamily: 'monospace' }}>
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" /></svg>
                       <span>{form.mobileCode} {form.mobile}</span>
                     </div>
-                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: '11px', color: '#141414', background: '#FFFFFF', border: '1px solid rgba(20,20,20,0.1)', borderRadius: '4px', padding: '3px 8px' }}>
-                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#141414" strokeWidth="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" /><polyline points="22,6 12,13 2,6" /></svg>
+                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: '11px', color: '#141414', background: '#FFFFFF', border: '1px solid rgba(139,105,20,0.18)', borderRadius: '6px', padding: '3px 9px' }}>
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" /><polyline points="22,6 12,13 2,6" /></svg>
                       <span>{form.email}</span>
                     </div>
                   </div>
@@ -1042,12 +1050,17 @@ export default function GuestCheckoutModal({
                   className={`gcm-pay-option ${payMethod === 'payhere' ? 'active' : ''}`}
                   onClick={() => setPayMethod('payhere')}
                 >
-                  <div style={{ width: 18, height: 18, borderRadius: '50%', border: '1.5px solid #141414', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, background: payMethod === 'payhere' ? '#141414' : 'transparent', marginTop: 1 }}>
+                  {payMethod === 'payhere' && (
+                    <div className="gcm-corner-ribbon" title="Selected">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg>
+                    </div>
+                  )}
+                  <div style={{ width: 18, height: 18, borderRadius: '50%', border: `1.5px solid ${payMethod === 'payhere' ? '#8B6914' : 'rgba(139,105,20,0.4)'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, background: payMethod === 'payhere' ? 'linear-gradient(135deg, #9C7A3C, #8B6914)' : 'transparent', marginTop: 1 }}>
                     {payMethod === 'payhere' && <div style={{ width: 6, height: 6, background: '#fff', borderRadius: '50%' }} />}
                   </div>
                   <div style={{ flex: 1 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#141414" strokeWidth="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2" /><line x1="1" y1="10" x2="23" y2="10" /></svg>
+                      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2" /><line x1="1" y1="10" x2="23" y2="10" /></svg>
                       <span style={{ fontWeight: 600, fontSize: '13.5px', color: '#141414' }}>Pay via PayHere</span>
                     </div>
                     <div style={{ fontSize: '11px', color: '#666666', marginTop: 3 }}>
@@ -1055,7 +1068,7 @@ export default function GuestCheckoutModal({
                     </div>
                     <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap', marginTop: 8 }}>
                       {['VISA', 'mastercard', 'AMEX', 'eWallets', 'BANK', 'USSD'].map((b) => (
-                        <span key={b} style={{ fontSize: '8.5px', fontWeight: 600, color: '#444444', background: '#F8F7F4', border: '1px solid rgba(20,20,20,0.1)', borderRadius: 3, padding: '1.5px 6px', textTransform: 'uppercase' }}>
+                        <span key={b} style={{ fontSize: '8.5px', fontWeight: 600, color: '#6B5B3E', background: '#FAF8F4', border: '1px solid rgba(139,105,20,0.18)', borderRadius: 4, padding: '1.5px 6px', textTransform: 'uppercase' }}>
                           {b}
                         </span>
                       ))}
@@ -1073,12 +1086,12 @@ export default function GuestCheckoutModal({
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg>
                     </div>
                   )}
-                  <div style={{ width: 18, height: 18, borderRadius: '50%', border: '1.5px solid #141414', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, background: payMethod === 'bank_transfer' ? '#141414' : 'transparent', marginTop: 1 }}>
+                  <div style={{ width: 18, height: 18, borderRadius: '50%', border: `1.5px solid ${payMethod === 'bank_transfer' ? '#8B6914' : 'rgba(139,105,20,0.4)'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, background: payMethod === 'bank_transfer' ? 'linear-gradient(135deg, #9C7A3C, #8B6914)' : 'transparent', marginTop: 1 }}>
                     {payMethod === 'bank_transfer' && <div style={{ width: 6, height: 6, background: '#fff', borderRadius: '50%' }} />}
                   </div>
                   <div style={{ flex: 1 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#141414" strokeWidth="2"><line x1="3" y1="21" x2="21" y2="21" /><line x1="6" y1="18" x2="6" y2="11" /><line x1="10" y1="18" x2="10" y2="11" /><line x1="14" y1="18" x2="14" y2="11" /><line x1="18" y1="18" x2="18" y2="11" /><polygon points="12 3 2 10 22 10 22 10 12 3" /></svg>
+                      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="2"><line x1="3" y1="21" x2="21" y2="21" /><line x1="6" y1="18" x2="6" y2="11" /><line x1="10" y1="18" x2="10" y2="11" /><line x1="14" y1="18" x2="14" y2="11" /><line x1="18" y1="18" x2="18" y2="11" /><polygon points="12 3 2 10 22 10 22 10 12 3" /></svg>
                       <span style={{ fontWeight: 600, fontSize: '13.5px', color: '#141414' }}>Direct Bank Transfer</span>
                     </div>
                     <div style={{ fontSize: '11.5px', color: '#666666', marginTop: 3 }}>
@@ -1089,25 +1102,25 @@ export default function GuestCheckoutModal({
 
                 {payMethod === 'bank_transfer' && (
                   <>
-                    <div style={{ background: '#F8F7F4', border: '1px solid rgba(20, 20, 20, 0.08)', borderRadius: 8, padding: '14px 16px', marginTop: 12 }}>
-                      <div style={{ fontSize: '9.5px', fontWeight: 600, color: '#666666', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 8 }}>Bank Transfer Details</div>
+                    <div style={{ background: '#FAF8F4', border: '1px solid rgba(139, 105, 20, 0.16)', borderRadius: 12, padding: '14px 16px', marginTop: 12 }}>
+                      <div style={{ fontSize: '9.5px', fontWeight: 600, color: '#7A5C10', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 8 }}>Bank Transfer Details</div>
                       {[['Bank', 'NATIONS TRUST BANK'], ['Account No.', '100460045365'], ['Branch', 'Bankshall Street (PETTAH)'], ['Amount', `LKR ${subtotal.toLocaleString()}`]].map(([label, value], i) => (
-                        <div key={i} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', borderTop: i > 0 ? '1px solid rgba(20,20,20,0.06)' : undefined, marginTop: i > 0 ? 6 : 0, paddingTop: i > 0 ? 6 : 0, color: '#141414' }}>
+                        <div key={i} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', borderTop: i > 0 ? '1px solid rgba(139,105,20,0.1)' : undefined, marginTop: i > 0 ? 6 : 0, paddingTop: i > 0 ? 6 : 0, color: '#141414' }}>
                           <span style={{ color: '#666666', fontSize: '11.5px' }}>{label}</span>
                           <span style={{ fontWeight: 600, color: '#141414', fontFamily: label === 'Account No.' ? 'monospace' : undefined }}>{value}</span>
                         </div>
                       ))}
                     </div>
 
-                    <div style={{ background: '#F8F7F4', border: '1px solid rgba(20, 20, 20, 0.1)', borderRadius: 8, padding: '12px 14px', marginTop: 12, display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+                    <div style={{ background: '#FAF8F4', border: '1px solid rgba(139, 105, 20, 0.18)', borderRadius: 10, padding: '12px 14px', marginTop: 12, display: 'flex', gap: 10, alignItems: 'flex-start' }}>
                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="2" style={{ flexShrink: 0, marginTop: 1 }}><circle cx="12" cy="12" r="10" /><line x1="12" y1="16" x2="12" y2="12" /><line x1="12" y1="8" x2="12.01" y2="8" /></svg>
                       <span style={{ fontSize: '11.5px', color: '#444444', lineHeight: 1.5 }}>
                         Please upload your payment receipt after completing the transfer. Your order will be verified within 24 hours.
                       </span>
                     </div>
 
-                    <label style={{ display: 'block', fontSize: '9.5px', fontWeight: 600, color: '#666666', textTransform: 'uppercase', letterSpacing: '0.1em', marginTop: 12, marginBottom: 6 }}>Upload Transfer Receipt</label>
-                    <div style={{ border: '1.5px dashed rgba(20,20,20,0.18)', borderRadius: 8, padding: 14, textAlign: 'center', cursor: 'pointer', position: 'relative', overflow: 'hidden', marginBottom: 12, background: '#FFFFFF' }}>
+                    <label style={{ display: 'block', fontSize: '9.5px', fontWeight: 600, color: '#7A5C10', textTransform: 'uppercase', letterSpacing: '0.1em', marginTop: 12, marginBottom: 6 }}>Upload Transfer Receipt</label>
+                    <div style={{ border: '1.5px dashed rgba(139,105,20,0.35)', borderRadius: 12, padding: 14, textAlign: 'center', cursor: 'pointer', position: 'relative', overflow: 'hidden', marginBottom: 12, background: '#FAF8F4' }}>
                       <input type="file" accept=".jpg,.jpeg,.png,.webp,.pdf" onChange={handleReceiptSelect} style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer', width: '100%', height: '100%' }} />
                       {bankReceiptName ? (
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
@@ -1116,7 +1129,7 @@ export default function GuestCheckoutModal({
                         </div>
                       ) : (
                         <>
-                          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#666666" strokeWidth="1.5" style={{ marginBottom: 6 }}><polyline points="16 16 12 12 8 16" /><line x1="12" y1="12" x2="12" y2="21" /><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3" /></svg>
+                          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" style={{ marginBottom: 6 }}><polyline points="16 16 12 12 8 16" /><line x1="12" y1="12" x2="12" y2="21" /><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3" /></svg>
                           <div style={{ fontSize: '12px', color: '#141414', fontWeight: 500 }}>Click to upload receipt</div>
                           <div style={{ fontSize: '10.5px', color: '#777777', marginTop: 2 }}>PDF, JPG, PNG, WEBP · Max 10 MB</div>
                         </>
@@ -1124,7 +1137,7 @@ export default function GuestCheckoutModal({
                     </div>
 
                     <div onClick={() => setBankTransferConfirmed(v => !v)} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, padding: '8px 0', cursor: 'pointer', marginBottom: 14 }}>
-                      <div style={{ width: 17, height: 17, border: `1.5px solid ${bankTransferConfirmed ? '#141414' : 'rgba(20,20,20,0.25)'}`, borderRadius: 3, background: bankTransferConfirmed ? '#141414' : 'transparent', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 1, transition: 'all 0.2s ease' }}>
+                      <div style={{ width: 18, height: 18, border: `1.5px solid ${bankTransferConfirmed ? '#8B6914' : 'rgba(139,105,20,0.4)'}`, borderRadius: 4, background: bankTransferConfirmed ? 'linear-gradient(135deg, #9C7A3C, #8B6914)' : 'transparent', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 1, transition: 'all 0.2s ease' }}>
                         {bankTransferConfirmed && <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3"><polyline points="20 6 9 17 4 12" /></svg>}
                       </div>
                       <span style={{ fontSize: '12px', color: '#444444', lineHeight: 1.5 }}>
@@ -1159,15 +1172,15 @@ export default function GuestCheckoutModal({
                 {/* Legal Policy Links Notice */}
                 <div style={{ marginTop: '14px', fontSize: '11px', color: '#777777', textAlign: 'center', lineHeight: '1.6' }}>
                   By placing your order, you agree to Winsor's{' '}
-                  <a href="/terms" target="_blank" rel="noopener noreferrer" style={{ color: '#141414', textDecoration: 'underline', fontWeight: 500 }}>
+                  <a href="/terms" target="_blank" rel="noopener noreferrer" style={{ color: '#8B6914', textDecoration: 'underline', fontWeight: 600 }}>
                     Terms &amp; Conditions
                   </a>
                   ,{' '}
-                  <a href="/privacy" target="_blank" rel="noopener noreferrer" style={{ color: '#141414', textDecoration: 'underline', fontWeight: 500 }}>
+                  <a href="/privacy" target="_blank" rel="noopener noreferrer" style={{ color: '#8B6914', textDecoration: 'underline', fontWeight: 600 }}>
                     Privacy Policy
                   </a>
                   , and{' '}
-                  <a href="/warranty" target="_blank" rel="noopener noreferrer" style={{ color: '#141414', textDecoration: 'underline', fontWeight: 500 }}>
+                  <a href="/warranty" target="_blank" rel="noopener noreferrer" style={{ color: '#8B6914', textDecoration: 'underline', fontWeight: 600 }}>
                     Warranty Policy
                   </a>
                   .
@@ -1176,15 +1189,15 @@ export default function GuestCheckoutModal({
                 {/* Trust Badges */}
                 <div className="gcm-trust-footer">
                   <div className="gcm-trust-item">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#141414" strokeWidth="1.8"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /><polyline points="9 12 11 14 15 10" /></svg>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.8"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /><polyline points="9 12 11 14 15 10" /></svg>
                     <span>100% Authentic</span>
                   </div>
                   <div className="gcm-trust-item">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#141414" strokeWidth="1.8"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.8"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
                     <span>Secure Payment</span>
                   </div>
                   <div className="gcm-trust-item">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#141414" strokeWidth="1.8"><polyline points="1 4 1 10 7 10" /><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" /></svg>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.8"><polyline points="1 4 1 10 7 10" /><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" /></svg>
                     <span>Easy Returns</span>
                   </div>
                 </div>
@@ -1215,20 +1228,20 @@ export default function GuestCheckoutModal({
                   {payMethod === 'payhere' ? 'Payment confirmed. Your timepiece order is now being prepared.' : 'Your order is placed. Our team will verify your transfer within 24 hours.'}
                 </p>
                 {payMethod === 'bank_transfer' && (
-                  <div style={{ fontSize: '11.5px', color: '#555555', background: '#F8F7F4', border: '1px solid rgba(20,20,20,0.08)', borderRadius: 6, padding: '8px 12px', marginBottom: 12, textAlign: 'left' }}>
+                  <div style={{ fontSize: '11.5px', color: '#555555', background: '#FAF8F4', border: '1px solid rgba(139,105,20,0.16)', borderRadius: 10, padding: '8px 12px', marginBottom: 12, textAlign: 'left' }}>
                     Receipt received. You will receive an official update once verified.
                   </div>
                 )}
 
                 {/* Order reference box with Copy icon */}
                 <div style={{
-                  background: '#141414',
-                  border: '1px solid rgba(255,255,255,0.1)',
-                  borderRadius: '10px', padding: '18px 20px', marginBottom: 16,
-                  boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+                  background: 'linear-gradient(135deg, #1E1912 0%, #2B241A 100%)',
+                  border: '1px solid rgba(184, 150, 78, 0.4)',
+                  borderRadius: '14px', padding: '18px 20px', marginBottom: 16,
+                  boxShadow: '0 10px 28px rgba(30, 25, 18, 0.16)',
                   position: 'relative',
                 }}>
-                  <div style={{ fontSize: '9px', fontWeight: 500, color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase', letterSpacing: '0.14em', marginBottom: 8 }}>
+                  <div style={{ fontSize: '9px', fontWeight: 600, color: '#D6BE88', textTransform: 'uppercase', letterSpacing: '0.14em', marginBottom: 8 }}>
                     Order Reference Code
                   </div>
 
@@ -1243,10 +1256,10 @@ export default function GuestCheckoutModal({
                       onClick={handleCopyRef}
                       title="Copy Reference Code"
                       style={{
-                        background: copiedRef ? 'rgba(21,128,61,0.2)' : 'rgba(255,255,255,0.1)',
-                        border: `1px solid ${copiedRef ? '#15803d' : 'rgba(255,255,255,0.2)'}`,
-                        color: copiedRef ? '#86efac' : '#FFFFFF',
-                        borderRadius: '6px', padding: '5px 10px',
+                        background: copiedRef ? 'rgba(21,128,61,0.22)' : 'rgba(214,190,136,0.16)',
+                        border: `1px solid ${copiedRef ? '#15803d' : 'rgba(214,190,136,0.45)'}`,
+                        color: copiedRef ? '#86efac' : '#F3E5C2',
+                        borderRadius: '999px', padding: '5px 12px',
                         cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 5,
                         fontSize: '11px', fontWeight: 500, fontFamily: "'Jost', sans-serif",
                         transition: 'all 0.2s ease',
@@ -1266,7 +1279,7 @@ export default function GuestCheckoutModal({
                     </button>
                   </div>
 
-                  <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.45)', marginTop: 8 }}>
+                  <div style={{ fontSize: '10px', color: 'rgba(243,229,194,0.65)', marginTop: 8 }}>
                     Keep this reference code to track your delivery status
                   </div>
                 </div>
@@ -1274,19 +1287,9 @@ export default function GuestCheckoutModal({
                 {/* 📄 Download PDF Receipt Button */}
                 <button
                   type="button"
+                  className="gcm-btn-outline"
                   onClick={handleDownloadReceipt}
-                  style={{
-                    width: '100%', padding: '11.5px',
-                    background: '#FFFFFF',
-                    color: '#141414', border: '1px solid rgba(20,20,20,0.18)', borderRadius: '6px',
-                    cursor: 'pointer', fontFamily: "'Jost', sans-serif",
-                    fontSize: '11px', fontWeight: 500, letterSpacing: '0.08em',
-                    textTransform: 'uppercase', marginBottom: 14,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7,
-                    transition: 'all 0.2s ease',
-                  }}
-                  onMouseEnter={(e) => { e.currentTarget.style.background = '#141414'; e.currentTarget.style.color = '#FFFFFF'; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.background = '#FFFFFF'; e.currentTarget.style.color = '#141414'; }}
+                  style={{ marginBottom: 12 }}
                 >
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
@@ -1297,12 +1300,12 @@ export default function GuestCheckoutModal({
                 </button>
 
                 {/* Track your order info box */}
-                <div style={{ background: '#F8F7F4', border: '1px solid rgba(20,20,20,0.08)', borderRadius: 8, padding: '12px 14px', marginBottom: 16, textAlign: 'left' }}>
+                <div style={{ background: '#FAF8F4', border: '1px solid rgba(139,105,20,0.16)', borderRadius: 12, padding: '12px 14px', marginBottom: 16, textAlign: 'left' }}>
                   <div style={{ fontSize: '11px', fontWeight: 600, color: '#141414', marginBottom: 3, display: 'flex', alignItems: 'center', gap: 6 }}>
                     <span>Order Tracking</span>
                   </div>
                   <div style={{ fontSize: '11.5px', color: '#666666', lineHeight: 1.55 }}>
-                    Visit <Link href={`/orders/track?ref=${encodeURIComponent(orderRef)}&mobile=${encodeURIComponent(form.mobile)}`} style={{ color: '#141414', fontWeight: 600, textDecoration: 'underline' }}>Track Order Live</Link> or use reference <strong style={{ color: '#141414', fontFamily: 'monospace' }}>{orderRef}</strong> with your mobile number.
+                    Visit <Link href={`/orders/track?ref=${encodeURIComponent(orderRef)}&mobile=${encodeURIComponent(form.mobile)}`} style={{ color: '#8B6914', fontWeight: 600, textDecoration: 'underline' }}>Track Order Live</Link> or use reference <strong style={{ color: '#141414', fontFamily: 'monospace' }}>{orderRef}</strong> with your mobile number.
                   </div>
                 </div>
 

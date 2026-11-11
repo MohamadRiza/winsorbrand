@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useUser, SignInButton, useClerk } from '@clerk/nextjs';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
+import { showWishlistToast } from '@/components/WinsorToaster';
 
 const COUNTRIES = [
   { code: 'LK', name: 'Sri Lanka' },
@@ -433,11 +434,12 @@ export default function ProfilePage() {
 
   // Wishlist removal handler
   const handleRemoveFromWishlist = (productId: string) => {
+    const prod = allProducts.find(p => p._id === productId);
     const updated = wishlistIds.filter(id => id !== productId);
     setWishlistIds(updated);
     localStorage.setItem('winsor_wishlist', JSON.stringify(updated));
     setWishlistCount(updated.length);
-    toast.success('Timepiece removed from wishlist.');
+    showWishlistToast({ added: false, title: prod?.title, image: prod?.thumbnail?.url, productId });
   };
 
   // Dynamic Profile Completion Rate

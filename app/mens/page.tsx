@@ -9,7 +9,7 @@ import { useCart } from '@/app/context/CartContext';
 import { IProduct, CollectionSection, IGiftCategory } from '@/types';
 import NewsletterCard from '@/components/NewsletterCard';
 import ProductCard from '@/components/ProductCard';
-import { toast } from 'react-hot-toast';
+import { showWishlistToast } from '@/components/WinsorToaster';
 import MensHeroTypewriter from './MensHeroTypewriter';
 
 // Helper to determine product gender
@@ -135,14 +135,15 @@ function MensCollectionContent() {
   }, [products]);
 
   const toggleWishlist = (productId: string) => {
+    const prod = products.find(p => p._id === productId);
     const isFav = wishlist.includes(productId);
     let updated: string[];
     if (isFav) {
       updated = wishlist.filter(id => id !== productId);
-      toast.success('Removed from Wishlist');
+      showWishlistToast({ added: false, title: prod?.title, image: prod?.thumbnail?.url, productId });
     } else {
       updated = [...wishlist, productId];
-      toast.success('Added to Wishlist');
+      showWishlistToast({ added: true, title: prod?.title, image: prod?.thumbnail?.url, productId });
     }
     setWishlist(updated);
     localStorage.setItem('winsor_wishlist', JSON.stringify(updated));

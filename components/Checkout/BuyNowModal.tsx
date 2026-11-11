@@ -280,7 +280,7 @@ export default function BuyNowModal({
           position: fixed;
           inset: 0;
           z-index: 9998;
-          background: rgba(14, 14, 14, 0.65);
+          background: rgba(16, 13, 9, 0.62);
           backdrop-filter: blur(8px);
           -webkit-backdrop-filter: blur(8px);
           display: flex;
@@ -291,22 +291,22 @@ export default function BuyNowModal({
 
         .bnm-dialog {
           background: #ffffff;
-          border: 1px solid rgba(20, 20, 20, 0.1);
-          border-radius: 12px;
+          border: 1px solid rgba(139, 105, 20, 0.18);
+          border-radius: 18px;
           width: 100%;
           max-width: 480px;
           max-height: 90vh;
           overflow-y: auto;
-          box-shadow: 0 24px 64px rgba(0, 0, 0, 0.18);
+          box-shadow: 0 28px 72px rgba(20, 16, 10, 0.22);
           animation: bnm-fade-in 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
           font-family: 'Jost', sans-serif;
           scrollbar-width: thin;
-          scrollbar-color: rgba(20, 20, 20, 0.2) transparent;
+          scrollbar-color: rgba(139, 105, 20, 0.25) transparent;
           position: relative;
         }
 
         .bnm-dialog::-webkit-scrollbar { width: 5px; }
-        .bnm-dialog::-webkit-scrollbar-thumb { background: rgba(20, 20, 20, 0.2); border-radius: 4px; }
+        .bnm-dialog::-webkit-scrollbar-thumb { background: rgba(139, 105, 20, 0.25); border-radius: 4px; }
 
         .bnm-header {
           padding: 22px 26px 16px;
@@ -315,15 +315,16 @@ export default function BuyNowModal({
           justify-content: space-between;
           position: sticky;
           top: 0;
-          background: #ffffff;
+          background: rgba(255, 255, 255, 0.96);
+          backdrop-filter: blur(8px);
           z-index: 5;
-          border-bottom: 1px solid rgba(20, 20, 20, 0.06);
+          border-bottom: 1px solid rgba(139, 105, 20, 0.12);
           margin-bottom: 18px;
         }
 
         .bnm-title {
           font-family: 'Cormorant Garamond', Georgia, serif;
-          font-size: 24px;
+          font-size: 25px;
           font-weight: 500;
           color: #141414;
           margin: 0;
@@ -340,24 +341,24 @@ export default function BuyNowModal({
         }
 
         .bnm-close {
-          width: 32px;
-          height: 32px;
+          width: 34px;
+          height: 34px;
           border-radius: 50%;
-          border: 1px solid rgba(20, 20, 20, 0.1);
-          background: #F8F7F4;
-          color: #141414;
+          border: 1px solid rgba(139, 105, 20, 0.22);
+          background: #FAF8F3;
+          color: #6B5B3E;
           cursor: pointer;
           display: flex;
           align-items: center;
           justify-content: center;
           font-size: 16px;
           flex-shrink: 0;
-          transition: all 0.2s ease;
+          transition: all 0.22s ease;
         }
         .bnm-close:hover {
-          background: #141414;
-          color: #ffffff;
-          border-color: #141414;
+          background: rgba(139, 105, 20, 0.1);
+          color: #8B6914;
+          border-color: rgba(139, 105, 20, 0.45);
         }
 
         .bnm-stepper-container {
@@ -377,7 +378,7 @@ export default function BuyNowModal({
           transition: background 0.3s ease;
         }
         .bnm-stepper-line.active {
-          background: #141414;
+          background: linear-gradient(90deg, #9C7A3C, #8B6914);
           height: 1.5px;
         }
 
@@ -391,22 +392,23 @@ export default function BuyNowModal({
           width: 22px;
           height: 22px;
           border-radius: 50%;
-          background: #141414;
+          background: linear-gradient(135deg, #9C7A3C 0%, #8B6914 100%);
           display: flex;
           align-items: center;
           justify-content: center;
           color: #fff;
+          box-shadow: 0 2px 8px rgba(139, 105, 20, 0.22);
         }
         .bnm-step-badge {
           width: 28px;
           height: 28px;
           border-radius: 50%;
-          background: #141414;
+          background: linear-gradient(135deg, #9C7A3C 0%, #8B6914 100%);
           display: flex;
           align-items: center;
           justify-content: center;
           color: #ffffff;
-          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.16);
+          box-shadow: 0 4px 12px rgba(139, 105, 20, 0.28);
         }
 
         .bnm-body {
@@ -414,9 +416,9 @@ export default function BuyNowModal({
         }
 
         .bnm-card {
-          background: #F8F7F4;
-          border: 1px solid rgba(20, 20, 20, 0.08);
-          border-radius: 8px;
+          background: #FAF8F4;
+          border: 1px solid rgba(139, 105, 20, 0.15);
+          border-radius: 12px;
           padding: 16px 18px;
           margin-bottom: 14px;
           position: relative;
@@ -425,18 +427,18 @@ export default function BuyNowModal({
         .bnm-section-label {
           font-size: 10.5px;
           font-weight: 600;
-          color: #141414;
+          color: #7A5C10;
           text-transform: uppercase;
           letter-spacing: 0.08em;
           margin-bottom: 12px;
         }
 
         .bnm-pay-option {
-          border: 1px solid rgba(20, 20, 20, 0.12);
-          border-radius: 8px;
+          border: 1px solid rgba(139, 105, 20, 0.18);
+          border-radius: 12px;
           padding: 16px 18px;
           cursor: pointer;
-          transition: all 0.2s ease;
+          transition: all 0.22s ease;
           background: #ffffff;
           display: flex;
           align-items: flex-start;
@@ -449,12 +451,13 @@ export default function BuyNowModal({
           overflow: hidden;
         }
         .bnm-pay-option.active {
-          border-color: #141414;
+          border-color: #8B6914;
           border-width: 1.5px;
-          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+          background: #FFFEFA;
+          box-shadow: 0 6px 18px rgba(139, 105, 20, 0.1);
         }
         .bnm-pay-option:hover {
-          border-color: rgba(20, 20, 20, 0.35);
+          border-color: rgba(139, 105, 20, 0.45);
         }
 
         .bnm-corner-ribbon {
@@ -463,8 +466,8 @@ export default function BuyNowModal({
           right: 0;
           width: 26px;
           height: 26px;
-          background: #141414;
-          border-bottom-left-radius: 8px;
+          background: linear-gradient(135deg, #9C7A3C 0%, #8B6914 100%);
+          border-bottom-left-radius: 10px;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -475,7 +478,7 @@ export default function BuyNowModal({
           width: 18px;
           height: 18px;
           border-radius: 50%;
-          border: 1.5px solid #141414;
+          border: 1.5px solid rgba(139, 105, 20, 0.45);
           flex-shrink: 0;
           display: flex;
           align-items: center;
@@ -484,8 +487,8 @@ export default function BuyNowModal({
           margin-top: 1px;
         }
         .bnm-radio.active {
-          border-color: #141414;
-          background: #141414;
+          border-color: #8B6914;
+          background: linear-gradient(135deg, #9C7A3C 0%, #8B6914 100%);
         }
         .bnm-radio.active::after {
           content: '';
@@ -496,9 +499,9 @@ export default function BuyNowModal({
         }
 
         .bnm-bank-details {
-          background: #F8F7F4;
-          border: 1px solid rgba(20, 20, 20, 0.08);
-          border-radius: 8px;
+          background: #FAF8F4;
+          border: 1px solid rgba(139, 105, 20, 0.16);
+          border-radius: 12px;
           padding: 14px 16px;
           margin-top: 12px;
         }
@@ -511,15 +514,15 @@ export default function BuyNowModal({
           color: #141414;
         }
         .bnm-bank-row + .bnm-bank-row {
-          border-top: 1px solid rgba(20, 20, 20, 0.06);
+          border-top: 1px solid rgba(139, 105, 20, 0.1);
           margin-top: 6px;
           padding-top: 6px;
         }
 
         .bnm-info-box {
-          background: #F8F7F4;
-          border: 1px solid rgba(20, 20, 20, 0.1);
-          border-radius: 8px;
+          background: #FAF8F4;
+          border: 1px solid rgba(139, 105, 20, 0.18);
+          border-radius: 10px;
           padding: 12px 14px;
           margin-top: 12px;
           display: flex;
@@ -528,20 +531,20 @@ export default function BuyNowModal({
         }
 
         .bnm-receipt-upload {
-          border: 1.5px dashed rgba(20, 20, 20, 0.18);
-          border-radius: 8px;
+          border: 1.5px dashed rgba(139, 105, 20, 0.34);
+          border-radius: 12px;
           padding: 14px;
           text-align: center;
           cursor: pointer;
-          transition: all 0.2s ease;
+          transition: all 0.22s ease;
           position: relative;
           overflow: hidden;
           margin-top: 12px;
-          background: #ffffff;
+          background: #FAF8F4;
         }
         .bnm-receipt-upload:hover {
-          border-color: #141414;
-          background: #F8F7F4;
+          border-color: #8B6914;
+          background: #F7F2E8;
         }
         .bnm-receipt-upload input {
           position: absolute;
@@ -554,30 +557,30 @@ export default function BuyNowModal({
 
         .bnm-btn-primary {
           width: 100%;
-          height: 46px;
+          height: 48px;
           box-sizing: border-box;
-          background: #141414;
+          background: linear-gradient(135deg, #9C7A3C 0%, #8B6914 100%);
           color: #ffffff;
-          border: 1px solid #141414;
-          border-radius: 6px;
+          border: 1px solid rgba(139, 105, 20, 0.45);
+          border-radius: 999px;
           cursor: pointer;
           font-family: 'Jost', sans-serif;
           font-size: 11.5px;
-          font-weight: 500;
-          letter-spacing: 0.1em;
+          font-weight: 600;
+          letter-spacing: 0.13em;
           text-transform: uppercase;
-          transition: all 0.2s ease;
+          transition: all 0.22s ease;
           display: flex;
           align-items: center;
           justify-content: center;
           gap: 8px;
-          box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+          box-shadow: 0 8px 20px rgba(139, 105, 20, 0.24);
           margin-top: 0;
         }
         .bnm-btn-primary:hover:not(:disabled) {
-          background: #2C2C2C;
-          border-color: #2C2C2C;
-          box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+          background: linear-gradient(135deg, #7A5C10 0%, #684E0D 100%);
+          border-color: #684E0D;
+          box-shadow: 0 10px 24px rgba(139, 105, 20, 0.32);
           transform: translateY(-1px);
         }
         .bnm-btn-primary:disabled {
@@ -588,12 +591,12 @@ export default function BuyNowModal({
 
         .bnm-btn-outline {
           width: 100%;
-          height: 46px;
+          height: 48px;
           box-sizing: border-box;
           background: #FFFFFF;
-          border: 1px solid rgba(20, 20, 20, 0.2);
-          color: #141414;
-          border-radius: 6px;
+          border: 1.5px solid rgba(139, 105, 20, 0.34);
+          color: #7A5C10;
+          border-radius: 999px;
           cursor: pointer;
           font-family: 'Jost', sans-serif;
           font-size: 11.5px;
@@ -608,9 +611,9 @@ export default function BuyNowModal({
           gap: 8px;
         }
         .bnm-btn-outline:hover {
-          border-color: #141414;
-          background: #F8F7F4;
-          color: #141414;
+          border-color: #8B6914;
+          background: #FAF8F3;
+          color: #684E0D;
         }
 
         .bnm-checkbox-row {
@@ -624,7 +627,7 @@ export default function BuyNowModal({
         .bnm-checkbox {
           width: 18px;
           height: 18px;
-          border: 1.5px solid rgba(20, 20, 20, 0.3);
+          border: 1.5px solid rgba(139, 105, 20, 0.4);
           border-radius: 4px;
           flex-shrink: 0;
           display: flex;
@@ -634,8 +637,8 @@ export default function BuyNowModal({
           margin-top: 1px;
         }
         .bnm-checkbox.checked {
-          background: #141414;
-          border-color: #141414;
+          background: linear-gradient(135deg, #9C7A3C 0%, #8B6914 100%);
+          border-color: #8B6914;
         }
 
         .bnm-trust-footer {
@@ -644,7 +647,7 @@ export default function BuyNowModal({
           justify-content: space-around;
           margin-top: 20px;
           padding-top: 16px;
-          border-top: 1px solid rgba(20, 20, 20, 0.08);
+          border-top: 1px solid rgba(139, 105, 20, 0.12);
         }
         .bnm-trust-item {
           display: flex;
@@ -656,13 +659,14 @@ export default function BuyNowModal({
         }
 
         @media (max-width: 520px) {
-          .bnm-dialog { border-radius: 12px; max-height: 92vh; }
+          .bnm-dialog { border-radius: 16px; max-height: 92vh; }
           .bnm-header { padding: 18px 20px 14px; }
           .bnm-stepper-container { padding: 0 20px 14px; }
           .bnm-body { padding: 0 20px 20px; }
           .bnm-title { font-size: 22px; }
           .bnm-trust-footer { flex-wrap: wrap; gap: 10px; justify-content: center; }
-          .bnm-btn-outline { width: 90px !important; }
+          .bnm-btn-outline { width: 100%; }
+          .bnm-actions-row .bnm-btn-outline { width: auto; min-width: 96px; padding-left: 18px; padding-right: 18px; }
         }
       `}</style>
 
@@ -743,20 +747,20 @@ export default function BuyNowModal({
                   <div className="bnm-card">
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                       <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#141414" strokeWidth="2" style={{ flexShrink: 0, marginTop: 3 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" /></svg>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="2" style={{ flexShrink: 0, marginTop: 3 }}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" /></svg>
                         <span style={{ fontSize: '13px', color: '#141414', lineHeight: 1.5 }}>
                           {profile?.address}, {profile?.city}, {profile?.postalCode}, {profile?.country}
                         </span>
                       </div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#141414" strokeWidth="2" style={{ flexShrink: 0 }}><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" /></svg>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="2" style={{ flexShrink: 0 }}><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" /></svg>
                         <span style={{ fontSize: '13px', color: '#141414' }}>{profile?.mobileCode} {profile?.mobile}</span>
                       </div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 4, paddingTop: 8, borderTop: '1px solid rgba(20,20,20,0.08)' }}>
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#666666" strokeWidth="2" style={{ flexShrink: 0 }}><path d="M12 20h9" /><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" /></svg>
                         <span style={{ fontSize: '11.5px', color: '#666666' }}>
                           To change your address, visit{' '}
-                          <a href="/profile" style={{ color: '#141414', fontWeight: 600, textDecoration: 'underline' }}>Profile settings.</a>
+                          <a href="/profile" style={{ color: '#8B6914', fontWeight: 600, textDecoration: 'underline' }}>Profile settings.</a>
                         </span>
                       </div>
                     </div>
@@ -768,7 +772,7 @@ export default function BuyNowModal({
                     </div>
                     <div style={{ fontSize: '12px', color: '#666666' }}>
                       Please complete your address in{' '}
-                      <a href="/profile" style={{ color: '#141414', fontWeight: 600, textDecoration: 'underline' }}>Profile settings</a>{' '}
+                      <a href="/profile" style={{ color: '#8B6914', fontWeight: 600, textDecoration: 'underline' }}>Profile settings</a>{' '}
                       before purchasing.
                     </div>
                   </div>
@@ -777,7 +781,7 @@ export default function BuyNowModal({
                 {/* ORDER TOTAL CARD */}
                 <div className="bnm-card" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                    <div style={{ width: 38, height: 38, borderRadius: 8, background: 'rgba(20,20,20,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#141414' }}>
+                    <div style={{ width: 40, height: 40, borderRadius: 10, background: 'rgba(139,105,20,0.09)', border: '1px solid rgba(139,105,20,0.16)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#8B6914' }}>
                       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="4" y="2" width="16" height="20" rx="2" ry="2" /><line x1="8" y1="6" x2="16" y2="6" /><line x1="8" y1="10" x2="16" y2="10" /><line x1="8" y1="14" x2="12" y2="14" /></svg>
                     </div>
                     <div>
@@ -796,7 +800,7 @@ export default function BuyNowModal({
                   </div>
                 )}
 
-                <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginTop: 16 }}>
+                <div className="bnm-actions-row" style={{ display: 'flex', gap: 12, alignItems: 'center', marginTop: 16 }}>
                   <button className="bnm-btn-outline" onClick={onClose} style={{ width: 110, flexShrink: 0 }}>
                     Cancel
                   </button>
@@ -808,15 +812,15 @@ export default function BuyNowModal({
                 {/* Footer Trust Badges */}
                 <div className="bnm-trust-footer">
                   <div className="bnm-trust-item">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#141414" strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /><polyline points="9 12 11 14 15 10" /></svg>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /><polyline points="9 12 11 14 15 10" /></svg>
                     <span>100% Authentic</span>
                   </div>
                   <div className="bnm-trust-item">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#141414" strokeWidth="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
                     <span>Secure Payment</span>
                   </div>
                   <div className="bnm-trust-item">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#141414" strokeWidth="2"><polyline points="1 4 1 10 7 10" /><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" /></svg>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="2"><polyline points="1 4 1 10 7 10" /><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" /></svg>
                     <span>Easy Returns</span>
                   </div>
                 </div>
@@ -842,7 +846,7 @@ export default function BuyNowModal({
                   <div className={`bnm-radio ${payMethod === 'payhere' ? 'active' : ''}`} />
                   <div style={{ flex: 1 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#141414" strokeWidth="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2" /><line x1="1" y1="10" x2="23" y2="10" /></svg>
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2" /><line x1="1" y1="10" x2="23" y2="10" /></svg>
                       <span style={{ fontWeight: 600, fontSize: '13.5px', color: '#141414' }}>Pay via PayHere</span>
                     </div>
                     <div style={{ fontSize: '11.5px', color: '#666666', marginTop: 3 }}>
@@ -851,7 +855,7 @@ export default function BuyNowModal({
                     {/* Payment brand badges */}
                     <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 8 }}>
                       {['VISA', 'mastercard', 'AMEX', 'eWallets', 'BANK', 'USSD'].map((b) => (
-                        <span key={b} style={{ fontSize: '9px', fontWeight: 600, color: '#141414', background: '#F8F7F4', border: '1px solid rgba(20,20,20,0.1)', borderRadius: 4, padding: '2px 6px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                        <span key={b} style={{ fontSize: '9px', fontWeight: 600, color: '#6B5B3E', background: '#FAF8F4', border: '1px solid rgba(139,105,20,0.18)', borderRadius: 4, padding: '2px 6px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                           {b}
                         </span>
                       ))}
@@ -873,7 +877,7 @@ export default function BuyNowModal({
                   <div className={`bnm-radio ${payMethod === 'bank_transfer' ? 'active' : ''}`} />
                   <div style={{ flex: 1 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#141414" strokeWidth="2"><line x1="3" y1="21" x2="21" y2="21" /><line x1="6" y1="18" x2="6" y2="11" /><line x1="10" y1="18" x2="10" y2="11" /><line x1="14" y1="18" x2="14" y2="11" /><line x1="18" y1="18" x2="18" y2="11" /><polygon points="12 3 2 10 22 10 12 3" /></svg>
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="2"><line x1="3" y1="21" x2="21" y2="21" /><line x1="6" y1="18" x2="6" y2="11" /><line x1="10" y1="18" x2="10" y2="11" /><line x1="14" y1="18" x2="14" y2="11" /><line x1="18" y1="18" x2="18" y2="11" /><polygon points="12 3 2 10 22 10 12 3" /></svg>
                       <span style={{ fontWeight: 600, fontSize: '13.5px', color: '#141414' }}>Direct Bank Transfer</span>
                     </div>
                     <div style={{ fontSize: '11.5px', color: '#666666', marginTop: 3 }}>
@@ -895,7 +899,7 @@ export default function BuyNowModal({
 
                     {/* Alert info box */}
                     <div className="bnm-info-box">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#141414" strokeWidth="2" style={{ flexShrink: 0, marginTop: 1 }}><circle cx="12" cy="12" r="10" /><line x1="12" y1="16" x2="12" y2="12" /><line x1="12" y1="8" x2="12.01" y2="8" /></svg>
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="2" style={{ flexShrink: 0, marginTop: 1 }}><circle cx="12" cy="12" r="10" /><line x1="12" y1="16" x2="12" y2="12" /><line x1="12" y1="8" x2="12.01" y2="8" /></svg>
                       <span style={{ fontSize: '12px', color: '#444444', lineHeight: 1.5 }}>
                         Please upload your payment receipt after completing the transfer. Your order will be verified within 24 hours.
                       </span>
@@ -906,12 +910,12 @@ export default function BuyNowModal({
                       <input type="file" accept=".jpg,.jpeg,.png,.webp,.pdf" onChange={handleReceiptSelect} />
                       {bankReceiptName ? (
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#141414" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg>
-                          <span style={{ fontSize: '13px', color: '#141414', fontWeight: 600 }}>{bankReceiptName}</span>
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#15803d" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg>
+                          <span style={{ fontSize: '13px', color: '#15803d', fontWeight: 600 }}>{bankReceiptName}</span>
                         </div>
                       ) : (
                         <>
-                          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#141414" strokeWidth="1.5" style={{ margin: '0 auto 6px', display: 'block' }}><polyline points="16 16 12 12 8 16" /><line x1="12" y1="12" x2="12" y2="21" /><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3" /></svg>
+                          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="1.6" style={{ margin: '0 auto 6px', display: 'block' }}><polyline points="16 16 12 12 8 16" /><line x1="12" y1="12" x2="12" y2="21" /><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3" /></svg>
                           <div style={{ fontSize: '12.5px', color: '#141414', fontWeight: 600 }}>Click to upload transfer receipt</div>
                           <div style={{ fontSize: '11px', color: '#666666', marginTop: 3 }}>PDF, JPG, PNG, WEBP · Max 10 MB</div>
                         </>
@@ -936,7 +940,7 @@ export default function BuyNowModal({
                   </div>
                 )}
 
-                <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginTop: 16 }}>
+                <div className="bnm-actions-row" style={{ display: 'flex', gap: 12, alignItems: 'center', marginTop: 16 }}>
                   <button className="bnm-btn-outline" onClick={() => setStep('confirm')} style={{ width: 110, flexShrink: 0 }}>
                     ← Back
                   </button>
@@ -962,15 +966,15 @@ export default function BuyNowModal({
                 {/* Trust Badges */}
                 <div className="bnm-trust-footer">
                   <div className="bnm-trust-item">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#141414" strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /><polyline points="9 12 11 14 15 10" /></svg>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /><polyline points="9 12 11 14 15 10" /></svg>
                     <span>100% Authentic</span>
                   </div>
                   <div className="bnm-trust-item">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#141414" strokeWidth="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
                     <span>Secure Payment</span>
                   </div>
                   <div className="bnm-trust-item">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#141414" strokeWidth="2"><polyline points="1 4 1 10 7 10" /><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" /></svg>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="2"><polyline points="1 4 1 10 7 10" /><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" /></svg>
                     <span>Easy Returns</span>
                   </div>
                 </div>
@@ -980,23 +984,23 @@ export default function BuyNowModal({
             {/* ── STEP 3: Success ── */}
             {step === 'success' && (
               <div style={{ textAlign: 'center', padding: '10px 0 6px' }}>
-                <div style={{ width: 56, height: 56, borderRadius: '50%', background: '#F8F7F4', border: '1.5px solid #141414', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', color: '#141414' }}>
+                <div style={{ width: 62, height: 62, borderRadius: '50%', background: 'rgba(139,105,20,0.08)', border: '1.5px solid rgba(139,105,20,0.38)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', color: '#8B6914' }}>
                   <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg>
                 </div>
                 <h3 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '26px', color: '#141414', fontWeight: 500, margin: '0 0 6px' }}>Order Confirmed</h3>
                 <p style={{ fontSize: '13px', color: '#666666', lineHeight: 1.6, margin: '0 0 16px' }}>
                   {payMethod === 'payhere' ? 'Payment successful. Your timepiece order has been confirmed.' : 'Your order is placed. We will verify your bank transfer within 24 hours.'}
                 </p>
-                <div style={{ background: '#F8F7F4', border: '1px solid rgba(20,20,20,0.1)', borderRadius: 8, padding: '16px 20px', marginBottom: 16 }}>
-                  <div style={{ fontSize: '10px', fontWeight: 600, color: '#666666', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>Order Reference Code</div>
+                <div style={{ background: 'linear-gradient(135deg, #1E1912 0%, #2B241A 100%)', border: '1px solid rgba(184,150,78,0.4)', borderRadius: 14, padding: '18px 20px', marginBottom: 16, boxShadow: '0 10px 28px rgba(30,25,18,0.16)' }}>
+                  <div style={{ fontSize: '10px', fontWeight: 600, color: '#D6BE88', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 8 }}>Order Reference Code</div>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10 }}>
-                    <span style={{ fontSize: '19px', fontFamily: 'monospace', color: '#141414', fontWeight: 700 }}>{orderRef}</span>
-                    <button type="button" onClick={handleCopyRef} style={{ background: copiedRef ? 'rgba(20,20,20,0.06)' : '#FFFFFF', border: '1px solid rgba(20,20,20,0.2)', color: '#141414', borderRadius: '4px', padding: '5px 12px', cursor: 'pointer', fontSize: '11px', fontWeight: 500 }}>
+                    <span style={{ fontSize: '20px', fontFamily: 'monospace', color: '#FFFFFF', fontWeight: 700, letterSpacing: '0.06em' }}>{orderRef}</span>
+                    <button type="button" onClick={handleCopyRef} style={{ background: copiedRef ? 'rgba(21,128,61,0.22)' : 'rgba(214,190,136,0.16)', border: `1px solid ${copiedRef ? '#15803d' : 'rgba(214,190,136,0.45)'}`, color: copiedRef ? '#86efac' : '#F3E5C2', borderRadius: '999px', padding: '5px 13px', cursor: 'pointer', fontSize: '11px', fontWeight: 500 }}>
                       {copiedRef ? 'Copied' : 'Copy Code'}
                     </button>
                   </div>
                 </div>
-                <button type="button" onClick={handleDownloadReceipt} style={{ width: '100%', height: '46px', background: '#141414', color: '#ffffff', border: '1px solid #141414', borderRadius: '6px', cursor: 'pointer', fontSize: '11.5px', fontWeight: 500, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, boxShadow: '0 4px 14px rgba(0,0,0,0.1)' }}>
+                <button type="button" className="bnm-btn-primary" onClick={handleDownloadReceipt} style={{ marginBottom: 10 }}>
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" /></svg>
                   Download Receipt (PDF)
                 </button>

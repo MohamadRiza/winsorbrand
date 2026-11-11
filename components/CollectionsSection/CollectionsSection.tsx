@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useCurrency } from '@/app/context/CurrencyContext';
+import { showWishlistToast } from '@/components/WinsorToaster';
 
 // ── Types ──────────────────────────────────────────────────────────────────
 type SectionKey = 'sports' | 'luxury' | 'limited' | 'new' | 'ladies';
@@ -256,10 +257,10 @@ function WatchCard({ product, index }: { product: WatchProduct; index: number })
 
     if (isFav) {
       updated = updated.filter(id => id !== product._id);
-      import('react-hot-toast').then(({ default: toast }) => toast.success('Removed from Wishlist'));
+      showWishlistToast({ added: false, title: product.title, image: product.thumbnail?.url, productId: product._id });
     } else {
       updated = [...updated, product._id];
-      import('react-hot-toast').then(({ default: toast }) => toast.success('Added to Wishlist'));
+      showWishlistToast({ added: true, title: product.title, image: product.thumbnail?.url, productId: product._id });
     }
 
     localStorage.setItem('winsor_wishlist', JSON.stringify(updated));
