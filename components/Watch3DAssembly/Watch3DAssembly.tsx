@@ -1,21 +1,22 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import Image from 'next/image';
 import HeroLiveWatch from './HeroLiveWatch';
 import HeroSportWatch from './HeroSportWatch';
+import HeroEditorialTypewriter, { type HeroEditorialPhrase } from './HeroEditorialTypewriter';
 
 export default function Watch3DAssembly() {
   const [activeSlide, setActiveSlide] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
+  const [isHeroVisible, setIsHeroVisible] = useState(true);
   const [videoLoaded, setVideoLoaded] = useState(false);
+  const heroRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   interface SlideData {
     preTitle: string;
-    titleLine1: string;
-    titleLine2: string;
-    titleLine3: string;
+    phrase: HeroEditorialPhrase;
     description: string;
     cta: string;
     link: string;
@@ -27,10 +28,8 @@ export default function Watch3DAssembly() {
   const slides: SlideData[] = [
     {
       preTitle: "NEW COLLECTION 2026",
-      titleLine1: "Crafted to",
-      titleLine2: "Measure Time",
-      titleLine3: "Beautifully",
-      description: "Timeless design. Precision engineering. Made for generations.",
+      phrase: { line1: "Crafted to", line2: "Measure Time", accent: "Beautifully" },
+      description: "Timeless design. Signature precision. Built for generations.",
       cta: "EXPLORE COLLECTION",
       link: "#collections",
       image: "/winsor_hero_backgroundremoved.webp",
@@ -38,9 +37,7 @@ export default function Watch3DAssembly() {
     },
     {
       preTitle: "THE HERITAGE SERIES",
-      titleLine1: "Designed for",
-      titleLine2: "Everyday",
-      titleLine3: "Precision",
+      phrase: { line1: "Designed for", line2: "Everyday", accent: "Precision" },
       description: "Engineered for durability, accuracy, and modern performance.",
       cta: "VIEW HERITAGE",
       link: "#collections",
@@ -49,25 +46,43 @@ export default function Watch3DAssembly() {
     },
     {
       preTitle: "THE MASTER COLLECTION",
-      titleLine1: "Where Precision",
-      titleLine2: "Meets",
-      titleLine3: "Elegance",
-      description: "Experience the mechanical artistry of Japanese timepiece movements.",
+      phrase: { line1: "Where Precision", line2: "Meets", accent: "Elegance" },
+      description: "A Dubai-registered luxury house crafting statement timepieces of enduring refinement.",
       cta: "DISCOVER MASTER",
       link: "#collections",
       isVideo: true
     }
   ];
 
-  // Composed Slide Rotation Timer
-  useEffect(() => {
-    const duration = activeSlide === 2 ? 15000 : 6500;
-    const timeoutId = setTimeout(() => {
-      setActiveSlide((prev) => (prev + 1) % 3);
-    }, duration);
+  const handleAdvanceSlide = useCallback(() => {
+    setActiveSlide((prev) => (prev + 1) % 3);
+  }, []);
 
+  // Pause hero timers when scrolled out of view so downstream sections suffer zero CPU cost
+  useEffect(() => {
+    const el = heroRef.current;
+    if (!el || typeof IntersectionObserver === 'undefined') return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        if (entry) setIsHeroVisible(entry.isIntersecting);
+      },
+      { threshold: 0.05 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  // Reduced-motion fallback timer (normal visitors advance directly when typewriter finishes removing text)
+  useEffect(() => {
+    if (!isHeroVisible || typeof window === 'undefined') return;
+    const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
+    if (!reducedMotion) return;
+
+    const duration = activeSlide === 2 ? 12000 : 6500;
+    const timeoutId = setTimeout(handleAdvanceSlide, duration);
     return () => clearTimeout(timeoutId);
-  }, [activeSlide]);
+  }, [activeSlide, isHeroVisible, handleAdvanceSlide]);
 
   const handleSelectSlide = (idx: number) => {
     if (idx === activeSlide) return;
@@ -108,6 +123,7 @@ export default function Watch3DAssembly() {
 
   return (
     <div
+      ref={heroRef}
       id="hero"
       className="relative w-full overflow-clip"
       style={{
@@ -249,7 +265,7 @@ export default function Watch3DAssembly() {
                 opacity: isActive ? 1 : 0,
                 visibility: isActive ? 'visible' : 'hidden',
                 transition: 'opacity 0.8s cubic-bezier(0.25, 1, 0.5, 1), visibility 0.8s',
-                padding: isMobile ? '125px 16px 0 16px' : '0 12% 0 12%',
+                padding: isMobile ? '106px 16px 0 16px' : '0 12% 0 12%',
                 alignItems: isMobile ? 'flex-start' : 'center'
               }}
             >
@@ -264,54 +280,82 @@ export default function Watch3DAssembly() {
                   transition: 'transform 0.8s cubic-bezier(0.25, 1, 0.5, 1)',
                 }}
               >
-                {/* Pre-Title Label */}
-                <p
-                  className="tracking-[0.22em] mb-2 font-semibold uppercase"
+                {/* Discreet Dubai Registered Luxury House Hallmark */}
+                <div
+                  className="inline-flex items-center w-fit uppercase"
                   style={{
+                    gap: isMobile ? '5px' : '8px',
+                    padding: isMobile ? '2.5px 8px' : '4px 12px',
+                    marginBottom: isMobile ? '8px' : '14px',
+                    borderRadius: '999px',
+                    border: `1px solid ${isDarkSlide ? 'rgba(223, 177, 91, 0.34)' : 'rgba(139, 105, 20, 0.24)'}`,
+                    backgroundColor: isDarkSlide ? 'rgba(14, 10, 6, 0.55)' : 'rgba(139, 105, 20, 0.045)',
+                    backdropFilter: 'blur(6px)',
                     fontFamily: "'Jost', sans-serif",
-                    fontSize: isMobile ? '7.5px' : '11px',
-                    color: isDarkSlide ? '#dfb15b' : '#8b6914'
+                    fontSize: isMobile ? '6.5px' : '9.5px',
+                    fontWeight: 500,
+                    letterSpacing: isMobile ? '0.18em' : '0.24em',
+                    color: isDarkSlide ? 'rgba(243, 214, 152, 0.95)' : '#6e5210',
+                    whiteSpace: 'nowrap',
                   }}
                 >
-                  {slide.preTitle}
-                </p>
+                  <svg
+                    width={isMobile ? 7 : 9}
+                    height={isMobile ? 7 : 9}
+                    viewBox="0 0 12 12"
+                    fill="none"
+                    aria-hidden="true"
+                  >
+                    <path
+                      d="M6 1L10.5 6L6 11L1.5 6L6 1Z"
+                      stroke="currentColor"
+                      strokeWidth="1.2"
+                    />
+                    <circle cx="6" cy="6" r="1.4" fill="currentColor" />
+                  </svg>
+                  <span>Dubai Registered Brand</span>
+                </div>
 
-                {/* Composed Editorial Heading */}
-                {idx === 0 ? (
-                  <h1
-                    className="mb-3 font-normal"
+                {/* Pre-Title Label with Architectural Gold Hairline */}
+                <div className="flex items-center gap-2.5 mb-2.5">
+                  <span
+                    aria-hidden="true"
                     style={{
-                      fontFamily: "'Cormorant Garamond', serif",
-                      fontSize: isMobile ? '21px' : '58px',
-                      lineHeight: 1.12,
-                      letterSpacing: '-0.01em',
-                      color: isDarkSlide ? '#ffffff' : '#141414',
+                      display: 'inline-block',
+                      width: isMobile ? '12px' : '22px',
+                      height: '1px',
+                      backgroundColor: isDarkSlide ? '#dfb15b' : '#8b6914',
+                      opacity: 0.78,
+                      flexShrink: 0,
+                      transition: 'background-color 0.4s ease',
+                    }}
+                  />
+                  <p
+                    className="tracking-[0.22em] font-semibold uppercase"
+                    style={{
+                      fontFamily: "'Jost', sans-serif",
+                      fontSize: isMobile ? '7.5px' : '11px',
+                      color: isDarkSlide ? '#dfb15b' : '#8b6914',
+                      margin: 0,
                     }}
                   >
-                    {slide.titleLine1}<br />
-                    {slide.titleLine2}{' '}
-                    <span style={{ color: isDarkSlide ? '#dfb15b' : '#8b6914', fontStyle: 'italic' }}>
-                      {slide.titleLine3}
-                    </span>
-                  </h1>
-                ) : (
-                  <h2
-                    className="mb-3 font-normal"
-                    style={{
-                      fontFamily: "'Cormorant Garamond', serif",
-                      fontSize: isMobile ? '21px' : '58px',
-                      lineHeight: 1.12,
-                      letterSpacing: '-0.01em',
-                      color: isDarkSlide ? '#ffffff' : '#141414',
-                    }}
-                  >
-                    {slide.titleLine1}<br />
-                    {slide.titleLine2}{' '}
-                    <span style={{ color: isDarkSlide ? '#dfb15b' : '#8b6914', fontStyle: 'italic' }}>
-                      {slide.titleLine3}
-                    </span>
-                  </h2>
-                )}
+                    {slide.preTitle}
+                  </p>
+                </div>
+
+                {/* Composed Editorial Typewriter & Erase Heading */}
+                <HeroEditorialTypewriter
+                  phrase={slide.phrase}
+                  asHeading={idx === 0 ? 'h1' : 'h2'}
+                  isActive={isActive}
+                  isHeroVisible={isHeroVisible}
+                  isDarkSlide={isDarkSlide}
+                  isMobile={isMobile}
+                  startCompleted={idx === 0}
+                  initialHoldMs={2300}
+                  holdDurationMs={idx === 2 ? 6000 : 2800}
+                  onSequenceComplete={handleAdvanceSlide}
+                />
 
                 {/* Tagline Description */}
                 <p
@@ -585,22 +629,44 @@ export default function Watch3DAssembly() {
           animation: float 4.5s ease-in-out infinite;
         }
         @keyframes scrollDot {
-          0% { opacity: 0; top: 5px; }
+          0% { opacity: 0; transform: translate(-50%, 0); }
           30% { opacity: 1; }
-          100% { opacity: 0; top: 15px; }
+          100% { opacity: 0; transform: translate(-50%, 10px); }
         }
-        .wn-type-cursor {
+        .wn-caret-slot[data-caret="idle"]::after,
+        .wn-caret-slot[data-caret="moving"]::after {
+          content: "";
           display: inline-block;
-          margin-left: 2px;
-          font-weight: 200;
-          line-height: 0.9;
-          animation: wn-type-blink 0.85s infinite;
-          user-select: none;
+          width: var(--wn-caret-w, 2px);
+          height: 0.86em;
+          vertical-align: -0.09em;
+          margin-left: 3px;
+          border-radius: 1px;
+          background: var(--wn-caret-bg);
+          box-shadow: var(--wn-caret-glow);
           pointer-events: none;
+          user-select: none;
+          will-change: opacity;
         }
-        @keyframes wn-type-blink {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0; }
+        .wn-caret-slot--italic[data-caret="idle"]::after,
+        .wn-caret-slot--italic[data-caret="moving"]::after {
+          margin-left: 4px;
+        }
+        .wn-caret-spacer::after {
+          opacity: 0 !important;
+          animation: none !important;
+        }
+        .wn-caret-slot[data-caret="idle"]::after {
+          animation: wn-caret-pulse 1.05s ease-in-out infinite;
+        }
+        @keyframes wn-caret-pulse {
+          0%, 100% { opacity: 0.95; }
+          50% { opacity: 0.14; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .wn-caret-slot::after {
+            display: none !important;
+          }
         }
       `}</style>
     </div>

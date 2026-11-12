@@ -52,7 +52,7 @@ export default function BenefitsBanner() {
     },
     {
       title: 'Secure Payments',
-      subtext: '100% secure checkout with payhere.lk',
+      subtext: '100% secure checkout with Payments.lk',
       icon: (
         <svg
           className="w-5 h-5 text-[#dfb15b]"

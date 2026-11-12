@@ -1,14 +1,14 @@
+import crypto from 'node:crypto';
 import { NextRequest, NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db';
 import Order from '@/lib/models/Order';
-import Product from '@/lib/models/Product';
 import { validateAndConsumeCouponForOrder } from '@/lib/couponHelper';
-
-// ── Security helper: sanitize strings ──────────────────────────────────────
-function sanitize(val: unknown): string {
-  if (typeof val !== 'string') return '';
-  return val.trim().replace(/<[^>]*>/g, '').slice(0, 500);
-}
+import {
+  decrementStockForOrderItems,
+  OrderValidationError,
+  resolveOrderItemsFromDb,
+  sanitizeOrderText as sanitize,
+} from '@/lib/orderFulfillment';
 
 // ── Validate email format ──────────────────────────────────────────────────
 function isValidEmail(email: string): boolean {
@@ -27,8 +27,15 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const {
       guestInfo, items, shippingAddress, paymentMethod, customOrderRef,
-      paymentStatus, payhereOrderId, couponCode, validationToken,
+      couponCode, validationToken, checkoutSource,
     } = body;
+
+    if (paymentMethod !== 'bank_transfer') {
+      return NextResponse.json(
+        { success: false, error: 'Card orders must be initiated through Payments.lk checkout.' },
+        { status: 400 }
+      );
+    }
 
     // ── 1. Validate guest info ──────────────────────────────────────────────
     if (!guestInfo || typeof guestInfo !== 'object') {
@@ -87,69 +94,10 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // ── 4. Server-side stock validation — NEVER trust client prices ─────────
-    let serverSubtotal = 0;
-    const validatedItems: any[] = [];
-
-    for (const item of items) {
-      if (!item.productId || typeof item.quantity !== 'number' || item.quantity < 1) {
-        return NextResponse.json(
-          { success: false, error: 'Invalid item data in order' },
-          { status: 400 }
-        );
-      }
-
-      // Fetch product from DB — authoritative price and stock source
-      const product = await Product.findById(item.productId);
-      if (!product || !product.isActive) {
-        return NextResponse.json(
-          { success: false, error: `Product not found or unavailable` },
-          { status: 404 }
-        );
-      }
-
-      // Find variant
-      const variant = product.colorVariants.find(
-        (v: any) => v.colorName === item.colorVariant
-      ) || product.colorVariants[0];
-
-      if (!variant) {
-        return NextResponse.json(
-          { success: false, error: `No variant available for ${product.title}` },
-          { status: 400 }
-        );
-      }
-
-      // Check stock
-      if (variant.qty < item.quantity) {
-        return NextResponse.json(
-          {
-            success: false,
-            error: `Insufficient stock for "${product.title}" (${variant.colorName}). Only ${variant.qty} available.`,
-          },
-          { status: 400 }
-        );
-      }
-
-      // Use DB price — never client-supplied price
-      const serverPrice = product.price;
-      serverSubtotal += serverPrice * item.quantity;
-
-      validatedItems.push({
-        productId: product._id.toString(),
-        productTitle: product.title,
-        productModelNo: product.modelNo,
-        productThumbnail: variant.image?.url || product.thumbnail?.url || '',
-        colorVariant: variant.colorName,
-        quantity: item.quantity,
-        price: serverPrice,
-        isGift: false,
-        giftNote: '',
-        canvaLink: '',
-        giftAttachmentUrl: '',
-        giftAttachmentName: '',
-      });
-    }
+    // ── 4. Server-side stock & price validation — NEVER trust client prices ──
+    const { validatedItems, serverSubtotal } = await resolveOrderItemsFromDb(items, {
+      allowGiftMetadata: false,
+    });
 
     // ── 5. Verify & consume coupon BEFORE decrementing stock ────────────────
     const couponResult = await validateAndConsumeCouponForOrder({
@@ -172,35 +120,16 @@ export async function POST(req: NextRequest) {
     } = couponResult;
 
     // ── 6. Generate cryptographically safe order reference ──────────────────
-    const uid = crypto.randomUUID().replace(/-/g, '').slice(0, 8).toUpperCase();
-    const orderRef = customOrderRef && typeof customOrderRef === 'string' ? customOrderRef : `WG-${uid}`;
+    const uid = crypto.randomBytes(4).toString('hex').toUpperCase();
+    const orderRef =
+      typeof customOrderRef === 'string' && /^WG-[A-Z0-9]{4,16}$/i.test(customOrderRef.trim())
+        ? customOrderRef.trim().toUpperCase()
+        : `WG-${uid}`;
 
     // ── 7. Atomically decrement stock ───────────────────────────────────────
-    for (const item of validatedItems) {
-      const product = await Product.findById(item.productId);
-      if (!product) continue;
+    await decrementStockForOrderItems(validatedItems);
 
-      const variant = product.colorVariants.find(
-        (v: any) => v.colorName === item.colorVariant
-      );
-      if (variant) {
-        variant.qty -= item.quantity;
-        variant.inStock = variant.qty > 0;
-      } else if (product.colorVariants[0]) {
-        product.colorVariants[0].qty -= item.quantity;
-        product.colorVariants[0].inStock = product.colorVariants[0].qty > 0;
-      }
-
-      // Update global isSoldOut flag if all variants empty
-      const allOutOfStock = product.colorVariants.every((v: any) => v.qty === 0);
-      if (allOutOfStock) {
-        product.isSoldOut = true;
-      }
-
-      await product.save();
-    }
-
-    // ── 7. Sanitize shipping address ────────────────────────────────────────
+    // ── 8. Sanitize shipping address ────────────────────────────────────────
     const safeAddress = {
       address: sanitize(shippingAddress.address),
       city: sanitize(shippingAddress.city),
@@ -210,8 +139,7 @@ export async function POST(req: NextRequest) {
       mobileCode: sanitize(shippingAddress.mobileCode),
     };
 
-    // ── 8. Create guest order in DB ─────────────────────────────────────────
-    const isPaid = paymentStatus === 'paid' || (paymentMethod === 'card' && paymentStatus === 'paid');
+    // ── 9. Create guest bank-transfer order in DB (always starts pending) ───
     const newOrder = await Order.create({
       clerkId: null,
       isGuestOrder: true,
@@ -229,12 +157,15 @@ export async function POST(req: NextRequest) {
       couponDiscountPercent,
       couponDiscountAmount,
       finalTotal: appliedCouponCode ? finalTotal : serverSubtotal,
-      status: isPaid ? 'processing' : 'pending',
+      status: 'pending',
       isGift: false,
       // Payment
-      paymentMethod: paymentMethod === 'bank_transfer' ? 'bank_transfer' : 'card',
-      paymentStatus: isPaid ? 'paid' : 'pending',
-      payhereOrderId: payhereOrderId || null,
+      paymentMethod: 'bank_transfer',
+      paymentProvider: 'bank_transfer',
+      paymentStatus: 'pending',
+      checkoutSource: checkoutSource === 'guest_cart' ? 'guest_cart' : 'guest_buy_now',
+      inventoryCommitted: true,
+      couponCommitted: true,
     });
 
     return NextResponse.json({
@@ -251,6 +182,12 @@ export async function POST(req: NextRequest) {
       },
     });
   } catch (error: any) {
+    if (error instanceof OrderValidationError) {
+      return NextResponse.json(
+        { success: false, error: error.message },
+        { status: error.status }
+      );
+    }
     console.error('Guest order creation error:', error);
     return NextResponse.json(
       { success: false, error: error?.message || 'Server error creating guest order' },

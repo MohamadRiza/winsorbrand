@@ -1,8 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useAuth } from '@clerk/nextjs';
 import toast from 'react-hot-toast';
 import { generateReceiptPdf } from '@/lib/utils/generateReceiptPdf';
+import { buildClerkAuthHeaders } from '@/lib/clerkClientHeaders';
 
 export interface BuyNowItem {
   productId: string;
@@ -35,26 +37,8 @@ interface BuyNowModalProps {
   onOrderSuccess?: (orderRef: string) => void;
 }
 
-type PayMethod = 'payhere' | 'bank_transfer';
+type PayMethod = 'card' | 'bank_transfer';
 type Step = 'confirm' | 'payment' | 'success';
-
-function loadPayhereSDK(): Promise<void> {
-  return new Promise((resolve, reject) => {
-    if (typeof (window as any).payhere !== 'undefined') { resolve(); return; }
-    const existing = document.querySelector('script[src*="payhere.lk"]');
-    if (existing) {
-      existing.addEventListener('load', () => resolve());
-      existing.addEventListener('error', () => reject(new Error('PayHere SDK failed to load')));
-      return;
-    }
-    const script = document.createElement('script');
-    script.src = 'https://www.payhere.lk/lib/payhere.js';
-    script.async = true;
-    script.onload = () => resolve();
-    script.onerror = () => reject(new Error('Failed to load payment gateway.'));
-    document.head.appendChild(script);
-  });
-}
 
 const ALLOWED_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'application/pdf'];
 
@@ -62,13 +46,14 @@ export default function BuyNowModal({
   isOpen, onClose, item, profile,
   userFirstName, userLastName, userEmail, onOrderSuccess,
 }: BuyNowModalProps) {
+  const { getToken, userId: clerkUserId } = useAuth();
   const [step, setStep] = useState<Step>('confirm');
   const [submitting, setSubmitting] = useState(false);
   const [orderRef, setOrderRef] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [copiedRef, setCopiedRef] = useState(false);
 
-  const [payMethod, setPayMethod] = useState<PayMethod>('bank_transfer');
+  const [payMethod, setPayMethod] = useState<PayMethod>('card');
   const [bankReceipt, setBankReceipt] = useState<File | null>(null);
   const [bankReceiptName, setBankReceiptName] = useState('');
   const [bankTransferConfirmed, setBankTransferConfirmed] = useState(false);
@@ -77,7 +62,7 @@ export default function BuyNowModal({
   useEffect(() => {
     if (isOpen) {
       setStep('confirm'); setErrorMsg(''); setOrderRef('');
-      setPayMethod('bank_transfer'); setBankReceipt(null);
+      setPayMethod('card'); setBankReceipt(null);
       setBankReceiptName(''); setBankTransferConfirmed(false);
     }
   }, [isOpen]);
@@ -118,78 +103,67 @@ export default function BuyNowModal({
       if (!bankReceipt) { toast.error('Please upload your bank transfer receipt.'); return; }
     }
     setSubmitting(true);
+    let isRedirecting = false;
     try {
-      const ref = `WN-${Math.random().toString(36).slice(2, 10).toUpperCase()}`;
-      setOrderRef(ref);
-
-      if (payMethod === 'payhere') {
-        const hashRes = await fetch('/api/payment/payhere-hash', {
+      const authHeaders = await buildClerkAuthHeaders(getToken);
+      if (payMethod === 'card') {
+        const checkoutRes = await fetch('/api/payment/payments-lk/checkout', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ clerkId: profile?.clerkId, orderRef: ref, amount: subtotal, currency: 'LKR' }),
-        });
-        const hashData = await hashRes.json();
-        if (!hashData.success) throw new Error('Failed to initialise payment gateway.');
-
-        await loadPayhereSDK();
-
-        const payherePaymentId = await new Promise<string>((resolve, reject) => {
-          const payhere = (window as any).payhere;
-          payhere.onCompleted = (pId: string) => resolve(pId || ref);
-          payhere.onDismissed = () => reject(new Error('Payment was cancelled. No order was created and no charges were made.'));
-          payhere.onError = (error: string) => reject(new Error(`Payment failed: ${error}`));
-          payhere.startPayment({
-            sandbox: hashData.data.isSandbox, merchant_id: hashData.data.merchantId,
-            return_url: '', cancel_url: '',
-            notify_url: `${window.location.origin}/api/payment/payhere-notify`,
-            order_id: ref, items: `${item.productTitle}`,
-            amount: subtotal.toFixed(2), currency: 'LKR',
-            first_name: userFirstName || 'Valued', last_name: userLastName || 'Client',
-            email: userEmail || profile?.email || '',
-            phone: `${profile?.mobileCode || ''}${profile?.mobile || ''}`.replace(/\s/g, ''),
-            address: profile?.address || '', city: profile?.city || '',
-            country: profile?.country || 'Sri Lanka', hash: hashData.data.hash,
-          });
-        });
-
-        const res = await fetch('/api/customer/orders', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: authHeaders,
           body: JSON.stringify({
-            clerkId: profile?.clerkId,
-            orderRef: ref,
+            clerkId: clerkUserId || profile?.clerkId,
+            isGuest: false,
+            checkoutSource: 'buy_now',
+            returnPath: typeof window !== 'undefined' ? window.location.pathname : '/collections',
             items: [{
-              productId: item.productId, productTitle: item.productTitle,
-              productModelNo: item.productModelNo, productThumbnail: item.productThumbnail,
-              colorVariant: item.colorVariant || '', quantity: item.quantity, price: item.price,
-              isGift: false, giftNote: '', canvaLink: '', giftAttachmentUrl: '', giftAttachmentName: '',
+              productId: item.productId,
+              colorVariant: item.colorVariant || '',
+              quantity: item.quantity,
+              isGift: false,
+              giftNote: '',
+              canvaLink: '',
+              giftAttachmentUrl: '',
+              giftAttachmentName: '',
             }],
             shippingAddress: {
-              address: profile!.address, city: profile!.city, postalCode: profile!.postalCode,
-              country: profile!.country, mobile: profile!.mobile, mobileCode: profile!.mobileCode,
+              address: profile!.address,
+              city: profile!.city,
+              postalCode: profile!.postalCode,
+              country: profile!.country,
+              mobile: profile!.mobile,
+              mobileCode: profile!.mobileCode,
             },
-            subtotal, isGift: false, couponCode: null, validationToken: null,
+            isGift: false,
+            couponCode: null,
+            validationToken: null,
             customerName: [userFirstName, userLastName].filter(Boolean).join(' ') || profile?.name || 'Valued Client',
             customerEmail: userEmail || profile?.email || '',
             customerMobile: `${profile?.mobileCode || ''} ${profile?.mobile || ''}`.trim(),
-            paymentMethod: 'card',
-            paymentStatus: 'paid',
-            payhereOrderId: payherePaymentId,
           }),
         });
-        const data = await res.json();
-        if (!res.ok || !data.success) throw new Error(data.error || 'Failed to record timepiece purchase.');
-
-        if (onOrderSuccess) onOrderSuccess(ref);
-        setStep('success');
-        toast.success('Payment confirmed! Your timepiece order is placed.');
+        const checkoutData = await checkoutRes.json();
+        if (!checkoutRes.ok || !checkoutData.success || !checkoutData.data?.checkoutUrl) {
+          throw new Error(checkoutData.error || 'Failed to initiate Payments.lk checkout.');
+        }
+        const checkoutUrl = String(checkoutData.data.checkoutUrl);
+        if (!/^https:\/\/([a-z0-9-]+\.)?payments\.lk\//i.test(checkoutUrl)) {
+          throw new Error('Unexpected payment gateway URL.');
+        }
+        setOrderRef(checkoutData.data.orderRef || '');
+        isRedirecting = true;
+        toast.loading('Redirecting to Payments.lk secure checkout...');
+        window.location.assign(checkoutUrl);
+        return;
       } else {
+        const ref = `WN-${Math.random().toString(36).slice(2, 10).toUpperCase()}`;
+        setOrderRef(ref);
         const res = await fetch('/api/customer/orders', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: authHeaders,
           body: JSON.stringify({
-            clerkId: profile?.clerkId,
+            clerkId: clerkUserId || profile?.clerkId,
             orderRef: ref,
+            checkoutSource: 'buy_now',
             items: [{
               productId: item.productId, productTitle: item.productTitle,
               productModelNo: item.productModelNo, productThumbnail: item.productThumbnail,
@@ -219,8 +193,8 @@ export default function BuyNowModal({
           reader.readAsDataURL(bankReceipt!);
         });
         const receiptRes = await fetch('/api/payment/bank-receipt', {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ clerkId: profile?.clerkId, orderRef: ref, fileBase64, fileName: bankReceipt!.name, mimeType: bankReceipt!.type, isGuest: false }),
+          method: 'POST', headers: authHeaders,
+          body: JSON.stringify({ clerkId: clerkUserId || profile?.clerkId, orderRef: ref, fileBase64, fileName: bankReceipt!.name, mimeType: bankReceipt!.type, isGuest: false }),
         });
         setBankReceiptUploading(false);
         const receiptData = await receiptRes.json();
@@ -234,7 +208,7 @@ export default function BuyNowModal({
       setBankReceiptUploading(false);
       setErrorMsg(err?.message || 'Order placement failed. Please try again.');
     } finally {
-      setSubmitting(false);
+      if (!isRedirecting) setSubmitting(false);
     }
   };
 
@@ -264,8 +238,8 @@ export default function BuyNowModal({
       items: [{ productTitle: item.productTitle, productModelNo: item.productModelNo, colorVariant: item.colorVariant, quantity: item.quantity, price: item.price }],
       subtotal,
       finalTotal: subtotal,
-      paymentMethod: payMethod === 'payhere' ? 'PayHere Card Payment' : 'Direct Bank Transfer',
-      paymentStatus: payMethod === 'payhere' ? 'paid' : 'pending',
+      paymentMethod: payMethod === 'card' ? 'Payments.lk Card Payment' : 'Direct Bank Transfer',
+      paymentStatus: payMethod === 'card' ? 'paid' : 'pending',
     });
     toast.success('PDF Receipt downloaded successfully!');
   };
@@ -838,23 +812,28 @@ export default function BuyNowModal({
 
                 <div className="bnm-section-label">Payment Method</div>
 
-                {/* Option 1: Pay via PayHere */}
+                {/* Option 1: Pay Online via Payments.lk */}
                 <div
-                  className={`bnm-pay-option ${payMethod === 'payhere' ? 'active' : ''}`}
-                  onClick={() => setPayMethod('payhere')}
+                  className={`bnm-pay-option ${payMethod === 'card' ? 'active' : ''}`}
+                  onClick={() => setPayMethod('card')}
                 >
-                  <div className={`bnm-radio ${payMethod === 'payhere' ? 'active' : ''}`} />
+                  {payMethod === 'card' && (
+                    <div className="bnm-corner-ribbon" title="Selected">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="20 6 9 17 4 12" /></svg>
+                    </div>
+                  )}
+                  <div className={`bnm-radio ${payMethod === 'card' ? 'active' : ''}`} />
                   <div style={{ flex: 1 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2" /><line x1="1" y1="10" x2="23" y2="10" /></svg>
-                      <span style={{ fontWeight: 600, fontSize: '13.5px', color: '#141414' }}>Pay via PayHere</span>
+                      <span style={{ fontWeight: 600, fontSize: '13.5px', color: '#141414' }}>Pay Online via Payments.lk</span>
                     </div>
                     <div style={{ fontSize: '11.5px', color: '#666666', marginTop: 3 }}>
-                      Visa · Mastercard · Amex · eWallet · Bank · USSD
+                      Visa · Mastercard · Amex · LankaQR · Bank Pay
                     </div>
                     {/* Payment brand badges */}
                     <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 8 }}>
-                      {['VISA', 'mastercard', 'AMEX', 'eWallets', 'BANK', 'USSD'].map((b) => (
+                      {['VISA', 'Mastercard', 'AMEX', 'LankaQR', 'Bank Pay'].map((b) => (
                         <span key={b} style={{ fontSize: '9px', fontWeight: 600, color: '#6B5B3E', background: '#FAF8F4', border: '1px solid rgba(139,105,20,0.18)', borderRadius: 4, padding: '2px 6px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                           {b}
                         </span>
@@ -957,7 +936,7 @@ export default function BuyNowModal({
                       </>
                     ) : (
                       <>
-                        Place Order &#8594;
+                        {payMethod === 'card' ? 'Continue to Payments.lk →' : 'Place Order →'}
                       </>
                     )}
                   </button>
@@ -989,7 +968,7 @@ export default function BuyNowModal({
                 </div>
                 <h3 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '26px', color: '#141414', fontWeight: 500, margin: '0 0 6px' }}>Order Confirmed</h3>
                 <p style={{ fontSize: '13px', color: '#666666', lineHeight: 1.6, margin: '0 0 16px' }}>
-                  {payMethod === 'payhere' ? 'Payment successful. Your timepiece order has been confirmed.' : 'Your order is placed. We will verify your bank transfer within 24 hours.'}
+                  {payMethod === 'card' ? 'Payment successful. Your timepiece order has been confirmed.' : 'Your order is placed. We will verify your bank transfer within 24 hours.'}
                 </p>
                 <div style={{ background: 'linear-gradient(135deg, #1E1912 0%, #2B241A 100%)', border: '1px solid rgba(184,150,78,0.4)', borderRadius: 14, padding: '18px 20px', marginBottom: 16, boxShadow: '0 10px 28px rgba(30,25,18,0.16)' }}>
                   <div style={{ fontSize: '10px', fontWeight: 600, color: '#D6BE88', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 8 }}>Order Reference Code</div>

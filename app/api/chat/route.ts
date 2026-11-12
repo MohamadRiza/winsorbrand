@@ -116,7 +116,7 @@ CRITICAL: When answering direct factual or policy questions covered below (such 
 - Can I order from anywhere in Sri Lanka?
   Yes. We provide islandwide delivery within Sri Lanka.
 - Do you offer Cash on Delivery?
-  No. Cash on Delivery is currently not available. We accept online payment methods including card payments, payment gateway options (PayHere), and bank transfers.
+  No. Cash on Delivery is currently not available. We accept online payment methods including card and QR payments via Payments.lk, and bank transfers.
 - Is it safe to pay by card?
   Yes. Card payments are processed securely through our payment gateway. WINSOR does not have access to your complete card details.
 - Can I order from outside Sri Lanka?

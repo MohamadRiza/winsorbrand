@@ -3,12 +3,13 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useUser, SignInButton } from '@clerk/nextjs';
+import { useUser, useAuth, SignInButton } from '@clerk/nextjs';
 import { useCart, CartItem } from '@/app/context/CartContext';
 import { useCurrency } from '@/app/context/CurrencyContext';
 import toast from 'react-hot-toast';
 import GuestCheckoutModal from '@/components/Checkout/GuestCheckoutModal';
 import WinsorLoader from '@/components/WinsorLoader';
+import { buildClerkAuthHeaders } from '@/lib/clerkClientHeaders';
 import {
   ClientCouponResult,
   computeCouponTotals,
@@ -25,6 +26,7 @@ const getItemImage = (item: CartItem): string => {
 
 export default function CartPage() {
   const { isLoaded: userLoaded, isSignedIn, user } = useUser();
+  const { getToken } = useAuth();
   const { cartItems, loading: cartLoading, updateQuantity, removeFromCart, clearCart } = useCart();
   const { convertPrice } = useCurrency();
 
@@ -122,28 +124,6 @@ export default function CartPage() {
       return next;
     });
     toast.success('Gifting options removed.');
-  };
-
-  // ── PayHere SDK Loader ────────────────────────────────────────────────────
-  const loadPayhereSDK = (): Promise<void> => {
-    return new Promise((resolve, reject) => {
-      if (typeof (window as any).payhere !== 'undefined') {
-        resolve();
-        return;
-      }
-      const existing = document.querySelector('script[src*="payhere.lk"]');
-      if (existing) {
-        existing.addEventListener('load', () => resolve());
-        existing.addEventListener('error', () => reject(new Error('PayHere SDK failed to load')));
-        return;
-      }
-      const script = document.createElement('script');
-      script.src = 'https://www.payhere.lk/lib/payhere.js';
-      script.async = true;
-      script.onload = () => resolve();
-      script.onerror = () => reject(new Error('Failed to load payment gateway. Please check your connection.'));
-      document.head.appendChild(script);
-    });
   };
 
   // ── Bank Receipt File Selector ───────────────────────────────────────────
@@ -417,7 +397,7 @@ export default function CartPage() {
     setShowConfirmModal(true);
   };
 
-  // Place Order — handles both Card (PayHere) and Bank Transfer flows
+  // Place Order — handles both Card (Payments.lk) and Bank Transfer flows
   const handlePlaceOrder = async () => {
     // ── Pre-flight validation for bank transfer ─────────────────────────────
     if (paymentMethod === 'bank_transfer') {
@@ -432,9 +412,8 @@ export default function CartPage() {
     }
 
     setPaymentProcessing(true);
+    let isRedirecting = false;
     try {
-      const ref = `WNS-2026-${Math.floor(100000 + Math.random() * 900000)}`;
-
       const orderItems = selectedItemsList.map(item => {
         const key = `${item.productId}-${item.colorVariant || ''}`;
         const gift = giftDetails[key];
@@ -455,62 +434,18 @@ export default function CartPage() {
       });
 
       const orderHasGifts = orderItems.some(i => i.isGift);
+      const authHeaders = await buildClerkAuthHeaders(getToken);
 
-      setOrderRef(ref);
-
-      // ── Step 2a: Card payment via PayHere ────────────────────────────────
+      // ── Step 2a: Card / QR payment via Payments.lk ────────────────────────
       if (paymentMethod === 'card') {
-        const finalAmount = selectedFinalTotal;
-
-        // Get server-generated hash (secret stays server-side)
-        const hashRes = await fetch('/api/payment/payhere-hash', {
+        const checkoutRes = await fetch('/api/payment/payments-lk/checkout', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ clerkId: user?.id, orderRef: ref, amount: finalAmount, currency: 'LKR' }),
-        });
-        const hashData = await hashRes.json();
-        if (!hashData.success) throw new Error('Failed to initialise payment gateway.');
-
-        // Load PayHere SDK dynamically
-        await loadPayhereSDK();
-
-        // Open PayHere payment popup
-        const payherePaymentId = await new Promise<string>((resolve, reject) => {
-          const payhere = (window as any).payhere;
-          payhere.onCompleted = (pId: string) => resolve(pId || ref);
-          payhere.onDismissed = () =>
-            reject(new Error('Payment was cancelled. No order was created and no charges were made.'));
-          payhere.onError = (error: string) =>
-            reject(new Error(`Payment failed: ${error}`));
-
-          payhere.startPayment({
-            sandbox: hashData.data.isSandbox,
-            merchant_id: hashData.data.merchantId,
-            return_url: '',
-            cancel_url: '',
-            notify_url: `${window.location.origin}/api/payment/payhere-notify`,
-            order_id: ref,
-            items: `Winsor Timepieces (${selectedCount} item${selectedCount > 1 ? 's' : ''})`,
-            amount: finalAmount.toFixed(2),
-            currency: 'LKR',
-            first_name: user?.firstName || 'Valued',
-            last_name: user?.lastName || 'Client',
-            email: user?.emailAddresses?.[0]?.emailAddress || profile?.email || '',
-            phone: `${profile?.mobileCode || ''}${profile?.mobile || ''}`.replace(/\s/g, ''),
-            address: profile?.address || '',
-            city: profile?.city || '',
-            country: profile?.country || 'Sri Lanka',
-            hash: hashData.data.hash,
-          });
-        });
-
-        // ── Order is created ONLY after payment is confirmed by PayHere ────────
-        const res = await fetch('/api/customer/orders', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: authHeaders,
           body: JSON.stringify({
             clerkId: user?.id,
-            orderRef: ref,
+            isGuest: false,
+            checkoutSource: 'cart',
+            returnPath: '/cart',
             items: orderItems,
             shippingAddress: {
               address: profile.address,
@@ -520,40 +455,47 @@ export default function CartPage() {
               mobile: profile.mobile,
               mobileCode: profile.mobileCode,
             },
-            subtotal: selectedSubtotal,
             isGift: orderHasGifts,
             couponCode: appliedCoupon?.code || null,
             validationToken: appliedCoupon?.validationToken || null,
-            customerName: user?.fullName || [user?.firstName, user?.lastName].filter(Boolean).join(' ') || profile?.name || 'Valued Patron',
+            customerName:
+              user?.fullName ||
+              [user?.firstName, user?.lastName].filter(Boolean).join(' ') ||
+              profile?.name ||
+              'Valued Patron',
             customerEmail: user?.emailAddresses?.[0]?.emailAddress || profile?.email || '',
             customerMobile: `${profile?.mobileCode || ''} ${profile?.mobile || ''}`.trim(),
-            paymentMethod: 'card',
-            paymentStatus: 'paid',
-            payhereOrderId: payherePaymentId,
           }),
         });
 
-        const data = await res.json();
-        if (!res.ok || !data.success) {
-          throw new Error(data.error || 'Failed to record timepiece purchase');
+        const checkoutData = await checkoutRes.json();
+        if (!checkoutRes.ok || !checkoutData.success || !checkoutData.data?.checkoutUrl) {
+          throw new Error(checkoutData.error || 'Failed to initiate Payments.lk checkout.');
         }
 
-        // Payment & order registration successful
-        await clearCart();
-        setAppliedCoupon(null);
-        setCouponInput('');
-        setOrderSuccess(true);
-        setShowConfirmModal(false);
-        toast.success('Payment confirmed! Your timepiece order is placed.');
+        const checkoutUrl = String(checkoutData.data.checkoutUrl);
+        if (!/^https:\/\/([a-z0-9-]+\.)?payments\.lk\//i.test(checkoutUrl)) {
+          throw new Error('Unexpected payment gateway URL.');
+        }
+
+        setOrderRef(checkoutData.data.orderRef || '');
+        isRedirecting = true;
+        toast.loading('Redirecting to Payments.lk secure checkout...');
+        window.location.assign(checkoutUrl);
+        return;
 
         // ── Step 2b: Bank transfer receipt upload ────────────────────────────
       } else {
+        const ref = `WNS-2026-${Math.floor(100000 + Math.random() * 900000)}`;
+        setOrderRef(ref);
+
         const res = await fetch('/api/customer/orders', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: authHeaders,
           body: JSON.stringify({
             clerkId: user?.id,
             orderRef: ref,
+            checkoutSource: 'cart',
             items: orderItems,
             shippingAddress: {
               address: profile.address,
@@ -591,7 +533,7 @@ export default function CartPage() {
 
         const receiptRes = await fetch('/api/payment/bank-receipt', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: authHeaders,
           body: JSON.stringify({
             clerkId: user?.id,
             orderRef: ref,
@@ -620,7 +562,7 @@ export default function CartPage() {
       setBankReceiptUploading(false);
       toast.error(err?.message || 'Order placement failed. Please try again.');
     } finally {
-      setPaymentProcessing(false);
+      if (!isRedirecting) setPaymentProcessing(false);
     }
   };
 
@@ -2328,7 +2270,7 @@ export default function CartPage() {
 
                   <div className="bnm-section-label">Payment Method</div>
 
-                  {/* Option 1: Pay via PayHere */}
+                  {/* Option 1: Pay Online via Payments.lk */}
                   <div
                     className={`bnm-pay-option ${paymentMethod === 'card' ? 'active' : ''}`}
                     onClick={() => { setPaymentMethod('card'); setBankReceipt(null); setBankReceiptName(''); setBankTransferConfirmed(false); }}
@@ -2337,13 +2279,13 @@ export default function CartPage() {
                     <div style={{ flex: 1 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#141414" strokeWidth="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2" /><line x1="1" y1="10" x2="23" y2="10" /></svg>
-                        <span style={{ fontWeight: 600, fontSize: '13.5px', color: '#141414' }}>Pay via PayHere</span>
+                        <span style={{ fontWeight: 600, fontSize: '13.5px', color: '#141414' }}>Pay Online via Payments.lk</span>
                       </div>
                       <div style={{ fontSize: '11.5px', color: '#666666', marginTop: 3 }}>
-                        Visa · Mastercard · Amex · eWallet · Bank · USSD
+                        Visa · Mastercard · Amex · LankaQR · Bank Pay
                       </div>
                       <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 8 }}>
-                        {['VISA', 'mastercard', 'AMEX', 'eWallets', 'BANK', 'USSD'].map((b) => (
+                        {['VISA', 'Mastercard', 'AMEX', 'LankaQR', 'Bank Pay'].map((b) => (
                           <span key={b} style={{ fontSize: '9px', fontWeight: 600, color: '#141414', background: '#F8F7F4', border: '1px solid rgba(20,20,20,0.1)', borderRadius: 4, padding: '2px 6px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                             {b}
                           </span>
@@ -2439,7 +2381,7 @@ export default function CartPage() {
                           {bankReceiptUploading ? 'Uploading Receipt...' : 'Processing...'}
                         </>
                       ) : (
-                        <>Place Order &#8594;</>
+                        <>{paymentMethod === 'card' ? 'Continue to Payments.lk →' : 'Place Order →'}</>
                       )}
                     </button>
                   </div>
@@ -3091,7 +3033,7 @@ export default function CartPage() {
                     <div className="security-badges">
                       <div className="security-badge-title">
                         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
-                        <span>100% secure checkout with payhere.lk</span>
+                        <span>100% secure checkout with Payments.lk</span>
                       </div>
                       <div className="payment-logo-row">
                         {/* Visa */}
@@ -3147,6 +3089,7 @@ export default function CartPage() {
       <GuestCheckoutModal
         isOpen={showGuestCheckoutModal}
         onClose={() => setShowGuestCheckoutModal(false)}
+        checkoutSource="guest_cart"
         items={selectedItemsList.map(item => ({
           productId: item.productId,
           productTitle: item.product?.title || 'Timepiece',

@@ -84,6 +84,7 @@ interface OrderData {
   customerMobile?: string;
   paymentMethod?: string;
   paymentStatus?: string;
+  paymentProvider?: string | null;
 }
 
 function OrderTrackingContent() {
@@ -213,7 +214,9 @@ function OrderTrackingContent() {
       discountPercent: order.couponDiscountPercent || undefined,
       discountAmount: order.couponDiscountAmount || undefined,
       finalTotal: order.finalTotal ?? order.subtotal,
-      paymentMethod: isBank ? 'Direct Bank Transfer' : 'PayHere Card Payment',
+      paymentMethod: isBank
+        ? 'Direct Bank Transfer'
+        : 'Payments.lk Card Payment',
       paymentStatus: isPaid ? 'paid' : 'pending',
     });
     toast.success('Official PDF Receipt downloaded!');

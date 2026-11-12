@@ -1,37 +1,51 @@
+import crypto from 'node:crypto';
 import { NextRequest, NextResponse } from 'next/server';
-import { getAuth } from '@clerk/nextjs/server';
+import { getVerifiedClerkUserId } from '@/lib/clerkAuth';
 import { connectDB } from '@/lib/db';
 import Order from '@/lib/models/Order';
 import Product from '@/lib/models/Product';
 import Customer from '@/lib/models/Customer';
 import { validateAndConsumeCouponForOrder } from '@/lib/couponHelper';
+import {
+  decrementStockForOrderItems,
+  OrderValidationError,
+  resolveOrderItemsFromDb,
+} from '@/lib/orderFulfillment';
 
 export async function GET(req: NextRequest) {
   try {
     await connectDB();
-    let { userId } = getAuth(req);
+    const userId = await getVerifiedClerkUserId(req);
     const queryClerkId = req.nextUrl.searchParams.get('clerkId');
     const queryEmail = req.nextUrl.searchParams.get('email');
 
-    if (!userId && queryClerkId) {
-      userId = queryClerkId;
-    }
-
-    if (!userId && !queryEmail) {
+    if (!userId) {
       return NextResponse.json(
         { success: false, error: 'Unauthorized. Please sign in.' },
         { status: 401 }
       );
     }
 
-    const filterConditions: any[] = [];
-    if (userId) {
-      filterConditions.push({ clerkId: userId });
+    if (queryClerkId && queryClerkId !== userId) {
+      return NextResponse.json(
+        { success: false, error: 'Account session mismatch.' },
+        { status: 403 }
+      );
     }
-    if (queryEmail) {
-      const cleanEmail = queryEmail.toLowerCase().trim();
-      filterConditions.push({ customerEmail: cleanEmail });
-      filterConditions.push({ guestEmail: cleanEmail });
+
+    const filterConditions: any[] = [{ clerkId: userId }];
+
+    // Only include email-matched orders if the email belongs to this authenticated customer's profile
+    const customerProfile = await Customer.findOne({ clerkId: userId }).select('email').lean() as any;
+    const verifiedProfileEmail = customerProfile?.email ? String(customerProfile.email).toLowerCase().trim() : '';
+    const requestedEmail = queryEmail ? queryEmail.toLowerCase().trim() : '';
+    const emailToInclude = verifiedProfileEmail && (!requestedEmail || requestedEmail === verifiedProfileEmail)
+      ? verifiedProfileEmail
+      : '';
+
+    if (emailToInclude) {
+      filterConditions.push({ customerEmail: emailToInclude });
+      filterConditions.push({ guestEmail: emailToInclude });
     }
 
     const query = filterConditions.length === 1
@@ -80,17 +94,13 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     await connectDB();
-    let { userId } = getAuth(req);
+    const userId = await getVerifiedClerkUserId(req);
     const body = await req.json();
     const {
-      clerkId, orderRef, items, shippingAddress, subtotal, isGift,
-      couponCode, validationToken, paymentMethod, paymentStatus, payhereOrderId,
-      customerName, customerEmail, customerMobile,
+      clerkId, orderRef: clientOrderRef, items, shippingAddress, isGift,
+      couponCode, validationToken, paymentMethod,
+      customerName, customerEmail, customerMobile, checkoutSource,
     } = body;
-
-    if (!userId && clerkId) {
-      userId = clerkId;
-    }
 
     if (!userId) {
       return NextResponse.json(
@@ -99,65 +109,37 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (!orderRef || !items || !shippingAddress || !subtotal) {
+    if (typeof clerkId === 'string' && clerkId && clerkId !== userId) {
+      return NextResponse.json(
+        { success: false, error: 'Account session mismatch.' },
+        { status: 403 }
+      );
+    }
+
+    if (paymentMethod !== 'bank_transfer') {
+      return NextResponse.json(
+        { success: false, error: 'Card orders must be initiated through Payments.lk checkout.' },
+        { status: 400 }
+      );
+    }
+
+    if (!items || !shippingAddress) {
       return NextResponse.json(
         { success: false, error: 'Missing required order fields' },
         { status: 400 }
       );
     }
 
-    if (!Array.isArray(items) || items.length === 0) {
-      return NextResponse.json(
-        { success: false, error: 'Order must contain at least one timepiece' },
-        { status: 400 }
-      );
-    }
-
-    // 1. Validate stock first to prevent race conditions or partial updates and resolve authoritative variant thumbnail
-    const validatedItems = [];
-    for (const item of items) {
-      const product = await Product.findById(item.productId);
-      if (!product) {
-        return NextResponse.json(
-          { success: false, error: `Timepiece not found` },
-          { status: 404 }
-        );
-      }
-      
-      const variant = product.colorVariants.find(v => v.colorName === item.colorVariant);
-      if (variant) {
-        if (variant.qty < item.quantity) {
-          return NextResponse.json(
-            { success: false, error: `Insufficient stock for ${product.title} (${item.colorVariant}). Only ${variant.qty} remaining.` },
-            { status: 400 }
-          );
-        }
-      } else if (product.colorVariants[0]) {
-        if (product.colorVariants[0].qty < item.quantity) {
-          return NextResponse.json(
-            { success: false, error: `Insufficient stock for ${product.title}. Only ${product.colorVariants[0].qty} remaining.` },
-            { status: 400 }
-          );
-        }
-      } else {
-        return NextResponse.json(
-          { success: false, error: `Timepiece does not have any variants available` },
-          { status: 400 }
-        );
-      }
-
-      const variantThumbnail = variant?.image?.url || item.productThumbnail || product.thumbnail?.url || '';
-      validatedItems.push({
-        ...item,
-        productThumbnail: variantThumbnail,
-      });
-    }
+    // 1. Authoritatively validate stock and compute subtotal strictly from MongoDB Product records
+    const { validatedItems, serverSubtotal, hasGifts } = await resolveOrderItemsFromDb(items, {
+      allowGiftMetadata: true,
+    });
 
     // 2. Verify and consume coupon BEFORE decrementing stock so invalid coupons never subtract inventory
     const couponResult = await validateAndConsumeCouponForOrder({
       couponCode,
       validationToken,
-      subtotal,
+      subtotal: serverSubtotal,
       expectedClerkId: userId,
     });
     if (!couponResult.ok) {
@@ -173,30 +155,14 @@ export async function POST(req: NextRequest) {
       finalTotal,
     } = couponResult;
 
-    // 3. Decrement stock for variants
-    for (const item of items) {
-      const product = await Product.findById(item.productId);
-      if (product) {
-        const variant = product.colorVariants.find(v => v.colorName === item.colorVariant);
-        if (variant) {
-          variant.qty -= item.quantity;
-          variant.inStock = variant.qty > 0;
-        } else if (product.colorVariants[0]) {
-          product.colorVariants[0].qty -= item.quantity;
-          product.colorVariants[0].inStock = product.colorVariants[0].qty > 0;
-        }
-        
-        // Re-evaluate global sold out state
-        const allOutOfStock = product.colorVariants.every(v => v.qty === 0);
-        if (allOutOfStock) {
-          product.isSoldOut = true;
-        }
-        
-        await product.save();
-      }
-    }
+    // 3. Decrement stock atomically after coupon verification
+    await decrementStockForOrderItems(validatedItems);
 
-    const isPaid = paymentStatus === 'paid' || (paymentMethod === 'card' && paymentStatus === 'paid');
+    const safeSuffix = crypto.randomBytes(4).toString('hex').toUpperCase();
+    const orderRef =
+      typeof clientOrderRef === 'string' && /^(WNS-2026-|WN-)[A-Z0-9]{4,16}$/i.test(clientOrderRef.trim())
+        ? clientOrderRef.trim().toUpperCase()
+        : `WNS-2026-${safeSuffix}`;
 
     // Look up customer document to fill in any missing contact details
     let resolvedCustomerName = customerName?.trim() || null;
@@ -231,22 +197,31 @@ export async function POST(req: NextRequest) {
       orderRef,
       items: validatedItems,
       shippingAddress,
-      subtotal,
-      status: isPaid ? 'processing' : 'pending',
-      isGift: !!isGift || validatedItems.some((i: any) => i.isGift),
+      subtotal: serverSubtotal,
+      status: 'pending',
+      isGift: !!isGift || hasGifts,
       // Coupon data (all computed server-side)
       couponCode: appliedCouponCode,
       couponDiscountPercent,
       couponDiscountAmount,
-      finalTotal: appliedCouponCode ? finalTotal : subtotal,
-      // Payment
-      paymentMethod: paymentMethod === 'bank_transfer' ? 'bank_transfer' : 'card',
-      paymentStatus: isPaid ? 'paid' : 'pending',
-      payhereOrderId: payhereOrderId || null,
+      finalTotal: appliedCouponCode ? finalTotal : serverSubtotal,
+      // Payment — bank transfer always starts pending admin receipt verification
+      paymentMethod: 'bank_transfer',
+      paymentProvider: 'bank_transfer',
+      paymentStatus: 'pending',
+      checkoutSource: checkoutSource === 'buy_now' ? 'buy_now' : 'cart',
+      inventoryCommitted: true,
+      couponCommitted: true,
     });
 
     return NextResponse.json({ success: true, data: newOrder });
   } catch (error: any) {
+    if (error instanceof OrderValidationError) {
+      return NextResponse.json(
+        { success: false, error: error.message },
+        { status: error.status }
+      );
+    }
     console.error('Create customer order API error:', error);
     return NextResponse.json(
       { success: false, error: error?.message || 'Server error' },

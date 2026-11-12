@@ -1,4 +1,5 @@
 import { clerkMiddleware } from '@clerk/nextjs/server';
+import { getExpectedClerkIssuerHost } from '@/lib/clerkIssuer';
 import { NextRequest, NextResponse, NextFetchEvent } from 'next/server';
 import { verifyAccessToken } from '@/lib/jwt';
 
@@ -74,14 +75,31 @@ function isStaleClerkSession(token?: string): boolean {
     const parts = token.split('.');
     if (parts.length < 2) return false;
     const header = JSON.parse(Buffer.from(parts[0], 'base64url').toString('utf8'));
-    // Invalidate the legacy Clerk instance key id 'ins_2voZuNySdIp39pQgtQeQLkSXNb5'
-    if (header.kid === 'ins_2voZuNySdIp39pQgtQeQLkSXNb5') {
-      return true;
-    }
-    // In production, ensure session token matches the production instance key id 'ins_3Hlk2s3HqcNnByzqXuX1cTj4pNf'
-    if (process.env.NODE_ENV === 'production') {
+    const pk = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY || '';
+    const isLiveKey = pk.startsWith('pk_live_');
+
+    // Only treat the dev instance key id as stale when running against a live production Clerk key.
+    // Note: in development (pk_test_...), apt-walrus-40.clerk.accounts.dev legitimately signs tokens with 'ins_2voZuNySdIp39pQgtQeQLkSXNb5'.
+    if (isLiveKey || (!pk && process.env.NODE_ENV === 'production')) {
+      if (header.kid === 'ins_2voZuNySdIp39pQgtQeQLkSXNb5') {
+        return true;
+      }
       if (header.kid && header.kid !== 'ins_3Hlk2s3HqcNnByzqXuX1cTj4pNf') {
         return true;
+      }
+    } else if (pk.startsWith('pk_test_') && header.kid === 'ins_3Hlk2s3HqcNnByzqXuX1cTj4pNf') {
+      return true;
+    }
+
+    // Also guard against tokens issued by any mismatched Clerk frontend API host.
+    const expectedHost = getExpectedClerkIssuerHost();
+    if (expectedHost && parts[1]) {
+      const payload = JSON.parse(Buffer.from(parts[1], 'base64url').toString('utf8'));
+      if (typeof payload?.iss === 'string' && payload.iss) {
+        const issHost = new URL(payload.iss).hostname;
+        if (issHost && issHost !== expectedHost) {
+          return true;
+        }
       }
     }
   } catch {

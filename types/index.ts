@@ -115,6 +115,9 @@ export interface IOrderShippingAddress {
   mobileCode: string;
 }
 
+export type PaymentProvider = 'payments_lk' | 'bank_transfer';
+export type CheckoutSource = 'cart' | 'buy_now' | 'guest_cart' | 'guest_buy_now';
+
 export interface IOrder {
   _id?: string;
   clerkId?: string | null;   // null for guest orders
@@ -142,9 +145,25 @@ export interface IOrder {
   // Payment fields
   paymentMethod?: PaymentMethod;
   paymentStatus?: PaymentStatus;
+  paymentProvider?: PaymentProvider | null;
+  paymentsLkCheckoutId?: string | null;
+  paymentsLkPaymentId?: string | null;
+  paymentsLkEventId?: string | null;
+  paymentsLkMode?: 'test' | 'live' | null;
+  paymentsLkCardScheme?: string | null;
+  paymentsLkCardLast4?: string | null;
+  paymentsLkFeeCents?: number | null;
+  paymentsLkNetCents?: number | null;
+  paymentsLkRefundedCents?: number | null;
+  paymentsLkVerifiedAt?: Date | null;
+  gatewayConfirmed?: boolean;
+  checkoutSource?: CheckoutSource | null;
+  inventoryCommitted?: boolean;
+  couponCommitted?: boolean;
+  paidAt?: Date | null;
+  paymentFailureReason?: string | null;
   receiptUrl?: string | null;
   receiptPublicId?: string | null;
-  payhereOrderId?: string | null;
   createdAt?: Date;
   updatedAt?: Date;
   deliveredAt?: Date | null;

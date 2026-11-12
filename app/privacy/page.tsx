@@ -630,7 +630,7 @@ export default function PrivacyPolicyPage() {
                 </li>
                 <li className="legal-list-item">
                   <span className="legal-bullet" />
-                  <span><strong>Payment Gateways:</strong> Authorized acquiring banks and payment gateways (e.g., PayHere, Stripe) for secure checkout processing.</span>
+                  <span><strong>Payment Gateways:</strong> Authorized acquiring banks and payment gateways (e.g., Payments.lk) for secure checkout processing.</span>
                 </li>
                 <li className="legal-list-item">
                   <span className="legal-bullet" />

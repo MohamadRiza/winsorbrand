@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db';
 import Order from '@/lib/models/Order';
 import Product from '@/lib/models/Product';
-import Customer from '@/lib/models/Customer';
 import { verifyPermissions } from '@/lib/authHelper';
+import { enrichOrdersForAdmin } from '@/lib/orderFulfillment';
 
 export async function PATCH(
   req: NextRequest,
@@ -52,11 +52,23 @@ export async function PATCH(
       );
     }
 
+    // Never allow manual override of paymentStatus for Payments.lk card orders
+    if (paymentStatus && order.paymentMethod !== 'bank_transfer') {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Online card payments can only be confirmed via Payments.lk gateway verification.',
+        },
+        { status: 400 }
+      );
+    }
+
     const previousStatus = order.status;
 
     // Stock replenishment check:
-    // If the status is changing to 'cancelled' from a non-cancelled active state, restore inventory stock in parallel
-    if (status && status === 'cancelled' && previousStatus !== 'cancelled') {
+    // If the status is changing to 'cancelled' from a non-cancelled active state,
+    // restore inventory stock in parallel ONLY when inventory was previously committed.
+    if (status && status === 'cancelled' && previousStatus !== 'cancelled' && order.inventoryCommitted !== false) {
       await Promise.all(
         order.items.map(async (item: any) => {
           const product = await Product.findById(item.productId);
@@ -94,31 +106,7 @@ export async function PATCH(
 
     await order.save();
 
-    // Enrich with customer details
-    const cust = order.clerkId ? await Customer.findOne({ clerkId: order.clerkId }).lean() : null;
-
-    const customerName = order.customerName
-      || order.guestName
-      || cust?.name
-      || (cust?.email ? cust.email.split('@')[0] : (order.isGuestOrder ? 'Guest Customer' : 'Registered Patron'));
-
-    const customerEmail = order.customerEmail
-      || order.guestEmail
-      || cust?.email
-      || null;
-
-    const customerMobile = order.customerMobile
-      || order.guestMobile
-      || (order.shippingAddress?.mobileCode && order.shippingAddress?.mobile
-        ? `${order.shippingAddress.mobileCode} ${order.shippingAddress.mobile}`
-        : (cust?.mobileCode && cust?.mobile ? `${cust.mobileCode} ${cust.mobile}` : null));
-
-    const enriched = {
-      ...order.toObject(),
-      customerName,
-      customerEmail,
-      customerMobile,
-    };
+    const [enriched] = await enrichOrdersForAdmin([order.toObject()]);
 
     return NextResponse.json({ success: true, data: enriched });
   } catch (error: any) {

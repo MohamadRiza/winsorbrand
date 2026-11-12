@@ -36,6 +36,7 @@ interface GuestCheckoutModalProps {
   isOpen: boolean;
   onClose: () => void;
   items: GuestCheckoutItem[];
+  checkoutSource?: 'guest_cart' | 'guest_buy_now';
   appliedCoupon?: ClientCouponResult | null;
   onCouponChange?: (coupon: ClientCouponResult | null) => void;
   onLoginClick?: () => void;
@@ -70,6 +71,7 @@ export default function GuestCheckoutModal({
   isOpen,
   onClose,
   items,
+  checkoutSource = 'guest_buy_now',
   appliedCoupon = null,
   onCouponChange,
   onLoginClick,
@@ -91,7 +93,7 @@ export default function GuestCheckoutModal({
   const [receiptSnapshot, setReceiptSnapshot] = useState<CompletedReceiptSnapshot | null>(null);
 
   // Payment state
-  const [payMethod, setPayMethod] = useState<'payhere' | 'bank_transfer'>('payhere');
+  const [payMethod, setPayMethod] = useState<'card' | 'bank_transfer'>('card');
   const [bankReceipt, setBankReceipt] = useState<File | null>(null);
   const [bankReceiptName, setBankReceiptName] = useState('');
   const [bankTransferConfirmed, setBankTransferConfirmed] = useState(false);
@@ -119,7 +121,7 @@ export default function GuestCheckoutModal({
       setErrorMsg('');
       setOrderRef('');
       setFormErrors({});
-      setPayMethod('payhere');
+      setPayMethod('card');
       setBankReceipt(null);
       setBankReceiptName('');
       setBankTransferConfirmed(false);
@@ -202,21 +204,6 @@ export default function GuestCheckoutModal({
     return Object.keys(errs).length === 0;
   };
 
-  // ── Load PayHere SDK ────────────────────────────────────────────────────
-  const loadPayhereSDK = (): Promise<void> => {
-    return new Promise((resolve, reject) => {
-      if (typeof (window as any).payhere !== 'undefined') { resolve(); return; }
-      const existing = document.querySelector('script[src*="payhere.lk"]');
-      if (existing) { existing.addEventListener('load', () => resolve()); existing.addEventListener('error', () => reject(new Error('SDK load failed'))); return; }
-      const script = document.createElement('script');
-      script.src = 'https://www.payhere.lk/lib/payhere.js';
-      script.async = true;
-      script.onload = () => resolve();
-      script.onerror = () => reject(new Error('Failed to load payment gateway.'));
-      document.head.appendChild(script);
-    });
-  };
-
   // ── Receipt file select ─────────────────────────────────────────────────
   const handleReceiptSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -237,7 +224,7 @@ export default function GuestCheckoutModal({
     setStep('payment');
   };
 
-  // ── Step 2: Execute payment (PayHere or bank transfer) ───────────────────
+  // ── Step 2: Execute payment (Payments.lk or bank transfer) ──────────────
   const handlePay = async () => {
     setErrorMsg('');
     if (payMethod === 'bank_transfer') {
@@ -245,41 +232,9 @@ export default function GuestCheckoutModal({
       if (!bankReceipt) { toast.error('Please upload your bank transfer receipt.'); return; }
     }
     setSubmitting(true);
+    let isRedirecting = false;
     try {
-      const ref = orderRef || `WG-${Math.random().toString(36).slice(2, 10).toUpperCase()}`;
-      setOrderRef(ref);
-
       const resolvedEmail = form.email.trim().toLowerCase();
-      const buildOrderRequestBody = (
-        method: 'card' | 'bank_transfer',
-        status: 'paid' | 'pending',
-        paymentId?: string
-      ) => ({
-        guestInfo: {
-          name: form.name.trim(),
-          email: resolvedEmail,
-          mobile: `${form.mobileCode} ${form.mobile.trim()}`,
-        },
-        items: items.map(i => ({
-          productId: i.productId,
-          colorVariant: i.colorVariant,
-          quantity: i.quantity,
-        })),
-        shippingAddress: {
-          address: form.address.trim(),
-          city: form.city.trim(),
-          postalCode: form.postalCode.trim(),
-          country: form.country,
-          mobile: form.mobile.trim(),
-          mobileCode: form.mobileCode,
-        },
-        couponCode: localCoupon?.code || null,
-        validationToken: localCoupon?.validationToken || null,
-        paymentMethod: method,
-        paymentStatus: status,
-        ...(paymentId ? { payhereOrderId: paymentId } : {}),
-        customOrderRef: ref,
-      });
 
       const captureOrderSnapshot = (serverData?: any) => {
         setReceiptSnapshot({
@@ -292,59 +247,85 @@ export default function GuestCheckoutModal({
         });
       };
 
-      if (payMethod === 'payhere') {
-        const hashRes = await fetch('/api/payment/payhere-hash', {
+      if (payMethod === 'card') {
+        const checkoutRes = await fetch('/api/payment/payments-lk/checkout', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ orderRef: ref, amount: finalTotal, currency: 'LKR', isGuest: true, guestEmail }),
+          body: JSON.stringify({
+            isGuest: true,
+            checkoutSource: checkoutSource || 'guest_buy_now',
+            returnPath: typeof window !== 'undefined' ? window.location.pathname : '/collections',
+            guestInfo: {
+              name: form.name.trim(),
+              email: resolvedEmail,
+              mobile: `${form.mobileCode} ${form.mobile.trim()}`,
+            },
+            items: items.map(i => ({
+              productId: i.productId,
+              colorVariant: i.colorVariant,
+              quantity: i.quantity,
+            })),
+            shippingAddress: {
+              address: form.address.trim(),
+              city: form.city.trim(),
+              postalCode: form.postalCode.trim(),
+              country: form.country,
+              mobile: form.mobile.trim(),
+              mobileCode: form.mobileCode,
+            },
+            couponCode: localCoupon?.code || null,
+            validationToken: localCoupon?.validationToken || null,
+          }),
         });
-        const hashData = await hashRes.json();
-        if (!hashData.success) throw new Error('Failed to initialise payment gateway.');
+        const checkoutData = await checkoutRes.json();
+        if (!checkoutRes.ok || !checkoutData.success || !checkoutData.data?.checkoutUrl) {
+          throw new Error(checkoutData.error || 'Failed to initiate Payments.lk checkout.');
+        }
 
-        await loadPayhereSDK();
+        const checkoutUrl = String(checkoutData.data.checkoutUrl);
+        if (!/^https:\/\/([a-z0-9-]+\.)?payments\.lk\//i.test(checkoutUrl)) {
+          throw new Error('Unexpected payment gateway URL.');
+        }
 
-        const payherePaymentId = await new Promise<string>((resolve, reject) => {
-          const payhere = (window as any).payhere;
-          payhere.onCompleted = (pId: string) => resolve(pId || ref);
-          payhere.onDismissed = () => reject(new Error('Payment was cancelled. No order was created and no charges were made.'));
-          payhere.onError = (error: string) => reject(new Error(`Payment failed: ${error}`));
-          payhere.startPayment({
-            sandbox: hashData.data.isSandbox,
-            merchant_id: hashData.data.merchantId,
-            return_url: '', cancel_url: '',
-            notify_url: `${window.location.origin}/api/payment/payhere-notify`,
-            order_id: ref,
-            items: items.map(i => i.productTitle).join(', ').slice(0, 100),
-            amount: finalTotal.toFixed(2), currency: 'LKR',
-            first_name: form.name.trim().split(' ')[0] || 'Guest',
-            last_name: form.name.trim().split(' ').slice(1).join(' ') || 'Customer',
-            email: guestEmail,
-            phone: `${form.mobileCode}${form.mobile.trim()}`.replace(/\s/g, ''),
-            address: form.address.trim(), city: form.city.trim(),
-            country: COUNTRIES.find(c => c.code === form.country)?.name || form.country,
-            hash: hashData.data.hash,
-          });
-        });
-
-        // ── Guest Order is created ONLY after payment is confirmed by PayHere ────
-        const res = await fetch('/api/orders/guest', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(buildOrderRequestBody('card', 'paid', payherePaymentId)),
-        });
-        const data = await res.json();
-        if (!data.success) throw new Error(data.error || 'Failed to place guest order.');
-
-        captureOrderSnapshot(data.data);
-        if (onOrderSuccess) onOrderSuccess(ref, form.name.trim());
-        setStep('success');
-        toast.success('Payment confirmed! Your timepiece order is placed.');
+        setOrderRef(checkoutData.data.orderRef || '');
+        isRedirecting = true;
+        toast.loading('Redirecting to Payments.lk secure checkout...');
+        window.location.assign(checkoutUrl);
+        return;
       } else {
+        const ref = orderRef || `WG-${Math.random().toString(36).slice(2, 10).toUpperCase()}`;
+        setOrderRef(ref);
+
         // ── Bank Transfer Guest Order Creation ─────────────────────────────────
         const res = await fetch('/api/orders/guest', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(buildOrderRequestBody('bank_transfer', 'pending')),
+          body: JSON.stringify({
+            guestInfo: {
+              name: form.name.trim(),
+              email: resolvedEmail,
+              mobile: `${form.mobileCode} ${form.mobile.trim()}`,
+            },
+            items: items.map(i => ({
+              productId: i.productId,
+              colorVariant: i.colorVariant,
+              quantity: i.quantity,
+            })),
+            shippingAddress: {
+              address: form.address.trim(),
+              city: form.city.trim(),
+              postalCode: form.postalCode.trim(),
+              country: form.country,
+              mobile: form.mobile.trim(),
+              mobileCode: form.mobileCode,
+            },
+            couponCode: localCoupon?.code || null,
+            validationToken: localCoupon?.validationToken || null,
+            paymentMethod: 'bank_transfer',
+            paymentStatus: 'pending',
+            checkoutSource: checkoutSource || 'guest_buy_now',
+            customOrderRef: ref,
+          }),
         });
         const data = await res.json();
         if (!data.success) throw new Error(data.error || 'Failed to place guest order.');
@@ -373,7 +354,7 @@ export default function GuestCheckoutModal({
       setBankReceiptUploading(false);
       setErrorMsg(err?.message || 'Payment failed. Please try again.');
     } finally {
-      setSubmitting(false);
+      if (!isRedirecting) setSubmitting(false);
     }
   };
 
@@ -429,8 +410,8 @@ export default function GuestCheckoutModal({
       discountPercent: receiptSnapshot?.discountPercent ?? localCoupon?.discountPercent ?? undefined,
       discountAmount: receiptSnapshot?.discountAmount ?? (localCoupon ? discountAmount : undefined),
       finalTotal: snapFinalTotal,
-      paymentMethod: payMethod === 'payhere' ? 'PayHere Card Payment' : 'Direct Bank Transfer',
-      paymentStatus: payMethod === 'payhere' ? 'paid' : 'pending',
+      paymentMethod: payMethod === 'card' ? 'Payments.lk Card Payment' : 'Direct Bank Transfer',
+      paymentStatus: payMethod === 'card' ? 'paid' : 'pending',
     });
 
     toast.success('PDF Receipt downloaded successfully!');
@@ -1248,29 +1229,29 @@ export default function GuestCheckoutModal({
 
                 <div style={{ fontSize: '10.5px', fontWeight: 600, color: '#666666', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 10 }}>Payment Method</div>
 
-                {/* Option 1: Pay via PayHere */}
+                {/* Option 1: Pay Online via Payments.lk */}
                 <div
-                  className={`gcm-pay-option ${payMethod === 'payhere' ? 'active' : ''}`}
-                  onClick={() => setPayMethod('payhere')}
+                  className={`gcm-pay-option ${payMethod === 'card' ? 'active' : ''}`}
+                  onClick={() => setPayMethod('card')}
                 >
-                  {payMethod === 'payhere' && (
+                  {payMethod === 'card' && (
                     <div className="gcm-corner-ribbon" title="Selected">
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg>
                     </div>
                   )}
-                  <div style={{ width: 18, height: 18, borderRadius: '50%', border: `1.5px solid ${payMethod === 'payhere' ? '#8B6914' : 'rgba(139,105,20,0.4)'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, background: payMethod === 'payhere' ? 'linear-gradient(135deg, #9C7A3C, #8B6914)' : 'transparent', marginTop: 1 }}>
-                    {payMethod === 'payhere' && <div style={{ width: 6, height: 6, background: '#fff', borderRadius: '50%' }} />}
+                  <div style={{ width: 18, height: 18, borderRadius: '50%', border: `1.5px solid ${payMethod === 'card' ? '#8B6914' : 'rgba(139,105,20,0.4)'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, background: payMethod === 'card' ? 'linear-gradient(135deg, #9C7A3C, #8B6914)' : 'transparent', marginTop: 1 }}>
+                    {payMethod === 'card' && <div style={{ width: 6, height: 6, background: '#fff', borderRadius: '50%' }} />}
                   </div>
                   <div style={{ flex: 1 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                       <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#8B6914" strokeWidth="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2" /><line x1="1" y1="10" x2="23" y2="10" /></svg>
-                      <span style={{ fontWeight: 600, fontSize: '13.5px', color: '#141414' }}>Pay via PayHere</span>
+                      <span style={{ fontWeight: 600, fontSize: '13.5px', color: '#141414' }}>Pay Online via Payments.lk</span>
                     </div>
                     <div style={{ fontSize: '11px', color: '#666666', marginTop: 3 }}>
-                      Visa · Mastercard · Amex · eWallet · Bank · USSD
+                      Visa · Mastercard · Amex · LankaQR · Bank Pay
                     </div>
                     <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap', marginTop: 8 }}>
-                      {['VISA', 'mastercard', 'AMEX', 'eWallets', 'BANK', 'USSD'].map((b) => (
+                      {['VISA', 'Mastercard', 'AMEX', 'LankaQR', 'Bank Pay'].map((b) => (
                         <span key={b} style={{ fontSize: '8.5px', fontWeight: 600, color: '#6B5B3E', background: '#FAF8F4', border: '1px solid rgba(139,105,20,0.18)', borderRadius: 4, padding: '1.5px 6px', textTransform: 'uppercase' }}>
                           {b}
                         </span>
@@ -1368,7 +1349,7 @@ export default function GuestCheckoutModal({
                       {bankReceiptUploading ? 'Uploading Receipt...' : 'Processing...'}
                     </>
                   ) : (
-                    payMethod === 'payhere' ? 'Pay Now via PayHere' : 'Place Order — Bank Transfer'
+                    payMethod === 'card' ? 'Continue to Payments.lk →' : 'Place Order — Bank Transfer'
                   )}
                 </button>
 
@@ -1428,7 +1409,7 @@ export default function GuestCheckoutModal({
                 </h3>
                 <p style={{ fontSize: '13px', color: '#666666', lineHeight: 1.6, margin: '0 0 12px' }}>
                   Thank you, <strong style={{ color: '#141414' }}>{form.name}</strong>.{' '}
-                  {payMethod === 'payhere' ? 'Payment confirmed. Your timepiece order is now being prepared.' : 'Your order is placed. Our team will verify your transfer within 24 hours.'}
+                  {payMethod === 'card' ? 'Payment confirmed. Your timepiece order is now being prepared.' : 'Your order is placed. Our team will verify your transfer within 24 hours.'}
                 </p>
                 {payMethod === 'bank_transfer' && (
                   <div style={{ fontSize: '11.5px', color: '#555555', background: '#FAF8F4', border: '1px solid rgba(139,105,20,0.16)', borderRadius: 10, padding: '8px 12px', marginBottom: 12, textAlign: 'left' }}>

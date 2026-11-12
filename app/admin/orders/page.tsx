@@ -22,27 +22,142 @@ export default function AdminOrdersPage() {
   const [confirmRejectOrder, setConfirmRejectOrder] = useState<IOrder | null>(null);
   const [isRejectingPayment, setIsRejectingPayment] = useState(false);
 
+  // Verification & Refresh States
+  const [verifyingPaymentId, setVerifyingPaymentId] = useState<string | null>(null);
+  const [refreshingOrders, setRefreshingOrders] = useState(false);
+
   // Filters State
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeTab, setActiveTab] = useState<'all' | 'bank_pending' | 'cancel_requested' | 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled'>('all');
+  const [activeTab, setActiveTab] = useState<'all' | 'payment_succeeded' | 'bank_pending' | 'cancel_requested' | 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled'>('all');
 
   useEffect(() => {
     fetchOrders();
   }, []);
 
-  const fetchOrders = async () => {
+  const fetchOrders = async (isManualSync = false) => {
     try {
-      const res = await fetch('/api/admin/orders', { credentials: 'include' });
+      if (isManualSync) setRefreshingOrders(true);
+      const res = await fetch('/api/admin/orders', { credentials: 'include', cache: 'no-store' });
       if (!res.ok) throw new Error('Failed to fetch orders');
       const data = await res.json();
       if (data.success) {
-        setOrders(data.data || []);
+        const fetched: IOrder[] = data.data || [];
+        setOrders(fetched);
+        setSelectedOrder((prev) =>
+          prev?._id ? fetched.find((o) => o._id === prev._id) || prev : prev
+        );
+        if (isManualSync) {
+          toast.success('Orders synchronized with Payments.lk');
+        }
       }
     } catch (error: any) {
       console.error('Error fetching orders:', error);
       toast.error('Failed to load orders');
     } finally {
       setLoading(false);
+      setRefreshingOrders(false);
+    }
+  };
+
+  // Strictly true ONLY when Payments.lk confirmed money received (no full/partial refund)
+  const isGatewayPaymentSucceeded = (order: IOrder): boolean => {
+    if (order.paymentMethod === 'bank_transfer') return false;
+    if (order.paymentProvider && order.paymentProvider !== 'payments_lk') return false;
+    if (order.paymentStatus !== 'paid') return false;
+    if (order.gatewayConfirmed !== true) return false;
+    if (!order.paymentsLkCheckoutId || !order.paymentsLkPaymentId || !order.paidAt) return false;
+    return (order.paymentsLkRefundedCents ?? 0) === 0;
+  };
+
+  const getGatewayRefundState = (order: IOrder): 'full' | 'partial' | null => {
+    if (order.paymentMethod === 'bank_transfer') return null;
+    const refunded = order.paymentsLkRefundedCents ?? 0;
+    if (refunded <= 0) return null;
+    const expected = Math.round((order.finalTotal ?? order.subtotal ?? 0) * 100);
+    return refunded >= expected && expected > 0 ? 'full' : 'partial';
+  };
+
+  const getGatewayPaymentDisplay = (order: IOrder) => {
+    const refundState = getGatewayRefundState(order);
+    if (refundState === 'full') {
+      return {
+        label: 'Refunded',
+        badgeClass: 'bg-slate-100 text-slate-700 border-slate-300',
+        dotClass: 'bg-slate-500',
+        confirmed: false,
+      };
+    }
+    if (refundState === 'partial') {
+      return {
+        label: 'Partially Refunded',
+        badgeClass: 'bg-amber-50 text-amber-800 border-amber-300',
+        dotClass: 'bg-amber-500',
+        confirmed: false,
+      };
+    }
+    if (isGatewayPaymentSucceeded(order)) {
+      return {
+        label: 'Payment Succeeded',
+        badgeClass: 'bg-emerald-50 text-emerald-800 border-emerald-300',
+        dotClass: 'bg-emerald-500',
+        confirmed: true,
+      };
+    }
+    if (order.paymentStatus === 'paid') {
+      return {
+        label: 'Unverified',
+        badgeClass: 'bg-amber-50 text-amber-800 border-amber-300',
+        dotClass: 'bg-amber-500',
+        confirmed: false,
+      };
+    }
+    if (order.paymentStatus === 'failed') {
+      return {
+        label: 'Payment Failed',
+        badgeClass: 'bg-rose-50 text-rose-700 border-rose-200',
+        dotClass: 'bg-rose-500',
+        confirmed: false,
+      };
+    }
+    return {
+      label: 'Pending Payment',
+      badgeClass: 'bg-amber-50 text-amber-700 border-amber-200',
+      dotClass: 'bg-amber-500',
+      confirmed: false,
+    };
+  };
+
+  // Live Gateway Verification against Payments.lk API
+  const handleVerifyGatewayPayment = async (order: IOrder) => {
+    if (!order._id) return;
+    try {
+      setVerifyingPaymentId(order._id);
+      const res = await fetch(`/api/admin/orders/${order._id}/verify-payment`, {
+        method: 'POST',
+        credentials: 'include',
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Failed to verify payment with Payments.lk');
+      }
+
+      if (data.data) {
+        setOrders((prev) => prev.map((o) => (o._id === order._id ? { ...o, ...data.data } : o)));
+        if (selectedOrder?._id === order._id) {
+          setSelectedOrder((prev) => (prev?._id === order._id ? { ...prev, ...data.data } : prev));
+        }
+      }
+
+      if (data.confirmed) {
+        toast.success(`Payment Succeeded confirmed for #${order.orderRef}!`);
+      } else {
+        toast(data.message || `Gateway status: ${data.gatewayStatus}`, { icon: 'ℹ️' });
+      }
+    } catch (err: any) {
+      console.error('Verify gateway payment error:', err);
+      toast.error(err.message || 'Unable to verify payment with Payments.lk');
+    } finally {
+      setVerifyingPaymentId(null);
     }
   };
 
@@ -189,7 +304,7 @@ export default function AdminOrdersPage() {
   // 📄 DOWNLOAD OFFICIAL PDF RECEIPT
   const handleDownloadReceipt = (order: IOrder) => {
     const isBank = order.paymentMethod === 'bank_transfer';
-    const isPaid = order.paymentStatus === 'paid';
+    const isPaid = isBank ? order.paymentStatus === 'paid' : isGatewayPaymentSucceeded(order);
     const resolvedMobile = order.customerMobile || order.guestMobile || `${order.shippingAddress?.mobileCode || ''} ${order.shippingAddress?.mobile || ''}`.trim() || 'N/A';
 
     generateReceiptPdf({
@@ -217,7 +332,9 @@ export default function AdminOrdersPage() {
       couponCode: order.couponCode || undefined,
       discountPercent: order.couponDiscountPercent || undefined,
       discountAmount: order.couponDiscountAmount || undefined,
-      paymentMethod: isBank ? 'Direct Bank Transfer' : 'PayHere Gateway',
+      paymentMethod: isBank
+        ? 'Direct Bank Transfer'
+        : 'Payments.lk Gateway',
       paymentStatus: isPaid ? 'paid' : 'pending',
     });
     toast.success(`Official PDF Receipt for #${order.orderRef} downloaded!`);
@@ -232,6 +349,7 @@ export default function AdminOrdersPage() {
   const metrics = useMemo(() => {
     return {
       total: orders.length,
+      paymentSucceeded: orders.filter(o => isGatewayPaymentSucceeded(o)).length,
       bankPending: orders.filter(o => o.paymentMethod === 'bank_transfer' && o.paymentStatus !== 'paid').length,
       cancelRequests: orders.filter(o => o.status === 'cancel_requested').length,
       processing: orders.filter(o => o.status === 'processing').length,
@@ -241,14 +359,18 @@ export default function AdminOrdersPage() {
       cancelled: orders.filter(o => o.status === 'cancelled').length,
       revenue: orders
         .filter(o => o.status !== 'cancelled')
-        .reduce((sum, o) => sum + (o.subtotal || 0), 0)
+        .reduce((sum, o) => sum + (o.finalTotal ?? o.subtotal ?? 0), 0)
     };
   }, [orders]);
 
   // Filtered orders
   const filteredOrders = useMemo(() => {
     return orders.filter(order => {
-      if (activeTab === 'bank_pending') {
+      if (activeTab === 'payment_succeeded') {
+        if (!isGatewayPaymentSucceeded(order)) {
+          return false;
+        }
+      } else if (activeTab === 'bank_pending') {
         if (order.paymentMethod !== 'bank_transfer' || order.paymentStatus === 'paid') {
           return false;
         }
@@ -332,9 +454,23 @@ export default function AdminOrdersPage() {
             Review client purchases, manage status transitions, and verify direct bank payments.
           </p>
         </div>
-        <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-xl border border-[#1a1209]/10 shadow-sm">
-          <span className="text-xs text-[#1a1209]/50 font-medium uppercase tracking-wider">Active Orders:</span>
-          <span className="font-bold text-[#8B6914] text-lg font-mono tabular-nums">{orders.filter(o => o.status !== 'cancelled').length}</span>
+        <div className="flex items-center gap-2.5">
+          <button
+            type="button"
+            disabled={refreshingOrders}
+            onClick={() => fetchOrders(true)}
+            className="inline-flex items-center gap-2 px-3.5 py-2.5 bg-white hover:bg-[#faf7f0] text-[#1a1209] text-xs font-semibold rounded-xl border border-[#1a1209]/15 shadow-sm transition cursor-pointer disabled:opacity-60"
+            title="Re-sync pending card orders directly with Payments.lk"
+          >
+            <svg className={`w-3.5 h-3.5 text-[#8B6914] ${refreshingOrders ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            {refreshingOrders ? 'Syncing Gateway...' : 'Sync Gateway'}
+          </button>
+          <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-xl border border-[#1a1209]/10 shadow-sm">
+            <span className="text-xs text-[#1a1209]/50 font-medium uppercase tracking-wider">Active Orders:</span>
+            <span className="font-bold text-[#8B6914] text-lg font-mono tabular-nums">{orders.filter(o => o.status !== 'cancelled').length}</span>
+          </div>
         </div>
       </div>
 
@@ -435,6 +571,7 @@ export default function AdminOrdersPage() {
         <div className="flex flex-wrap gap-2 border-t border-[#1a1209]/5 pt-3">
           {[
             { id: 'all', label: `All Orders (${metrics.total})` },
+            { id: 'payment_succeeded', label: `Payment Succeeded (${metrics.paymentSucceeded})`, confirmed: metrics.paymentSucceeded > 0 },
             { id: 'bank_pending', label: `Bank Approvals (${metrics.bankPending})`, alert: metrics.bankPending > 0 },
             { id: 'cancel_requested', label: `Cancel Requested (${metrics.cancelRequests})` },
             { id: 'pending', label: `Pending (${metrics.pending})` },
@@ -449,6 +586,8 @@ export default function AdminOrdersPage() {
               className={`px-3.5 py-1.5 text-xs font-semibold rounded-lg border transition-all cursor-pointer flex items-center gap-1.5 ${
                 activeTab === tab.id
                   ? 'bg-[#1a1209] text-[#faf7f0] border-[#1a1209] shadow-sm'
+                  : (tab as any).confirmed
+                  ? 'bg-emerald-50 text-emerald-800 border-emerald-200 hover:bg-emerald-100/70'
                   : tab.alert
                   ? 'bg-indigo-50 text-indigo-800 border-indigo-200 hover:bg-indigo-100/70'
                   : 'bg-white text-[#1a1209]/70 border-[#1a1209]/10 hover:bg-[#faf7f0]/60'
@@ -574,11 +713,11 @@ export default function AdminOrdersPage() {
                       </div>
                     </td>
                     <td className="px-6 py-4 font-bold text-[#8B6914] text-sm font-mono tabular-nums">
-                      LKR {(order.subtotal || 0).toLocaleString()}
+                      LKR {(order.finalTotal ?? order.subtotal ?? 0).toLocaleString()}
                     </td>
                     {/* Payment Method & Status Column */}
                     <td className="px-6 py-4">
-                      <div className="flex flex-col gap-1.5">
+                      <div className="flex flex-col gap-1.5 items-start">
                         {/* Payment Method Badge */}
                         {order.paymentMethod === 'bank_transfer' ? (
                           <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
@@ -592,22 +731,75 @@ export default function AdminOrdersPage() {
                             <svg className="w-3 h-3 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                             </svg>
-                            PayHere
+                            Payments.lk
                           </span>
                         )}
                         {/* Payment Status Badge */}
-                        <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold border ${
-                          order.paymentStatus === 'paid'
-                            ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                            : order.paymentStatus === 'failed'
-                            ? 'bg-rose-50 text-rose-700 border-rose-200'
-                            : 'bg-amber-50 text-amber-700 border-amber-200'
-                        }`}>
-                          <span className={`w-1.5 h-1.5 rounded-full ${
-                            order.paymentStatus === 'paid' ? 'bg-emerald-500' : order.paymentStatus === 'failed' ? 'bg-rose-500' : 'bg-amber-500'
-                          }`} />
-                          {order.paymentStatus === 'paid' ? 'Paid' : order.paymentStatus === 'failed' ? 'Failed' : 'Pending Approval'}
-                        </span>
+                        {order.paymentMethod === 'bank_transfer' ? (
+                          <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold border ${
+                            order.paymentStatus === 'paid'
+                              ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                              : order.paymentStatus === 'failed'
+                              ? 'bg-rose-50 text-rose-700 border-rose-200'
+                              : 'bg-amber-50 text-amber-700 border-amber-200'
+                          }`}>
+                            <span className={`w-1.5 h-1.5 rounded-full ${
+                              order.paymentStatus === 'paid' ? 'bg-emerald-500' : order.paymentStatus === 'failed' ? 'bg-rose-500' : 'bg-amber-500'
+                            }`} />
+                            {order.paymentStatus === 'paid'
+                              ? 'Paid'
+                              : order.paymentStatus === 'failed'
+                              ? 'Failed'
+                              : 'Pending Approval'}
+                          </span>
+                        ) : (() => {
+                          const gwDisplay = getGatewayPaymentDisplay(order);
+                          return (
+                            <>
+                              <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold border ${gwDisplay.badgeClass}`}>
+                                {gwDisplay.confirmed ? (
+                                  <svg className="w-3 h-3 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                                  </svg>
+                                ) : (
+                                  <span className={`w-1.5 h-1.5 rounded-full ${gwDisplay.dotClass}`} />
+                                )}
+                                {gwDisplay.label}
+                              </span>
+                              {gwDisplay.confirmed && (
+                                <div className="flex items-center gap-1.5 flex-wrap pl-0.5">
+                                  {(order.paymentsLkCardScheme || order.paymentsLkCardLast4) && (
+                                    <span className="text-[10px] font-mono font-semibold text-[#1a1209]/65">
+                                      {[order.paymentsLkCardScheme, order.paymentsLkCardLast4 ? `•••• ${order.paymentsLkCardLast4}` : ''].filter(Boolean).join(' ')}
+                                    </span>
+                                  )}
+                                  {order.paymentsLkMode === 'test' && (
+                                    <span className="px-1.5 py-0.5 rounded bg-amber-50 border border-amber-200 text-[9px] font-bold uppercase tracking-wider text-amber-800">
+                                      Sandbox
+                                    </span>
+                                  )}
+                                </div>
+                              )}
+                              {!gwDisplay.confirmed && order.paymentsLkCheckoutId && (
+                                <button
+                                  type="button"
+                                  disabled={verifyingPaymentId === order._id}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleVerifyGatewayPayment(order);
+                                  }}
+                                  className="inline-flex items-center gap-1 px-2 py-0.5 bg-white hover:bg-[#faf7f0] text-[#8B6914] border border-[#8B6914]/30 rounded-md text-[10px] font-semibold transition cursor-pointer disabled:opacity-50"
+                                  title="Check live payment confirmation directly from Payments.lk"
+                                >
+                                  <svg className={`w-2.5 h-2.5 ${verifyingPaymentId === order._id ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                  </svg>
+                                  {verifyingPaymentId === order._id ? 'Checking...' : 'Verify Gateway'}
+                                </button>
+                              )}
+                            </>
+                          );
+                        })()}
                         {/* Quick Approve Action for Bank Transfer Orders */}
                         {order.paymentMethod === 'bank_transfer' && order.paymentStatus !== 'paid' && (
                           <button
@@ -1060,7 +1252,7 @@ export default function AdminOrdersPage() {
                           <svg className="w-3.5 h-3.5 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                           </svg>
-                          PayHere (Card)
+                          Payments.lk (Card / QR)
                         </span>
                       )}
                     </div>
@@ -1068,27 +1260,164 @@ export default function AdminOrdersPage() {
                     {/* Payment Status Row */}
                     <div className="flex justify-between items-center border-b border-[#1a1209]/5 pb-3">
                       <span className="text-[#1a1209]/60 font-medium">Payment Status</span>
-                      <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border ${
-                        selectedOrder.paymentStatus === 'paid'
-                          ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                          : selectedOrder.paymentStatus === 'failed'
-                          ? 'bg-rose-50 text-rose-700 border-rose-200'
-                          : 'bg-amber-50 text-amber-700 border-amber-200'
-                      }`}>
-                        <span className={`w-1.5 h-1.5 rounded-full ${
-                          selectedOrder.paymentStatus === 'paid' ? 'bg-emerald-500' : selectedOrder.paymentStatus === 'failed' ? 'bg-rose-500' : 'bg-amber-500'
-                        }`} />
-                        {selectedOrder.paymentStatus === 'paid' ? 'Paid' : selectedOrder.paymentStatus === 'failed' ? 'Failed' : 'Pending'}
-                      </span>
+                      {selectedOrder.paymentMethod === 'bank_transfer' ? (
+                        <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border ${
+                          selectedOrder.paymentStatus === 'paid'
+                            ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                            : selectedOrder.paymentStatus === 'failed'
+                            ? 'bg-rose-50 text-rose-700 border-rose-200'
+                            : 'bg-amber-50 text-amber-700 border-amber-200'
+                        }`}>
+                          <span className={`w-1.5 h-1.5 rounded-full ${
+                            selectedOrder.paymentStatus === 'paid' ? 'bg-emerald-500' : selectedOrder.paymentStatus === 'failed' ? 'bg-rose-500' : 'bg-amber-500'
+                          }`} />
+                          {selectedOrder.paymentStatus === 'paid' ? 'Paid' : selectedOrder.paymentStatus === 'failed' ? 'Failed' : 'Pending'}
+                        </span>
+                      ) : (() => {
+                        const gwDisplay = getGatewayPaymentDisplay(selectedOrder);
+                        return (
+                          <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border ${gwDisplay.badgeClass}`}>
+                            {gwDisplay.confirmed ? (
+                              <svg className="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                              </svg>
+                            ) : (
+                              <span className={`w-1.5 h-1.5 rounded-full ${gwDisplay.dotClass}`} />
+                            )}
+                            {gwDisplay.label}
+                          </span>
+                        );
+                      })()}
                     </div>
 
-                    {/* PayHere Order ID */}
-                    {selectedOrder.paymentMethod !== 'bank_transfer' && selectedOrder.payhereOrderId && (
-                      <div className="flex justify-between items-center border-b border-[#1a1209]/5 pb-3">
-                        <span className="text-[#1a1209]/60 font-medium">PayHere Order ID</span>
-                        <span className="font-mono text-[#1a1209] font-semibold text-[11px] bg-white px-2 py-1 rounded border border-[#1a1209]/10">{selectedOrder.payhereOrderId}</span>
-                      </div>
-                    )}
+                    {/* Gateway Verification Details for Payments.lk Orders */}
+                    {selectedOrder.paymentMethod !== 'bank_transfer' && (() => {
+                      const confirmed = isGatewayPaymentSucceeded(selectedOrder);
+                      const refundState = getGatewayRefundState(selectedOrder);
+                      return (
+                        <div className="space-y-2.5 pt-1">
+                          {confirmed ? (
+                            <div className="p-3 bg-emerald-50/90 border border-emerald-200 rounded-xl flex items-start gap-2.5">
+                              <div className="w-6 h-6 rounded-lg bg-emerald-100 border border-emerald-300 flex items-center justify-center text-emerald-700 flex-shrink-0 mt-0.5">
+                                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                                </svg>
+                              </div>
+                              <div className="space-y-0.5 flex-1">
+                                <div className="flex items-center justify-between gap-2">
+                                  <p className="text-xs font-bold text-emerald-950">
+                                    100% Gateway Confirmed — Payment Succeeded
+                                  </p>
+                                  {selectedOrder.paymentsLkMode === 'test' && (
+                                    <span className="px-1.5 py-0.5 rounded bg-amber-100 border border-amber-300 text-[9px] font-bold uppercase tracking-wider text-amber-900">
+                                      Sandbox
+                                    </span>
+                                  )}
+                                </div>
+                                <p className="text-[11px] text-emerald-800">
+                                  Funds received and verified directly via Payments.lk API.
+                                </p>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className={`p-3 rounded-xl border text-[11px] ${
+                              refundState
+                                ? 'bg-slate-50 border-slate-200 text-slate-800'
+                                : 'bg-amber-50/80 border-amber-200 text-amber-900'
+                            }`}>
+                              <p className="font-bold">
+                                {refundState === 'full'
+                                  ? 'Payment Refunded in Full on Payments.lk'
+                                  : refundState === 'partial'
+                                  ? 'Payment Partially Refunded on Payments.lk'
+                                  : 'Funds Not Yet Confirmed by Payments.lk'}
+                              </p>
+                              <p className="mt-0.5 opacity-90">
+                                {selectedOrder.paymentFailureReason || 'Click verify below to query live settlement status directly from Payments.lk.'}
+                              </p>
+                            </div>
+                          )}
+
+                          {selectedOrder.paymentsLkPaymentId && (
+                            <div className="flex justify-between items-center border-b border-[#1a1209]/5 pb-2 gap-3">
+                              <span className="text-[#1a1209]/60 font-medium">Payments.lk Payment ID</span>
+                              <button
+                                type="button"
+                                onClick={() => copyToClipboard(selectedOrder.paymentsLkPaymentId!, 'Payment ID')}
+                                className="font-mono text-[#1a1209] font-semibold text-[11px] bg-white px-2 py-1 rounded border border-[#1a1209]/10 break-all text-right hover:border-[#8B6914]/50 transition cursor-pointer"
+                                title="Click to copy Payment ID"
+                              >
+                                {selectedOrder.paymentsLkPaymentId}
+                              </button>
+                            </div>
+                          )}
+
+                          {selectedOrder.paymentsLkCheckoutId && (
+                            <div className="flex justify-between items-center border-b border-[#1a1209]/5 pb-2 gap-3">
+                              <span className="text-[#1a1209]/60 font-medium">Payments.lk Checkout ID</span>
+                              <button
+                                type="button"
+                                onClick={() => copyToClipboard(selectedOrder.paymentsLkCheckoutId!, 'Checkout ID')}
+                                className="font-mono text-[#1a1209] font-semibold text-[11px] bg-white px-2 py-1 rounded border border-[#1a1209]/10 break-all text-right hover:border-[#8B6914]/50 transition cursor-pointer"
+                                title="Click to copy Checkout ID"
+                              >
+                                {selectedOrder.paymentsLkCheckoutId}
+                              </button>
+                            </div>
+                          )}
+
+                          {(selectedOrder.paymentsLkCardScheme || selectedOrder.paymentsLkCardLast4) && (
+                            <div className="flex justify-between items-center border-b border-[#1a1209]/5 pb-2">
+                              <span className="text-[#1a1209]/60 font-medium">Card Used</span>
+                              <span className="font-mono font-semibold text-[#1a1209]">
+                                {[selectedOrder.paymentsLkCardScheme, selectedOrder.paymentsLkCardLast4 ? `•••• ${selectedOrder.paymentsLkCardLast4}` : ''].filter(Boolean).join(' ')}
+                              </span>
+                            </div>
+                          )}
+
+                          {typeof selectedOrder.paymentsLkNetCents === 'number' && selectedOrder.paymentsLkNetCents > 0 && (
+                            <div className="flex justify-between items-center border-b border-[#1a1209]/5 pb-2">
+                              <span className="text-[#1a1209]/60 font-medium">Net Received (After Gateway Fee)</span>
+                              <span className="font-mono font-bold text-emerald-700">
+                                LKR {(selectedOrder.paymentsLkNetCents / 100).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                {typeof selectedOrder.paymentsLkFeeCents === 'number' && (
+                                  <span className="text-[10px] font-normal text-[#1a1209]/50 ml-1.5">
+                                    (Fee: LKR {(selectedOrder.paymentsLkFeeCents / 100).toFixed(2)})
+                                  </span>
+                                )}
+                              </span>
+                            </div>
+                          )}
+
+                          {selectedOrder.paidAt && (
+                            <div className="flex justify-between items-center border-b border-[#1a1209]/5 pb-2">
+                              <span className="text-[#1a1209]/60 font-medium">Payment Confirmed At</span>
+                              <span className="font-mono text-[#1a1209]">
+                                {new Date(selectedOrder.paidAt).toLocaleString()}
+                              </span>
+                            </div>
+                          )}
+
+                          {selectedOrder.paymentsLkCheckoutId && (
+                            <button
+                              type="button"
+                              disabled={verifyingPaymentId === selectedOrder._id}
+                              onClick={() => handleVerifyGatewayPayment(selectedOrder)}
+                              className="w-full py-2 bg-white hover:bg-[#faf7f0] border border-[#1a1209]/15 text-[#1a1209] text-xs font-semibold rounded-xl transition flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                            >
+                              <svg className={`w-3.5 h-3.5 text-[#8B6914] ${verifyingPaymentId === selectedOrder._id ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                              </svg>
+                              {verifyingPaymentId === selectedOrder._id
+                                ? 'Checking Payments.lk Live Status...'
+                                : confirmed
+                                ? 'Re-Verify Gateway Settlement'
+                                : 'Verify Live with Payments.lk'}
+                            </button>
+                          )}
+                        </div>
+                      );
+                    })()}
 
                     {/* Bank Transfer Receipt & Verification Panel */}
                     {selectedOrder.paymentMethod === 'bank_transfer' && (

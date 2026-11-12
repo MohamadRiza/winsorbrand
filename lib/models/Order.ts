@@ -153,17 +153,87 @@ const OrderSchema = new Schema<IOrderDocument>({
     default: 'pending',
     index: true,
   },
+  paymentProvider: {
+    type: String,
+    enum: ['payments_lk', 'bank_transfer', null],
+    default: null,
+  },
+  paymentsLkCheckoutId: {
+    type: String,
+    trim: true,
+    default: null,
+    index: true,
+  },
+  paymentsLkPaymentId: {
+    type: String,
+    trim: true,
+    default: null,
+    index: true,
+  },
+  paymentsLkEventId: {
+    type: String,
+    trim: true,
+    default: null,
+  },
+  paymentsLkMode: {
+    type: String,
+    enum: ['test', 'live', null],
+    default: null,
+  },
+  paymentsLkCardScheme: {
+    type: String,
+    trim: true,
+    default: null,
+  },
+  paymentsLkCardLast4: {
+    type: String,
+    trim: true,
+    default: null,
+  },
+  paymentsLkFeeCents: {
+    type: Number,
+    default: null,
+  },
+  paymentsLkNetCents: {
+    type: Number,
+    default: null,
+  },
+  paymentsLkRefundedCents: {
+    type: Number,
+    default: null,
+  },
+  paymentsLkVerifiedAt: {
+    type: Date,
+    default: null,
+  },
+  checkoutSource: {
+    type: String,
+    enum: ['cart', 'buy_now', 'guest_cart', 'guest_buy_now', null],
+    default: null,
+  },
+  inventoryCommitted: {
+    type: Boolean,
+    default: true,
+  },
+  couponCommitted: {
+    type: Boolean,
+    default: true,
+  },
+  paidAt: {
+    type: Date,
+    default: null,
+  },
+  paymentFailureReason: {
+    type: String,
+    trim: true,
+    default: null,
+  },
   receiptUrl: {
     type: String,
     trim: true,
     default: null,
   },
   receiptPublicId: {
-    type: String,
-    trim: true,
-    default: null,
-  },
-  payhereOrderId: {
     type: String,
     trim: true,
     default: null,

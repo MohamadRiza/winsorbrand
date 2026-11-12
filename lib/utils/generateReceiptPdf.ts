@@ -215,7 +215,7 @@ export function generateReceiptPdf(data: ReceiptData) {
   doc.setFontSize(7);
   doc.setTextColor(textGray[0], textGray[1], textGray[2]);
   doc.text(
-    isBankTransfer ? 'Direct Bank Transfer' : 'PayHere Gateway',
+    isBankTransfer ? 'Direct Bank Transfer' : 'Payments.lk Gateway',
     badgeX + (badgeW / 2),
     bannerY + 18.5,
     { align: 'center' }

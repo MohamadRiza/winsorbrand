@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAuth } from '@clerk/nextjs/server';
+import { getVerifiedClerkUserId } from '@/lib/clerkAuth';
 import { connectDB } from '@/lib/db';
 import Order from '@/lib/models/Order';
 import { uploadToCloudinary } from '@/lib/models/uploadToCloudinary';
@@ -65,16 +65,20 @@ export async function POST(req: NextRequest) {
     let order;
 
     if (!isGuest) {
-      // Signed-in user — verify via Clerk session or clerkId fallback
-      let { userId } = getAuth(req);
-      if (!userId && clerkId) {
-        userId = clerkId;
-      }
+      // Signed-in user — verify cryptographically via Clerk session
+      const userId = await getVerifiedClerkUserId(req);
 
       if (!userId) {
         return NextResponse.json(
           { success: false, error: 'Unauthorized. Please sign in.' },
           { status: 401 }
+        );
+      }
+
+      if (typeof clerkId === 'string' && clerkId && clerkId !== userId) {
+        return NextResponse.json(
+          { success: false, error: 'Account session mismatch.' },
+          { status: 403 }
         );
       }
 

@@ -71,21 +71,36 @@ export function verifyCouponToken(token: string): CouponTokenPayload | null {
   }
 }
 
+type CouponVerificationResult =
+  | {
+      ok: true;
+      couponId: string | null;
+      appliedCouponCode: string | null;
+      couponDiscountPercent: number;
+      couponDiscountAmount: number;
+      finalTotal: number;
+    }
+  | {
+      ok: false;
+      status: number;
+      error: string;
+    };
+
 /**
- * Re-verify coupon token + live MongoDB state and atomically consume one coupon usage.
- * Call BEFORE decrementing product stock so rejected coupons never leak inventory.
+ * Shared read-only coupon check: verifies JWT token, ownership, active status, expiry, and usage limit.
  */
-export async function validateAndConsumeCouponForOrder(params: {
+async function verifyCouponEligibility(params: {
   couponCode?: unknown;
   validationToken?: unknown;
   subtotal: number;
   expectedClerkId: string | null;
-}): Promise<OrderCouponResult> {
+}): Promise<CouponVerificationResult> {
   const { couponCode, validationToken, subtotal, expectedClerkId } = params;
 
   if (!couponCode && !validationToken) {
     return {
       ok: true,
+      couponId: null,
       appliedCouponCode: null,
       couponDiscountPercent: 0,
       couponDiscountAmount: 0,
@@ -155,10 +170,90 @@ export async function validateAndConsumeCouponForOrder(params: {
     };
   }
 
+  const couponDiscountPercent = coupon.discountPercent;
+  const couponDiscountAmount = Math.round((subtotal * couponDiscountPercent) / 100);
+  const finalTotal = Math.max(0, subtotal - couponDiscountAmount);
+
+  return {
+    ok: true,
+    couponId: coupon._id.toString(),
+    appliedCouponCode: coupon.code,
+    couponDiscountPercent,
+    couponDiscountAmount,
+    finalTotal,
+  };
+}
+
+/**
+ * Preview and price a coupon without incrementing usageCount (for redirect-based checkouts).
+ */
+export async function previewCouponForOrder(params: {
+  couponCode?: unknown;
+  validationToken?: unknown;
+  subtotal: number;
+  expectedClerkId: string | null;
+}): Promise<OrderCouponResult> {
+  const check = await verifyCouponEligibility(params);
+  if (!check.ok) return check;
+  return {
+    ok: true,
+    appliedCouponCode: check.appliedCouponCode,
+    couponDiscountPercent: check.couponDiscountPercent,
+    couponDiscountAmount: check.couponDiscountAmount,
+    finalTotal: check.finalTotal,
+  };
+}
+
+/**
+ * Atomically increment usageCount for an already-applied coupon code during order fulfillment.
+ */
+export async function consumeVerifiedCouponCode(couponCode: string): Promise<boolean> {
+  const cleanCode = sanitizeCouponCode(couponCode);
+  if (!cleanCode) return false;
+  const updated = await Coupon.findOneAndUpdate(
+    {
+      code: cleanCode,
+      isActive: true,
+      expiresAt: { $gt: new Date() },
+      $or: [
+        { usageLimit: null },
+        { usageLimit: { $exists: false } },
+        { $expr: { $lt: ['$usageCount', '$usageLimit'] } },
+      ],
+    } as any,
+    { $inc: { usageCount: 1 } },
+    { new: true }
+  );
+  return !!updated;
+}
+
+/**
+ * Re-verify coupon token + live MongoDB state and atomically consume one coupon usage.
+ * Call BEFORE decrementing product stock so rejected coupons never leak inventory.
+ */
+export async function validateAndConsumeCouponForOrder(params: {
+  couponCode?: unknown;
+  validationToken?: unknown;
+  subtotal: number;
+  expectedClerkId: string | null;
+}): Promise<OrderCouponResult> {
+  const check = await verifyCouponEligibility(params);
+  if (!check.ok) return check;
+
+  if (!check.couponId) {
+    return {
+      ok: true,
+      appliedCouponCode: null,
+      couponDiscountPercent: 0,
+      couponDiscountAmount: 0,
+      finalTotal: check.finalTotal,
+    };
+  }
+
   // Atomic check-and-increment guard against concurrent redemptions
   const updatedCoupon = await Coupon.findOneAndUpdate(
     {
-      _id: coupon._id,
+      _id: check.couponId,
       isActive: true,
       expiresAt: { $gt: new Date() },
       $or: [
@@ -180,8 +275,8 @@ export async function validateAndConsumeCouponForOrder(params: {
   }
 
   const couponDiscountPercent = updatedCoupon.discountPercent;
-  const couponDiscountAmount = Math.round((subtotal * couponDiscountPercent) / 100);
-  const finalTotal = Math.max(0, subtotal - couponDiscountAmount);
+  const couponDiscountAmount = Math.round((params.subtotal * couponDiscountPercent) / 100);
+  const finalTotal = Math.max(0, params.subtotal - couponDiscountAmount);
 
   return {
     ok: true,

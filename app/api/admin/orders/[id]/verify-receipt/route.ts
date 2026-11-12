@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db';
 import Order from '@/lib/models/Order';
-import Customer from '@/lib/models/Customer';
 import { verifyPermissions } from '@/lib/authHelper';
+import { enrichOrdersForAdmin } from '@/lib/orderFulfillment';
 
 // ──────────────────────────────────────────────────────────────────────────────
 // PATCH /api/admin/orders/[id]/verify-receipt
@@ -72,31 +72,7 @@ export async function PATCH(
       await order.save();
     }
 
-    // Enrich with customer profile metadata
-    const cust = order.clerkId ? await Customer.findOne({ clerkId: order.clerkId }).lean() : null;
-
-    const customerName = order.customerName
-      || order.guestName
-      || cust?.name
-      || (cust?.email ? cust.email.split('@')[0] : (order.isGuestOrder ? 'Guest Customer' : 'Registered Patron'));
-
-    const customerEmail = order.customerEmail
-      || order.guestEmail
-      || cust?.email
-      || null;
-
-    const customerMobile = order.customerMobile
-      || order.guestMobile
-      || (order.shippingAddress?.mobileCode && order.shippingAddress?.mobile
-        ? `${order.shippingAddress.mobileCode} ${order.shippingAddress.mobile}`
-        : (cust?.mobileCode && cust?.mobile ? `${cust.mobileCode} ${cust.mobile}` : null));
-
-    const enriched = {
-      ...order.toObject(),
-      customerName,
-      customerEmail,
-      customerMobile,
-    };
+    const [enriched] = await enrichOrdersForAdmin([order.toObject()]);
 
     return NextResponse.json({ success: true, data: enriched });
   } catch (error: any) {

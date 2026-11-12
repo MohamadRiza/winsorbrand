@@ -11,7 +11,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db';
 import Coupon from '@/lib/models/Coupon';
-import { getAuth } from '@clerk/nextjs/server';
+import { getVerifiedClerkUserId } from '@/lib/clerkAuth';
 import { RateLimiterMemory } from 'rate-limiter-flexible';
 import { sanitizeCouponCode, signCouponToken } from '@/lib/couponHelper';
 
@@ -23,12 +23,7 @@ const rateLimiter = new RateLimiterMemory({
 
 export async function POST(req: NextRequest) {
   // ① Resolve authenticated user if signed in (guests are also permitted)
-  let authUserId: string | null = null;
-  try {
-    authUserId = getAuth(req).userId || null;
-  } catch {
-    authUserId = null;
-  }
+  const authUserId = await getVerifiedClerkUserId(req);
 
   // ② Rate limiting by IP
   const ip =
