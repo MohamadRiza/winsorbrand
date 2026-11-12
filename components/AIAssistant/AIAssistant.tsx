@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { usePathname } from 'next/navigation';
 import Image from 'next/image';
 import toast from 'react-hot-toast';
 
@@ -114,6 +115,8 @@ function FormattedMessageText({ content }: { content: string }) {
 }
 
 export default function AIAssistant() {
+  const pathname = usePathname() || '';
+  const isProductDetailsPage = /^\/collections\/[^/]+$/.test(pathname);
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -854,12 +857,25 @@ export default function AIAssistant() {
             width: 250px;
           }
         }
+        @media (max-width: 768px) {
+          .ai-widget-trigger.ai-pdp-sticky-offset {
+            right: 14px;
+            bottom: calc(84px + env(safe-area-inset-bottom, 0px));
+            width: 48px;
+            height: 48px;
+          }
+          .wn-concierge-dropup.ai-pdp-sticky-offset {
+            right: 14px;
+            bottom: calc(144px + env(safe-area-inset-bottom, 0px));
+            width: 250px;
+          }
+        }
       `}</style>
 
       {/* DROP-UP CONCIERGE SPEED DIAL (WHATSAPP / AI) */}
       <div 
         ref={menuRef}
-        className={`wn-concierge-dropup ${isMenuOpen && !isOpen ? 'open' : ''}`}
+        className={`wn-concierge-dropup ${isMenuOpen && !isOpen ? 'open' : ''} ${isProductDetailsPage ? 'ai-pdp-sticky-offset' : ''}`}
         role="dialog"
         aria-label="Winsor Concierge Options"
         aria-hidden={!isMenuOpen || isOpen}
@@ -1000,7 +1016,7 @@ export default function AIAssistant() {
       {/* FLOATING TRIGGER BUTTON (SHOWS WINSOR LOGO FIRST WITH PING ANIMATION) */}
       <button 
         ref={triggerRef}
-        className={`ai-widget-trigger ${isOpen ? 'open' : ''} ${isMenuOpen ? 'menu-active' : ''}`}
+        className={`ai-widget-trigger ${isOpen ? 'open' : ''} ${isMenuOpen ? 'menu-active' : ''} ${isProductDetailsPage ? 'ai-pdp-sticky-offset' : ''}`}
         onClick={() => {
           if (isOpen) {
             if (currentUtterance) {

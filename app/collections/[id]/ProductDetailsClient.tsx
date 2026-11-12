@@ -515,8 +515,20 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
           display: flex;
           align-items: center;
           gap: 8px;
-          flex-wrap: wrap;
+          flex-wrap: nowrap;
+          min-width: 0;
           letter-spacing: 0.02em;
+        }
+        .pdp-breadcrumb > a,
+        .pdp-breadcrumb > span:not(:last-child) {
+          flex-shrink: 0;
+          white-space: nowrap;
+        }
+        .pdp-breadcrumb > span:last-child {
+          min-width: 0;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
         }
         .pdp-breadcrumb a {
           color: inherit;
@@ -649,21 +661,24 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
           color: rgba(20, 20, 20, 0.5);
         }
         .pdp-title {
-          font-family: 'Cormorant Garamond', serif;
-          font-size: clamp(32px, 3.4vw, 44px);
-          font-weight: 500;
-          line-height: 1.08;
+          font-family: 'Jost', 'Helvetica Neue', Arial, sans-serif;
+          font-size: clamp(24px, 2.25vw, 31px);
+          font-weight: 600;
+          line-height: 1.24;
           color: #141414;
-          margin: 0 0 6px 0;
-          letter-spacing: 0.01em;
-          overflow-wrap: anywhere;
+          margin: 0 0 8px 0;
+          letter-spacing: 0.015em;
+          overflow-wrap: break-word;
+          word-break: break-word;
         }
         .pdp-tagline {
-          font-size: 14px;
-          color: rgba(20, 20, 20, 0.62);
-          margin: 0 0 12px 0;
+          font-family: 'Jost', 'Helvetica Neue', Arial, sans-serif;
+          font-size: 13.5px;
+          line-height: 1.45;
+          color: rgba(20, 20, 20, 0.6);
+          margin: 0 0 14px 0;
           font-weight: 400;
-          letter-spacing: 0.01em;
+          letter-spacing: 0.02em;
         }
         .pdp-price {
           font-family: 'Jost', sans-serif;
@@ -1746,7 +1761,14 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
             flex-shrink: 0;
           }
           .pdp-title {
-            font-size: 32px;
+            font-size: 21px;
+            line-height: 1.28;
+            letter-spacing: 0.01em;
+            margin-bottom: 6px;
+          }
+          .pdp-tagline {
+            font-size: 12.5px;
+            margin-bottom: 12px;
           }
           .pdp-price-main {
             font-size: 25px;
@@ -1888,6 +1910,111 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
           .rev-card-editorial {
             padding: 16px;
             border-radius: 12px;
+          }
+        }
+
+        /* ── MOBILE STICKY PURCHASE BAR (<= 768px ONLY) ── */
+        .pdp-mobile-sticky-bar {
+          display: none;
+        }
+        @media (max-width: 768px) {
+          .pdp-page {
+            padding-bottom: calc(82px + env(safe-area-inset-bottom, 0px));
+          }
+          .pdp-mobile-sticky-bar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 9980;
+            padding: 10px 12px calc(10px + env(safe-area-inset-bottom, 0px));
+            background: rgba(255, 253, 249, 0.94);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border-top: 1px solid rgba(139, 105, 20, 0.24);
+            box-shadow: 0 -10px 30px rgba(20, 20, 20, 0.12);
+          }
+          .pdp-sticky-btn {
+            height: 44px;
+            border-radius: 999px;
+            font-size: 10.5px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, opacity 0.18s ease;
+            -webkit-tap-highlight-color: transparent;
+          }
+          .pdp-sticky-btn:active:not(:disabled) {
+            transform: scale(0.97);
+          }
+          .pdp-sticky-cart {
+            flex: 1 1 0;
+            min-width: 0;
+            padding: 0 10px;
+            background: #141414;
+            color: #FFFFFF;
+            border: 1px solid #141414;
+            box-shadow: 0 6px 16px rgba(20, 20, 20, 0.16);
+          }
+          .pdp-sticky-cart:disabled {
+            background: rgba(20, 20, 20, 0.16);
+            border-color: transparent;
+            color: rgba(20, 20, 20, 0.42);
+            box-shadow: none;
+            cursor: not-allowed;
+          }
+          .pdp-sticky-buy {
+            flex: 1 1 0;
+            min-width: 0;
+            padding: 0 10px;
+            background: linear-gradient(135deg, #9C7A3C 0%, #8B6914 100%);
+            color: #FFFFFF;
+            border: none;
+            box-shadow: 0 6px 18px rgba(139, 105, 20, 0.28);
+          }
+          .pdp-sticky-buy:disabled {
+            background: rgba(20, 20, 20, 0.16);
+            color: rgba(20, 20, 20, 0.42);
+            box-shadow: none;
+            cursor: not-allowed;
+          }
+          .pdp-sticky-wa {
+            flex: 0 0 auto;
+            padding: 0 12px;
+            background: #FFFFFF;
+            color: #141414;
+            border: 1px solid rgba(37, 211, 102, 0.45);
+            text-decoration: none;
+            box-shadow: 0 4px 12px rgba(20, 20, 20, 0.06);
+          }
+          .pdp-sticky-wa-dot {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: #25D366;
+            color: #FFFFFF;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+          }
+        }
+        @media (max-width: 350px) {
+          .pdp-sticky-wa {
+            width: 44px;
+            padding: 0;
+          }
+          .pdp-sticky-wa-label {
+            display: none;
           }
         }
       `}</style>
@@ -3027,6 +3154,54 @@ export default function ProductDetailsClient({ id }: ProductDetailsClientProps) 
               onClick={e => e.stopPropagation()}
               style={{ maxWidth: '90vw', maxHeight: '88vh', objectFit: 'contain', borderRadius: '12px', boxShadow: '0 32px 80px rgba(0,0,0,0.6)', cursor: 'default' }}
             />
+          </div>
+        )}
+
+        {/* ── Mobile Sticky Purchase Action Bar (<= 768px) ───────────────── */}
+        {!lightboxImg && !showGuestModal && !showBuyNowModal && (
+          <div
+            className="pdp-mobile-sticky-bar"
+            data-testid="pdp-mobile-sticky-bar"
+            role="region"
+            aria-label="Quick purchase actions"
+          >
+            <button
+              type="button"
+              onClick={handleAddToCart}
+              disabled={isSoldOut}
+              aria-label="Add to Cart"
+              className="pdp-sticky-btn pdp-sticky-cart"
+            >
+              <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" aria-hidden="true" style={{ flexShrink: 0 }}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+              </svg>
+              <span>Add to Cart</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={handleBuyNow}
+              disabled={isSoldOut}
+              aria-label={isSoldOut ? 'Out of Stock' : 'Buy Now'}
+              className="pdp-sticky-btn pdp-sticky-buy"
+            >
+              <span>{isSoldOut ? 'Sold Out' : 'Buy Now'}</span>
+            </button>
+
+            <a
+              href={whatsappContactUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Inquire via WhatsApp (+94 77 071 6212)"
+              className="pdp-sticky-btn pdp-sticky-wa"
+            >
+              <span className="pdp-sticky-wa-dot" aria-hidden="true">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M17.472 14.382c-.301-.15-1.78-.877-2.056-.977-.276-.101-.477-.15-.678.15-.2.301-.778.977-.954 1.177-.176.2-.351.226-.652.075-.302-.15-1.272-.469-2.423-1.496-.897-.801-1.503-1.79-1.68-2.091-.176-.301-.019-.464.132-.614.136-.135.302-.351.452-.527.151-.176.201-.301.302-.502.1-.2.05-.376-.025-.526-.075-.15-.678-1.633-.929-2.235-.244-.587-.492-.507-.678-.517-.176-.01-.377-.01-.578-.01s-.527.075-.802.376c-.276.301-1.054 1.03-1.054 2.511s1.079 2.911 1.23 3.112c.151.201 2.124 3.243 5.145 4.547.719.311 1.281.497 1.719.636.722.23 1.378.197 1.898.12.579-.086 1.78-.727 2.031-1.43.251-.703.251-1.305.176-1.43-.076-.126-.276-.201-.577-.351zM12.04 21.75c-1.748 0-3.46-.46-4.96-1.33l-.356-.21-3.684.966.983-3.593-.23-.367A9.774 9.774 0 0 1 2.25 12.04C2.25 6.64 6.64 2.25 12.04 2.25c2.618 0 5.079 1.02 6.93 2.871a9.754 9.754 0 0 1 2.87 6.919c0 5.4-4.39 9.71-9.8 9.71zm0-17.75a7.95 7.95 0 0 0-7.95 7.95c0 1.54.44 3.03 1.28 4.32l.21.32-.57 2.08 2.13-.56.31.18c1.25.75 2.68 1.14 4.14 1.14 4.38 0 7.95-3.57 7.95-7.95 0-2.12-.83-4.12-2.33-5.62A7.904 7.904 0 0 0 12.04 4z" />
+                </svg>
+              </span>
+              <span className="pdp-sticky-wa-label">WhatsApp</span>
+            </a>
           </div>
         )}
       </div>
