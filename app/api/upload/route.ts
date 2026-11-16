@@ -6,6 +6,9 @@ import { uploadToCloudinary } from '@/lib/models/uploadToCloudinary';
 export async function POST(req: NextRequest) {
   try {
     const { file, type, name } = await req.json();
+    if (!file || typeof file !== 'string') {
+      return NextResponse.json({ success: false, error: 'Missing file payload.' }, { status: 400 });
+    }
 
     const folderMap: Record<string, string> = {
       thumbnail:  'winsor/thumbnails',

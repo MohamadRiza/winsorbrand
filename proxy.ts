@@ -171,8 +171,8 @@ export const config = {
     // Admin routes
     '/admin/:path*',
     '/api/admin/:path*',
-    // Skip Next.js internals and all static files, unless found in search params
-    '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
+    // Skip Next.js internals, local media files (/media/*), and all static files, unless found in search params
+    '/((?!_next|media/|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest|mp4|webm|mov|pdf)).*)',
     // Always run for API routes
     '/(api|trpc)(.*)',
   ],

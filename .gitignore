@@ -52,3 +52,6 @@ node_modules/
 /blob-report/
 /playwright/.cache/
 /playwright/.auth/
+
+# Migrated media files (copy to the VPS with scp/rsync; do not commit binaries)
+/storage/
